@@ -173,7 +173,14 @@
             <button onclick='deleteMenu("\${key}")'>Sil</button>
           </div>
         \`;
-        div.onclick = () => window.location.href = item.url;
+        
+    const img = document.createElement("img");
+    img.src = item.img;
+    img.alt = item.name;
+    img.style.cursor = "pointer";
+    img.onclick = () => window.location.href = item.url;
+    div.appendChild(img);
+    
         container.appendChild(div);
       }
     });
