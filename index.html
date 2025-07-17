@@ -14,8 +14,20 @@
     .menu-item img { max-width: 60px; cursor: pointer; }
     button { margin: 5px; padding: 5px 10px; }
     input[type="text"], input[type="password"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
-    .eye-icon { position: absolute; margin-left: -30px; cursor: pointer; }
-    #login-section, #add-menu-section, #change-password-section, #disable-password-section { display: none; padding: 20px; text-align: center; }#login-section.active { display: block; margin: 40px auto; background: white; max-width: 400px; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    #login-section {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+      text-align: center;
+    }
+    #add-menu-section { display: none; padding: 20px; }
   </style>
 </head>
 <body>
@@ -24,16 +36,13 @@
   <h2>QR Menü</h2>
   <div>
     <button onclick="showLogin()">Düzenlemek İçin Şifre Gir</button>
-    
-    <button onclick="showDisablePassword()">Şifreyi Kaldır</button>
   </div>
 </header>
 
 <div class="menu-grid" id="menu-container"></div>
 
 <div id="login-section">
-  <input type="password" id="password-input" placeholder="Şifre girin" />
-  <span class="eye-icon" onclick="togglePassword()">👁️</span><br/>
+  <input type="password" id="password-input" placeholder="Şifre girin" /><br/>
   <button onclick="checkPassword()">Giriş</button>
 </div>
 
@@ -44,22 +53,9 @@
   <button onclick="addNewMenu()">Menüye Ekle</button>
 </div>
 
-<div id="change-password-section">
-  <input type="password" id="old-password" placeholder="Eski Şifre" /><br/>
-  <input type="password" id="new-password" placeholder="Yeni Şifre" /><br/>
-  <button onclick="changePassword()">Şifreyi Değiştir</button>
-</div>
-
-<div id="disable-password-section">
-  <input type="password" id="verify-password" placeholder="Şifre girin (kaldırmak için)" /><br/>
-  <button onclick="disablePassword()">Şifreyi Kaldır</button>
-</div>
-
 <script>
   let currentPassword = "1234567890";
-  let passwordDisabled = false;
-let isLoggedIn = false; // düzenleme için şifre girildiğinde true yapılır
-let currentPassword = localStorage.getItem("qrmenu_password") || "1234567890";
+  let isLoggedIn = false;
 
   const firebaseConfig = {
     apiKey: "AIzaSyAKc8xYsvoewvJFp8ms26uEFLnuclY3xr0",
@@ -75,50 +71,19 @@ let currentPassword = localStorage.getItem("qrmenu_password") || "1234567890";
   const db = firebase.database();
 
   function showLogin() {
-    document.getElementById("login-section").classList.add("active");
-  }
-
-  function togglePassword() {
-    const input = document.getElementById("password-input");
-    input.type = input.type === "password" ? "text" : "password";
+    const section = document.getElementById("login-section");
+    section.style.display = "block";
   }
 
   function checkPassword() {
     const val = document.getElementById("password-input").value;
-    if (passwordDisabled || val === currentPassword) {
-      isLoggedIn = true; document.getElementById("add-menu-section").style.display = "block"; 
+    if (val === currentPassword) {
+      isLoggedIn = true;
+      document.getElementById("add-menu-section").style.display = "block";
+      document.getElementById("login-section").style.display = "none";
+      loadMenus();
     } else {
       alert("Hatalı şifre!");
-    }
-  }
-
-  function showChangePassword() {
-    document.getElementById("change-password-section").style.display = "block";
-  }
-
-  function changePassword() {
-    const oldP = document.getElementById("old-password").value;
-    const newP = document.getElementById("new-password").value;
-    if (oldP === currentPassword && newP.length > 0) {
-      currentPassword = newP;
-      localStorage.setItem("qrmenu_password", newP);
-      alert("Şifre değiştirildi.");
-    } else {
-      alert("Eski şifre yanlış veya yeni şifre boş.");
-    }
-  }
-
-  function showDisablePassword() {
-    document.getElementById("disable-password-section").style.display = "block";
-  }
-
-  function disablePassword() {
-    const check = document.getElementById("verify-password").value;
-    if (check === currentPassword) {
-      passwordDisabled = true;
-      alert("Şifre kaldırıldı.");
-    } else {
-      alert("Şifre yanlış.");
     }
   }
 
@@ -171,26 +136,28 @@ let currentPassword = localStorage.getItem("qrmenu_password") || "1234567890";
         const title = document.createElement("div");
         title.innerText = item.name;
 
-        const editBtn = document.createElement("button");
-        editBtn.innerText = "Düzenle";
-        editBtn.onclick = (e) => {
-          e.stopPropagation();
-          editMenu(key, item);
-        };
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.innerText = "Sil";
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          deleteMenu(key);
-        };
-
         div.appendChild(img);
         div.appendChild(title);
+
         if (isLoggedIn) {
-          if (isLoggedIn) div.appendChild(editBtn);
-          if (isLoggedIn) div.appendChild(deleteBtn);
+          const editBtn = document.createElement("button");
+          editBtn.innerText = "Düzenle";
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            editMenu(key, item);
+          };
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.innerText = "Sil";
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteMenu(key);
+          };
+
+          div.appendChild(editBtn);
+          div.appendChild(deleteBtn);
         }
+
         container.appendChild(div);
       }
     });
