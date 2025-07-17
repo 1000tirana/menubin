@@ -58,6 +58,7 @@
 <script>
   let currentPassword = "1234567890";
   let passwordDisabled = false;
+let isLoggedIn = false;
 
   const firebaseConfig = {
     apiKey: "AIzaSyAKc8xYsvoewvJFp8ms26uEFLnuclY3xr0",
@@ -84,7 +85,7 @@
   function checkPassword() {
     const val = document.getElementById("password-input").value;
     if (passwordDisabled || val === currentPassword) {
-      document.getElementById("add-menu-section").style.display = "block";
+      document.getElementById("add-menu-section").style.display = "block"; isLoggedIn = true;
     } else {
       alert("Hatalı şifre!");
     }
@@ -184,8 +185,10 @@
 
         div.appendChild(img);
         div.appendChild(title);
-        div.appendChild(editBtn);
-        div.appendChild(deleteBtn);
+        if (isLoggedIn) {
+          div.appendChild(editBtn);
+          div.appendChild(deleteBtn);
+        }
         container.appendChild(div);
       }
     });
