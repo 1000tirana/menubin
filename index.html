@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Menü</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #222; color: white; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; padding: 30px; }
+    .menu-item { background: white; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+    .menu-item:hover { transform: scale(1.03); }
+    .menu-item img { max-width: 60px; height: auto; margin-bottom: 10px; }
+    .login-button { background-color: #ff6600; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+    #login-section, #add-menu-section { display: none; padding: 20px; }
+    input[type="password"], input[type="text"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
+    button { margin-top: 10px; }
+    @media(max-width: 600px) { .menu-item img { max-width: 40px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>QR Menü</h2>
+  <button class="login-button" onclick="showLogin()">Giriş Yap</button>
+</header>
+
+<div class="menu-grid" id="menu-container">
+  <div class="menu-item" onclick="window.location.href='https://ornek.com/qr-print'">
+    <img src="https://cdn-icons-png.flaticon.com/512/159/159778.png" alt="QR Print" />
+    <div>QR Print</div>
+  </div>
+  <div class="menu-item" onclick="window.location.href='https://ornek.com/qr-scan'">
+    <img src="https://cdn-icons-png.flflaticon.com/512/709/709496.png" alt="QR Scan" />
+    <div>QR Scan</div>
+  </div>
+</div>
+
+<div id="login-section">
+  <input type="password" id="password-input" placeholder="Şifre girin" />
+  <button onclick="checkPassword()">Giriş</button>
+</div>
+
+<div id="add-menu-section">
+  <input type="text" id="menu-name" placeholder="Menü Adı" /><br/>
+  <input type="text" id="menu-url" placeholder="Yönlendirme URL'si" /><br/>
+  <input type="text" id="menu-image-url" placeholder="Logo (Resim URL)" /><br/>
+  <button onclick="addNewMenu()">Menüye Ekle</button>
+</div>
+
+<script>
+  function sha256(str) {
+    const buffer = new TextEncoder('utf-8').encode(str);
+    return crypto.subtle.digest('SHA-256', buffer).then(hash => {
+      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    });
+  }
+
+  async function checkPassword() {
+    const password = document.getElementById("password-input").value;
+    const hash = await sha256(password);
+    if (hash === "9c736f6e7b2c23a7b84c670388b53dc846db89fa5d3e3361cfd4e62c6157969f") {
+      document.getElementById("add-menu-section").style.display = "block";
+    } else {
+      alert("Hatalı şifre!");
+    }
+  }
+
+  function showLogin() {
+    document.getElementById("login-section").style.display = "block";
+  }
+
+  function addNewMenu() {
+    const name = document.getElementById("menu-name").value;
+    const url = document.getElementById("menu-url").value;
+    const imgUrl = document.getElementById("menu-image-url").value;
+
+    if (!name || !url || !imgUrl) {
+      alert("Tüm alanları doldurun.");
+      return;
+    }
+
+    const newItem = {
+      name: name,
+      url: url,
+      img: imgUrl
+    };
+
+    let items = JSON.parse(localStorage.getItem("menuItems") || "[]");
+    items.push(newItem);
+    localStorage.setItem("menuItems", JSON.stringify(items));
+    appendMenuItem(newItem);
+  }
+
+  function appendMenuItem(item) {
+    const newItem = document.createElement("div");
+    newItem.className = "menu-item";
+    newItem.onclick = () => window.location.href = item.url;
+    newItem.innerHTML = \`
+      <img src="\${item.img}" alt="\${item.name}" />
+      <div>\${item.name}</div>
+    \`;
+    document.getElementById("menu-container").appendChild(newItem);
+  }
+
+  // Sayfa yüklendiğinde localStorage'dan menüleri yükle
+  window.onload = function() {
+    const items = JSON.parse(localStorage.getItem("menuItems") || "[]");
+    items.forEach(appendMenuItem);
+  };
+</script>
+
+</body>
+</html>
