@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>IMEI ve Barkod Ekleme Sistemi</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #1e1e1e;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .form-container {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        input {
+            padding: 10px;
+            font-size: 1em;
+            width: 200px;
+        }
+        button {
+            padding: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #list {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 700px;
+        }
+        .entry {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .entry span {
+            flex: 1;
+        }
+        .entry button {
+            background-color: #555;
+            margin-left: 5px;
+        }
+        .entry button:hover {
+            background-color: #777;
+        }
+        .counters {
+            display: none;
+        }
+        .scroll-buttons {
+            margin: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .download-button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>IMEI ve Barkod Ekleme Sistemi</header>
+
+    <div class="top-info" style="text-align:center; margin-top: 10px;">
+        <p id="latest-imei">Son girilen IMEI: -</p>
+        <p id="today-count">Bugün girilen IMEI sayısı: 0</p>
+        <button onclick="window.scrollTo(0, document.body.scrollHeight)">Aşağı Git</button>
+    </div>
+
+    <div class="form-container">
+        <input type="text" id="imei" placeholder="15 Haneli IMEI">
+        <button onclick="pasteIMEI()">Yapıştır IMEI</button>
+        <input type="text" id="barcode" placeholder="4 Haneli Barkod">
+        <button onclick="pasteBarcode()">Yapıştır Barkod</button>
+        <button onclick="pasteBoth()">IMEI ve Barkod Yapıştır</button>
+        <button onclick="addEntry()">Ekle</button>
+    </div>
+
+    <div id="list"></div>
+
+    <button class="download-button" onclick="downloadList()">Listeyi İndir</button>
+
+    <div class="scroll-buttons">
+        <button onclick="window.scrollTo(0, 0)">Yukarı Git</button>
+    </div>
+
+    <script>
+        let entries = JSON.parse(localStorage.getItem("entries") || "[]");
+        let todayDate = "2025-07-16";
+        let todayEntries = entries.filter(e => e.date === todayDate).length;
+
+        function isValidIMEI(imei) {
+            return /^\d{15}$/.test(imei);
+        }
+
+        function isValidBarcode(barcode) {
+            return /^[a-zA-Z0-9]{4}$/.test(barcode);
+        }
+
+        function pasteIMEI() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('imei').value = text.trim();
+            });
+        }
+
+        function pasteBarcode() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('barcode').value = text.trim();
+            });
+        }
+
+        function pasteBoth() {
+            navigator.clipboard.readText().then(text => {
+                const raw = text.trim().replace(/\s+/g, "");
+                const imeiMatch = raw.match(/\d{15}/);
+                const barcodeMatch = raw.match(/[a-zA-Z0-9]{4}/g)?.[0];
+                if (imeiMatch) document.getElementById('imei').value = imeiMatch[0];
+                if (barcodeMatch) document.getElementById('barcode').value = barcodeMatch;
+
+                setTimeout(() => {
+                    const imei = document.getElementById('imei').value.trim();
+                    const barcode = document.getElementById('barcode').value.trim();
+                    if (isValidIMEI(imei) && isValidBarcode(barcode)) {
+                        if (!entries.some(e => e.imei === imei)) {
+                            entries.push({ imei, barcode, date: todayDate });
+                            localStorage.setItem("entries", JSON.stringify(entries));
+                            todayEntries += 1;
+                            renderList();
+                        }
+                    }
+                }, 100);
+            });
+        }
+
+        function addEntry() {
+            const imei = document.getElementById('imei').value.trim();
+            const barcode = document.getElementById('barcode').value.trim();
+            if (!isValidIMEI(imei)) {
+                alert("IMEI 15 haneli rakam olmalı.");
+                return;
+            }
+            if (!isValidBarcode(barcode)) {
+                alert("Barkod 4 karakterli olmalı.");
+                return;
+            }
+            if (entries.some(e => e.imei === imei)) {
+                alert("Bu IMEI zaten mevcut.");
+                return;
+            }
+            entries.push({ imei, barcode, date: todayDate });
+            localStorage.setItem("entries", JSON.stringify(entries));
+            todayEntries += 1;
+            renderList();
+        }
+
+        function deleteEntry(index) {
+            if (entries[index].date === todayDate) todayEntries -= 1;
+            entries.splice(index, 1);
+            localStorage.setItem("entries", JSON.stringify(entries));
+            renderList();
+        }
+
+        function editEntry(index) {
+            const newIMEI = prompt("Yeni IMEI:", entries[index].imei);
+            const newBarcode = prompt("Yeni Barkod:", entries[index].barcode);
+            if (!isValidIMEI(newIMEI) || !isValidBarcode(newBarcode)) {
+                alert("Geçerli giriş girilmedi.");
+                return;
+            }
+            if (entries.some((e, i) => i !== index && e.imei === newIMEI)) {
+                alert("Bu IMEI zaten başka bir kayıtta var.");
+                return;
+            }
+            entries[index].imei = newIMEI;
+            entries[index].barcode = newBarcode;
+            localStorage.setItem("entries", JSON.stringify(entries));
+            renderList();
+        }
+
+        function downloadList() {
+            let text = entries.map((e, i) => (i+1) + ". " + e.imei + " - " + e.barcode).join("\n");
+            let blob = new Blob([text], {type: "text/plain"});
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "imei_listesi.txt";
+            a.click();
+        }
+
+        function loadFromFile() {
+            const fileInput = document.getElementById('fileUpload');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n');
+                lines.forEach(line => {
+                    const match = line.match(/\d{15}/);
+                    const barcode = line.split('-')[1]?.trim();
+                    if (match && isValidBarcode(barcode)) {
+                        const imei = match[0];
+                        if (!entries.some(e => e.imei === imei)) {
+                            entries.push({ imei, barcode, date: todayDate });
+                            if (todayDate === "2025-07-16") todayEntries += 1;
+                        }
+                    }
+                });
+                localStorage.setItem("entries", JSON.stringify(entries));
+                renderList();
+            };
+            reader.readAsText(file);
+        }
+
+        function renderList() {
+            const list = document.getElementById("list");
+            list.innerHTML = "";
+            entries.forEach((entry, index) => {
+                const div = document.createElement("div");
+                div.className = "entry";
+
+                const info = document.createElement("span");
+                info.textContent = (index + 1) + ". " + entry.imei + " - " + entry.barcode;
+
+                const buttons = document.createElement("div");
+
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Düzenle";
+                editBtn.onclick = () => editEntry(index);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "Sil";
+                deleteBtn.onclick = () => deleteEntry(index);
+
+                buttons.appendChild(editBtn);
+                buttons.appendChild(deleteBtn);
+
+                div.appendChild(info);
+                div.appendChild(buttons);
+                list.appendChild(div);
+            });
+            document.getElementById("today-count").textContent = "Bugün girilen IMEI sayısı: " + todayEntries;
+            const lastEntry = entries[entries.length - 1];
+            if (lastEntry) {
+                document.getElementById("latest-imei").textContent = "Son girilen IMEI: " + lastEntry.imei;
+            }
+        }
+
+        renderList();
+    </script>
+</body>
+</html>
