@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Menü Gelişmiş</title>
+  <title>QR Menü</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background-color: #222; color: white; }
+    body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; padding: 0; }
+    header { display: flex; justify-content: space-between; align-items: center; background: #222; color: white; padding: 15px 20px; }
     .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; padding: 30px; }
-    .menu-item { background: white; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
-    .menu-item img { max-width: 60px; height: auto; margin-bottom: 10px; }
-    .menu-buttons { margin-top: 10px; }
+    .menu-item { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+    .menu-item img { max-width: 60px; cursor: pointer; }
     button { margin: 5px; padding: 5px 10px; }
+    input[type="text"], input[type="password"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
+    .eye-icon { position: absolute; margin-left: -30px; cursor: pointer; }
     #login-section, #add-menu-section, #change-password-section, #disable-password-section { display: none; padding: 20px; }
-    input[type="password"], input[type="text"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
-    .eye-icon { position: absolute; right: 10px; top: 42px; cursor: pointer; }
-    .login-controls { display: flex; align-items: center; gap: 10px; }
-    @media(max-width: 600px) { .menu-item img { max-width: 40px; } }
   </style>
 </head>
 <body>
@@ -35,10 +32,8 @@
 <div class="menu-grid" id="menu-container"></div>
 
 <div id="login-section">
-  <div style="position: relative;">
-    <input type="password" id="password-input" placeholder="Şifre girin" />
-    <span class="eye-icon" onclick="togglePasswordVisibility()">👁️</span>
-  </div>
+  <input type="password" id="password-input" placeholder="Şifre girin" />
+  <span class="eye-icon" onclick="togglePassword()">👁️</span><br/>
   <button onclick="checkPassword()">Giriş</button>
 </div>
 
@@ -61,7 +56,7 @@
 </div>
 
 <script>
-  let currentPassword = "1234567890"; // default
+  let currentPassword = "1234567890";
   let passwordDisabled = false;
 
   const firebaseConfig = {
@@ -71,8 +66,7 @@
     projectId: "menubin-9f225",
     storageBucket: "menubin-9f225.appspot.com",
     messagingSenderId: "590812327239",
-    appId: "1:590812327239:web:e9a17620b0d524b37af062",
-    measurementId: "G-35RWNC314P"
+    appId: "1:590812327239:web:e9a17620b0d524b37af062"
   };
 
   firebase.initializeApp(firebaseConfig);
@@ -82,44 +76,44 @@
     document.getElementById("login-section").style.display = "block";
   }
 
-  function showChangePassword() {
-    document.getElementById("change-password-section").style.display = "block";
-  }
-
-  function showDisablePassword() {
-    document.getElementById("disable-password-section").style.display = "block";
-  }
-
-  function togglePasswordVisibility() {
+  function togglePassword() {
     const input = document.getElementById("password-input");
     input.type = input.type === "password" ? "text" : "password";
   }
 
   function checkPassword() {
-    const input = document.getElementById("password-input").value;
-    if (passwordDisabled || input === currentPassword) {
+    const val = document.getElementById("password-input").value;
+    if (passwordDisabled || val === currentPassword) {
       document.getElementById("add-menu-section").style.display = "block";
     } else {
       alert("Hatalı şifre!");
     }
   }
 
+  function showChangePassword() {
+    document.getElementById("change-password-section").style.display = "block";
+  }
+
   function changePassword() {
-    const oldPass = document.getElementById("old-password").value;
-    const newPass = document.getElementById("new-password").value;
-    if (oldPass === currentPassword && newPass.length > 0) {
-      currentPassword = newPass;
-      alert("Şifre güncellendi.");
+    const oldP = document.getElementById("old-password").value;
+    const newP = document.getElementById("new-password").value;
+    if (oldP === currentPassword && newP.length > 0) {
+      currentPassword = newP;
+      alert("Şifre değiştirildi.");
     } else {
       alert("Eski şifre yanlış veya yeni şifre boş.");
     }
   }
 
+  function showDisablePassword() {
+    document.getElementById("disable-password-section").style.display = "block";
+  }
+
   function disablePassword() {
-    const pass = document.getElementById("verify-password").value;
-    if (pass === currentPassword) {
+    const check = document.getElementById("verify-password").value;
+    if (check === currentPassword) {
       passwordDisabled = true;
-      alert("Şifre devre dışı bırakıldı.");
+      alert("Şifre kaldırıldı.");
     } else {
       alert("Şifre yanlış.");
     }
@@ -133,9 +127,9 @@
       alert("Tüm alanları doldurun.");
       return;
     }
-    const newItem = { name, url, img };
-    const newKey = db.ref().child('menus').push().key;
-    db.ref('menus/' + newKey).set(newItem);
+    const item = { name, url, img };
+    const key = db.ref().child("menus").push().key;
+    db.ref("menus/" + key).set(item);
     location.reload();
   }
 
@@ -144,20 +138,20 @@
     const url = prompt("Yeni URL:", item.url);
     const img = prompt("Yeni görsel URL:", item.img);
     if (name && url && img) {
-      db.ref('menus/' + key).set({ name, url, img });
+      db.ref("menus/" + key).set({ name, url, img });
       location.reload();
     }
   }
 
   function deleteMenu(key) {
-    if (confirm("Bu menüyü silmek istediğinize emin misiniz?")) {
-      db.ref('menus/' + key).remove();
+    if (confirm("Bu menüyü silmek istediğinizden emin misiniz?")) {
+      db.ref("menus/" + key).remove();
       location.reload();
     }
   }
 
   function loadMenus() {
-    db.ref('menus').once('value', snapshot => {
+    db.ref("menus").once("value", (snapshot) => {
       const container = document.getElementById("menu-container");
       container.innerHTML = "";
       const data = snapshot.val();
@@ -165,22 +159,33 @@
         const item = data[key];
         const div = document.createElement("div");
         div.className = "menu-item";
-        div.innerHTML = \`
-          <img src="\${item.img}" alt="\${item.name}" />
-          <div>\${item.name}</div>
-          <div class="menu-buttons">
-            <button onclick='editMenu("\${key}", \${JSON.stringify(item)})'>Düzenle</button>
-            <button onclick='deleteMenu("\${key}")'>Sil</button>
-          </div>
-        \`;
-        
-    const img = document.createElement("img");
-    img.src = item.img;
-    img.alt = item.name;
-    img.style.cursor = "pointer";
-    img.onclick = () => window.location.href = item.url;
-    div.appendChild(img);
-    
+
+        const img = document.createElement("img");
+        img.src = item.img;
+        img.alt = item.name;
+        img.onclick = () => window.location.href = item.url;
+
+        const title = document.createElement("div");
+        title.innerText = item.name;
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Düzenle";
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editMenu(key, item);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Sil";
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteMenu(key);
+        };
+
+        div.appendChild(img);
+        div.appendChild(title);
+        div.appendChild(editBtn);
+        div.appendChild(deleteBtn);
         container.appendChild(div);
       }
     });
