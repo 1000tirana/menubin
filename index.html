@@ -15,7 +15,7 @@
     button { margin: 5px; padding: 5px 10px; }
     input[type="text"], input[type="password"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
     .eye-icon { position: absolute; margin-left: -30px; cursor: pointer; }
-    #login-section, #add-menu-section, #change-password-section, #disable-password-section { display: none; padding: 20px; }
+    #login-section, #add-menu-section, #change-password-section, #disable-password-section { display: none; padding: 20px; text-align: center; }#login-section.active { display: block; margin: 40px auto; background: white; max-width: 400px; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
@@ -75,7 +75,7 @@ let currentPassword = localStorage.getItem("qrmenu_password") || "1234567890";
   const db = firebase.database();
 
   function showLogin() {
-    document.getElementById("login-section").style.display = "block";
+    document.getElementById("login-section").classList.add("active");
   }
 
   function togglePassword() {
