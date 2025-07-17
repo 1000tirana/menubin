@@ -23,8 +23,8 @@
 <header>
   <h2>QR Menü</h2>
   <div>
-    <button onclick="showLogin()">Giriş Yap</button>
-    <button onclick="showChangePassword()">Şifre Değiştir</button>
+    <button onclick="showLogin()">Düzenlemek İçin Şifre Gir</button>
+    
     <button onclick="showDisablePassword()">Şifreyi Kaldır</button>
   </div>
 </header>
@@ -58,7 +58,8 @@
 <script>
   let currentPassword = "1234567890";
   let passwordDisabled = false;
-let isLoggedIn = false;
+let isLoggedIn = false; // düzenleme için şifre girildiğinde true yapılır
+let currentPassword = localStorage.getItem("qrmenu_password") || "1234567890";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAKc8xYsvoewvJFp8ms26uEFLnuclY3xr0",
@@ -85,7 +86,7 @@ let isLoggedIn = false;
   function checkPassword() {
     const val = document.getElementById("password-input").value;
     if (passwordDisabled || val === currentPassword) {
-      document.getElementById("add-menu-section").style.display = "block"; isLoggedIn = true;
+      isLoggedIn = true; document.getElementById("add-menu-section").style.display = "block"; 
     } else {
       alert("Hatalı şifre!");
     }
@@ -100,6 +101,7 @@ let isLoggedIn = false;
     const newP = document.getElementById("new-password").value;
     if (oldP === currentPassword && newP.length > 0) {
       currentPassword = newP;
+      localStorage.setItem("qrmenu_password", newP);
       alert("Şifre değiştirildi.");
     } else {
       alert("Eski şifre yanlış veya yeni şifre boş.");
@@ -186,8 +188,8 @@ let isLoggedIn = false;
         div.appendChild(img);
         div.appendChild(title);
         if (isLoggedIn) {
-          div.appendChild(editBtn);
-          div.appendChild(deleteBtn);
+          if (isLoggedIn) div.appendChild(editBtn);
+          if (isLoggedIn) div.appendChild(deleteBtn);
         }
         container.appendChild(div);
       }
