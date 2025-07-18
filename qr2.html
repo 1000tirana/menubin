@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aplikacioni QR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+body {
+font-family: 'Segoe UI', sans-serif;
+margin: 0; padding: 0;
+background-color: #121212;
+color: #ffffff;
+}
+.container {
+max-width: 480px;
+margin: auto;
+padding: 20px;
+}
+h2 {
+text-align: center;
+margin-bottom: 20px;
+font-size: 24px;
+}
+#reader {
+width: 100%;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 0 10px #00e676;
+}
+.status-box {
+background: #1e1e1e;
+padding: 12px;
+border-radius: 8px;
+margin-top: 15px;
+font-size: 16px;
+text-align: center;
+border: 1px solid #333;
+}
+ul {
+list-style: decimal;
+padding: 10px;
+background: #1a1a1a;
+border-radius: 8px;
+margin-top: 20px;
+}
+li {
+margin: 6px 0;
+font-size: 16px;
+}
+button {
+width: 100%;
+padding: 14px;
+font-size: 16px;
+background: linear-gradient(45deg, #00c853, #64dd17);
+color: white;
+border: none;
+border-radius: 10px;
+margin-top: 12px;
+cursor: pointer;
+transition: background 0.3s ease;
+}
+button:hover {
+background: linear-gradient(45deg, #64dd17, #00c853);
+}
+.top-button {
+position: absolute;
+left: 20px;
+top: 20px;
+padding: 8px 16px;
+background-color: #4CAF50;
+border: none;
+color: white;
+border-radius: 4px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Skano Kodin QR</h2>
+<div id="reader"></div>
+<div class="status-box" id="lastScanned">QR i fundit: -</div>
+<ul id="qrList"></ul>
+<button onclick="copyText()">📋 Kopjo si tekst</button>
+<button onclick="shareText()">📤 Dërgo me WhatsApp</button>
+<button onclick="clearList()">🗑️ Fshini listën</button>
+</div>
+<button onclick="window.location.href='https://1000tirana.github.io/menubin/'" class="top-button">🔙 Kthehu në faqen kryesore</button>
+
+<script>
+let scannedCodes = JSON.parse(localStorage.getItem("qrList")) || [];
+const qrList = document.getElementById("qrList");
+const lastScanned = document.getElementById("lastScanned");
+
+function renderList() {
+qrList.innerHTML = "";
+scannedCodes.forEach((code, index) => {
+const li = document.createElement("li");
+li.textContent = code;
+qrList.appendChild(li);
+});
+if (scannedCodes.length > 0) {
+lastScanned.textContent = "QR i fundit: " + scannedCodes[scannedCodes.length - 1];
+}
+}
+
+function addToList(code) {
+if (scannedCodes.includes(code)) return;
+scannedCodes.push(code);
+localStorage.setItem("qrList", JSON.stringify(scannedCodes));
+renderList();
+}
+
+function getTextList() {
+return scannedCodes.map((code, i) => `${i + 1}. ${code}`).join('\n');
+}
+
+function copyText() {
+navigator.clipboard.writeText(getTextList()).then(() => {
+alert("Lista u kopjua!");
+});
+}
+
+function shareText() {
+const text = getTextList();
+const url = "https://wa.me/?text=" + encodeURIComponent(text);
+window.open(url, '_blank');
+}
+
+function clearList() {
+if (confirm("Je i sigurt që dëshiron të fshish listën?")) {
+scannedCodes = [];
+localStorage.removeItem("qrList");
+renderList();
+lastScanned.textContent = "QR i fundit: -";
+}
+}
+
+const html5QrCode = new Html5Qrcode("reader");
+html5QrCode.start(
+{ facingMode: "environment" },
+{ fps: 10, qrbox: 250 },
+text => addToList(text)
+).catch(err => console.error("Kamera nuk mund të hapet:", err));
+
+renderList();
+</script>
+</body>
+</html>
