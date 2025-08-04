@@ -2,47 +2,37 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobil OCR (Numara Tanıma)</title>
+  <title>OCR Kamera + Yeniden Tara</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    input, button, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    #output, #rawTextOutput {
-      margin-top: 20px;
-      background: #f9f9f9;
-      padding: 10px;
-      border: 1px solid #ccc;
-    }
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<style>
+body { max-width: 100%; box-sizing: border-box; }
+input, button { font-size: 16px; padding: 10px; width: 100%; margin-bottom: 10px; }
+video { width: 100%; height: auto; }
+.num-item { flex-wrap: wrap; font-size: 16px; }
+    body { font-family: Arial; padding: 20px; }
+    #output, #rawTextOutput { margin-top: 20px; background: #f4f4f4; padding: 10px; border: 1px solid #ccc; }
+    canvas { display: none; }
+    video { max-width: 100%; border: 1px solid #ccc; }
+    textarea { width: 100%; height: 100px; font-size: 14px; }
     .processing { color: orange; }
     .success { color: green; }
     .error { color: red; }
-    .num-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid #ddd;
-      font-size: 16px;
-    }
-    .num-item button {
-      font-size: 14px;
-      padding: 6px 10px;
-    }
+    .num-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .num-item button { margin-left: 10px; }
   </style>
 </head>
 <body>
-  <h2>📱 Mobil OCR - Telefon Numarası Tanı</h2>
+  <h2>📸 OCR ile Telefon Numarası Tanıma (Kamera + Yeniden Tara)</h2>
 
   <input type="file" id="imageInput" accept="image/*" multiple>
-  <button id="startBtn">📤 OCR Başlat</button>
+  <button id="startBtn">Dosyalardan Tara</button>
 
+  <h3>📷 Kameradan Çek</h3>
+  <video id="camera" autoplay playsinline></video><br>
+  <button id="captureBtn">Kameradan Fotoğraf Çek</button>
+
+  <canvas id="canvas"></canvas>
   <div id="status" class="processing"></div>
 
   <div id="output">
@@ -58,14 +48,20 @@
   <script>
     const input = document.getElementById("imageInput");
     const startBtn = document.getElementById("startBtn");
+    const camera = document.getElementById("camera");
+    const captureBtn = document.getElementById("captureBtn");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
     const list = document.getElementById("numberList");
     const rawTextArea = document.getElementById("rawText");
     const status = document.getElementById("status");
 
     let savedNumbers = JSON.parse(localStorage.getItem("phoneNumbers")) || [];
 
+    // Sayfa açılışında kaydedilmiş numaraları yükle
     window.onload = () => {
       savedNumbers.forEach(n => addToList(n));
+      startCamera();
     };
 
     function extractPhone(text) {
@@ -108,16 +104,35 @@
     async function runOCRfromFiles() {
       const files = Array.from(input.files);
       if (!files.length) return alert("Lütfen en az bir görsel seçin.");
+
       for (const file of files) {
         await runOCRonBlob(file);
       }
     }
 
+    async function captureAndProcess() {
+      canvas.width = camera.videoWidth;
+      canvas.height = camera.videoHeight;
+      ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(runOCRonBlob, 'image/png');
+    }
+
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => camera.srcObject = stream)
+        .catch(err => {
+          status.textContent = "🚫 Kamera başlatılamadı: " + err.message;
+          status.className = "error";
+        });
+    }
+
+    // Yeniden tara butonunda: sadece ham metne geri yaz
     window.reScanText = function (num) {
       rawTextArea.value = `🔁 Lütfen bu numarayı tekrar kontrol et: ${num}`;
     }
 
     startBtn.onclick = runOCRfromFiles;
+    captureBtn.onclick = captureAndProcess;
   </script>
 </body>
 </html>
