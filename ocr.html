@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobil OCR (Numara Tanıma)</title>
+  <title>Mobil OCR (Gelişmiş Formatlama)</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
     body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; }
@@ -31,7 +31,7 @@
   </style>
 </head>
 <body>
-  <h2>📱 Mobil OCR (Formatlı + Geçmişli)</h2>
+  <h2>📱 Mobil OCR (Gelişmiş Formatlama)</h2>
 
   <input type="file" id="imageInput" accept="image/*" multiple>
   <button id="startBtn">📤 OCR Başlat</button>
@@ -75,8 +75,11 @@
     }
 
     function extractPhone(text) {
-      const matches = text.match(/(?:\+90\s?)?(5\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})/g) || [];
-      return matches.map(normalizeNumber);
+      const looseMatches = text.match(/5\d{9}/g) || [];
+      const formattedMatches = text.match(/(?:\+90\s?)?(5\d{2}[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2})/g) || [];
+      const combined = [...looseMatches, ...formattedMatches];
+      const unique = [...new Set(combined)];
+      return unique.map(normalizeNumber);
     }
 
     function addToList(num) {
