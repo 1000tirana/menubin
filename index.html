@@ -1,170 +1,218 @@
-<!DOCTYPE html>
-<html lang="tr"> 
+<!doctype html>
+<html lang="sq">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>1000 MENU TIRANA</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#22c1e6" />
+  <title>1000 Studio • Ana Sayfa</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f0f0; margin: 0; padding: 0; }
-    header { display: flex; justify-content: space-between; align-items: center; background: #222; color: white; padding: 15px 20px; }
-    .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; padding: 30px; }
-    .menu-item { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
-    .menu-item img { max-width: 60px; cursor: pointer; }
-    button { margin: 5px; padding: 5px 10px; }
-    input[type="text"], input[type="password"] { padding: 8px; margin-top: 10px; width: 100%; max-width: 300px; }
-    #login-section {
-      display: none;
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      z-index: 1000;
-      text-align: center;
+    :root{--bg:#e6f5ff;--grad1:#22c1e6;--grad2:#6ee7f0;--panel:#ffffff;--text:#0f2a3a;--muted:#556b7a;--ring:rgba(34,193,230,.35);--chip:#f1f5f9}
+    @media (prefers-color-scheme: dark){
+      :root{--bg:#0b1220;--grad1:#0ea5e9;--grad2:#22d3ee;--panel:#0e1726;--text:#e7eefc;--muted:#a9b4c6;--chip:#101b2a}
     }
-    #add-menu-section { display: none; padding: 20px; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font:15.5px ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(600px 300px at 100% -10%, var(--grad2) 0%, transparent 60%),
+        radial-gradient(600px 300px at -10% 10%, var(--grad1) 0%, transparent 60%),
+        var(--bg);
+      min-height:100dvh;display:flex;flex-direction:column;
+    }
+    .wrap{width:min(1100px,92vw);margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:10;padding:env(safe-area-inset-top) 14px 12px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.65));border-bottom:1px solid #0001;backdrop-filter:saturate(140%) blur(10px)}
+    @media (prefers-color-scheme: dark){.topbar{background:linear-gradient(180deg,rgba(2,6,23,.9),rgba(2,6,23,.6));border-bottom-color:#fff2}}
+    .topbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .logo{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:900;background:radial-gradient(circle at 30% 20%,var(--grad1),var(--grad2));box-shadow:0 8px 26px rgba(34,193,230,.35)}
+    .lang{display:flex;gap:8px;align-items:center}
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #0001;background:#fff;color:#16222e;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .pill.active{outline:2px solid rgba(34,193,230,.35)}
+    @media (prefers-color-scheme: dark){.pill{background:#0f1a2a;color:#e7eefc;border-color:#fff2}}
+    .flag{font-size:14px}
+    .subtitle{margin-top:4px;color:var(--muted);font-size:12.5px}
+    .hero{margin-top:18px;background:var(--panel);border:1px solid #0001;border-radius:18px;box-shadow:0 20px 60px rgba(34,193,230,.35);padding:18px}
+    .hero-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 10px 12px}
+    .hero-title{display:flex;align-items:center;gap:8px;font-weight:800}
+    .hero-badge{padding:7px 10px;border-radius:999px;font-size:12px;background:linear-gradient(180deg,#eef8ff,#e6f3ff);color:#0f2a3a;border:1px solid #0001}
+    @media (prefers-color-scheme: dark){.hero-badge{background:#0b1625;color:#cde8ff;border-color:#fff2}}
+    .grid{display:grid;gap:14px;margin-top:10px;grid-template-columns:repeat(1,minmax(0,1fr))}
+    @media (min-width:750px){.grid{grid-template-columns:1fr 1fr 1fr}}
+    .card{position:relative;border-radius:16px;overflow:hidden;background:var(--chip);border:1px solid #0001;padding:16px;display:flex;gap:14px;align-items:center;transition:transform .18s,box-shadow .18s}
+    .card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(34,193,230,.35)}
+    .icon{width:52px;height:52px;border-radius:14px;flex:0 0 52px;background:radial-gradient(circle at 30% 20%,var(--grad1),var(--grad2));display:grid;place-items:center;color:#fff;font-size:24px;font-weight:900}
+    .card h3{margin:0 0 6px;font-size:16.5px}
+    .card p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.35}
+    .card .file{position:absolute;top:8px;right:10px;font-size:11px;opacity:.7}
+    .card a.stretch{position:absolute;inset:0;border-radius:inherit}
+    .section-title{margin:14px 6px 6px;font-weight:800;font-size:14px;color:var(--muted)}
+    .footer{opacity:.7;text-align:center;font-size:12.5px;padding:22px 12px 28px}
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="wrap topbar-row">
+      <div class="brand">
+        <div class="logo">QR</div>
+        <div>
+          <div id="t.appTitle">QR Studio</div>
+          <div class="subtitle" id="t.appSubtitle">Mjete të shpejta: QR • OCR • IMEI</div>
+        </div>
+      </div>
+      <div class="lang" role="group" aria-label="Language">
+        <button class="pill" id="btn-tr" data-lang="tr"><span class="flag">🇹🇷</span> TR</button>
+        <button class="pill active" id="btn-sq" data-lang="sq"><span class="flag">🇦🇱</span> SQ</button>
+      </div>
+    </div>
+  </header>
 
-<header>
-  <h2>1000 MENU TIRANA</h2>
-  <div>
-    <button onclick="showLogin()">Düzenlemek İçin Şifre Gir</button>
-  </div>
-</header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-header">
+        <div class="hero-title">
+          <span style="display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:linear-gradient(180deg,var(--grad1),var(--grad2));color:#fff;font-weight:900">◎</span>
+          <span id="t.heroTitle">QR Studio Pro</span>
+        </div>
+        <div class="hero-badge" id="t.badge">Parapamje fikse • 4K+ PNG</div>
+      </div>
 
-<div class="menu-grid" id="menu-container"></div>
+      <div class="section-title" id="t.tools">Mjetet</div>
+      <div class="grid">
+        <!-- qr.html -->
+        <article class="card">
+          <div class="icon">▦</div>
+          <div>
+            <h3 id="t.qr1_h">qr barkod A4 yazdır</h3>
+            <p id="t.qr1_p">Printo fletë A4 me shumë QR.</p>
+          </div>
+          <div class="file">qr.html</div>
+          <a class="stretch" href="qr.html"></a>
+        </article>
 
-<div id="login-section">
-  <input type="password" id="password-input" placeholder="Şifre girin" /><br/>
-  <button onclick="checkPassword()">Giriş</button>
-</div>
+        <!-- qr2.html -->
+        <article class="card">
+          <div class="icon">▣</div>
+          <div>
+            <h3 id="t.qr2_h">barkod listesi hazırla</h3>
+            <p id="t.qr2_p">Përgatit listë barkodesh dhe eksport.</p>
+          </div>
+          <div class="file">qr2.html</div>
+          <a class="stretch" href="qr2.html"></a>
+        </article>
 
-<div id="add-menu-section">
-  <input type="text" id="menu-name" placeholder="Menü Adı" /><br/>
-  <input type="text" id="menu-url" placeholder="Yönlendirme URL'si" /><br/>
-  <input type="text" id="menu-image-url" placeholder="Logo (Resim URL)" /><br/>
-  <button onclick="addNewMenu()">Menüye Ekle</button>
-</div>
+        <!-- qr_studio_pro_sq.html -->
+        <article class="card">
+          <div class="icon">◎</div>
+          <div>
+            <h3 id="t.qrpro_h">metin ve url den qr Üret</h3>
+            <p id="t.qrpro_p">Krijo QR nga tekst ose URL me cilësi të lartë.</p>
+          </div>
+          <div class="file">qr_studio_pro_sq.html</div>
+          <a class="stretch" href="qr_studio_pro_sq.html"></a>
+        </article>
 
-<script>
-  let currentPassword = "1234567890";
-  let isLoggedIn = false;
+        <!-- ocr.html -->
+        <article class="card">
+          <div class="icon">𐄫</div>
+          <div>
+            <h3 id="t.ocr_h">OCR (Njohje Teksti)</h3>
+            <p id="t.ocr_p">Nxirr tekst nga fotografitë dhe kopjo.</p>
+          </div>
+          <div class="file">ocr.html</div>
+          <a class="stretch" href="ocr.html"></a>
+        </article>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAKc8xYsvoewvJFp8ms26uEFLnuclY3xr0",
-    authDomain: "menubin-9f225.firebaseapp.com",
-    databaseURL: "https://menubin-9f225-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "menubin-9f225",
-    storageBucket: "menubin-9f225.appspot.com",
-    messagingSenderId: "590812327239",
-    appId: "1:590812327239:web:e9a17620b0d524b37af062"
-  };
+        <!-- imeiqrbicycle.html -->
+        <article class="card">
+          <div class="icon">🚲</div>
+          <div>
+            <h3 id="t.imei_h">IMEI • QR Bicycle</h3>
+            <p id="t.imei_p">Ndihmës për IMEI dhe QR biçikletash.</p>
+          </div>
+          <div class="file">imeiqrbicycle.html</div>
+          <a class="stretch" href="imeiqrbicycle.html"></a>
+        </article>
+      </div>
+    </section>
+  </main>
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  <footer class="footer">v1.2 • SQ default • TR/SQ geçiş</footer>
 
-  function showLogin() {
-    const section = document.getElementById("login-section");
-    section.style.display = "block";
-  }
-
-  function checkPassword() {
-    const val = document.getElementById("password-input").value;
-    if (val === currentPassword) {
-      isLoggedIn = true;
-      document.getElementById("add-menu-section").style.display = "block";
-      document.getElementById("login-section").style.display = "none";
-      loadMenus();
-    } else {
-      alert("Hatalı şifre!");
-    }
-  }
-
-  function addNewMenu() {
-    const name = document.getElementById("menu-name").value;
-    const url = document.getElementById("menu-url").value;
-    const img = document.getElementById("menu-image-url").value;
-    if (!name || !url || !img) {
-      alert("Tüm alanları doldurun.");
-      return;
-    }
-    const item = { name, url, img };
-    const key = db.ref().child("menus").push().key;
-    db.ref("menus/" + key).set(item);
-    location.reload();
-  }
-
-  function editMenu(key, item) {
-    const name = prompt("Yeni isim:", item.name);
-    const url = prompt("Yeni URL:", item.url);
-    const img = prompt("Yeni görsel URL:", item.img);
-    if (name && url && img) {
-      db.ref("menus/" + key).set({ name, url, img });
-      location.reload();
-    }
-  }
-
-  function deleteMenu(key) {
-    if (confirm("Bu menüyü silmek istediğinizden emin misiniz?")) {
-      db.ref("menus/" + key).remove();
-      location.reload();
-    }
-  }
-
-  function loadMenus() {
-    db.ref("menus").once("value", (snapshot) => {
-      const container = document.getElementById("menu-container");
-      container.innerHTML = "";
-      const data = snapshot.val();
-      for (let key in data) {
-        const item = data[key];
-        const div = document.createElement("div");
-        div.className = "menu-item";
-
-        const img = document.createElement("img");
-        img.src = item.img;
-        img.alt = item.name;
-        img.onclick = () => window.location.href = item.url;
-
-        const title = document.createElement("div");
-        title.innerText = item.name;
-
-        div.appendChild(img);
-        div.appendChild(title);
-
-        if (isLoggedIn) {
-          const editBtn = document.createElement("button");
-          editBtn.innerText = "Düzenle";
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
-            editMenu(key, item);
-          };
-
-          const deleteBtn = document.createElement("button");
-          deleteBtn.innerText = "Sil";
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteMenu(key);
-          };
-
-          div.appendChild(editBtn);
-          div.appendChild(deleteBtn);
-        }
-
-        container.appendChild(div);
+  <script>
+    // Dil sözlükleri
+    const dict = {
+      tr:{
+        appTitle:"QR Studio",
+        appSubtitle:"Hızlı araçlar: QR • OCR • IMEI",
+        heroTitle:"QR Studio Pro",
+        badge:"Sabit önizleme • 4K+ PNG",
+        tools:"Araçlar",
+        qr1_h:"qr barkod A4 yazdır",
+        qr1_p:"A4 sayfada çoklu QR yazdır.",
+        qr2_h:"barkod listesi hazırla",
+        qr2_p:"Barkod listesi oluştur ve dışa aktar.",
+        qrpro_h:"metin ve url den qr Üret",
+        qrpro_p:"Metin veya URL'den yüksek kaliteli QR üret.",
+        ocr_h:"OCR (Metin Tanıma)",
+        ocr_p:"Fotoğraflardan metni tanı ve kopyala.",
+        imei_h:"IMEI • QR Bicycle",
+        imei_p:"IMEI ve bisiklet QR işlemleri için yardımcı."
+      },
+      sq:{
+        appTitle:"QR Studio",
+        appSubtitle:"Mjete të shpejta: QR • OCR • IMEI",
+        heroTitle:"QR Studio Pro",
+        badge:"Parapamje fikse • 4K+ PNG",
+        tools:"Mjetet",
+        qr1_h:"qr barkod A4 yazdır",
+        qr1_p:"Printo faqe A4 me shumë QR.",
+        qr2_h:"barkod listesi hazırla",
+        qr2_p:"Përgatit listë barkodesh dhe eksport.",
+        qrpro_h:"metin ve url den qr Üret",
+        qrpro_p:"Krijo QR nga tekst ose URL me cilësi të lartë.",
+        ocr_h:"OCR (Njohje Teksti)",
+        ocr_p:"Nxirr tekst nga fotografitë dhe kopjo.",
+        imei_h:"IMEI • QR Bicycle",
+        imei_p:"Ndihmës për IMEI dhe QR biçikletash."
       }
-    });
-  }
+    };
 
-  window.onload = loadMenus;
-</script>
+    const els = {
+      appTitle:document.getElementById('t.appTitle'),
+      appSubtitle:document.getElementById('t.appSubtitle'),
+      heroTitle:document.getElementById('t.heroTitle'),
+      badge:document.getElementById('t.badge'),
+      tools:document.getElementById('t.tools'),
+      qr1_h:document.getElementById('t.qr1_h'),
+      qr1_p:document.getElementById('t.qr1_p'),
+      qr2_h:document.getElementById('t.qr2_h'),
+      qr2_p:document.getElementById('t.qr2_p'),
+      qrpro_h:document.getElementById('t.qrpro_h'),
+      qrpro_p:document.getElementById('t.qrpro_p'),
+      ocr_h:document.getElementById('t.ocr_h'),
+      ocr_p:document.getElementById('t.ocr_p'),
+      imei_h:document.getElementById('t.imei_h'),
+      imei_p:document.getElementById('t.imei_p')
+    };
 
+    function setLang(l){
+      const t = dict[l] || dict.sq;
+      for(const k in els){ if(els[k]) els[k].textContent = t[k]; }
+      localStorage.setItem('lang', l);
+      document.getElementById('btn-tr').classList.toggle('active', l==='tr');
+      document.getElementById('btn-sq').classList.toggle('active', l==='sq');
+      document.documentElement.lang = l;
+    }
+
+    // İlk yüklemede SQ başlat (kayıtlı tercih varsa ona saygı duy)
+    const saved = localStorage.getItem('lang');
+    setLang(saved || 'sq');
+
+    // Dil butonları
+    document.getElementById('btn-tr').addEventListener('click',()=>setLang('tr'));
+    document.getElementById('btn-sq').addEventListener('click',()=>setLang('sq'));
+  </script>
 </body>
 </html>
