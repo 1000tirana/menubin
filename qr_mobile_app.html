@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>QR Studio — Mobil Uygulama Görünümlü QR Oluşturucu</title>
+  <title>QR Studio Pro — Yüksek Kaliteli QR Oluşturucu</title>
   <meta name="theme-color" content="#0ea5e9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,8 +15,8 @@
       --card:#ffffff;
       --ink:#0f172a;
       --muted:#64748b;
-      --accent:#0ea5e9;
-      --radius:18px;
+      --radius:20px;
+      --preview: 300px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -25,245 +25,149 @@
       font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
       color:var(--ink);
       background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
-      display:flex; align-items:center; justify-content:center;
-      padding:24px;
+      display:flex; align-items:flex-start; justify-content:center;
+      padding:40px 20px 20px; /* üstte ekstra boşluk eklendi */
     }
     .app{
-      width:min(720px,100%);
+      width:min(920px,100%);
       background:var(--card);
       border-radius:28px;
-      box-shadow: 0 30px 60px rgba(0,0,0,.25), 0 10px 20px rgba(0,0,0,.12);
+      box-shadow: 0 28px 64px rgba(0,0,0,.25), 0 10px 20px rgba(0,0,0,.12);
       overflow:hidden;
     }
-    .app__topbar{
-      height:62px; display:flex; align-items:center; justify-content:space-between;
-      padding:0 18px;
-      background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    .topbar{
+      height:64px; display:flex; align-items:center; justify-content:space-between;
+      padding:0 18px; background:linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       border-bottom:1px solid #e2e8f0;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px;
-    }
-    .brand__logo{
-      width:36px;height:36px;border-radius:12px;
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800;}
+    .logo{ width:36px;height:36px;border-radius:12px; display:grid;place-items:center;color:#fff;
       background: radial-gradient(circle at 30% 30%, #38bdf8, #0ea5e9);
-      display:inline-grid; place-items:center; color:white; font-weight:800;
-      box-shadow: inset 0 0 10px rgba(255,255,255,.35);
-      font-size:18px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,.35); }
+    .badge{ font-size:12px; font-weight:700; color:#0369a1; background:#e6f4ff; padding:6px 10px; border-radius:999px;}
+    .body{ padding:16px; }
+    .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:16px; }
+    @media (max-width:840px){
+      .grid{ grid-template-columns: 1fr; }
+      :root{ --preview: 260px; }
     }
-    .app__body{ padding:18px; }
-    .card{
-      background:#ffffff;border:1px solid #e2e8f0;border-radius:var(--radius);
-      padding:16px 16px 0 16px;
-      box-shadow: 0 8px 24px rgba(14,165,233,.15);
-    }
+    .panel{ background:#fff; border:1px solid #e2e8f0; border-radius:var(--radius);
+      padding:16px; box-shadow: 0 8px 24px rgba(14,165,233,.12); }
     .row{ display:flex; gap:12px; flex-wrap:wrap; }
-    .field{flex:1 1 240px; display:flex; flex-direction:column; gap:8px;}
-    label{font-size:13px;color:var(--muted); font-weight:600; letter-spacing:.2px;}
+    .field{ flex:1 1 240px; display:flex; flex-direction:column; gap:8px; }
+    label{ font-size:13px; color:var(--muted); font-weight:600; }
     input[type="text"], select, input[type="number"], input[type="color"], input[type="range"]{
-      width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:14px 14px;
-      font-size:15px; outline:none; transition:.2s border-color, .2s box-shadow;
-      background:#fbfdff;
+      width:100%; border:1px solid #cbd5e1; border-radius:12px; padding:13px 14px;
+      font-size:15px; outline:none; transition:.2s border-color, .2s box-shadow; background:#fbfdff;
     }
     input[type="text"]:focus, select:focus, input[type="number"]:focus{
       border-color:#0ea5e9; box-shadow:0 0 0 4px rgba(14,165,233,.15);
     }
     .actions{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;}
-    button{
-      appearance:none; border:none; cursor:pointer; font-weight:700;
-      padding:14px 16px; border-radius:12px; font-size:15px;
-      transition: transform .02s ease-in-out, box-shadow .2s, background .2s;
-    }
-    .btn-primary{ background:#0ea5e9; color:#fff; box-shadow:0 6px 16px rgba(14,165,233,.3); }
-    .btn-primary:active{ transform:translateY(1px); }
-    .btn-soft{ background:#f1f5f9; color:#0f172a; }
-    .btn-danger{ background:#ef4444; color:#fff; }
-    .qr-wrap{
-      display:grid; place-items:center;
-      padding:20px; margin-top:12px; background:#f8fafc;
-      border-top:1px solid #e2e8f0; border-radius: 0 0 var(--radius) var(--radius);
-    }
-    #qr{
-      width:100%; max-width: min(520px, 100vw - 64px); aspect-ratio:1/1;
-      display:grid; place-items:center; background:#fff;
-      border-radius:18px; border:1px solid #e2e8f0;
-      box-shadow: 0 14px 36px rgba(2,6,23,.12), inset 0 0 0 10px #fff;
-      padding:12px;
-    }
-    .hint{ color:var(--muted); font-size:12px; }
-    .footer{ text-align:center; color:#e2e8f0; font-size:12px; margin-top:14px; }
-    .pill{
-      padding:6px 10px; border-radius:999px; background:#e6f4ff; color:#0369a1; display:inline-flex; align-items:center; gap:6px; font-weight:700; font-size:12px;
-    }
+    button{ appearance:none; border:none; cursor:pointer; font-weight:700; border-radius:12px;
+      padding:14px 16px; font-size:15px; transition: transform .02s, box-shadow .2s, background .2s; }
+    .primary{ background:#0ea5e9; color:#fff; box-shadow:0 6px 16px rgba(14,165,233,.3); }
+    .soft{ background:#f1f5f9; color:#0f172a; }
+    .danger{ background:#ef4444; color:#fff; }
+    .hint{ color:var(--muted); font-size:12px; margin-top:8px;}
+    .preview{ display:grid; place-items:center; background:#f8fafc; padding:16px; border:1px solid #e2e8f0;
+      border-radius:var(--radius); }
+    #qr{ width: var(--preview); height: var(--preview); background:#fff; border-radius:18px; border:1px solid #e2e8f0;
+      padding:12px; box-shadow: 0 14px 36px rgba(2,6,23,.1), inset 0 0 0 10px #fff; display:grid; place-items:center; }
+    #qr canvas, #qr img{ width: 100% !important; height: 100% !important; image-rendering: pixelated; image-rendering: crisp-edges; }
+    .footer{ text-align:center; color:#e2e8f0; font-size:12px; margin:10px 0 14px;}
   </style>
 </head>
 <body>
-  <div class="app" role="application" aria-label="QR Studio">
-    <div class="app__topbar">
-      <div class="brand"><div class="brand__logo">QR</div> QR Studio</div>
-      <div class="pill" title="Yüksek Kalite Modu">4K PNG</div>
+  <div class="app" role="application" aria-label="QR Studio Pro">
+    <div class="topbar">
+      <div class="brand"><div class="logo">QR</div> QR Studio Pro</div>
+      <div class="badge">Sabit önizleme • 4K+ PNG</div>
     </div>
-    <div class="app__body">
-      <div class="card">
-        <div class="row">
-          <div class="field" style="flex-basis:100%">
-            <label for="text">URL veya Metin</label>
-            <input id="text" type="text" placeholder="https://ornek.com veya istediğiniz metin" value="https://ornek.com"/>
+    <div class="body">
+      <div class="grid">
+        <div class="panel">
+          <div class="row">
+            <div class="field" style="flex-basis:100%">
+              <label for="text">URL veya Metin</label>
+              <input id="text" type="text" placeholder="https://ornek.com veya metin" value="https://ornek.com">
+            </div>
+            <div class="field">
+              <label for="size">Çıktı Kalitesi (px) <span id="sizeLabel" class="hint"></span></label>
+              <input id="size" type="range" min="256" max="4096" step="64" value="1024">
+            </div>
+            <div class="field">
+              <label for="ec">Hata Düzeyi (EC Level)</label>
+              <select id="ec">
+                <option value="H">H — %30</option>
+                <option value="Q">Q — %25</option>
+                <option value="M" selected>M — %15</option>
+                <option value="L">L — %7</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="margin">Kenar Boşluğu (px)</label>
+              <input id="margin" type="number" min="0" max="256" step="2" value="24">
+            </div>
+            <div class="field">
+              <label for="dark">Kare Rengi</label>
+              <input id="dark" type="color" value="#000000">
+            </div>
+            <div class="field">
+              <label for="light">Arkaplan</label>
+              <input id="light" type="color" value="#ffffff">
+            </div>
           </div>
-          <div class="field">
-            <label for="size">Boyut (px) <span id="sizeLabel" class="hint"></span></label>
-            <input id="size" type="range" min="256" max="2048" step="64" value="245" />
+          <div class="actions">
+            <button class="primary" id="generate">QR Oluştur</button>
+            <button class="soft" id="download">PNG İndir</button>
+            <button class="soft" id="copy">Panoya Kopyala</button>
+            <button class="danger" id="clear">Temizle</button>
           </div>
-          <div class="field">
-            <label for="ecLevel">Hata Düzeyi (EC Level)</label>
-            <select id="ecLevel">
-              <option value="H">H — %30</option>
-              <option value="Q">Q — %25</option>
-              <option value="M" selected>M — %15</option>
-              <option value="L">L — %7</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="margin">Kenar Boşluğu (px)</label>
-            <input id="margin" type="number" min="0" max="128" step="4" value="24" />
-          </div>
-          <div class="field">
-            <label for="dark">Kare Rengi</label>
-            <input id="dark" type="color" value="#000000" />
-          </div>
-          <div class="field">
-            <label for="light">Zemin (Açık Renk)</label>
-            <input id="light" type="color" value="#ffffff" />
-          </div>
+          <div class="hint">Not: Kaydırıcı önizleme boyutunu değiştirmez, yalnızca **indirme** kalitesini artırır.</div>
         </div>
-
-        <div class="actions">
-          <button class="btn-primary" id="generate">QR Oluştur</button>
-          <button class="btn-soft" id="download">PNG İndir</button>
-          <button class="btn-soft" id="copy">Görseli Panoya Kopyala</button>
-          <button class="btn-danger" id="clear">Temizle</button>
-        </div>
-        <div class="hint" style="margin:10px 2px 4px;">İpucu: Yüksek kalite için boyutu ↑ artırın (örn. 1024–2048 px). PNG çıktısı retina uyumludur.</div>
-
-        <div class="qr-wrap">
-          <div id="qr" aria-live="polite" aria-label="Oluşturulan QR Kod Önizlemesi">
-            <!-- QR burada görünecek -->
-          </div>
+        <div class="preview">
+          <div id="qr" aria-live="polite" aria-label="QR önizleme"></div>
         </div>
       </div>
-      <div class="footer">© QR Studio — Tek dosyalık, mobil uygulama hissiyatlı QR oluşturucu</div>
+      <div class="footer">© QR Studio Pro — Mobil ve web uyumlu tek dosyalık QR üretici</div>
     </div>
   </div>
 
-  <!-- QRCode.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
   <script>
-    const $ = (s)=>document.querySelector(s);
-    const elText = $('#text');
-    const elSize = $('#size');
-    const elSizeLabel = $('#sizeLabel');
-    const elLevel = $('#ecLevel');
-    const elMargin = $('#margin');
-    const elDark = $('#dark');
-    const elLight = $('#light');
-    const elQRWrap = $('#qr');
+    const $ = s => document.querySelector(s);
+    const elText = $('#text'), elSize = $('#size'), elSizeLabel = $('#sizeLabel'),
+          elEC = $('#ec'), elMargin = $('#margin'), elDark = $('#dark'), elLight = $('#light'), elWrap = $('#qr');
     let qrcode;
-
     function updateSizeLabel(){ elSizeLabel.textContent = '('+elSize.value+' px)'; }
-    updateSizeLabel();
-    elSize.addEventListener('input', updateSizeLabel);
-
-    function ensureUrlLike(v){
-      try{
-        new URL(v);
-        return v;
-      }catch(e){
-        if(/^[\w\-]+\.[\w\-]/.test(v)){ return 'https://'+v; }
-        return v;
-      }
-    }
-
+    elSize.addEventListener('input', updateSizeLabel); updateSizeLabel();
+    function ensureUrlLike(v){ try{ new URL(v); return v;}catch(e){ if(/^[\\w-]+\\.[\\w-]/.test(v)) return 'https://'+v; return v;}}
     function createQR(){
-      if(!window.QRCode){
-        alert('QR kitaplığı yüklenemedi.');
-        return;
-      }
-      const text = ensureUrlLike(elText.value.trim());
-      const size = parseInt(elSize.value,10);
-      const level = elLevel.value || 'M';
-      const dark = elDark.value;
-      const light = elLight.value;
-      elQRWrap.innerHTML = '';
-      qrcode = new QRCode(elQRWrap, {
-        text, width:size, height:size,
-        colorDark: dark,
-        colorLight: light,
-        correctLevel: QRCode.CorrectLevel[level] || QRCode.CorrectLevel.M
-      });
+      if(!window.QRCode) return alert('QR kitaplığı yüklenemedi.');
+      const text = ensureUrlLike(elText.value.trim()), size = parseInt(elSize.value,10),
+            level = elEC.value||'M', dark=elDark.value, light=elLight.value;
+      elWrap.innerHTML='';
+      qrcode = new QRCode(elWrap,{text,width:size,height:size,colorDark:dark,colorLight:light,correctLevel:QRCode.CorrectLevel[level]||QRCode.CorrectLevel.M});
+      const canvas=elWrap.querySelector('canvas'); if(canvas){canvas.style.width='100%';canvas.style.height='100%';}
     }
-
-    function getCanvas(){
-      const canvas = elQRWrap.querySelector('canvas');
-      if(canvas) return canvas;
-      const img = elQRWrap.querySelector('img');
-      if(!img) return null;
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = elLight.value;
-      ctx.fillRect(0,0,c.width,c.height);
-      ctx.drawImage(img,0,0);
-      return c;
-    }
-
-    function downloadPNG(){
-      const base = getCanvas();
-      if(!base){ alert('Önce bir QR oluşturun.'); return; }
-      const pad = parseInt(elMargin.value,10);
-      const out = document.createElement('canvas');
-      out.width = base.width + pad*2;
-      out.height = base.height + pad*2;
-      const ctx = out.getContext('2d');
-      ctx.fillStyle = elLight.value;
-      ctx.fillRect(0,0,out.width,out.height);
-      ctx.drawImage(base, pad, pad);
-      const a = document.createElement('a');
-      a.href = out.toDataURL('image/png');
-      a.download = 'qr.png';
-      a.click();
-    }
-
-    async function copyPNG(){
-      try{
-        const base = getCanvas();
-        if(!base){ alert('Önce bir QR oluşturun.'); return; }
-        const pad = parseInt(elMargin.value,10);
-        const out = document.createElement('canvas');
-        out.width = base.width + pad*2;
-        out.height = base.height + pad*2;
-        const ctx = out.getContext('2d');
-        ctx.fillStyle = elLight.value;
-        ctx.fillRect(0,0,out.width,out.height);
-        ctx.drawImage(base, pad, pad);
-        const blob = await new Promise(r=>out.toBlob(r,'image/png'));
-        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-        alert('QR görseli panoya kopyalandı ✅');
-      }catch(err){
-        alert('Kopyalama desteklenmiyor.');
-      }
-    }
-
-    function clearAll(){
-      elText.value = '';
-      elQRWrap.innerHTML = '';
-    }
-
+    function getCanvas(){ const c=elWrap.querySelector('canvas'); if(c) return c; const img=elWrap.querySelector('img'); if(!img) return null;
+      const cn=document.createElement('canvas'); cn.width=img.naturalWidth; cn.height=img.naturalHeight; cn.getContext('2d').drawImage(img,0,0); return cn;}
+    function exportPNG(){
+      const base=getCanvas(); if(!base) return alert('Önce QR oluşturun.'); const pad=parseInt(elMargin.value,10)||0;
+      const out=document.createElement('canvas'); out.width=base.width+pad*2; out.height=base.height+pad*2;
+      const ctx=out.getContext('2d'); ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
+      const a=document.createElement('a'); a.href=out.toDataURL('image/png'); a.download='qr-'+Date.now()+'.png'; a.click(); }
+    async function copyPNG(){ try{ const base=getCanvas(); if(!base) return alert('Önce QR oluşturun.');
+      const pad=parseInt(elMargin.value,10)||0; const out=document.createElement('canvas'); out.width=base.width+pad*2; out.height=base.height+pad*2;
+      const ctx=out.getContext('2d'); ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
+      const blob=await new Promise(r=>out.toBlob(r,'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); alert('QR kopyalandı ✅'); }
+      catch(e){ alert('Kopyalama desteklenmiyor.'); } }
+    function clearAll(){ elText.value=''; elWrap.innerHTML=''; }
     $('#generate').addEventListener('click', createQR);
-    $('#download').addEventListener('click', downloadPNG);
+    $('#download').addEventListener('click', exportPNG);
     $('#copy').addEventListener('click', copyPNG);
     $('#clear').addEventListener('click', clearAll);
-
     window.addEventListener('load', ()=> setTimeout(createQR, 120));
   </script>
 </body>
