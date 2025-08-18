@@ -26,7 +26,7 @@
       color:var(--ink);
       background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
       display:flex; align-items:flex-start; justify-content:center;
-      padding:40px 20px 20px; /* üstte ekstra boşluk eklendi */
+      padding:40px 20px 20px;
     }
     .app{
       width:min(920px,100%);
@@ -45,6 +45,15 @@
       background: radial-gradient(circle at 30% 30%, #38bdf8, #0ea5e9);
       box-shadow: inset 0 0 10px rgba(255,255,255,.35); }
     .badge{ font-size:12px; font-weight:700; color:#0369a1; background:#e6f4ff; padding:6px 10px; border-radius:999px;}
+    .lang-switch{ display:flex; gap:8px; align-items:center; }
+    .lang-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid #cbd5e1; background:#fff; padding:8px 10px;
+      border-radius:12px; cursor:pointer; font-weight:700; font-size:13px;
+      box-shadow:0 2px 6px rgba(15,23,42,.06);
+    }
+    .lang-btn.active{ outline:3px solid rgba(14,165,233,.25); border-color:#0ea5e9; }
+    .flag{ width:18px; height:18px; border-radius:3px; display:inline-block; }
     .body{ padding:16px; }
     .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:16px; }
     @media (max-width:840px){
@@ -81,23 +90,45 @@
 <body>
   <div class="app" role="application" aria-label="QR Studio Pro">
     <div class="topbar">
-      <div class="brand"><div class="logo">QR</div> QR Studio Pro</div>
-      <div class="badge">Sabit önizleme • 4K+ PNG</div>
+      <div class="brand"><div class="logo">QR</div> <span data-i18n="brand">QR Studio Pro</span></div>
+      <div class="lang-switch">
+        <span class="badge" data-i18n="badge">Sabit önizleme • 4K+ PNG</span>
+        <button class="lang-btn active" data-lang="tr" aria-label="Türkçe">
+          <span class="flag" aria-hidden="true" title="Türkiye">
+            <svg viewBox="0 0 640 480" width="18" height="18">
+              <path fill="#e30a17" d="M0 0h640v480H0z"/>
+              <path fill="#fff" d="M407 240a116 116 0 1 1-232 0 116 116 0 1 1 232 0z" transform="matrix(1.0476 0 0 1.0476 -51 -11)"/>
+              <path fill="#e30a17" d="M413 240a92 92 0 1 1-184 0 92 92 0 1 1 184 0z" transform="matrix(1.0476 0 0 1.0476 -51 -11)"/>
+              <path fill="#fff" d="m431 240-58 19 36-50-36-50 58 19 36-50v62l58 19-58 19v62z"/>
+            </svg>
+          </span>
+          TR
+        </button>
+        <button class="lang-btn " data-lang="sq" aria-label="Shqip">
+          <span class="flag" aria-hidden="true" title="Shqipëri">
+            <svg viewBox="0 0 640 480" width="18" height="18">
+              <path fill="#e41e20" d="M0 0h640v480H0z"/>
+              <path fill="#000" d="M320 110c30 0 60 40 60 40s30-40 60-40c0 40-20 70-20 70s40 10 40 30c-20 0-60 20-60 20s40 20 40 40c-30 0-60-10-60-10s10 40-20 70c-30-30-20-70-20-70s-30 10-60 10c0-20 40-40 40-40s-40-20-60-20c0-20 40-30 40-30s-20-30-20-70c30 0 60 40 60 40s30-40 60-40z"/>
+            </svg>
+          </span>
+          SQ
+        </button>
+      </div>
     </div>
     <div class="body">
       <div class="grid">
         <div class="panel">
           <div class="row">
             <div class="field" style="flex-basis:100%">
-              <label for="text">URL veya Metin</label>
-              <input id="text" type="text" placeholder="https://ornek.com veya metin" value="https://ornek.com">
+              <label for="text" data-i18n="label_text">URL veya Metin</label>
+              <input id="text" type="text" data-i18n-placeholder="ph_text" placeholder="https://ornek.com veya metin" value="https://ornek.com">
             </div>
             <div class="field">
-              <label for="size">Çıktı Kalitesi (px) <span id="sizeLabel" class="hint"></span></label>
+              <label for="size" data-i18n="label_quality">Çıktı Kalitesi (px) <span id="sizeLabel" class="hint"></span></label>
               <input id="size" type="range" min="256" max="4096" step="64" value="1024">
             </div>
             <div class="field">
-              <label for="ec">Hata Düzeyi (EC Level)</label>
+              <label for="ec" data-i18n="label_ec">Hata Düzeyi (EC Level)</label>
               <select id="ec">
                 <option value="H">H — %30</option>
                 <option value="Q">Q — %25</option>
@@ -106,31 +137,31 @@
               </select>
             </div>
             <div class="field">
-              <label for="margin">Kenar Boşluğu (px)</label>
+              <label for="margin" data-i18n="label_margin">Kenar Boşluğu (px)</label>
               <input id="margin" type="number" min="0" max="256" step="2" value="24">
             </div>
             <div class="field">
-              <label for="dark">Kare Rengi</label>
+              <label for="dark" data-i18n="label_dark">Kare Rengi</label>
               <input id="dark" type="color" value="#000000">
             </div>
             <div class="field">
-              <label for="light">Arkaplan</label>
+              <label for="light" data-i18n="label_light">Arkaplan</label>
               <input id="light" type="color" value="#ffffff">
             </div>
           </div>
           <div class="actions">
-            <button class="primary" id="generate">QR Oluştur</button>
-            <button class="soft" id="download">PNG İndir</button>
-            <button class="soft" id="copy">Panoya Kopyala</button>
-            <button class="danger" id="clear">Temizle</button>
+            <button class="primary" id="generate" data-i18n="btn_generate">QR Oluştur</button>
+            <button class="soft" id="download" data-i18n="btn_download">PNG İndir</button>
+            <button class="soft" id="copy" data-i18n="btn_copy">Panoya Kopyala</button>
+            <button class="danger" id="clear" data-i18n="btn_clear">Temizle</button>
           </div>
-          <div class="hint">Not: Kaydırıcı önizleme boyutunu değiştirmez, yalnızca **indirme** kalitesini artırır.</div>
+          <div class="hint" data-i18n="hint_quality">Not: Kaydırıcı önizleme boyutunu değiştirmez, yalnızca <b>indirme</b> kalitesini artırır.</div>
         </div>
         <div class="preview">
-          <div id="qr" aria-live="polite" aria-label="QR önizleme"></div>
+          <div id="qr" aria-live="polite" aria-label="QR preview"></div>
         </div>
       </div>
-      <div class="footer">© QR Studio Pro — Mobil ve web uyumlu tek dosyalık QR üretici</div>
+      <div class="footer" data-i18n="footer">© QR Studio Pro — Mobil ve web uyumlu tek dosyalık QR üretici</div>
     </div>
   </div>
 
@@ -139,36 +170,130 @@
     const $ = s => document.querySelector(s);
     const elText = $('#text'), elSize = $('#size'), elSizeLabel = $('#sizeLabel'),
           elEC = $('#ec'), elMargin = $('#margin'), elDark = $('#dark'), elLight = $('#light'), elWrap = $('#qr');
-    let qrcode;
-    function updateSizeLabel(){ elSizeLabel.textContent = '('+elSize.value+' px)'; }
-    elSize.addEventListener('input', updateSizeLabel); updateSizeLabel();
-    function ensureUrlLike(v){ try{ new URL(v); return v;}catch(e){ if(/^[\\w-]+\\.[\\w-]/.test(v)) return 'https://'+v; return v;}}
-    function createQR(){
-      if(!window.QRCode) return alert('QR kitaplığı yüklenemedi.');
-      const text = ensureUrlLike(elText.value.trim()), size = parseInt(elSize.value,10),
-            level = elEC.value||'M', dark=elDark.value, light=elLight.value;
-      elWrap.innerHTML='';
-      qrcode = new QRCode(elWrap,{text,width:size,height:size,colorDark:dark,colorLight:light,correctLevel:QRCode.CorrectLevel[level]||QRCode.CorrectLevel.M});
-      const canvas=elWrap.querySelector('canvas'); if(canvas){canvas.style.width='100%';canvas.style.height='100%';}
+
+    const I18N = {
+      tr: {
+        brand: "QR Studio Pro",
+        badge: "Sabit önizleme • 4K+ PNG",
+        label_text: "URL veya Metin",
+        ph_text: "https://ornek.com veya metin",
+        label_quality: "Çıktı Kalitesi (px)",
+        label_ec: "Hata Düzeyi (EC Level)",
+        label_margin: "Kenar Boşluğu (px)",
+        label_dark: "Kare Rengi",
+        label_light: "Arkaplan",
+        btn_generate: "QR Oluştur",
+        btn_download: "PNG İndir",
+        btn_copy: "Panoya Kopyala",
+        btn_clear: "Temizle",
+        hint_quality: "Not: Kaydırıcı önizleme boyutunu değiştirmez, yalnızca <b>indirme</b> kalitesini artırır.",
+        alert_lib: "QR kitaplığı yüklenemedi.",
+        alert_before: "Önce bir QR oluşturun.",
+        alert_clip: "QR görseli panoya kopyalandı ✅",
+        alert_clip_fail: "Kopyalama bu tarayıcıda desteklenmiyor.",
+        footer: "© QR Studio Pro — Mobil ve web uyumlu tek dosyalık QR üretici"
+      },
+      sq: {
+        brand: "QR Studio Pro",
+        badge: "Parashikim fiks • 4K+ PNG",
+        label_text: "URL ose Tekst",
+        ph_text: "https://shembull.com ose tekst",
+        label_quality: "Cilësia e Skedarit (px)",
+        label_ec: "Niveli i GABIMIT (EC Level)",
+        label_margin: "Hapësira Anësore (px)",
+        label_dark: "Ngjyra e Karrés",
+        label_light: "Sfondi",
+        btn_generate: "Krijo QR",
+        btn_download: "Shkarko PNG",
+        btn_copy: "Kopjo në Kujtesë",
+        btn_clear: "Pastro",
+        hint_quality: "Shënim: Rrëshqitësi nuk ndryshon madhësinë e parashikimit; rrit vetëm cilësinë e <b>shkarkimit</b>.",
+        alert_lib: "Biblioteka e QR nuk u ngarkua.",
+        alert_before: "Së pari krijoni një QR.",
+        alert_clip: "Imazhi i QR u kopjua ✅",
+        alert_clip_fail: "Kopjimi nuk mbështetet në këtë shfletues.",
+        footer: "© QR Studio Pro — Krijues QR një-skanarësh, i përshtatshëm për celular dhe web"
+      }
+    };
+
+    let currentLang = "tr";
+
+    function t(key){ return (I18N[currentLang] && I18N[currentLang][key]) || key; }
+
+    function applyI18N(){
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = t(el.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const k = el.getAttribute('data-i18n-placeholder');
+        el.setAttribute('placeholder', t(k));
+      });
+      document.title = "QR Studio Pro — " + (currentLang==='tr' ? "Yüksek Kaliteli QR Oluşturucu" : "Gjenerues QR me Cilësi të Lartë");
+      document.documentElement.lang = currentLang;
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        if(btn.getAttribute('data-lang')===currentLang) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
     }
-    function getCanvas(){ const c=elWrap.querySelector('canvas'); if(c) return c; const img=elWrap.querySelector('img'); if(!img) return null;
-      const cn=document.createElement('canvas'); cn.width=img.naturalWidth; cn.height=img.naturalHeight; cn.getContext('2d').drawImage(img,0,0); return cn;}
+
+    function updateSizeLabel(){ elSizeLabel.textContent = '('+elSize.value+' px)'; }
+    elSize.addEventListener('input', updateSizeLabel);
+
+    function ensureUrlLike(v){
+      try{ new URL(v); return v; }
+      catch(e){ if(/^[\w-]+\.[\w-]/.test(v)) return 'https://'+v; return v; }
+    }
+
+    function createQR(){
+      if(!window.QRCode){ alert(t('alert_lib')); return; }
+      const text = ensureUrlLike(elText.value.trim());
+      const size = parseInt(elSize.value,10);
+      const level = (QRCode.CorrectLevel[elEC.value] || QRCode.CorrectLevel.M);
+      elWrap.innerHTML='';
+      new QRCode(elWrap, { text, width:size, height:size, colorDark: elDark.value, colorLight: elLight.value, correctLevel: level });
+      const canvas = elWrap.querySelector('canvas'); if(canvas){ canvas.style.width='100%'; canvas.style.height='100%'; }
+    }
+
+    function getCanvas(){
+      const c=elWrap.querySelector('canvas'); if(c) return c;
+      const img=elWrap.querySelector('img'); if(!img) return null;
+      const cn=document.createElement('canvas'); cn.width=img.naturalWidth; cn.height=img.naturalHeight;
+      const ctx=cn.getContext('2d'); ctx.imageSmoothingEnabled=false; ctx.drawImage(img,0,0); return cn;
+    }
+
     function exportPNG(){
-      const base=getCanvas(); if(!base) return alert('Önce QR oluşturun.'); const pad=parseInt(elMargin.value,10)||0;
+      const base=getCanvas(); if(!base) return alert(t('alert_before'));
+      const pad=parseInt(elMargin.value,10)||0;
       const out=document.createElement('canvas'); out.width=base.width+pad*2; out.height=base.height+pad*2;
-      const ctx=out.getContext('2d'); ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
-      const a=document.createElement('a'); a.href=out.toDataURL('image/png'); a.download='qr-'+Date.now()+'.png'; a.click(); }
-    async function copyPNG(){ try{ const base=getCanvas(); if(!base) return alert('Önce QR oluşturun.');
-      const pad=parseInt(elMargin.value,10)||0; const out=document.createElement('canvas'); out.width=base.width+pad*2; out.height=base.height+pad*2;
-      const ctx=out.getContext('2d'); ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
-      const blob=await new Promise(r=>out.toBlob(r,'image/png')); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); alert('QR kopyalandı ✅'); }
-      catch(e){ alert('Kopyalama desteklenmiyor.'); } }
+      const ctx=out.getContext('2d'); ctx.imageSmoothingEnabled=false;
+      ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
+      const a=document.createElement('a'); a.href=out.toDataURL('image/png'); a.download='qr-'+Date.now()+'.png'; a.click();
+    }
+
+    async function copyPNG(){
+      try{
+        const base=getCanvas(); if(!base) return alert(t('alert_before'));
+        const pad=parseInt(elMargin.value,10)||0;
+        const out=document.createElement('canvas'); out.width=base.width+pad*2; out.height=base.height+pad*2;
+        const ctx=out.getContext('2d'); ctx.imageSmoothingEnabled=false;
+        ctx.fillStyle=elLight.value; ctx.fillRect(0,0,out.width,out.height); ctx.drawImage(base,pad,pad);
+        const blob=await new Promise(r=>out.toBlob(r,'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+        alert(t('alert_clip'));
+      }catch(e){ alert(t('alert_clip_fail')); }
+    }
+
     function clearAll(){ elText.value=''; elWrap.innerHTML=''; }
-    $('#generate').addEventListener('click', createQR);
-    $('#download').addEventListener('click', exportPNG);
-    $('#copy').addEventListener('click', copyPNG);
-    $('#clear').addEventListener('click', clearAll);
-    window.addEventListener('load', ()=> setTimeout(createQR, 120));
+
+    function setLang(lang){ currentLang = lang; applyI18N(); }
+
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.lang-btn'); if(btn) setLang(btn.getAttribute('data-lang'));
+    });
+    document.getElementById('generate').addEventListener('click', createQR);
+    document.getElementById('download').addEventListener('click', exportPNG);
+    document.getElementById('copy').addEventListener('click', copyPNG);
+    document.getElementById('clear').addEventListener('click', clearAll);
+
+    applyI18N(); updateSizeLabel(); setTimeout(createQR, 120);
   </script>
 </body>
 </html>
