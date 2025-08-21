@@ -46,9 +46,10 @@
   }
   .btn:hover{border-color:#cbd5e1}
   .btn[aria-pressed="true"]{background:#eef2ff; border-color:#c7d2fe}
-  select, input[type="color"]{
+  select, input[type="color"], input[type="number"]{
     border:1px solid #e5e7eb; background:#fff; padding:8px 10px; border-radius:8px; font-size:13px; cursor:pointer;
   }
+  input[type="number"]{ width:72px; }
   .sep{width:1px; height:28px; background:#e5e7eb; margin:0 6px}
   main{padding:24px 12px 60px; min-height:calc(100% - 56px)}
   .stage{
@@ -98,7 +99,7 @@
     main{ padding:12px 8px 40px; }
     .toolbar{ gap:6px; padding:8px; }
     .toolbar .group{ gap:4px; padding:4px; }
-    .btn, select, input[type="color"]{ padding:7px 8px; font-size:12px; }
+    .btn, select, input[type="color"], input[type="number"]{ padding:7px 8px; font-size:12px; }
   }
 
   /* Print */
@@ -140,6 +141,7 @@
         <div class="sep"></div>
 
         <label class="flex tag">Size
+          <input id="fontInput" type="number" min="8" max="72" step="1" placeholder="px" />
           <select id="fontsize">
             <option value="">—</option>
             <option value="12px">12</option>
@@ -277,7 +279,6 @@
     document.getElementById('lang-en').setAttribute('aria-pressed', String(currentLang==='en'));
     document.getElementById('lang-sq').setAttribute('aria-pressed', String(currentLang==='sq'));
     document.getElementById('lang-tr').setAttribute('aria-pressed', String(currentLang==='tr'));
-    // (Texts are English here; if needed we can re-wire i18n again.)
   }
   setLang(currentLang);
   document.getElementById('lang-en').addEventListener('click', ()=> setLang('en'));
@@ -323,34 +324,48 @@
     sel.addRange(range);
   }
 
-  /* ---- Robust font size control (no messy nested spans) ---- */
+  /* ---- Robust font size control (manual input + dropdown + step buttons) ---- */
   const sizeSelect = document.getElementById('fontsize');
+  const fontInput = document.getElementById('fontInput');
   const stepBtns = { dec: document.getElementById('btn-size-dec'), inc: document.getElementById('btn-size-inc') };
 
+  // Manual numeric input (px)
+  fontInput.addEventListener('change', e=>{
+    const v = parseInt(e.target.value, 10);
+    if (isNaN(v)) return;
+    const bounded = Math.max(8, Math.min(72, v));
+    applyFontSize(bounded + 'px');
+    sizeSelect.value = ''; // keep dropdown neutral
+    fontInput.value = bounded;
+  });
+
+  // Dropdown change
   sizeSelect.addEventListener('change', e=>{
     const size = e.target.value;
     if(!size) return;
     applyFontSize(size);
+    fontInput.value = parseInt(size,10);
   });
 
+  // Step buttons
   stepBtns.inc.addEventListener('click', ()=> stepFontSize(+2));
   stepBtns.dec.addEventListener('click', ()=> stepFontSize(-2));
 
   function stepFontSize(delta){
     const sel = getSelectionRange(); if(!sel) return;
-    // Detect current size from first block node; fallback 14
-    const blocks = getSelectedBlocks(sel);
-    const cur = getComputedStyle(blocks[0] || editor).fontSize || '14px';
-    const num = parseInt(cur,10);
-    const next = Math.max(8, Math.min(72, num + delta)) + 'px';
-    applyFontSize(next);
-    // Update dropdown approximately
-    sizeSelect.value = next;
+    // Determine current font-size from the selection start container
+    let baseNode = sel.startContainer.nodeType === 1 ? sel.startContainer : sel.startContainer.parentElement;
+    if(!baseNode) baseNode = editor;
+    const curSize = parseInt(getComputedStyle(baseNode).fontSize || '14px', 10);
+    const next = Math.max(8, Math.min(72, curSize + delta));
+    applyFontSize(next + 'px');
+    sizeSelect.value = '';
+    fontInput.value = next;
   }
 
   function applyFontSize(sizePx){
     const sel = getSelectionRange(); if(!sel) return;
-    // Extract contents to sanitize font-size styles, then wrap in a clean span sized
+    // Clone selected contents and strip previous font-size to avoid nesting conflicts
     const frag = sel.cloneContents();
     sanitizeFontSize(frag);
     const span = document.createElement('span');
@@ -393,43 +408,6 @@
     const sel = window.getSelection();
     if(!sel || sel.rangeCount===0) return null;
     return sel.getRangeAt(0);
-  }
-
-  function getSelectedBlocks(range){
-    // Collect unique ancestor blocks in selection
-    const blocks = new Set();
-    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-      acceptNode(node){
-        if(node===editor) return NodeFilter.FILTER_SKIP;
-        const r = document.createRange();
-        try{
-          r.selectNode(node);
-        }catch(e){
-          r.selectNodeContents(node);
-        }
-        const intersects = range.compareBoundaryPoints(Range.END_TO_START, r) < 0 &&
-                           range.compareBoundaryPoints(Range.START_TO_END, r) > 0;
-        if(!intersects) return NodeFilter.FILTER_SKIP;
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    });
-    while(walker.nextNode()){
-      const n = walker.currentNode.nodeType===1 ? walker.currentNode : walker.currentNode.parentElement;
-      const blk = findBlockAncestor(n);
-      if(blk) blocks.add(blk);
-    }
-    return Array.from(blocks);
-  }
-
-  function findBlockAncestor(el){
-    while(el && el!==editor){
-      const disp = getComputedStyle(el).display;
-      if(disp==='block' || disp==='list-item' || /^h[1-6]$/i.test(el.tagName) || el.tagName==='P' || el.tagName==='LI' || el.tagName==='BLOCKQUOTE'){
-        return el;
-      }
-      el = el.parentElement;
-    }
-    return null;
   }
 
   /* ---- Colors & misc ---- */
@@ -529,7 +507,7 @@
     }
   });
 
-  // Paste as plain text option (prevents messy HTML from web/Word)
+  // Paste as plain text option
   document.getElementById('paste-clean').addEventListener('change', e=>{
     const clean = e.target.checked;
     if(clean){
