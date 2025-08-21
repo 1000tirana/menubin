@@ -3,105 +3,661 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Wordlike Editor</title>
+<title>Simple Word Page — Online Editor</title>
 <style>
   :root{
-    --page-w:210mm;
-    --page-h:297mm;
-    --page-margin:20mm;
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --ink:#111;
+    --muted:#6b7280;
+    --accent:#2563eb;
+    --page-w: 210mm; /* A4 screen width */
+    --page-h: 297mm;
+    --page-margin: 20mm;
+    --ph: "Start typing here...";
   }
-  body{margin:0;font-family:sans-serif;background:#f4f6f8}
-  header{position:sticky;top:0;background:#fff;padding:6px;border-bottom:1px solid #ddd}
-  .toolbar{display:flex;flex-wrap:wrap;gap:6px}
-  .btn,select,input[type=number],input[type=color]{
-    padding:6px 8px;font-size:13px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    color:var(--ink);
+    background:linear-gradient(180deg,#e9eef5, #f8fafc);
   }
-  .page{background:#fff;width:var(--page-w);min-height:var(--page-h);margin:20px auto;padding:var(--page-margin);box-shadow:0 2px 6px rgba(0,0,0,.1)}
-  #editor[contenteditable=true]{outline:none}
-  @media print{
-    header{display:none}
-    .page{box-shadow:none;border:none;margin:0}
+  header{
+    position:sticky; top:0; z-index:10;
+    backdrop-filter: blur(6px);
+    background:rgba(255,255,255,0.85);
+    border-bottom:1px solid #e5e7eb;
   }
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    max-width:1200px; margin:0 auto; padding:10px 12px;
+    overflow-x:auto; overscroll-behavior-inline:contain;
+  }
+  .toolbar .group{
+    display:flex; gap:6px; align-items:center; flex-wrap:wrap;
+    padding:6px; background:#fff; border:1px solid #e5e7eb; border-radius:10px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.02);
+  }
+  .btn{
+    appearance:none; border:1px solid #e5e7eb; background:#fff; color:#111;
+    padding:8px 10px; border-radius:8px; cursor:pointer; font-size:13px; white-space:nowrap;
+  }
+  .btn:hover{border-color:#cbd5e1}
+  .btn[aria-pressed="true"]{background:#eef2ff; border-color:#c7d2fe}
+  select, input[type="color"]{
+    border:1px solid #e5e7eb; background:#fff; padding:8px 10px; border-radius:8px; font-size:13px; cursor:pointer;
+  }
+  .sep{width:1px; height:28px; background:#e5e7eb; margin:0 6px}
+  main{padding:24px 12px 60px; min-height:calc(100% - 56px)}
+  .stage{
+    display:flex; justify-content:center; align-items:flex-start; gap:24px; flex-wrap:wrap;
+    max-width:1200px; margin:0 auto;
+  }
+  .page-wrap{ width:var(--page-w); max-width:100%; }
+  .page{
+    background:var(--panel);
+    width:var(--page-w); min-height:var(--page-h);
+    padding: var(--page-margin);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.7) inset;
+    overflow: visible;
+  }
+  #editor[contenteditable="true"]{outline:none}
+  #editor:empty:before{
+    content: var(--ph, "Start typing here...");
+    color:#9ca3af;
+  }
+  #editor img{max-width:100%; height:auto}
+  blockquote{border-left:4px solid #e5e7eb; margin:8px 0 8px 0; padding:6px 10px; color:#475569; background:#f8fafc}
+  .sidebar{
+    flex:1 1 260px; max-width:320px;
+    background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.04);
+  }
+  .sidebar h3{margin:4px 0 10px; font-size:14px; color:#374151}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0}
+  .row label{font-size:12px; color:#6b7280}
+  .muted{color:var(--muted); font-size:12px}
+  .tag{font-size:11px; padding:4px 8px; border-radius:999px; background:#f1f5f9; color:#334155}
+  .flex{display:flex; gap:8px; align-items:center}
+  .hidden{display:none !important}
+
+  /* Lang switch */
+  .spacer{flex:1 1 auto}
+  .lang-switch.group{margin-left:auto}
+  .flag.btn{display:flex; align-items:center; gap:6px; font-weight:600}
+  .flag .emoji{font-size:16px; line-height:1}
+
+  /* Mobile-friendly page preview */
+  @media (max-width: 900px){
+    .page{ width:100%; min-height:auto; padding:16px; border-radius:8px; }
+    .page-wrap{ width:100%; }
+    main{ padding:12px 8px 40px; }
+    .toolbar{ gap:6px; padding:8px; }
+    .toolbar .group{ gap:4px; padding:4px; }
+    .btn, select, input[type="color"]{ padding:7px 8px; font-size:12px; }
+  }
+
+  /* Print */
+  @media print {
+    header, .sidebar, .hint, .no-print { display:none !important; }
+    body{ background:white; }
+    .page{ box-shadow:none; border:none; border-radius:0; }
+    @page{
+      size: A4 portrait;
+      margin: 20mm;
+    }
+  }
+
+  ::selection{ background:#c7d2fe; }
 </style>
-<style id="print-style"></style>
 </head>
 <body>
-<header>
-  <div class="toolbar">
-    <input id="fontInput" type="number" min="8" max="250" step="1" placeholder="px">
-    <select id="fontsize">
-      <option value="">—</option>
-      <option value="12px">12</option>
-      <option value="24px">24</option>
-      <option value="48px">48</option>
-      <option value="96px">96</option>
-      <option value="160px">160</option>
-      <option value="250px">250</option>
-    </select>
-    <button class="btn" id="btn-size-dec">A−</button>
-    <button class="btn" id="btn-size-inc">A+</button>
+  <header class="no-print">
+    <div class="toolbar">
+      <div class="group">
+        <button class="btn" id="btn-new" title="New">New</button>
+        <label class="btn" for="file-open" title="Open">
+          <span>Open</span>
+          <input id="file-open" type="file" accept=".txt,.html,.htm,.md,.rtf,image/*" class="hidden" />
+        </label>
+        <button class="btn" id="btn-save" title="Download (HTML)">Download</button>
+        <button class="btn" id="btn-print" title="Print">Print</button>
+      </div>
 
-    <select id="orientation">
-      <option value="portrait">Portrait</option>
-      <option value="landscape">Landscape</option>
-    </select>
+      <div class="group">
+        <select id="paraStyle" title="Paragraph style">
+          <option value="p">Normal</option>
+          <option value="h1">Title (H1)</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+          <option value="blockquote">Quote</option>
+        </select>
 
-    <button class="btn" onclick="window.print()">Print</button>
-  </div>
-</header>
+        <div class="sep"></div>
 
-<div class="page">
-  <div id="editor" contenteditable="true">
-    <h1>Untitled Document</h1>
-    <p>Start typing here...</p>
-  </div>
-</div>
+        <label class="flex tag">Size
+          <select id="fontsize">
+            <option value="">—</option>
+            <option value="12px">12</option>
+            <option value="14px">14</option>
+            <option value="16px">16</option>
+            <option value="18px">18</option>
+            <option value="20px">20</option>
+            <option value="22px">22</option>
+            <option value="24px">24</option>
+            <option value="28px">28</option>
+            <option value="32px">32</option>
+          </select>
+        </label>
+        <button class="btn" id="btn-size-dec" title="Decrease size">A−</button>
+        <button class="btn" id="btn-size-inc" title="Increase size">A+</button>
+
+        <div class="sep"></div>
+
+        <button class="btn" data-cmd="bold" title="Bold"><b>B</b></button>
+        <button class="btn" data-cmd="italic" title="Italic"><i>I</i></button>
+        <button class="btn" data-cmd="underline" title="Underline"><u>U</u></button>
+        <button class="btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+
+        <div class="sep"></div>
+        <label class="flex tag">Color <input type="color" id="foreColor" value="#111111" /></label>
+        <label class="flex tag">Highlight <input type="color" id="hiliteColor" value="#fffd54" /></label>
+      </div>
+
+      <div class="group">
+        <button class="btn" data-cmd="justifyLeft" title="Left">Left</button>
+        <button class="btn" data-cmd="justifyCenter" title="Center">Center</button>
+        <button class="btn" data-cmd="justifyRight" title="Right">Right</button>
+        <button class="btn" data-cmd="justifyFull" title="Justify">Justify</button>
+        <div class="sep"></div>
+        <button class="btn" data-cmd="insertUnorderedList" title="Bullets">• List</button>
+        <button class="btn" data-cmd="insertOrderedList" title="Numbered">1. List</button>
+        <button class="btn" data-cmd="outdent" title="Outdent">⇤</button>
+        <button class="btn" data-cmd="indent" title="Indent">⇥</button>
+      </div>
+
+      <div class="group">
+        <label class="btn" for="img-open" title="Insert Image"><span>Image</span>
+          <input id="img-open" type="file" accept="image/*" class="hidden" />
+        </label>
+        <button class="btn" id="btn-clear" title="Clear Formatting">Clear</button>
+        <button class="btn" id="btn-full" title="Fullscreen">Fullscreen</button>
+        <label class="flex tag"><input type="checkbox" id="paste-clean" /> Paste as plain text</label>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="group lang-switch" role="group" aria-label="Language">
+        <button class="btn flag" id="lang-en" data-lang="en" aria-pressed="true" title="English">
+          <span class="emoji">🇬🇧</span> EN
+        </button>
+        <button class="btn flag" id="lang-sq" data-lang="sq" aria-pressed="false" title="Shqip">
+          <span class="emoji">🇦🇱</span> SQ
+        </button>
+        <button class="btn flag" id="lang-tr" data-lang="tr" aria-pressed="false" title="Türkçe">
+          <span class="emoji">🇹🇷</span> TR
+        </button>
+      </div>
+
+      <div class="muted">Autosaves · <span id="status" class="tag">Ready</span></div>
+    </div>
+  </header>
+
+  <main>
+    <div class="stage">
+      <div class="page-wrap">
+        <div id="page" class="page">
+          <div id="editor" contenteditable="true" spellcheck="true">
+            <h1 style="margin-top:0" data-i18n-doc="untitled">Untitled Document</h1>
+            <p data-i18n-doc="intro">This editor provides a simple “Word-like” experience. Use Print to get an A4 output.</p>
+          </div>
+        </div>
+        <p class="hint muted no-print" id="hint">Tip: use <kbd>Ctrl/Cmd + P</kbd> to print, and <kbd>Ctrl/Cmd + B/I/U</kbd> for formatting.</p>
+      </div>
+
+      <aside class="sidebar no-print">
+        <h3>Page Settings</h3>
+        <div class="row">
+          <label>Size</label>
+          <select id="pagesize">
+            <option value="A4" selected>A4 (210×297mm)</option>
+            <option value="Letter">Letter (8.5×11")</option>
+            <option value="A5">A5 (148×210mm)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Orientation</label>
+          <select id="orientation">
+            <option value="portrait" selected>Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Margins</label>
+          <select id="margins">
+            <option value="15mm">Narrow (15mm)</option>
+            <option value="20mm" selected>Normal (20mm)</option>
+            <option value="25mm">Wide (25mm)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Line Spacing</label>
+          <select id="linespacing">
+            <option value="1">1.0</option>
+            <option value="1.15" selected>1.15</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2.0</option>
+          </select>
+        </div>
+        <div class="row">
+          <button class="btn" id="btn-reset">Reset Page</button>
+        </div>
+        <hr/>
+        <h3>File</h3>
+        <p class="muted">Supports .txt/.html import. You can also drag & drop images.</p>
+      </aside>
+    </div>
+  </main>
 
 <script>
-const editor=document.getElementById('editor');
-const sizeSelect=document.getElementById('fontsize');
-const fontInput=document.getElementById('fontInput');
-const MAX=250,MIN=8;
+(function(){
+  const editor = document.getElementById('editor');
+  const status = document.getElementById('status');
 
-function getSelRange(){const s=window.getSelection();return s&&s.rangeCount?s.getRangeAt(0):null;}
+  /* ---- Language (persist only; texts are English in this build) ---- */
+  const LANG_KEY = 'wordlike-lang';
+  let currentLang = localStorage.getItem(LANG_KEY) || 'en';
+  function setLang(lang){
+    currentLang = (lang==='sq' || lang==='tr') ? lang : 'en';
+    localStorage.setItem(LANG_KEY, currentLang);
+    document.getElementById('lang-en').setAttribute('aria-pressed', String(currentLang==='en'));
+    document.getElementById('lang-sq').setAttribute('aria-pressed', String(currentLang==='sq'));
+    document.getElementById('lang-tr').setAttribute('aria-pressed', String(currentLang==='tr'));
+    // (Texts are English here; if needed we can re-wire i18n again.)
+  }
+  setLang(currentLang);
+  document.getElementById('lang-en').addEventListener('click', ()=> setLang('en'));
+  document.getElementById('lang-sq').addEventListener('click', ()=> setLang('sq'));
+  document.getElementById('lang-tr').addEventListener('click', ()=> setLang('tr'));
 
-function applyFontSize(px){
-  const r=getSelRange();if(!r)return;
-  const frag=r.cloneContents();
-  const span=document.createElement('span');
-  span.style.fontSize=px;
-  span.appendChild(frag);
-  r.deleteContents();r.insertNode(span);
-}
+  /* ---- execCommand helpers for simple actions ---- */
+  function cmd(name, value=null){
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand(name, false, value);
+    editor.focus();
+    autosave();
+  }
+  document.querySelectorAll('[data-cmd]').forEach(btn=>{
+    btn.addEventListener('click', ()=> cmd(btn.dataset.cmd));
+  });
 
-function step(delta){
-  const r=getSelRange();if(!r)return;
-  let base=r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement;
-  let cur=parseInt(getComputedStyle(base).fontSize)||14;
-  let next=Math.max(MIN,Math.min(MAX,cur+delta));
-  applyFontSize(next+'px');
-  fontInput.value=next; sizeSelect.value='';
-}
+  /* ---- Paragraph style via formatBlock ---- */
+  const paraStyle = document.getElementById('paraStyle');
+  paraStyle.addEventListener('change', e=>{
+    const val = e.target.value;
+    if(val==='blockquote'){
+      // Wrap selection in blockquote
+      wrapSelectionInBlock('blockquote');
+    }else{
+      document.execCommand('formatBlock', false, val);
+    }
+    autosave();
+  });
 
-fontInput.addEventListener('change',e=>{
-  let v=parseInt(e.target.value);if(isNaN(v))return;
-  v=Math.max(MIN,Math.min(MAX,v));
-  applyFontSize(v+'px'); sizeSelect.value='';
-});
-sizeSelect.addEventListener('change',e=>{
-  if(!e.target.value)return;
-  applyFontSize(e.target.value);
-  fontInput.value=parseInt(e.target.value);
-});
-document.getElementById('btn-size-inc').onclick=()=>step(2);
-document.getElementById('btn-size-dec').onclick=()=>step(-2);
+  function wrapSelectionInBlock(tag){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0) return;
+    const range = sel.getRangeAt(0);
+    const content = range.extractContents();
+    const el = document.createElement(tag);
+    el.appendChild(content);
+    range.insertNode(el);
+    // place caret at end
+    range.setStartAfter(el);
+    range.setEndAfter(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
 
-/* print orientation */
-const orient=document.getElementById('orientation');
-const printStyle=document.getElementById('print-style');
-orient.addEventListener('change',()=>{
-  printStyle.textContent=@page{size:A4 ${orient.value};};
-});
-</script>
+  /* ---- Robust font size control (no messy nested spans) ---- */
+  const sizeSelect = document.getElementById('fontsize');
+  const stepBtns = { dec: document.getElementById('btn-size-dec'), inc: document.getElementById('btn-size-inc') };
+
+  sizeSelect.addEventListener('change', e=>{
+    const size = e.target.value;
+    if(!size) return;
+    applyFontSize(size);
+  });
+
+  stepBtns.inc.addEventListener('click', ()=> stepFontSize(+2));
+  stepBtns.dec.addEventListener('click', ()=> stepFontSize(-2));
+
+  function stepFontSize(delta){
+    const sel = getSelectionRange(); if(!sel) return;
+    // Detect current size from first block node; fallback 14
+    const blocks = getSelectedBlocks(sel);
+    const cur = getComputedStyle(blocks[0] || editor).fontSize || '14px';
+    const num = parseInt(cur,10);
+    const next = Math.max(8, Math.min(72, num + delta)) + 'px';
+    applyFontSize(next);
+    // Update dropdown approximately
+    sizeSelect.value = next;
+  }
+
+  function applyFontSize(sizePx){
+    const sel = getSelectionRange(); if(!sel) return;
+    // Extract contents to sanitize font-size styles, then wrap in a clean span sized
+    const frag = sel.cloneContents();
+    sanitizeFontSize(frag);
+    const span = document.createElement('span');
+    span.style.fontSize = sizePx;
+    span.appendChild(frag);
+    // Replace selection
+    sel.deleteContents();
+    sel.insertNode(span);
+    // Move caret after selection
+    sel.setStartAfter(span);
+    sel.setEndAfter(span);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(sel);
+    autosave();
+  }
+
+  function sanitizeFontSize(root){
+    // Remove inline font-size from elements; unwrap <font> tags
+    const tree = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+    const toUnwrap = [];
+    while(tree.nextNode()){
+      const el = tree.currentNode;
+      if(el.nodeName === 'FONT'){
+        toUnwrap.push(el);
+      }
+      if(el.style && el.style.fontSize){
+        el.style.fontSize = null;
+        if(!el.getAttribute('style')) el.removeAttribute('style');
+      }
+    }
+    toUnwrap.forEach(node=>{
+      const parent = node.parentNode;
+      while(node.firstChild) parent.insertBefore(node.firstChild, node);
+      parent.removeChild(node);
+    });
+  }
+
+  function getSelectionRange(){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0) return null;
+    return sel.getRangeAt(0);
+  }
+
+  function getSelectedBlocks(range){
+    // Collect unique ancestor blocks in selection
+    const blocks = new Set();
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode(node){
+        if(node===editor) return NodeFilter.FILTER_SKIP;
+        const r = document.createRange();
+        try{
+          r.selectNode(node);
+        }catch(e){
+          r.selectNodeContents(node);
+        }
+        const intersects = range.compareBoundaryPoints(Range.END_TO_START, r) < 0 &&
+                           range.compareBoundaryPoints(Range.START_TO_END, r) > 0;
+        if(!intersects) return NodeFilter.FILTER_SKIP;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    while(walker.nextNode()){
+      const n = walker.currentNode.nodeType===1 ? walker.currentNode : walker.currentNode.parentElement;
+      const blk = findBlockAncestor(n);
+      if(blk) blocks.add(blk);
+    }
+    return Array.from(blocks);
+  }
+
+  function findBlockAncestor(el){
+    while(el && el!==editor){
+      const disp = getComputedStyle(el).display;
+      if(disp==='block' || disp==='list-item' || /^h[1-6]$/i.test(el.tagName) || el.tagName==='P' || el.tagName==='LI' || el.tagName==='BLOCKQUOTE'){
+        return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  /* ---- Colors & misc ---- */
+  document.getElementById('foreColor').addEventListener('change', e=> cmd('foreColor', e.target.value));
+  document.getElementById('hiliteColor').addEventListener('change', e=>{
+    if(!document.queryCommandSupported('hiliteColor')){ cmd('backColor', e.target.value); }
+    else{ cmd('hiliteColor', e.target.value); }
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', ()=>{
+    cmd('removeFormat');
+    normalizeInline(editor);
+  });
+
+  document.getElementById('btn-full').addEventListener('click', ()=>{
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    }else{
+      document.exitFullscreen();
+    }
+  });
+
+  document.getElementById('btn-new').addEventListener('click', ()=>{
+    if(editor.textContent.trim().length && !confirm('Create a new blank page? Current content may be lost.')) return;
+    editor.innerHTML = '<h1 style="margin-top:0" data-i18n-doc="untitled">Untitled Document</h1><p data-i18n-doc="intro">This editor provides a simple “Word-like” experience. Use Print to get an A4 output.</p>';
+    autosave(true);
+  });
+
+  document.getElementById('btn-save').addEventListener('click', ()=>{
+    const content = `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Document</title>
+<style>@page{size:auto;margin:20mm}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Helvetica,Arial;font-size:14px;line-height:1.5;color:#111;margin:0;padding:20mm;background:#fff;} .doc{max-width:800px;margin:0 auto;} img{max-width:100%;height:auto} blockquote{border-left:4px solid #ddd; padding:6px 10px; color:#555; background:#fafafa}</style></head>
+<body><div class="doc">${editor.innerHTML}</div></body></html>`;
+    const blob = new Blob([content], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (document.title || 'Document') + '.html';
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('btn-print').addEventListener('click', ()=> window.print());
+
+  // Open (txt/html/img)
+  document.getElementById('file-open').addEventListener('change', async e=>{
+    const file = e.target.files[0]; if(!file) return;
+    if(file.type && file.type.startsWith('image/')){
+      insertImageFile(file);
+      e.target.value='';
+      return;
+    }
+    const text = await file.text();
+    if(file.name.match(/\.(html?|htm)$/i)){
+      editor.innerHTML = text;
+    }else if(file.name.match(/\.rtf$/i)){
+      editor.innerHTML = '<pre style="white-space:pre-wrap; font-family:ui-monospace, monospace">'+escapeHtml(text)+'</pre>';
+    }else{
+      editor.innerHTML = textToHtml(text);
+    }
+    autosave(true);
+    e.target.value='';
+  });
+
+  document.getElementById('img-open').addEventListener('change', async e=>{
+    const file = e.target.files[0]; if(!file) return;
+    insertImageFile(file);
+    e.target.value='';
+  });
+
+  function insertImageFile(file){
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = document.createElement('img');
+      img.src = reader.result;
+      img.alt = file.name;
+      img.style.maxWidth = '100%';
+      insertNodeAtCaret(img);
+      autosave();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ---- Editor behaviors ---- */
+  editor.addEventListener('input', autosave);
+  editor.addEventListener('keydown', e=>{
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+      e.preventDefault();
+      document.getElementById('btn-save').click();
+    }
+    if((e.ctrlKey||e.metaKey) && e.key === 'Enter'){
+      e.preventDefault();
+      const hr = document.createElement('hr');
+      hr.style.pageBreakAfter='always';
+      hr.style.border='0'; hr.style.height='1px'; hr.style.background='#e5e7eb';
+      insertNodeAtCaret(hr);
+      insertNodeAtCaret(document.createElement('p'));
+      autosave();
+    }
+  });
+
+  // Paste as plain text option (prevents messy HTML from web/Word)
+  document.getElementById('paste-clean').addEventListener('change', e=>{
+    const clean = e.target.checked;
+    if(clean){
+      editor.addEventListener('paste', handlePlainPaste);
+    }else{
+      editor.removeEventListener('paste', handlePlainPaste);
+    }
+  });
+  function handlePlainPaste(ev){
+    ev.preventDefault();
+    const text = (ev.clipboardData || window.clipboardData).getData('text');
+    document.execCommand('insertText', false, text);
+  }
+
+  editor.addEventListener('dragover', e=>{ e.preventDefault(); });
+  editor.addEventListener('drop', e=>{
+    e.preventDefault();
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')) insertImageFile(file);
+  });
+
+  /* ---- Page settings ---- */
+  const root = document.documentElement;
+  const pagesize = document.getElementById('pagesize');
+  const orientation = document.getElementById('orientation');
+  const margins = document.getElementById('margins');
+  const linespacing = document.getElementById('linespacing');
+
+  function applyPage(){
+    const size = pagesize.value;
+    const orient = orientation.value;
+    const margin = margins.value;
+    const lh = linespacing.value;
+
+    let w = '210mm', h = '297mm';
+    if(size==='Letter'){ w = '216mm'; h = '279mm'; }
+    if(size==='A5'){ w = '148mm'; h = '210mm'; }
+    if(orient==='landscape'){ const tmp=w; w=h; h=tmp; }
+    root.style.setProperty('--page-w', w);
+    root.style.setProperty('--page-h', h);
+    root.style.setProperty('--page-margin', margin);
+    editor.style.lineHeight = lh;
+  }
+  [pagesize, orientation, margins, linespacing].forEach(el=> el.addEventListener('change', applyPage));
+  applyPage();
+
+  document.getElementById('btn-reset').addEventListener('click', ()=>{
+    pagesize.value='A4'; orientation.value='portrait'; margins.value='20mm'; linespacing.value='1.15';
+    applyPage();
+  });
+
+  /* ---- Local autosave ---- */
+  const KEY = 'wordlike-doc-v1';
+  let saveTimer;
+  function autosave(immediate){
+    clearTimeout(saveTimer);
+    const save = ()=>{
+      try{
+        const data = {
+          html: editor.innerHTML,
+          meta: { time: Date.now(), size: editor.innerText.length }
+        };
+        localStorage.setItem(KEY, JSON.stringify(data));
+        setStatus('Saved');
+      }catch(e){ setStatus('Save failed'); }
+    };
+    if(immediate) save(); else saveTimer = setTimeout(save, 500);
+  }
+
+  (function restoreIfAny(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) return;
+      const data = JSON.parse(raw);
+      if(confirm('Restore the last autosaved content?')){
+        editor.innerHTML = data.html || editor.innerHTML;
+      }
+    }catch(e){}
+  })();
+
+  function setStatus(msg){
+    status.textContent = msg;
+    status.style.transition='none';
+    status.style.background='#e0f2fe';
+    setTimeout(()=>{
+      status.style.transition='background 800ms ease';
+      status.style.background='';
+    }, 50);
+  }
+
+  /* ---- Utilities ---- */
+  function textToHtml(text){
+    const esc = escapeHtml(text);
+    return esc.split(/\n{2,}/).map(p=> '<p>'+p.replace(/\n/g,'<br>')+'</p>').join('');
+  }
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  }
+  function insertNodeAtCaret(node){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount===0){ editor.appendChild(node); return; }
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function normalizeInline(rootEl){
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_ELEMENT, null);
+    while(walker.nextNode()){
+      const el = walker.currentNode;
+      if(el.nodeName==='SPAN' && !el.getAttribute('style')){
+        el.replaceWith(...el.childNodes);
+      }
+    }
+  }
+
+  // Keep document title in sync with first H1
+  const titleObserver = new MutationObserver(()=>{
+    const h1 = editor.querySelector('h1');
+    if(h1){
+      document.title = (h1.textContent || 'Document').trim() || 'Document';
+    }
+  });
+  titleObserver.observe(editor, {childList:true, subtree:true, characterData:true});
+
+})();</script>
 </body>
 </html>
