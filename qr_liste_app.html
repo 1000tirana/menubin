@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="sq">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR Liste · Son 4 Hane</title>
+<title>Lista QR · 4 Shifrat e Fundit</title>
 <style>
   :root{
     --bg:#0f1115;
@@ -21,112 +21,64 @@
     background:var(--bg);
     color:var(--text);
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
   }
   header{
     position:sticky; top:0; z-index:20;
     background:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,0));
-    padding:12px 16px 6px 16px;
-    display:flex; align-items:center; gap:12px;
+    padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
   }
-  .app-title{font-size:18px; font-weight:700; letter-spacing:.3px}
-  .pill{
-    padding:4px 10px; border-radius:999px;
-    background:#1f2430; color:var(--muted); font-size:12px;
-  }
+  .flags{display:flex; gap:8px;}
+  .flags button{background:none;border:none;font-size:20px;cursor:pointer}
+  .app-title{font-size:16px;font-weight:700}
+  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:var(--muted);font-size:12px;}
   .last-scan{
-    position:sticky; top:48px; z-index:15;
+    position:sticky; top:46px; z-index:15;
     display:flex; align-items:center; gap:8px;
     background:#122019; color:#bff4d1;
     border:1px solid #1b3a2b; border-left:4px solid var(--accent);
-    margin:0 12px; border-radius:10px; padding:9px 12px;
+    margin:6px 12px; border-radius:10px; padding:8px 12px;
     font-size:14px;
   }
+  .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:var(--danger)}
   .container{padding:10px 16px 120px 16px; max-width:840px; margin:0 auto;}
-  .camera-card{
-    background:var(--card);
-    border-radius:14px;
-    padding:12px;
-    box-shadow:0 20px 60px rgba(0,0,0,.35);
-  }
-  .video-wrap{
-    position:relative;
-    border-radius:12px;
-    overflow:hidden;
-    background:#0a0c10;
-    aspect-ratio: 3/4;
-  }
-  video{width:100%; height:100%; object-fit:cover; display:block;}
+  .camera-card{background:var(--card);border-radius:14px;padding:12px;}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4;}
+  video{width:100%;height:100%;object-fit:cover;display:block;}
   canvas#capture{display:none;}
-  .scan-frame{
-    position:absolute; inset:10%; border:2px solid rgba(255,255,255,.75);
-    border-radius:12px; box-shadow:0 0 0 9999px rgba(0,0,0,.25) inset;
-    pointer-events:none;
-  }
-  .controls{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
-  button, .btn{
-    appearance:none; border:none; border-radius:12px;
-    background:#222734; color:var(--text);
-    padding:12px 14px; font-size:15px; font-weight:600;
-    display:inline-flex; align-items:center; gap:8px;
-    cursor:pointer; outline:none;
-  }
-  button:disabled{opacity:.5; cursor:not-allowed}
-  .btn-primary{ background:var(--accent); color:#07130e; }
-  .btn-warn{ background:var(--warn); color:#221a00;}
-  .btn-danger{ background:var(--danger); color:#260000;}
-  .btn-ghost{ background:#1b2030; color:var(--muted); }
-  .list-card{
-    margin-top:16px; background:var(--card); border-radius:14px; padding:8px 0;
-  }
-  .list-header{ display:flex; justify-content:space-between; align-items:center; padding:8px 14px; border-bottom:1px solid #242a39;}
-  .list{ list-style:none; padding:0; margin:0; }
-  .item{
-    display:flex; gap:10px; align-items:flex-start;
-    padding:12px 14px; border-bottom:1px dashed #23293a;
-  }
+  .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.75);border-radius:12px;pointer-events:none;}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  button,.btn{appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--accent);color:#07130e}
+  .btn-danger{background:var(--danger);color:#260000}
+  .btn-warn{background:var(--warn);color:#221a00}
+  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0;}
+  .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;}
+  .list{list-style:none;padding:0;margin:0;}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px dashed #23293a;}
   .item:last-child{border-bottom:none}
-  .index{ width:28px; height:28px; border-radius:999px; background:#242a39; display:flex; align-items:center; justify-content:center; font-weight:700; color:#c0c7d9; flex:0 0 auto;}
-  .value{ word-break:break-word; flex:1; font-size:18px; font-weight:700; letter-spacing:.5px;}
-  .time{ color:var(--muted); font-size:12px; margin-top:4px; font-weight:500;}
-  .del-btn{ background:#23293a; color:#ff9b9b; border-radius:10px; padding:8px 10px; font-weight:700}
-  .toolbar{
-    position:fixed; left:0; right:0; bottom:0; z-index:10;
-    backdrop-filter: blur(10px);
-    background:rgba(10,12,16,.8);
-    border-top:1px solid #242a39;
-    padding:12px 16px; display:flex; gap:10px;
-  }
-  .toolbar .btn{flex:1; justify-content:center}
-  .hint{ color:var(--muted); font-size:12px; margin-top:8px; }
-  .small{ font-size:12px; color:var(--muted); }
-  .badge{ padding:2px 6px; border-radius:8px; background:#1f2430; color:#9fb0ff; font-size:11px; }
-  .row{ display:flex; gap:8px; flex-wrap:wrap;}
-  .row > *{ flex:1; }
-  .switch{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted);}
-  .switch input{ width:36px; height:22px; appearance:none; background:#2a3042; border-radius:999px; position:relative; outline:none; cursor:pointer;}
-  .switch input:checked{ background:#2e7a58;}
-  .switch input::after{ content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:white; transition:.2s;}
-  .switch input:checked::after{ left:17px;}
-  .toast{
-    position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
-    background:#161d2a; color:#e7f1ff; padding:10px 14px; border-radius:10px; border:1px solid #27324a;
-    display:none;
-  }
-  .green-glow{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 18px rgba(0,255,144,.6) inset; border-color: rgba(0,255,144,.9); }
-  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;}
+  .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto;}
+  .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px}
+  .time{color:var(--muted);font-size:12px;margin-top:4px}
+  .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px}
+  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:10;backdrop-filter:blur(10px);background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px;}
+  .toolbar .btn{flex:1;justify-content:center}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
 </style>
 </head>
 <body>
 <header>
-  <div class="app-title">QR Liste · Son 4</div>
-  <span id="camStatus" class="pill">Kamera: Kapalı</span>
+  <div><span class="app-title" id="t-title">Lista QR</span> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
+  <div class="flags">
+    <button onclick="setLang('sq')">🇦🇱</button>
+    <button onclick="setLang('en')">🇬🇧</button>
+    <button onclick="setLang('tr')">🇹🇷</button>
+  </div>
 </header>
 
 <div id="lastBanner" class="last-scan" style="display:none;">
-  <strong>Son taranan:</strong>
-  <span id="lastValue" class="mono">—</span>
-  <span id="lastTime" class="small" style="margin-left:auto;"></span>
+  <strong id="t-last">I fundit:</strong> <span id="lastValue">—</span>
 </div>
 
 <div class="container">
@@ -136,351 +88,64 @@
       <div id="scanFrame" class="scan-frame"></div>
     </div>
     <div class="controls">
-      <button id="startBtn" class="btn-primary">Kamerayı Aç</button>
-      <button id="stopBtn" class="btn-ghost" disabled>Dur</button>
-      <button id="torchBtn" class="btn-ghost" disabled>Flaş</button>
-      <button id="flipBtn" class="btn-ghost" disabled>Kamera Değiştir</button>
-      <label class="switch" title="Aynı kodu tekrar ekleme">
-        <input id="uniqueToggle" type="checkbox" checked>
-        <span>Tekrarları engelle</span>
-      </label>
+      <button id="startBtn" class="btn-primary">Start</button>
+      <button id="stopBtn" class="btn">Stop</button>
+      <button id="resetBtn" class="btn-danger">Pastro</button>
     </div>
-    <div class="hint">Bu sürüm iPhone/Safari uyumlu **jsQR** ile çalışır (QR). Sadece **son 4 alfasayısal** karakter listelenir.</div>
   </div>
 
   <div class="list-card">
     <div class="list-header">
-      <div><strong>Liste</strong> · <span id="count" class="badge">0</span></div>
-      <div class="row" style="flex: 0 0 auto;">
-        <button id="resetBtn" class="btn-danger">Temizle</button>
-      </div>
+      <div><strong id="t-list">Lista</strong> · <span id="count">0</span></div>
     </div>
     <ul id="list" class="list"></ul>
   </div>
 </div>
 
 <div class="toolbar">
-  <button id="copyBtn" class="btn">Kopyala</button>
+  <button id="copyBtn" class="btn">Kopjo</button>
   <button id="waBtn" class="btn">WhatsApp</button>
-  <button id="shareBtn" class="btn-warn">Paylaş</button>
 </div>
 
 <canvas id="capture"></canvas>
 <div id="toast" class="toast"></div>
 
-<!-- jsQR (QR çözümleyici) -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-
 <script>
-(() => {
-  const $ = (sel) => document.querySelector(sel);
-  const video = $('#video');
-  const canvas = $('#capture');
-  const ctx = canvas.getContext('2d', { willReadFrequently:true });
-  const camStatus = $('#camStatus');
-  const startBtn = $('#startBtn');
-  const stopBtn  = $('#stopBtn');
-  const torchBtn = $('#torchBtn');
-  const flipBtn  = $('#flipBtn');
-  const copyBtn = $('#copyBtn');
-  const waBtn   = $('#waBtn');
-  const shareBtn= $('#shareBtn');
-  const listEl  = $('#list');
-  const countEl = $('#count');
-  const resetBtn= $('#resetBtn');
-  const uniqueToggle = $('#uniqueToggle');
-  const scanFrame = $('#scanFrame');
-  const toastEl = $('#toast');
-  const lastBanner = $('#lastBanner');
-  const lastValue  = $('#lastValue');
-  const lastTime   = $('#lastTime');
+const video=document.getElementById('video'),canvas=document.getElementById('capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+const startBtn=document.getElementById('startBtn'),stopBtn=document.getElementById('stopBtn'),resetBtn=document.getElementById('resetBtn');
+const listEl=document.getElementById('list'),countEl=document.getElementById('count'),lastBanner=document.getElementById('lastBanner'),lastValue=document.getElementById('lastValue');
+const copyBtn=document.getElementById('copyBtn'),waBtn=document.getElementById('waBtn'),camStatus=document.getElementById('camStatus'),toastEl=document.getElementById('toast');
+let stream=null,scanning=false,lastScanAt=0,detectedSet=new Set(),items=[];
 
-  // State
-  let stream = null;
-  let track = null;
-  let scanning = false;
-  let lastScanAt = 0;
-  let usingBackCam = true;
-  let detectedSet = new Set();
-  let items = [];                // {value, time}  (value = last4 display)
+function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.slice(-4).toUpperCase();}
+function beep(){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.type='triangle';o.frequency.value=880;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0.001,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.16);setTimeout(()=>ac.close(),250);}catch{}}
+function addItem(raw){const val=last4(raw);if(!val)return;const now=new Date();if(detectedSet.has(raw)){lastBanner.classList.add('duplicate');}else{detectedSet.add(raw);items.push({value:val,time:now});renderList();beep();lastBanner.classList.remove('duplicate');}lastValue.textContent=val;lastBanner.style.display='flex';save();}
+function renderList(){listEl.innerHTML='';items.forEach((it,idx)=>{const li=document.createElement('li');li.className='item';li.innerHTML=`<div class="index">${idx+1}</div><div class="value">${it.value}</div><div class="time">${it.time.toLocaleTimeString()}</div><button class="del-btn">×</button>`;li.querySelector('.del-btn').onclick=()=>{items.splice(idx,1);renderList();save();};listEl.appendChild(li);});countEl.textContent=items.length;}
+async function startCam(){try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});video.srcObject=stream;await video.play();scanning=true;scanLoop();camStatus.textContent=langs[curLang].camOn;}catch(e){alert(e);}}
+function stopCam(){scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());}video.srcObject=null;camStatus.textContent=langs[curLang].camOff;}
+async function scanLoop(){if(!scanning)return;const now=performance.now();if(now-lastScanAt<150){return requestAnimationFrame(scanLoop);}lastScanAt=now;if(video.readyState>=2){canvas.width=video.videoWidth;canvas.height=video.videoHeight;ctx.drawImage(video,0,0,canvas.width,canvas.height);const img=ctx.getImageData(0,0,canvas.width,canvas.height);const qr=jsQR(img.data,canvas.width,canvas.height);if(qr&&qr.data){addItem(qr.data.trim());}}requestAnimationFrame(scanLoop);}
+function copyAll(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");navigator.clipboard.writeText(t);showToast(langs[curLang].copied);}
+function whatsapp(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");window.open("https://wa.me/?text="+encodeURIComponent(t));}
+function save(){localStorage.setItem("qrItems",JSON.stringify(items));}
+function load(){const r=localStorage.getItem("qrItems");if(r){items=JSON.parse(r);items=items.map(o=>({value:o.value,time:new Date(o.time)}));renderList();}}
+function showToast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',1500);}
 
-  function toast(msg, ms=1600){
-    toastEl.textContent = msg;
-    toastEl.style.display = 'block';
-    clearTimeout(toastEl._t);
-    toastEl._t = setTimeout(()=> toastEl.style.display='none', ms);
-  }
+// language support
+const langs={
+ sq:{title:"Lista QR",camOn:"Kamera: Hap",camOff:"Kamera: Mbyllur",list:"Lista",last:"I fundit:",copied:"Kopjuar!"},
+ en:{title:"QR List",camOn:"Camera: On",camOff:"Camera: Off",list:"List",last:"Last:",copied:"Copied!"},
+ tr:{title:"QR Liste",camOn:"Kamera: Açık",camOff:"Kamera: Kapalı",list:"Liste",last:"Son:",copied:"Kopyalandı!"}
+};
+let curLang="sq";
+function setLang(l){curLang=l;document.getElementById('t-title').textContent=langs[l].title;document.getElementById('t-list').textContent=langs[l].list;document.getElementById('t-last').textContent=langs[l].last;camStatus.textContent=scanning?langs[l].camOn:langs[l].camOff;copyBtn.textContent=l=="tr"?"Kopyala":l=="en"?"Copy":"Kopjo";waBtn.textContent="WhatsApp";resetBtn.textContent=l=="tr"?"Temizle":l=="en"?"Clear":"Pastro";startBtn.textContent=l=="tr"?"Başlat":l=="en"?"Start":"Start";stopBtn.textContent=l=="tr"?"Durdur":l=="en"?"Stop":"Stop";}
+window.setLang=setLang;
 
-  async function getCameras(){
-    try{
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      return devices.filter(d => d.kind === 'videoinput');
-    }catch(e){ return []; }
-  }
+// events
+startBtn.onclick=startCam;stopBtn.onclick=stopCam;resetBtn.onclick=()=>{items=[];detectedSet.clear();renderList();save();};copyBtn.onclick=copyAll;waBtn.onclick=whatsapp;
 
-  function pickBackCamera(cams){
-    const byLabel = cams.find(c => /back|rear|ortam|environment/i.test(c.label));
-    return byLabel || cams[cams.length-1] || cams[0];
-  }
-  function pickFrontCamera(cams){
-    const byLabel = cams.find(c => /front|ön|user/i.test(c.label));
-    return byLabel || cams[0];
-  }
-
-  async function startCamera(){
-    try{
-      let deviceId = null;
-      const cams = await getCameras();
-      if(cams.length){
-        const cam = usingBackCam ? pickBackCamera(cams) : pickFrontCamera(cams);
-        deviceId = cam?.deviceId || null;
-      }
-      const constraints = {
-        audio:false,
-        video: deviceId ? { deviceId: { exact: deviceId }, width:{ideal:1280}, height:{ideal:720} } :
-                          { facingMode: usingBackCam ? 'environment' : 'user', width:{ideal:1280}, height:{ideal:720} }
-      };
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
-      video.srcObject = stream;
-      await video.play();
-      track = stream.getVideoTracks()[0];
-      camStatus.textContent = 'Kamera: Açık';
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-      flipBtn.disabled = false;
-      torchBtn.disabled = !!(track.getCapabilities && track.getCapabilities().torch);
-      scanning = true;
-      scanLoop();
-    }catch(err){
-      console.error(err);
-      toast('Kamera açılamadı: ' + (err.message || err.name));
-    }
-  }
-
-  async function stopCamera(){
-    scanning = false;
-    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
-    video.srcObject = null;
-    camStatus.textContent = 'Kamera: Kapalı';
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    torchBtn.disabled = true;
-  }
-
-  async function toggleTorch(){
-    if(!track || !track.applyConstraints) return;
-    const caps = track.getCapabilities ? track.getCapabilities() : {};
-    if(!caps.torch){ toast('Flaş desteklenmiyor.'); return; }
-    const settings = track.getSettings();
-    const newVal = !settings.torch;
-    try{
-      await track.applyConstraints({ advanced: [{torch:newVal}] });
-      toast(newVal ? 'Flaş: Açık' : 'Flaş: Kapalı');
-    }catch(e){ toast('Flaş değiştirilemedi');}
-  }
-
-  function p2(n){ return String(n).padStart(2,'0'); }
-  function formatTime(d){ return `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`; }
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    })[s]);
-  }
-
-  // keep only alphanumeric, take last 4
-  function last4AlphaNum(s){
-    const only = String(s).replace(/[^0-9A-Za-z]/g, '');
-    if(!only) return '';
-    return only.slice(-4).toUpperCase();
-  }
-
-  function setLastBanner(val){
-    lastValue.textContent = val || '—';
-    lastTime.textContent = formatTime(new Date());
-    lastBanner.style.display = 'flex';
-  }
-
-  function addItem(raw){
-    const last4 = last4AlphaNum(raw);
-    if(!last4) return;
-    const now = new Date();
-    items.push({value:last4, time: now});
-    renderList();
-    setLastBanner(last4);
-    beep();
-    // glow feedback
-    const scanFrame = document.getElementById('scanFrame');
-    scanFrame.classList.add('green-glow');
-    clearTimeout(scanFrame._t); 
-    scanFrame._t = setTimeout(()=> scanFrame.classList.remove('green-glow'), 300);
-    save();
-  }
-
-  function renderList(){
-    listEl.innerHTML = '';
-    items.forEach((it, idx) => {
-      const li = document.createElement('li');
-      li.className = 'item';
-      li.innerHTML = `
-        <div class="index">${idx+1}</div>
-        <div class="value mono">
-          <div>${escapeHtml(it.value)}</div>
-          <div class="time">${formatTime(it.time)}</div>
-        </div>
-        <button class="del-btn" title="Sil">×</button>
-      `;
-      li.querySelector('.del-btn').onclick = () => {
-        items.splice(idx,1);
-        renderList(); save();
-      };
-      listEl.appendChild(li);
-    });
-    countEl.textContent = items.length;
-  }
-
-  function buildText(){
-    return items.map((it, i)=> `${i+1}. ${it.value}`).join('\\n');
-  }
-
-  async function copyAll(){
-    const text = buildText();
-    if(!text){ toast('Liste boş'); return; }
-    try{
-      await navigator.clipboard.writeText(text);
-      toast('Kopyalandı!');
-    }catch(e){
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy'); ta.remove();
-      toast('Kopyalandı.');
-    }
-  }
-
-  function whatsappShare(){
-    const text = buildText();
-    if(!text){ toast('Liste boş'); return; }
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-  }
-
-  async function systemShare(){
-    const text = buildText();
-    if(!text){ toast('Liste boş'); return; }
-    if(navigator.share){
-      try{ await navigator.share({ text }); }catch(e){}
-    }else{ toast('Cihaz paylaşımı desteklemiyor.'); }
-  }
-
-  function resetList(){
-    items.length = 0;
-    detectedSet.clear();
-    renderList(); save();
-  }
-
-  function cropToScanArea(w,h){
-    const ix = Math.floor(w*0.1), iy = Math.floor(h*0.1);
-    const iw = Math.floor(w*0.8), ih = Math.floor(h*0.8);
-    return {x:ix, y:iy, w:iw, h:ih};
-  }
-
-  function beep(){
-    try{
-      const ac = new (window.AudioContext||window.webkitAudioContext)();
-      const o = ac.createOscillator(); const g = ac.createGain();
-      o.type='triangle'; o.frequency.value=880;
-      o.connect(g); g.connect(ac.destination);
-      g.gain.setValueAtTime(0.001, ac.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.2, ac.currentTime+0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.15);
-      o.start(); o.stop(ac.currentTime+0.16);
-      setTimeout(()=>ac.close(), 250);
-    }catch{}
-  }
-
-  async function scanLoop(){
-    if(!scanning) return;
-    const now = performance.now();
-    if(now - lastScanAt < 120){ return requestAnimationFrame(scanLoop); }
-    lastScanAt = now;
-
-    if(video.readyState >= 2){
-      const vw = video.videoWidth, vh = video.videoHeight;
-      if(vw && vh){
-        canvas.width = vw; canvas.height = vh;
-        ctx.drawImage(video, 0, 0, vw, vh);
-        const {x,y,w,h} = cropToScanArea(vw,vh);
-        const imgData = ctx.getImageData(x, y, w, h);
-        try{
-          if(window.jsQR){
-            const qr = jsQR(imgData.data, w, h, { inversionAttempts: 'dontInvert' });
-            if(qr && qr.data){
-              const raw = qr.data.trim();
-              if(raw){
-                const key = raw; // full data for uniqueness
-                if(uniqueToggle.checked){
-                  if(detectedSet.has(key)) { requestAnimationFrame(scanLoop); return; }
-                  detectedSet.add(key);
-                }
-                addItem(raw);
-              }
-            }
-          }
-        }catch(e){}
-      }
-    }
-    requestAnimationFrame(scanLoop);
-  }
-
-  // Persistence
-  const LS_KEY = 'qr_list_items_ios_last4';
-  function save(){
-    try{
-      const data = items.map(o => ({ value:o.value, time:o.time.toISOString() }));
-      localStorage.setItem(LS_KEY, JSON.stringify(data));
-      const last = items[items.length-1];
-      if(last){ localStorage.setItem(LS_KEY+'_last', JSON.stringify(last)); }
-    }catch{}
-  }
-  function restore(){
-    try{
-      const raw = localStorage.getItem(LS_KEY);
-      if(raw){
-        const arr = JSON.parse(raw)||[];
-        items = arr.map(o => ({ value:o.value, time: new Date(o.time) }));
-        renderList();
-      }
-      const lastRaw = localStorage.getItem(LS_KEY+'_last');
-      if(lastRaw){
-        const last = JSON.parse(lastRaw);
-        setLastBanner(last.value || '');
-      }
-    }catch{}
-  }
-
-  // Buttons
-  startBtn.onclick = startCamera;
-  stopBtn.onclick  = stopCamera;
-  torchBtn.onclick = toggleTorch;
-  flipBtn.onclick  = async () => {
-    usingBackCam = !usingBackCam;
-    if(stream){ await stopCamera(); await startCamera(); }
-  };
-  copyBtn.onclick  = copyAll;
-  waBtn.onclick    = whatsappShare;
-  shareBtn.onclick = systemShare;
-  resetBtn.onclick = () => {
-    if(confirm('Listeyi temizlemek istiyor musunuz?')) resetList();
-  };
-
-  // Autostart if permission already granted
-  if (navigator.permissions && navigator.permissions.query){
-    navigator.permissions.query({name:'camera'}).then(p => {
-      if(p.state === 'granted'){ startCamera(); }
-    }).catch(()=>{});
-  }
-
-  restore();
-
-})();  
+// init
+load();setLang("sq");
 </script>
 </body>
 </html>
