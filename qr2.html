@@ -31,7 +31,7 @@
   .flags{display:flex; gap:8px;}
   .flags button{background:none;border:none;font-size:20px;cursor:pointer}
   .app-title{font-size:16px;font-weight:700}
-  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:var(--muted);font-size:12px;}
+  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;}
   .last-scan{
     position:sticky; top:46px; z-index:25;
     display:flex; align-items:center; gap:8px;
@@ -62,11 +62,13 @@
   .item:last-child{border-bottom:none}
   .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto;}
   .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px}
-  .time{color:var(--muted);font-size:12px;margin-top:4px}
+  .time{color:#a9b1c3;font-size:12px;margin-top:4px}
   .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px}
   .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;backdrop-filter:blur(10px);background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px;}
   .toolbar .btn{flex:1;justify-content:center}
   .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
+  .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:var(--text); padding:10px 12px; border-radius:10px; font-size:14px;}
 </style>
 </head>
 <body>
@@ -95,6 +97,10 @@
       <button id="torchBtn" class="btn">Flaş</button>
       <button id="resetBtn" class="btn-danger">Pastro</button>
     </div>
+    <div class="manual">
+      <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
+      <button id="manualAddBtn" class="btn-warn">Shto</button>
+    </div>
   </div>
 
   <div class="list-card">
@@ -118,14 +124,16 @@
 const $=sel=>document.querySelector(sel);
 const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
 const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),resetBtn=$('#resetBtn');
+const manualInput=$('#manualInput'),manualAddBtn=$('#manualAddBtn');
 const listEl=$('#list'),countEl=$('#count'),lastBanner=$('#lastBanner'),lastValue=$('#lastValue'),scanFrame=$('#scanFrame');
 const copyBtn=$('#copyBtn'),waBtn=$('#waBtn'),camStatus=$('#camStatus'),toastEl=$('#toast');
-let stream=null,track=null,scanning=false,lastScanAt=0,detectedSet=new Set(),items=[],torchOn=false;
+let stream=null,track=null,scanning=false,lastScanAt=0,items=[],torchOn=false;
+let seen=new Set(); // track by displayed last4
 
 const langs={
- sq:{title:"Lista QR",camOn:"Kamera: Hap",camOff:"Kamera: Mbyllur",list:"Lista",last:"I fundit:",copied:"Kopjuar!",start:"Start",stop:"Stop",clear:"Pastro",copy:"Kopjo",flash:"Dritë"},
- en:{title:"QR List",camOn:"Camera: On",camOff:"Camera: Off",list:"List",last:"Last:",copied:"Copied!",start:"Start",stop:"Stop",clear:"Clear",copy:"Copy",flash:"Flash"},
- tr:{title:"QR Liste",camOn:"Kamera: Açık",camOff:"Kamera: Kapalı",list:"Liste",last:"Son:",copied:"Kopyalandı!",start:"Başlat",stop:"Durdur",clear:"Temizle",copy:"Kopyala",flash:"Flaş"}
+ sq:{title:"Lista QR",camOn:"Kamera: Hap",camOff:"Kamera: Mbyllur",list:"Lista",last:"I fundit:",copied:"Kopjuar!",start:"Start",stop:"Stop",clear:"Pastro",copy:"Kopjo",flash:"Dritë",placeholder:"Shkruaj kodin...",add:"Shto",confirmDel:"A jeni i sigurt për fshirjen?", confirmClear:"Të pastrohet lista?"},
+ en:{title:"QR List",camOn:"Camera: On",camOff:"Camera: Off",list:"List",last:"Last:",copied:"Copied!",start:"Start",stop:"Stop",clear:"Clear",copy:"Copy",flash:"Flash",placeholder:"Type a code...",add:"Add",confirmDel:"Are you sure to delete?", confirmClear:"Clear the whole list?"},
+ tr:{title:"QR Liste",camOn:"Kamera: Açık",camOff:"Kamera: Kapalı",list:"Liste",last:"Son:",copied:"Kopyalandı!",start:"Başlat",stop:"Durdur",clear:"Temizle",copy:"Kopyala",flash:"Flaş",placeholder:"Kod yaz...",add:"Ekle",confirmDel:"Silmek istediğine emin misin?", confirmClear:"Liste tamamen temizlensin mi?"}
 };
 let curLang="sq";
 
@@ -140,6 +148,8 @@ function setLang(l){
   resetBtn.textContent=langs[l].clear;
   copyBtn.textContent=langs[l].copy;
   torchBtn.textContent=langs[l].flash;
+  manualInput.placeholder=langs[l].placeholder;
+  manualAddBtn.textContent=langs[l].add;
   waBtn.textContent="WhatsApp";
 }
 window.setLang=setLang;
@@ -148,9 +158,45 @@ function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.s
 function beep(freq=880){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.type='triangle';o.frequency.value=freq;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0.001,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.16);setTimeout(()=>ac.close(),250);}catch{}}
 function showBanner(val,isDup){lastValue.textContent=val||'—';lastBanner.style.display='flex';lastBanner.classList.toggle('duplicate', !!isDup);}
 function flashOverlay(isDup){scanFrame.classList.remove('glow-green','glow-red');scanFrame.offsetWidth;scanFrame.classList.add(isDup?'glow-red':'glow-green');clearTimeout(scanFrame._t);scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'), 350);}
-function addItem(raw){const val=last4(raw);if(!val)return;const isDup=detectedSet.has(raw);if(!isDup){detectedSet.add(raw);items.push({value:val,time:new Date()});renderList();save();beep(880);}else{beep(440);}showBanner(val,isDup);flashOverlay(isDup);}
 
-function renderList(){listEl.innerHTML='';items.forEach((it,idx)=>{const li=document.createElement('li');li.className='item';li.innerHTML=`<div class="index">${idx+1}</div><div class="value">${it.value}</div><div class="time">${new Date(it.time).toLocaleTimeString()}</div><button class="del-btn">×</button>`;li.querySelector('.del-btn').onclick=()=>{items.splice(idx,1);renderList();save();};listEl.appendChild(li);});countEl.textContent=items.length;}
+function pushItem(value){ // value is last4
+  const isDup = seen.has(value);
+  if(!isDup){
+    seen.add(value);
+    items.push({value, time:new Date()});
+    renderList(); save(); beep(880);
+  }else{
+    beep(440);
+  }
+  showBanner(value, isDup);
+  flashOverlay(isDup);
+}
+
+function addFromScan(raw){ const val=last4(raw); if(val) pushItem(val); }
+function addFromManual(){ const raw=manualInput.value.trim(); const val=last4(raw); if(!val){ showToast('—'); return; } pushItem(val); manualInput.value=''; }
+
+function renderList(){
+  listEl.innerHTML='';
+  items.forEach((it,idx)=>{
+    const li=document.createElement('li');
+    li.className='item';
+    li.innerHTML=`
+      <div class="index">${idx+1}</div>
+      <div class="value">${it.value}</div>
+      <div class="time">${new Date(it.time).toLocaleTimeString()}</div>
+      <button class="del-btn">×</button>`;
+    li.querySelector('.del-btn').onclick=()=>{
+      if(confirm(langs[curLang].confirmDel)){
+        const val=items[idx].value;
+        items.splice(idx,1);
+        if(!items.some(x=>x.value===val)) seen.delete(val);
+        renderList(); save();
+      }
+    };
+    listEl.appendChild(li);
+  });
+  countEl.textContent=items.length;
+}
 
 async function startCam(){
   try{
@@ -160,7 +206,6 @@ async function startCam(){
     scanning=true;
     camStatus.textContent=langs[curLang].camOn;
     track=stream.getVideoTracks()[0]||null;
-    // Torch availability
     torchOn=false;
     const caps=track && track.getCapabilities ? track.getCapabilities() : {};
     torchBtn.disabled = !(caps && 'torch' in caps);
@@ -200,7 +245,7 @@ async function scanLoop(){
     ctx.drawImage(video,0,0,canvas.width,canvas.height);
     const img=ctx.getImageData(0,0,canvas.width,canvas.height);
     const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
-    if(qr && qr.data){ addItem(qr.data.trim()); }
+    if(qr && qr.data){ addFromScan(qr.data.trim()); }
   }
   requestAnimationFrame(scanLoop);
 }
@@ -208,15 +253,21 @@ async function scanLoop(){
 function copyAll(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }navigator.clipboard.writeText(t).then(()=>showToast(langs[curLang].copied));}
 function whatsapp(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');}
 
-function save(){localStorage.setItem("qrItems_v2", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));}
-function load(){const raw=localStorage.getItem("qrItems_v2");if(raw){try{const arr=JSON.parse(raw)||[];items=arr.map(o=>({value:o.value,time:new Date(o.time)}));renderList();}catch{}}}
+function save(){localStorage.setItem("qrItems_v3", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));}
+function load(){const raw=localStorage.getItem("qrItems_v3");if(raw){try{const arr=JSON.parse(raw)||[];items=arr.map(o=>({value:o.value,time:new Date(o.time)}));items.forEach(x=>seen.add(x.value));renderList();}catch{}}}
 function showToast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',1400);}
 
 // events
 startBtn.onclick=startCam;
 stopBtn.onclick=stopCam;
 torchBtn.onclick=toggleTorch;
-resetBtn.onclick=()=>{items=[];detectedSet.clear();renderList();save();};
+resetBtn.onclick=()=>{
+  if(confirm(langs[curLang].confirmClear)){
+    items=[]; seen.clear(); renderList(); save();
+  }
+};
+manualAddBtn.onclick=addFromManual;
+manualInput.addEventListener('keyup',e=>{ if(e.key==='Enter') addFromManual(); });
 
 copyBtn.onclick=copyAll;
 waBtn.onclick=whatsapp;
