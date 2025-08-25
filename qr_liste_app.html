@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR / Barkod Listeleyici</title>
+<title>QR / Barkod Listeleyici (iPhone Uyumlu)</title>
 <style>
   :root{
     --bg:#0f1115;
@@ -49,7 +49,7 @@
     aspect-ratio: 3/4;
   }
   video{width:100%; height:100%; object-fit:cover; display:block;}
-  canvas{display:none;}
+  canvas#capture{display:none;}
   .scan-frame{
     position:absolute; inset:10%; border:2px solid rgba(255,255,255,.75);
     border-radius:12px; box-shadow:0 0 0 9999px rgba(0,0,0,.25) inset;
@@ -105,6 +105,7 @@
     background:#161d2a; color:#e7f1ff; padding:10px 14px; border-radius:10px; border:1px solid #27324a;
     display:none;
   }
+  .green-glow{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 18px rgba(0,255,144,.6) inset; border-color: rgba(0,255,144,.9); }
 </style>
 </head>
 <body>
@@ -117,19 +118,19 @@
   <div class="camera-card">
     <div class="video-wrap">
       <video id="video" playsinline muted></video>
-      <div class="scan-frame"></div>
+      <div id="scanFrame" class="scan-frame"></div>
     </div>
     <div class="controls">
       <button id="startBtn" class="btn-primary">Kamerayı Aç</button>
       <button id="stopBtn" class="btn-ghost" disabled>Dur</button>
       <button id="torchBtn" class="btn-ghost" disabled>Flaş</button>
-      <button id="flipBtn" class="btn-ghost">Kamera Değiştir</button>
+      <button id="flipBtn" class="btn-ghost" disabled>Kamera Değiştir</button>
       <label class="switch" title="Aynı kodu tekrar ekleme">
         <input id="uniqueToggle" type="checkbox" checked>
         <span>Tekrarları engelle</span>
       </label>
     </div>
-    <div class="hint">İpucu: Işığı açmak için “Flaş” düğmesini deneyin (destekleniyorsa). iPhone/Android tarayıcılarında en iyi deneyim için arka kamerayı seçin.</div>
+    <div class="hint">Not: iPhone/Safari uyumlu tarama için bu sürüm <b>jsQR</b> kütüphanesini kullanır (QR kodlar). EAN/Code128 gibi barkodlar için isterseniz ZXing ekleyebilirim.</div>
   </div>
 
   <div class="list-card">
@@ -149,15 +150,18 @@
   <button id="shareBtn" class="btn-warn">Paylaş</button>
 </div>
 
-<canvas id="canvas"></canvas>
+<canvas id="capture"></canvas>
 <div id="toast" class="toast"></div>
+
+<!-- jsQR (QR çözümleyici) -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
 <script>
 (() => {
   const $ = (sel) => document.querySelector(sel);
   const video = $('#video');
-  const canvas = $('#canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = $('#capture');
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
   const camStatus = $('#camStatus');
   const startBtn = $('#startBtn');
   const stopBtn  = $('#stopBtn');
@@ -170,6 +174,7 @@
   const countEl = $('#count');
   const resetBtn= $('#resetBtn');
   const uniqueToggle = $('#uniqueToggle');
+  const scanFrame = $('#scanFrame');
   const toastEl = $('#toast');
 
   // State
@@ -178,8 +183,8 @@
   let scanning = false;
   let lastScanAt = 0;
   let usingBackCam = true;
-  let detector = null;
-  let detectedSet = new Set();   // to prevent instant duplicates
+  let currentDeviceId = null;
+  let detectedSet = new Set();
   let items = [];                // {value, time}
 
   function toast(msg, ms=1600){
@@ -189,43 +194,48 @@
     toastEl._t = setTimeout(()=> toastEl.style.display='none', ms);
   }
 
-  async function initDetector(){
-    if ('BarcodeDetector' in window) {
-      const formats = ['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','itf'];
-      try{
-        detector = new BarcodeDetector({formats});
-      }catch(e){
-        detector = new BarcodeDetector(); // safari may not accept formats list
-      }
-      return true;
-    } else {
-      detector = null;
-      console.warn('BarcodeDetector desteklenmiyor.');
-      toast('Cihaz desteklemiyor: Kamera açıkken iOS/Android güncel tarayıcı kullanın.' , 2600);
-      return false;
+  async function getCameras(){
+    try{
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      return devices.filter(d => d.kind === 'videoinput');
+    }catch(e){
+      return [];
     }
   }
 
-  function getFacingMode(){ return usingBackCam ? 'environment' : 'user'; }
+  function pickBackCamera(cams){
+    // Prefer labels containing back/rear, otherwise last device
+    const byLabel = cams.find(c => /back|rear|ortam|environment/i.test(c.label));
+    return byLabel || cams[cams.length-1] || cams[0];
+  }
+  function pickFrontCamera(cams){
+    const byLabel = cams.find(c => /front|ön|user/i.test(c.label));
+    return byLabel || cams[0];
+  }
 
   async function startCamera(){
-    await initDetector();
     try{
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: getFacingMode() },
-          width: { ideal: 1280 }, height: { ideal: 720 }
-        },
-        audio: false
-      });
+      let deviceId = null;
+      const cams = await getCameras();
+      if(cams.length){
+        const cam = usingBackCam ? pickBackCamera(cams) : pickFrontCamera(cams);
+        deviceId = cam?.deviceId || null;
+      }
+      const constraints = {
+        audio:false,
+        video: deviceId ? { deviceId: { exact: deviceId }, width:{ideal:1280}, height:{ideal:720} } :
+                          { facingMode: usingBackCam ? 'environment' : 'user', width:{ideal:1280}, height:{ideal:720} }
+      };
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
       await video.play();
       track = stream.getVideoTracks()[0];
+      currentDeviceId = track.getSettings().deviceId || deviceId;
       camStatus.textContent = 'Kamera: Açık';
       startBtn.disabled = true;
       stopBtn.disabled = false;
       flipBtn.disabled = false;
-      torchBtn.disabled = !track.getCapabilities || !track.getCapabilities().torch;
+      torchBtn.disabled = !!(track.getCapabilities && track.getCapabilities().torch);
       scanning = true;
       scanLoop();
     }catch(err){
@@ -279,6 +289,10 @@
     items.push({value, time: now});
     renderList();
     beep();
+    // green glow feedback
+    scanFrame.classList.add('green-glow');
+    clearTimeout(scanFrame._t); 
+    scanFrame._t = setTimeout(()=> scanFrame.classList.remove('green-glow'), 300);
   }
 
   function renderList(){
@@ -325,7 +339,6 @@
       await navigator.clipboard.writeText(text);
       toast('Kopyalandı!');
     }catch(e){
-      // Fallback
       const ta = document.createElement('textarea');
       ta.value = text; document.body.appendChild(ta);
       ta.select(); document.execCommand('copy'); ta.remove();
@@ -346,7 +359,7 @@
     if(navigator.share){
       try{
         await navigator.share({ text });
-      }catch(e){ /* cancelled */ }
+      }catch(e){}
     }else{
       toast('Cihaz paylaşımı desteklemiyor.');
     }
@@ -358,31 +371,44 @@
     renderList();
   }
 
+  function cropToScanArea(w,h){
+    // crop to the inner scan-frame (inset:10%)
+    const ix = Math.floor(w*0.1), iy = Math.floor(h*0.1);
+    const iw = Math.floor(w*0.8), ih = Math.floor(h*0.8);
+    return {x:ix, y:iy, w:iw, h:ih};
+  }
+
   async function scanLoop(){
     if(!scanning) return;
-    // throttle to ~8 scans / sec
+    // throttle ~8fps
     const now = performance.now();
-    const elapsed = now - lastScanAt;
-    if(elapsed < 120){ return requestAnimationFrame(scanLoop); }
+    if(now - lastScanAt < 120){ return requestAnimationFrame(scanLoop); }
     lastScanAt = now;
 
-    if(detector){
-      try{
-        const codes = await detector.detect(video);
-        if(codes && codes.length){
-          for(const c of codes){
-            const val = c.rawValue || c.serialNumber || '';
-            if(!val) continue;
-
-            if(uniqueToggle.checked){
-              if(detectedSet.has(val)) continue;
-              detectedSet.add(val);
+    if(video.readyState >= 2){
+      const vw = video.videoWidth, vh = video.videoHeight;
+      if(vw && vh){
+        canvas.width = vw; canvas.height = vh;
+        ctx.drawImage(video, 0, 0, vw, vh);
+        // focus on center area for better speed & accuracy
+        const {x,y,w,h} = cropToScanArea(vw,vh);
+        const imgData = ctx.getImageData(x, y, w, h);
+        try{
+          if(window.jsQR){
+            const qr = jsQR(imgData.data, w, h, { inversionAttempts: 'dontInvert' });
+            if(qr && qr.data){
+              const val = qr.data.trim();
+              if(val){
+                const key = val;
+                if(uniqueToggle.checked){
+                  if(detectedSet.has(key)) { requestAnimationFrame(scanLoop); return; }
+                  detectedSet.add(key);
+                }
+                addItem(val);
+              }
             }
-            addItem(val);
           }
-        }
-      }catch(e){
-        // ignore frame errors
+        }catch(e){}
       }
     }
     requestAnimationFrame(scanLoop);
@@ -412,11 +438,11 @@
 
   // Save & restore list across refresh
   window.addEventListener('beforeunload', () => {
-    try{ localStorage.setItem('qr_list_items', JSON.stringify(items)); }catch{}
+    try{ localStorage.setItem('qr_list_items_ios', JSON.stringify(items)); }catch{}
   });
   (function restore(){
     try{
-      const raw = localStorage.getItem('qr_list_items');
+      const raw = localStorage.getItem('qr_list_items_ios');
       if(raw){
         const arr = JSON.parse(raw)||[];
         items = arr.map(o => ({ value:o.value, time: new Date(o.time) }));
