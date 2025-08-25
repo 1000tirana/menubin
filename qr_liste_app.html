@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR / Barkod Liste (iPhone Android)</title>
+<title>QR Liste · Son 4 Hane</title>
 <style>
   :root{
     --bg:#0f1115;
@@ -24,9 +24,9 @@
     -webkit-font-smoothing:antialiased;
   }
   header{
-    position:sticky; top:0; z-index:5;
-    background:linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,0));
-    padding:16px 16px 8px 16px;
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,0));
+    padding:12px 16px 6px 16px;
     display:flex; align-items:center; gap:12px;
   }
   .app-title{font-size:18px; font-weight:700; letter-spacing:.3px}
@@ -34,7 +34,15 @@
     padding:4px 10px; border-radius:999px;
     background:#1f2430; color:var(--muted); font-size:12px;
   }
-  .container{padding:12px 16px 120px 16px; max-width:840px; margin:0 auto;}
+  .last-scan{
+    position:sticky; top:48px; z-index:15;
+    display:flex; align-items:center; gap:8px;
+    background:#122019; color:#bff4d1;
+    border:1px solid #1b3a2b; border-left:4px solid var(--accent);
+    margin:0 12px; border-radius:10px; padding:9px 12px;
+    font-size:14px;
+  }
+  .container{padding:10px 16px 120px 16px; max-width:840px; margin:0 auto;}
   .camera-card{
     background:var(--card);
     border-radius:14px;
@@ -79,8 +87,8 @@
   }
   .item:last-child{border-bottom:none}
   .index{ width:28px; height:28px; border-radius:999px; background:#242a39; display:flex; align-items:center; justify-content:center; font-weight:700; color:#c0c7d9; flex:0 0 auto;}
-  .value{ word-break:break-word; flex:1; }
-  .time{ color:var(--muted); font-size:12px; margin-top:4px;}
+  .value{ word-break:break-word; flex:1; font-size:18px; font-weight:700; letter-spacing:.5px;}
+  .time{ color:var(--muted); font-size:12px; margin-top:4px; font-weight:500;}
   .del-btn{ background:#23293a; color:#ff9b9b; border-radius:10px; padding:8px 10px; font-weight:700}
   .toolbar{
     position:fixed; left:0; right:0; bottom:0; z-index:10;
@@ -106,13 +114,20 @@
     display:none;
   }
   .green-glow{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 18px rgba(0,255,144,.6) inset; border-color: rgba(0,255,144,.9); }
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;}
 </style>
 </head>
 <body>
 <header>
-  <div class="app-title">QR / Barkod Listeleyici</div>
+  <div class="app-title">QR Liste · Son 4</div>
   <span id="camStatus" class="pill">Kamera: Kapalı</span>
 </header>
+
+<div id="lastBanner" class="last-scan" style="display:none;">
+  <strong>Son taranan:</strong>
+  <span id="lastValue" class="mono">—</span>
+  <span id="lastTime" class="small" style="margin-left:auto;"></span>
+</div>
 
 <div class="container">
   <div class="camera-card">
@@ -130,7 +145,7 @@
         <span>Tekrarları engelle</span>
       </label>
     </div>
-    <div class="hint">Not: iPhone/Safari uyumlu tarama için bu sürüm <b>jsQR</b> kütüphanesini kullanır (QR kodlar). EAN/Code128 gibi barkodlar için isterseniz ZXing ekleyebilirim.</div>
+    <div class="hint">Bu sürüm iPhone/Safari uyumlu **jsQR** ile çalışır (QR). Sadece **son 4 alfasayısal** karakter listelenir.</div>
   </div>
 
   <div class="list-card">
@@ -176,6 +191,9 @@
   const uniqueToggle = $('#uniqueToggle');
   const scanFrame = $('#scanFrame');
   const toastEl = $('#toast');
+  const lastBanner = $('#lastBanner');
+  const lastValue  = $('#lastValue');
+  const lastTime   = $('#lastTime');
 
   // State
   let stream = null;
@@ -183,9 +201,8 @@
   let scanning = false;
   let lastScanAt = 0;
   let usingBackCam = true;
-  let currentDeviceId = null;
   let detectedSet = new Set();
-  let items = [];                // {value, time}
+  let items = [];                // {value, time}  (value = last4 display)
 
   function toast(msg, ms=1600){
     toastEl.textContent = msg;
@@ -198,13 +215,10 @@
     try{
       const devices = await navigator.mediaDevices.enumerateDevices();
       return devices.filter(d => d.kind === 'videoinput');
-    }catch(e){
-      return [];
-    }
+    }catch(e){ return []; }
   }
 
   function pickBackCamera(cams){
-    // Prefer labels containing back/rear, otherwise last device
     const byLabel = cams.find(c => /back|rear|ortam|environment/i.test(c.label));
     return byLabel || cams[cams.length-1] || cams[0];
   }
@@ -230,7 +244,6 @@
       video.srcObject = stream;
       await video.play();
       track = stream.getVideoTracks()[0];
-      currentDeviceId = track.getSettings().deviceId || deviceId;
       camStatus.textContent = 'Kamera: Açık';
       startBtn.disabled = true;
       stopBtn.disabled = false;
@@ -246,11 +259,7 @@
 
   async function stopCamera(){
     scanning = false;
-    if(stream){
-      stream.getTracks().forEach(t=>t.stop());
-      stream = null;
-      track = null;
-    }
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
     video.srcObject = null;
     camStatus.textContent = 'Kamera: Kapalı';
     startBtn.disabled = false;
@@ -270,29 +279,41 @@
     }catch(e){ toast('Flaş değiştirilemedi');}
   }
 
-  function beep(){
-    try{
-      const ac = new (window.AudioContext||window.webkitAudioContext)();
-      const o = ac.createOscillator(); const g = ac.createGain();
-      o.type='triangle'; o.frequency.value=880;
-      o.connect(g); g.connect(ac.destination);
-      g.gain.setValueAtTime(0.001, ac.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.2, ac.currentTime+0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.15);
-      o.start(); o.stop(ac.currentTime+0.16);
-      setTimeout(()=>ac.close(), 250);
-    }catch{}
+  function p2(n){ return String(n).padStart(2,'0'); }
+  function formatTime(d){ return `${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`; }
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[s]);
   }
 
-  function addItem(value){
+  // keep only alphanumeric, take last 4
+  function last4AlphaNum(s){
+    const only = String(s).replace(/[^0-9A-Za-z]/g, '');
+    if(!only) return '';
+    return only.slice(-4).toUpperCase();
+  }
+
+  function setLastBanner(val){
+    lastValue.textContent = val || '—';
+    lastTime.textContent = formatTime(new Date());
+    lastBanner.style.display = 'flex';
+  }
+
+  function addItem(raw){
+    const last4 = last4AlphaNum(raw);
+    if(!last4) return;
     const now = new Date();
-    items.push({value, time: now});
+    items.push({value:last4, time: now});
     renderList();
+    setLastBanner(last4);
     beep();
-    // green glow feedback
+    // glow feedback
+    const scanFrame = document.getElementById('scanFrame');
     scanFrame.classList.add('green-glow');
     clearTimeout(scanFrame._t); 
     scanFrame._t = setTimeout(()=> scanFrame.classList.remove('green-glow'), 300);
+    save();
   }
 
   function renderList(){
@@ -302,7 +323,7 @@
       li.className = 'item';
       li.innerHTML = `
         <div class="index">${idx+1}</div>
-        <div class="value">
+        <div class="value mono">
           <div>${escapeHtml(it.value)}</div>
           <div class="time">${formatTime(it.time)}</div>
         </div>
@@ -310,26 +331,15 @@
       `;
       li.querySelector('.del-btn').onclick = () => {
         items.splice(idx,1);
-        renderList();
+        renderList(); save();
       };
       listEl.appendChild(li);
     });
     countEl.textContent = items.length;
   }
 
-  function formatTime(d){
-    const p = (n)=> String(n).padStart(2,'0');
-    return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
-  }
-
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    })[s]);
-  }
-
   function buildText(){
-    return items.map((it, i)=> `${i+1}. ${it.value}`).join('\n');
+    return items.map((it, i)=> `${i+1}. ${it.value}`).join('\\n');
   }
 
   async function copyAll(){
@@ -349,38 +359,45 @@
   function whatsappShare(){
     const text = buildText();
     if(!text){ toast('Liste boş'); return; }
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   }
 
   async function systemShare(){
     const text = buildText();
     if(!text){ toast('Liste boş'); return; }
     if(navigator.share){
-      try{
-        await navigator.share({ text });
-      }catch(e){}
-    }else{
-      toast('Cihaz paylaşımı desteklemiyor.');
-    }
+      try{ await navigator.share({ text }); }catch(e){}
+    }else{ toast('Cihaz paylaşımı desteklemiyor.'); }
   }
 
   function resetList(){
     items.length = 0;
     detectedSet.clear();
-    renderList();
+    renderList(); save();
   }
 
   function cropToScanArea(w,h){
-    // crop to the inner scan-frame (inset:10%)
     const ix = Math.floor(w*0.1), iy = Math.floor(h*0.1);
     const iw = Math.floor(w*0.8), ih = Math.floor(h*0.8);
     return {x:ix, y:iy, w:iw, h:ih};
   }
 
+  function beep(){
+    try{
+      const ac = new (window.AudioContext||window.webkitAudioContext)();
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type='triangle'; o.frequency.value=880;
+      o.connect(g); g.connect(ac.destination);
+      g.gain.setValueAtTime(0.001, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.2, ac.currentTime+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+0.15);
+      o.start(); o.stop(ac.currentTime+0.16);
+      setTimeout(()=>ac.close(), 250);
+    }catch{}
+  }
+
   async function scanLoop(){
     if(!scanning) return;
-    // throttle ~8fps
     const now = performance.now();
     if(now - lastScanAt < 120){ return requestAnimationFrame(scanLoop); }
     lastScanAt = now;
@@ -390,21 +407,20 @@
       if(vw && vh){
         canvas.width = vw; canvas.height = vh;
         ctx.drawImage(video, 0, 0, vw, vh);
-        // focus on center area for better speed & accuracy
         const {x,y,w,h} = cropToScanArea(vw,vh);
         const imgData = ctx.getImageData(x, y, w, h);
         try{
           if(window.jsQR){
             const qr = jsQR(imgData.data, w, h, { inversionAttempts: 'dontInvert' });
             if(qr && qr.data){
-              const val = qr.data.trim();
-              if(val){
-                const key = val;
+              const raw = qr.data.trim();
+              if(raw){
+                const key = raw; // full data for uniqueness
                 if(uniqueToggle.checked){
                   if(detectedSet.has(key)) { requestAnimationFrame(scanLoop); return; }
                   detectedSet.add(key);
                 }
-                addItem(val);
+                addItem(raw);
               }
             }
           }
@@ -414,7 +430,33 @@
     requestAnimationFrame(scanLoop);
   }
 
-  // Button bindings
+  // Persistence
+  const LS_KEY = 'qr_list_items_ios_last4';
+  function save(){
+    try{
+      const data = items.map(o => ({ value:o.value, time:o.time.toISOString() }));
+      localStorage.setItem(LS_KEY, JSON.stringify(data));
+      const last = items[items.length-1];
+      if(last){ localStorage.setItem(LS_KEY+'_last', JSON.stringify(last)); }
+    }catch{}
+  }
+  function restore(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(raw){
+        const arr = JSON.parse(raw)||[];
+        items = arr.map(o => ({ value:o.value, time: new Date(o.time) }));
+        renderList();
+      }
+      const lastRaw = localStorage.getItem(LS_KEY+'_last');
+      if(lastRaw){
+        const last = JSON.parse(lastRaw);
+        setLastBanner(last.value || '');
+      }
+    }catch{}
+  }
+
+  // Buttons
   startBtn.onclick = startCamera;
   stopBtn.onclick  = stopCamera;
   torchBtn.onclick = toggleTorch;
@@ -429,27 +471,14 @@
     if(confirm('Listeyi temizlemek istiyor musunuz?')) resetList();
   };
 
-  // Autostart if permissions already granted
+  // Autostart if permission already granted
   if (navigator.permissions && navigator.permissions.query){
     navigator.permissions.query({name:'camera'}).then(p => {
       if(p.state === 'granted'){ startCamera(); }
     }).catch(()=>{});
   }
 
-  // Save & restore list across refresh
-  window.addEventListener('beforeunload', () => {
-    try{ localStorage.setItem('qr_list_items_ios', JSON.stringify(items)); }catch{}
-  });
-  (function restore(){
-    try{
-      const raw = localStorage.getItem('qr_list_items_ios');
-      if(raw){
-        const arr = JSON.parse(raw)||[];
-        items = arr.map(o => ({ value:o.value, time: new Date(o.time) }));
-        renderList();
-      }
-    }catch{}
-  })();
+  restore();
 
 })();  
 </script>
