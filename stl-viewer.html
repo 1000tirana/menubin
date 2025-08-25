@@ -1,64 +1,348 @@
 <!DOCTYPE html>
-<html lang=\"tr\">
+<html lang="tr">
 <head>
-<meta charset=\"utf-8\">
-<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover\">
-<title>STL Görüntüleyici v2 — Mobil Uyumlu</title>
-<style>
-:root{--bg:#0c0f14;--fg:#ecf2ff;--muted:#93a1b5;--panel:rgba(18,22,29,.9);--accent:#5aa3ff;}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-#toolbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:.5rem;align-items:center;justify-content:center;padding:.6rem env(safe-area-inset-right) calc(.7rem + env(safe-area-inset-bottom)) env(safe-area-inset-left);background:var(--panel);backdrop-filter:blur(8px);border-top:1px solid rgba(255,255,255,.07);z-index:10}
-.btn{appearance:none;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,#151a22,#0f141c);color:var(--fg);padding:.75rem .95rem;border-radius:.9rem;font-size:14px;font-weight:700;display:flex;align-items:center;gap:.45rem;box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 6px 18px rgba(0,0,0,.32);cursor:pointer}
-#file{display:none}#canvas{position:absolute;inset:0}
-#toast{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:var(--panel);border:1px solid rgba(255,255,255,.1);padding:.45rem .75rem;border-radius:.65rem;color:var(--muted);font-size:13px;z-index:11;backdrop-filter:blur(8px);max-width:92vw;text-align:center}
-#drop{position:absolute;inset:0;border:2px dashed rgba(255,255,255,.12);border-radius:16px;margin:14px;display:none;align-items:center;justify-content:center;color:var(--muted);z-index:7;pointer-events:none}
-#fabOpen{position:fixed;right:14px;bottom:calc(72px + env(safe-area-inset-bottom));background:var(--accent);color:#02122b;border:none;border-radius:999px;padding:.9rem 1.1rem;font-weight:800;box-shadow:0 10px 24px rgba(0,0,0,.35);z-index:10;cursor:pointer}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>STL Görüntüleyici — App v3</title>
+  <meta name="theme-color" content="#0b0e13" />
+  <style>
+    :root{
+      --bg:#0b0e13; --fg:#e9eefc; --muted:#9fb0c6; --panel:rgba(15,19,25,.9);
+      --accent:#59a6ff; --btn:#151a22; --btn2:#0f141a; --ok:#60e0a6; --err:#ff6f8d;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    #app{position:fixed;inset:0;display:flex;flex-direction:column}
+    #canvas{position:absolute;inset:0}
+    #toolbar{
+      position:fixed;left:0;right:0;bottom:0;display:flex;gap:.55rem;flex-wrap:wrap;
+      align-items:center;justify-content:center;padding:.6rem env(safe-area-inset-right) calc(.8rem + env(safe-area-inset-bottom)) env(safe-area-inset-left);
+      background:var(--panel);backdrop-filter:blur(8px);border-top:1px solid rgba(255,255,255,.06);z-index:20;
+    }
+    .btn{
+      -webkit-tap-highlight-color: transparent;
+      appearance:none;border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg,var(--btn),var(--btn2));color:var(--fg);
+      padding:.75rem .95rem;border-radius:.9rem;font-size:14px;font-weight:800;
+      display:flex;align-items:center;gap:.45rem;cursor:pointer;
+      box-shadow:0 1px 0 rgba(255,255,255,.05) inset, 0 6px 18px rgba(0,0,0,.32);
+    }
+    .btn:active{transform:translateY(1px)}
+    #file{display:none}
+    #toast{
+      position:fixed;left:50%;top:12px;transform:translateX(-50%);
+      background:var(--panel);border:1px solid rgba(255,255,255,.1);
+      padding:.45rem .75rem;border-radius:.65rem;color:var(--muted);font-size:13px;z-index:30;
+      backdrop-filter: blur(8px);max-width:95vw;text-align:center;
+    }
+    #drop{
+      position:absolute;inset:0;border:2px dashed rgba(255,255,255,.12);
+      border-radius:16px;margin:14px;display:none;align-items:center;justify-content:center;
+      color:var(--muted);z-index:7; pointer-events:none;
+    }
+    #fabOpen{
+      position: fixed; right: 14px; bottom: calc(74px + env(safe-area-inset-bottom));
+      background: var(--accent); color: #03162c; font-weight: 900;
+      border: none; border-radius: 999px; padding: .95rem 1.1rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      z-index: 21; cursor: pointer;
+    }
+    #fabOpen:active{ transform: translateY(1px) }
+    #msg{
+      position:fixed;left:10px;bottom:calc(64px + env(safe-area-inset-bottom));
+      color:var(--muted);font-size:12px;opacity:.85;z-index:19;background:var(--panel);
+      padding:.35rem .55rem;border-radius:.5rem;border:1px solid rgba(255,255,255,.06);
+    }
+    .chip{color:var(--fg);font-weight:800}
+  </style>
+  <!-- Manifest as data URL for single-file packaging -->
+  <link rel="manifest" id="manifest-link">
 </head>
 <body>
-<div id=\"toast\">📂 STL dosyanı açmak için alttan <b>STL Aç</b> veya sağ alttan <b>Aç</b> düğmesini kullan.</div>
-<div id=\"drop\">Bırakın…</div>
-<canvas id=\"canvas\"></canvas>
-<div id=\"toolbar\">
-  <label class=\"btn\" for=\"file\">📂 STL Aç</label>
-  <button id=\"reset\" class=\"btn\">🔄 Sıfırla</button>
-  <button id=\"wire\" class=\"btn\">🧵 Tel Kafes</button>
-  <button id=\"theme\" class=\"btn\">🌗 Arka Plan</button>
-  <button id=\"grid\" class=\"btn\"># Izgara</button>
+<div id="app">
+  <div id="toast">📂 <b>STL Aç</b> ile dosya seçebilir ya da aynı klasörde <span class="chip">filaltin_shield_keychain.stl</span> varsa otomatik yüklenir.</div>
+  <div id="drop">Bırakın…</div>
+  <canvas id="canvas" aria-label="STL Viewer"></canvas>
+
+  <div id="msg">İpucu: URL’ye <span class="chip">?stl=dosya.stl</span> ekleyebilirsin. İlk açılışta internet gerekir; sonra <b>çevrimdışı</b> çalışır.</div>
+
+  <div id="toolbar">
+    <label class="btn" for="file">📂 STL Aç</label>
+    <button id="reset"  class="btn">🔄 Sıfırla</button>
+    <button id="wire"   class="btn">🧵 Tel Kafes</button>
+    <button id="theme"  class="btn">🌗 Arka Plan</button>
+    <button id="grid"   class="btn"># Izgara</button>
+    <button id="snap"   class="btn">📸 Ekran</button>
+    <button id="install" class="btn">📲 Yükle</button>
+  </div>
+  <button id="fabOpen">Aç</button>
+  <input id="file" type="file" />
 </div>
-<button id=\"fabOpen\">Aç</button>
-<input id=\"file\" type=\"file\">
-<script src=\"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js\"></script>
-<script src=\"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js\"></script>
-<script src=\"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/STLLoader.js\"></script>
-<script src=\"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/utils/BufferGeometryUtils.js\"></script>
+
+<!-- Three.js (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/utils/BufferGeometryUtils.js"></script>
+
 <script>
 (function(){
-  const canvas=document.getElementById('canvas'); const toast=document.getElementById('toast'); const drop=document.getElementById('drop'); const fileInput=document.getElementById('file');
-  document.getElementById('fabOpen').addEventListener('click',()=>fileInput.click());
-  function showToast(t){ toast.innerHTML=t; toast.style.opacity=1; clearTimeout(showToast._t); showToast._t=setTimeout(()=>toast.style.opacity=0,5000); }
-  const scene=new THREE.Scene(); let dark=true; scene.background=new THREE.Color(0x0c0f14);
-  const camera=new THREE.PerspectiveCamera(60,1,0.1,20000); camera.position.set(0,0,180);
-  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  const controls=new THREE.OrbitControls(camera,canvas); controls.enableDamping=true; controls.dampingFactor=.08; controls.rotateSpeed=.9; controls.enablePan=true;
-  const amb=new THREE.AmbientLight(0xffffff,.55); const d1=new THREE.DirectionalLight(0xffffff,.75); d1.position.set(1,2,1); const d2=new THREE.DirectionalLight(0xffffff,.45); d2.position.set(-2,1,-1); scene.add(amb,d1,d2);
-  let grid=new THREE.GridHelper(400,20,0x334455,0x223344); grid.visible=false; scene.add(grid);
-  const holder=new THREE.Group(); scene.add(holder); let mesh=null;
-  const matSolid=new THREE.MeshPhysicalMaterial({color:0xdfe6f3,metalness:.05,roughness:.55,clearcoat:.25,clearcoatRoughness:.7});
-  const matWire=new THREE.MeshBasicMaterial({color:0x88aaff,wireframe:true}); let wireOn=false;
-  function onResize(){ const w=innerWidth,h=innerHeight; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); } addEventListener('resize',onResize,{passive:true}); onResize();
-  function frame(obj){ const box=new THREE.Box3().setFromObject(obj); const size=box.getSize(new THREE.Vector3()); const center=box.getCenter(new THREE.Vector3()); const maxDim=Math.max(size.x,size.y,size.z)||100; const dist=maxDim/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov)/2)); camera.position.copy(center.clone().add(new THREE.Vector3(0,0,dist*1.35))); controls.target.copy(center); controls.update(); }
-  function centerPivot(obj){ const box=new THREE.Box3().setFromObject(obj); const c=box.getCenter(new THREE.Vector3()); obj.position.sub(c); }
-  const loader=new THREE.STLLoader();
-  function addGeo(geo,name){ if(!geo||!geo.attributes||!geo.attributes.position){ showToast('STL okunamadı.'); return; } if(mesh){ holder.remove(mesh); mesh.geometry.dispose(); mesh=null; } mesh=new THREE.Mesh(geo,wireOn?matWire:matSolid); holder.add(mesh); centerPivot(holder); frame(holder); showToast('Yüklendi: <b>'+name+'</b>'); }
-  fileInput.addEventListener('change',e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const geo=loader.parse(r.result); addGeo(geo,f.name);}catch(err){console.error(err);showToast('STL parse edilemedi.');} }; r.readAsArrayBuffer(f);});
-  addEventListener('dragover',e=>{ e.preventDefault(); drop.style.display='flex'; }); addEventListener('dragleave',e=>{ drop.style.display='none'; });
-  addEventListener('drop',e=>{ e.preventDefault(); drop.style.display='none'; const f=e.dataTransfer.files&&e.dataTransfer.files[0]; if(f){ const r=new FileReader(); r.onload=()=>{ try{ const geo=loader.parse(r.result); addGeo(geo,f.name);}catch(err){console.error(err);showToast('STL parse edilemedi.');} }; r.readAsArrayBuffer(f);} });
-  document.getElementById('reset').addEventListener('click',()=>{ if(mesh){ centerPivot(holder); frame(holder); controls.reset(); } });
-  document.getElementById('wire').addEventListener('click',()=>{ wireOn=!wireOn; if(mesh){ mesh.material=wireOn?matWire:matSolid; } });
-  document.getElementById('theme').addEventListener('click',()=>{ dark=!dark; scene.background=new THREE.Color(dark?0x0c0f14:0xf2f5fb); grid.material.color=new THREE.Color(dark?0x334455:0x9db1c9);} );
-  document.getElementById('grid').addEventListener('click',()=>{ grid.visible=!grid.visible; });
-  (function loop(){ controls.update(); renderer.render(scene,camera); requestAnimationFrame(loop); })();
+  // --- Manifest (inline) ---
+  const manifest = {
+    "name": "STL Görüntüleyici — App v3",
+    "short_name": "STL Viewer",
+    "display": "standalone",
+    "start_url": ".",
+    "theme_color": "#0b0e13",
+    "background_color": "#0b0e13",
+    "icons": []
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const manifestURL = URL.createObjectURL(manifestBlob);
+  document.getElementById('manifest-link').setAttribute('href', manifestURL);
+
+  // --- Service Worker (inline via Blob) ---
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE_NAME = 'stl-viewer-v3-cache-v1';
+      const ASSETS = [
+        './',
+        location.pathname,
+        'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js',
+        'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/controls/OrbitControls.js',
+        'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/loaders/STLLoader.js',
+        'https://cdn.jsdelivr.net/npm/three@0.161.0/examples/js/utils/BufferGeometryUtils.js'
+      ];
+      self.addEventListener('install', (e) => {
+        e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).then(()=>self.skipWaiting()));
+      });
+      self.addEventListener('activate', (e) => {
+        e.waitUntil(
+          caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))).then(()=>self.clients.claim())
+        );
+      });
+      self.addEventListener('fetch', (e) => {
+        const url = new URL(e.request.url);
+        e.respondWith(
+          caches.match(e.request).then(resp => {
+            return resp || fetch(e.request).then(networkResp => {
+              const copy = networkResp.clone();
+              caches.open(CACHE_NAME).then(c => c.put(e.request, copy)).catch(()=>{});
+              return networkResp;
+            }).catch(()=>caches.match('./'));
+          })
+        );
+      });
+    `;
+    const swBlob = new Blob([swCode], {type: 'text/javascript'});
+    const swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).catch(()=>{});
+  }
+
+  // --- UI refs ---
+  const canvas = document.getElementById('canvas');
+  const toast  = document.getElementById('toast');
+  const drop   = document.getElementById('drop');
+  const fileInput = document.getElementById('file');
+  const btnInstall = document.getElementById('install');
+  document.getElementById('fabOpen').addEventListener('click', ()=> fileInput.click());
+
+  // PWA install prompt
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
+  btnInstall.addEventListener('click', async ()=>{
+    if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt = null; }
+    else show('Ana ekrana eklemek için tarayıcı menüsünü kullanın.');
+  });
+
+  // --- Scene setup ---
+  const scene = new THREE.Scene();
+  let dark = true;
+  scene.background = new THREE.Color(0x0b0e13);
+
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 20000);
+  camera.position.set(0, 0, 180);
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+  const controls = new THREE.OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.dampingFactor = .08;
+  controls.rotateSpeed = .9;
+  controls.enablePan = true;
+
+  const amb = new THREE.AmbientLight(0xffffff, .55);
+  const dir1 = new THREE.DirectionalLight(0xffffff, .75); dir1.position.set( 1, 2,  1);
+  const dir2 = new THREE.DirectionalLight(0xffffff, .45); dir2.position.set(-2, 1, -1);
+  scene.add(amb, dir1, dir2);
+
+  let grid = new THREE.GridHelper(400, 20, 0x334455, 0x223344);
+  grid.visible = false;
+  scene.add(grid);
+
+  const holder = new THREE.Group();
+  scene.add(holder);
+  let mesh = null;
+
+  const matSolid = new THREE.MeshPhysicalMaterial({
+    color: 0xdfe6f3, metalness: .05, roughness: .55,
+    clearcoat: .25, clearcoatRoughness: .7
+  });
+  const matWire = new THREE.MeshBasicMaterial({color: 0x88aaff, wireframe:true});
+  let wireOn = false;
+
+  function onResize(){
+    const w = innerWidth;
+    const h = innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+  }
+  addEventListener('resize', onResize, {passive:true}); onResize();
+
+  function frameObject(obj){
+    const bbox = new THREE.Box3().setFromObject(obj);
+    const size = bbox.getSize(new THREE.Vector3());
+    const center = bbox.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 100;
+    const dist = maxDim / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2));
+    const newPos = center.clone().add(new THREE.Vector3(0, 0, dist * 1.35));
+    camera.position.copy(newPos);
+    controls.target.copy(center);
+    controls.update();
+  }
+
+  function centerPivot(obj){
+    const box = new THREE.Box3().setFromObject(obj);
+    const center = box.getCenter(new THREE.Vector3());
+    obj.position.sub(center);
+  }
+
+  const loader = new THREE.STLLoader();
+
+  function show(t, danger=false){
+    toast.innerHTML = t;
+    toast.style.opacity = 1;
+    toast.style.borderColor = danger ? 'rgba(255,111,141,.45)' : 'rgba(255,255,255,.1)';
+    toast.style.color = danger ? '#ffd7e0' : 'var(--muted)';
+    clearTimeout(show._t); show._t = setTimeout(()=> toast.style.opacity = 0, 5000);
+  }
+
+  function addGeometry(geo, name="model.stl"){
+    if (!geo || !geo.attributes || !geo.attributes.position){
+      show("STL okunamadı.", true); return;
+    }
+    if (mesh){ holder.remove(mesh); mesh.geometry.dispose(); mesh = null; }
+    mesh = new THREE.Mesh(geo, wireOn ? matWire : matSolid);
+    mesh.castShadow = mesh.receiveShadow = true;
+    holder.add(mesh);
+    centerPivot(holder);
+    frameObject(holder);
+    show("Yüklendi: <b>"+name+"</b>");
+  }
+
+  // File input (no accept filter for iOS compatibility)
+  fileInput.addEventListener('change', (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onerror = ()=> show("Dosya okunamadı.", true);
+    reader.onload = () => {
+      try{
+        const arrayBuffer = reader.result;
+        const geometry = loader.parse(arrayBuffer);
+        addGeometry(geometry, file.name);
+      }catch(err){ console.error(err); show("STL parse edilemedi.", true); }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  // Drag & Drop (desktop)
+  addEventListener('dragover', (e)=>{ e.preventDefault(); drop.style.display='flex'; });
+  addEventListener('dragleave', (e)=>{ drop.style.display='none'; });
+  addEventListener('drop', (e)=>{
+    e.preventDefault(); drop.style.display='none';
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onerror = ()=> show("Dosya okunamadı.", true);
+      reader.onload = ()=>{
+        try{
+          const geometry = loader.parse(reader.result);
+          addGeometry(geometry, file.name);
+        }catch(err){ console.error(err); show("STL parse edilemedi.", true); }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
+
+  // Buttons
+  document.getElementById('reset').addEventListener('click', ()=>{
+    if (mesh){ centerPivot(holder); frameObject(holder); controls.reset(); }
+  });
+  document.getElementById('wire').addEventListener('click', ()=>{
+    wireOn = !wireOn; if (mesh){ mesh.material = wireOn ? matWire : matSolid; }
+  });
+  document.getElementById('theme').addEventListener('click', ()=>{
+    dark = !dark;
+    scene.background = new THREE.Color(dark ? 0x0b0e13 : 0xf2f5fb);
+    grid.material.color = new THREE.Color(dark ? 0x334455 : 0x9db1c9);
+  });
+  document.getElementById('grid').addEventListener('click', ()=>{ grid.visible = !grid.visible; });
+  document.getElementById('snap').addEventListener('click', ()=>{
+    try{
+      const url = renderer.domElement.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url; a.download = 'stl_screenshot.png';
+      document.body.appendChild(a); a.click(); a.remove();
+    }catch(e){ show('Görüntü alınamadı.', true); }
+  });
+
+  // Auto-load logic:
+  // 1) ?stl= parametresi
+  // 2) Aynı klasörde 'filaltin_shield_keychain.stl' varsa onu dener.
+  async function tryAutoLoad(){
+    const params = new URLSearchParams(location.search);
+    const urlParam = params.get('stl');
+    if (urlParam){
+      try {
+        const buf = await fetch(urlParam).then(r => r.arrayBuffer());
+        const geo = loader.parse(buf);
+        addGeometry(geo, urlParam.split('/').pop() || 'model.stl');
+        return;
+      } catch(e){ console.warn('URL yüklenemedi', e); show('URL ile yüklenemedi. Dosya seçmeyi deneyin.', true); }
+    }
+    // default relative file
+    try {
+      const resp = await fetch('./filaltin_shield_keychain.stl');
+      if (resp.ok){
+        const buf = await resp.arrayBuffer();
+        const geo = loader.parse(buf);
+        addGeometry(geo, 'filaltin_shield_keychain.stl');
+        return;
+      }
+    } catch(e){ /* ignore */ }
+    show('Hazır STL bulunamadı. 📂 "STL Aç" ile seçebilirsiniz.');
+  }
+
+  tryAutoLoad();
+
+  // Render loop
+  function tick(){
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  // Touch
+  canvas.style.touchAction = 'none';
 })();
 </script>
-</body></html>
+</body>
+</html>
