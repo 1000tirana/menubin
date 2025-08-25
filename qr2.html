@@ -58,17 +58,16 @@
   .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0;}
   .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;}
   .list{list-style:none;padding:0;margin:0;}
-  .item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px dashed #23293a;}
+  .item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px dashed #23293a;}
   .item:last-child{border-bottom:none}
-  .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto;}
-  .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px}
-  .time{color:#a9b1c3;font-size:12px;margin-top:4px}
+  .index{width:32px;height:32px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:800;color:#c0c7d9;flex:0 0 auto;}
+  .value{flex:1;font-size:18px;font-weight:800;letter-spacing:.5px}
   .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px}
   .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;backdrop-filter:blur(10px);background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px;}
   .toolbar .btn{flex:1;justify-content:center}
   .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
   .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
-  .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:var(--text); padding:10px 12px; border-radius:10px; font-size:14px;}
+  .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:#e7ebf5; padding:10px 12px; border-radius:10px; font-size:14px;}
 </style>
 </head>
 <body>
@@ -183,8 +182,7 @@ function renderList(){
     li.innerHTML=`
       <div class="index">${idx+1}</div>
       <div class="value">${it.value}</div>
-      <div class="time">${new Date(it.time).toLocaleTimeString()}</div>
-      <button class="del-btn">×</button>`;
+      <button class="del-btn" title="X">×</button>`;
     li.querySelector('.del-btn').onclick=()=>{
       if(confirm(langs[curLang].confirmDel)){
         const val=items[idx].value;
@@ -196,6 +194,10 @@ function renderList(){
     listEl.appendChild(li);
   });
   countEl.textContent=items.length;
+}
+
+function exportText(){
+  return items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");
 }
 
 async function startCam(){
@@ -250,11 +252,11 @@ async function scanLoop(){
   requestAnimationFrame(scanLoop);
 }
 
-function copyAll(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }navigator.clipboard.writeText(t).then(()=>showToast(langs[curLang].copied));}
-function whatsapp(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');}
+function copyAll(){const t=exportText();if(!t){ showToast('—'); return; }navigator.clipboard.writeText(t).then(()=>showToast(langs[curLang].copied));}
+function whatsapp(){const t=exportText();if(!t){ showToast('—'); return; }window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');}
 
-function save(){localStorage.setItem("qrItems_v3", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));}
-function load(){const raw=localStorage.getItem("qrItems_v3");if(raw){try{const arr=JSON.parse(raw)||[];items=arr.map(o=>({value:o.value,time:new Date(o.time)}));items.forEach(x=>seen.add(x.value));renderList();}catch{}}}
+function save(){localStorage.setItem("qrItems_v4", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));}
+function load(){const raw=localStorage.getItem("qrItems_v4");if(raw){try{const arr=JSON.parse(raw)||[];items=arr.map(o=>({value:o.value,time:new Date(o.time)}));items.forEach(x=>seen.add(x.value));renderList();}catch{}}}
 function showToast(m){toastEl.textContent=m;toastEl.style.display='block';setTimeout(()=>toastEl.style.display='none',1400);}
 
 // events
