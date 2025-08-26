@@ -1,0 +1,188 @@
+// ==== Ayarlar & Çeviri ====
+const L = {
+  sq:{ title:"Lista QR", camOn:"Kamera: Hap", camOff:"Kamera: Mbyllur",
+       start:"Start", stop:"Stop", switch:"Ndërro Kamerën", torch:"Dritë",
+       clear:"Pastro", placeholder:"Shkruaj kodin...", add:"Shto",
+       last:"I fundit:", copied:"Kopjuar!", askDel:"A jeni i sigurt për fshirjen?", askClear:"Të pastrohet lista?" },
+  en:{ title:"QR List", camOn:"Camera: On", camOff:"Camera: Off",
+       start:"Start", stop:"Stop", switch:"Switch Camera", torch:"Flash",
+       clear:"Clear", placeholder:"Type a code...", add:"Add",
+       last:"Last:", copied:"Copied!", askDel:"Are you sure to delete?", askClear:"Clear the whole list?" },
+  tr:{ title:"QR Liste", camOn:"Kamera: Açık", camOff:"Kamera: Kapalı",
+       start:"Başlat", stop:"Durdur", switch:"Kamera Değiştir", torch:"Flaş",
+       clear:"Temizle", placeholder:"Kod yaz...", add:"Ekle",
+       last:"Son:", copied:"Kopyalandı!", askDel:"Silmek istediğine emin misin?", askClear:"Liste tamamen temizlensin mi?" },
+};
+const LS_ITEMS = "qrItems_clean_v2";
+const LS_LANG  = "qr_lang";
+
+// ==== Kısa yardımcılar ====
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const last4 = s => (s||"").replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();
+
+// ==== DOM elemanları ====
+const video = $('#video'), scanFrame = $('#scanFrame'), camStatus = $('#camStatus');
+const startBtn = $('#startBtn'), stopBtn = $('#stopBtn'), switchBtn = $('#switchBtn'), torchBtn = $('#torchBtn'), resetBtn = $('#resetBtn');
+const manualInput = $('#manualInput'), manualAddBtn = $('#manualAddBtn');
+const copyBtn = $('#copyBtn'), waBtn = $('#waBtn');
+const listEl = $('#list'), lastBanner = $('#lastBanner'), lastValue = $('#lastValue');
+const tTitle = $('#t-title'), tLast = $('#t-last');
+
+// ==== Durum ====
+let stream=null, track=null, scanning=false, lastScanAt=0;
+let items=[], seen=new Set(), torchOn=false, facing='environment';
+let lang = localStorage.getItem(LS_LANG) || 'sq';
+
+// ==== Dil ====
+function setLang(x){
+  lang = (x in L) ? x : 'sq';
+  localStorage.setItem(LS_LANG, lang);
+  tTitle.textContent = L[lang].title;
+  tLast.textContent  = L[lang].last;
+  camStatus.textContent = scanning ? L[lang].camOn : L[lang].camOff;
+  startBtn.textContent  = L[lang].start;
+  stopBtn.textContent   = L[lang].stop;
+  switchBtn.textContent = L[lang].switch;
+  torchBtn.textContent  = L[lang].torch;
+  resetBtn.textContent  = L[lang].clear;
+  manualInput.placeholder = L[lang].placeholder;
+  manualAddBtn.textContent = L[lang].add;
+  copyBtn.textContent = (lang==='tr'?'Kopyala':lang==='en'?'Copy':'Kopjo');
+}
+$$('.flags [data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+setLang(lang); // açılışta Arnavutça (varsayılan 'sq')
+
+// ==== Liste ====
+function render(){
+  listEl.innerHTML = '';
+  items.forEach((v,i)=>{
+    const li = document.createElement('li');
+    li.className = 'item';
+    li.innerHTML = <div class="index">${i+1}</div><div class="value">${v}</div><button class="del">×</button>;
+    li.querySelector('.del').onclick = () => {
+      if(confirm(L[lang].askDel)){
+        items.splice(i,1);
+        seen = new Set(items);
+        render(); save();
+      }
+    };
+    listEl.appendChild(li);
+  });
+}
+const exportText = () => items.map((v,i)=>${i+1}. ${v}).join('\n');
+
+function save(){ localStorage.setItem(LS_ITEMS, JSON.stringify(items)); }
+function load(){
+  const raw = localStorage.getItem(LS_ITEMS);
+  if(raw){ items = JSON.parse(raw)||[]; seen = new Set(items); render(); }
+}
+load();
+
+// ==== Kamera ====
+function flashOverlay(dup){
+  scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth;
+  scanFrame.classList.add(dup?'glow-red':'glow-green');
+  clearTimeout(scanFrame._t); scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'),350);
+}
+function showBanner(v,dup){
+  lastValue.textContent = v || '—';
+  lastBanner.style.display='flex';
+  lastBanner.classList.toggle('duplicate', !!dup);
+}
+
+async function startCam(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing } });
+    video.srcObject = stream;
+    await video.play();
+    scanning = true;
+    camStatus.textContent = L[lang].camOn;
+    track = stream.getVideoTracks()[0] || null;
+    torchOn = false;
+    const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+    torchBtn.disabled = !(caps && 'torch' in caps);
+    scanLoop();
+  }catch(e){
+    alert(e && e.message ? e.message : e);
+  }
+}
+function stopCam(){
+  scanning = false;
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+  video.srcObject = null;
+  track=null; torchOn=false;
+  torchBtn.disabled = true;
+  camStatus.textContent = L[lang].camOff;
+}
+function switchCam(){
+  facing = (facing==='environment') ? 'user' : 'environment';
+  stopCam(); startCam();
+}
+async function toggleTorch(){
+  if(!track || !track.applyConstraints) return;
+  const caps = track.getCapabilities ? track.getCapabilities() : {};
+  if(!caps.torch) return;
+  try{
+    torchOn = !torchOn;
+    await track.applyConstraints({ advanced:[{ torch: torchOn }] });
+  }catch(e){ torchOn=false; }
+}
+
+async function scanLoop(){
+  if(!scanning) return;
+  const now = performance.now();
+  if(now - lastScanAt < 140){ return requestAnimationFrame(scanLoop); }
+  lastScanAt = now;
+  if(video.readyState >= 2){
+    // jsQR global olarak yüklendi mi?
+    if(typeof jsQR === 'function'){
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently:true });
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const img = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const qr = jsQR(img.data, canvas.width, canvas.height);
+      if(qr && qr.data){
+        const v = last4(qr.data.trim());
+        if(v){
+          const dup = seen.has(v);
+          if(!dup){ seen.add(v); items.push(v); render(); save(); }
+          flashOverlay(dup); showBanner(v, dup);
+        }
+      }
+    }
+  }
+  requestAnimationFrame(scanLoop);
+}
+
+// ==== Manuel ekleme / paylaşım ====
+function addManual(){
+  const v = last4(manualInput.value.trim());
+  if(!v) return;
+  const dup = seen.has(v);
+  if(!dup){ seen.add(v); items.push(v); render(); save(); }
+  flashOverlay(dup); showBanner(v, dup);
+  manualInput.value='';
+}
+function copyAll(){ const t=exportText(); if(t) navigator.clipboard.writeText(t); }
+function waShare(){ const t=exportText(); if(t) window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+function clearAll(){ if(confirm(L[lang].askClear)){ items=[]; seen.clear(); render(); save(); } }
+
+// ==== Event bağlama ====
+startBtn.addEventListener('click', startCam);
+stopBtn .addEventListener('click', stopCam);
+switchBtn.addEventListener('click', switchCam);
+torchBtn.addEventListener('click', toggleTorch);
+resetBtn.addEventListener('click', clearAll);
+manualAddBtn.addEventListener('click', addManual);
+manualInput.addEventListener('keyup', e=>{ if(e.key==='Enter') addManual(); });
+copyBtn.addEventListener('click', copyAll);
+waBtn  .addEventListener('click', waShare);
+
+// Önceden izin verildiyse otomatik başlat (bazı tarayıcılar destekler)
+if(navigator.permissions && navigator.permissions.query){
+  try{
+    navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted') startCam(); }).catch(()=>{});
+  }catch(_){}
+}
