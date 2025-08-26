@@ -1,259 +1,85 @@
 <!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR Liste</title>
-<style>
-  :root{--bg:#0f1115;--card:#171a21;--muted:#a9b1c3;--text:#e7ebf5;--accent:#29c06f;--danger:#ff5d5d}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-  header{position:sticky;top:0;z-index:30;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,0))}
-  .flags button{background:none;border:none;font-size:20px;cursor:pointer}
-  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:var(--muted);font-size:12px}
-  .container{padding:12px 16px 120px}
-  .camera-card{background:var(--card);border-radius:14px;padding:12px}
-  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:3/4}
-  video{width:100%;height:100%;object-fit:cover;display:block}
-  .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition:box-shadow .12s,border-color .12s}
-  .glow-green{box-shadow:0 0 0 9999px rgba(0,255,0,.15) inset,0 0 20px #0f0 inset;border-color:#0f0}
-  .glow-red{box-shadow:0 0 0 9999px rgba(255,0,0,.15) inset,0 0 20px #f00 inset;border-color:#f00}
-  .controls{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
-  button{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:#222734;color:#e7ebf5}
-  .btn-primary{background:var(--accent);color:#06160c}
-  .btn-danger{background:var(--danger);color:#260000}
-  .btn-warn{background:#ffc53d;color:#221a00}
-  .manual{display:flex;gap:8px;margin-top:10px}
-  .manual input{flex:1;padding:10px;background:#1b2030;border:1px solid #2a3246;color:#fff;border-radius:8px}
-  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0}
-  .item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px dashed #23293a}
-  .item:last-child{border-bottom:none}
-  .index{width:32px;height:32px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:800;color:#c0c7d9}
-  .value{flex:1;font-size:18px;font-weight:800}
-  .del{background:#23293a;color:#ff9b9b;border-radius:8px;padding:2px 8px}
-  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;padding:10px 16px;background:rgba(10,12,16,.9);backdrop-filter:blur(10px)}
-  .toolbar .btn{flex:1}
-  .last-scan{position:sticky;top:46px;z-index:25;margin:6px 12px;padding:8px 12px;border-radius:10px;display:none;align-items:center;gap:8px;background:#122019;color:#bff4d1;border:1px solid #1b3a2b;border-left:4px solid var(--accent)}
-  .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:#ff8b8b}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>QR Liste</title>
+  <style>
+    :root{--bg:#0f1115;--card:#171a21;--muted:#a9b1c3;--text:#e7ebf5;--accent:#29c06f;--danger:#ff5d5d}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    header{position:sticky;top:0;z-index:30;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,0))}
+    .flags button{background:none;border:none;font-size:20px;cursor:pointer}
+    .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:var(--muted);font-size:12px}
+    .container{padding:12px 16px 120px}
+    .camera-card{background:var(--card);border-radius:14px;padding:12px}
+    .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:3/4}
+    video{width:100%;height:100%;object-fit:cover;display:block}
+    .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition:box-shadow .12s,border-color .12s}
+    .glow-green{box-shadow:0 0 0 9999px rgba(0,255,0,.15) inset,0 0 20px #0f0 inset;border-color:#0f0}
+    .glow-red{box-shadow:0 0 0 9999px rgba(255,0,0,.15) inset,0 0 20px #f00 inset;border-color:#f00}
+    .controls{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+    button{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:#222734;color:#e7ebf5}
+    .btn-primary{background:var(--accent);color:#06160c}
+    .btn-danger{background:var(--danger);color:#260000}
+    .btn-warn{background:#ffc53d;color:#221a00}
+    .manual{display:flex;gap:8px;margin-top:10px}
+    .manual input{flex:1;padding:10px;background:#1b2030;border:1px solid #2a3246;color:#fff;border-radius:8px}
+    .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0}
+    .item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px dashed #23293a}
+    .item:last-child{border-bottom:none}
+    .index{width:32px;height:32px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:800;color:#c0c7d9}
+    .value{flex:1;font-size:18px;font-weight:800}
+    .del{background:#23293a;color:#ff9b9b;border-radius:8px;padding:2px 8px}
+    .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;padding:10px 16px;background:rgba(10,12,16,.9);backdrop-filter:blur(10px)}
+    .toolbar .btn{flex:1}
+    .last-scan{position:sticky;top:46px;z-index:25;margin:6px 12px;padding:8px 12px;border-radius:10px;display:none;align-items:center;gap:8px;background:#122019;color:#bff4d1;border:1px solid #1b3a2b;border-left:4px solid var(--accent)}
+    .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:#ff8b8b}
+  </style>
 </head>
 <body>
-<header>
-  <div><strong id="t-title">Lista QR</strong> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
-  <div class="flags">
-    <button type="button" data-lang="sq">🇦🇱</button>
-    <button type="button" data-lang="en">🇬🇧</button>
-    <button type="button" data-lang="tr">🇹🇷</button>
-  </div>
-</header>
-
-<div id="lastBanner" class="last-scan"><strong id="t-last">I fundit:</strong> <span id="lastValue">—</span></div>
-
-<div class="container">
-  <div class="camera-card">
-    <div class="video-wrap">
-      <video id="video" playsinline muted></video>
-      <div id="scanFrame" class="scan-frame"></div>
+  <header>
+    <div><strong id="t-title">Lista QR</strong> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
+    <div class="flags">
+      <button type="button" data-lang="sq">🇦🇱</button>
+      <button type="button" data-lang="en">🇬🇧</button>
+      <button type="button" data-lang="tr">🇹🇷</button>
     </div>
-    <div class="controls">
-      <button id="startBtn" class="btn-primary">Start</button>
-      <button id="stopBtn">Stop</button>
-      <button id="switchBtn">Kamera Değiştir</button>
-      <button id="torchBtn">Flaş</button>
-      <button id="resetBtn" class="btn-danger">Pastro</button>
+  </header>
+
+  <div id="lastBanner" class="last-scan"><strong id="t-last">I fundit:</strong> <span id="lastValue">—</span></div>
+
+  <div class="container">
+    <div class="camera-card">
+      <div class="video-wrap">
+        <video id="video" playsinline muted></video>
+        <div id="scanFrame" class="scan-frame"></div>
+      </div>
+      <div class="controls">
+        <button id="startBtn" class="btn-primary">Start</button>
+        <button id="stopBtn">Stop</button>
+        <button id="switchBtn">Kamera Değiştir</button>
+        <button id="torchBtn">Flaş</button>
+        <button id="resetBtn" class="btn-danger">Pastro</button>
+      </div>
+      <div class="manual">
+        <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
+        <button id="manualAddBtn" class="btn-warn">Shto</button>
+      </div>
     </div>
-    <div class="manual">
-      <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
-      <button id="manualAddBtn" class="btn-warn">Shto</button>
+
+    <div class="list-card">
+      <ul id="list"></ul>
     </div>
   </div>
 
-  <div class="list-card">
-    <ul id="list"></ul>
+  <div class="toolbar">
+    <button id="copyBtn" class="btn">Kopjo</button>
+    <button id="waBtn" class="btn">WhatsApp</button>
   </div>
-</div>
 
-<div class="toolbar">
-  <button id="copyBtn" class="btn">Kopjo</button>
-  <button id="waBtn" class="btn">WhatsApp</button>
-</div>
-
-<canvas id="capture"></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const $ = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
-  const video = $('#video'), canvas = $('#capture'), ctx = canvas.getContext('2d',{willReadFrequently:true});
-  const listEl = $('#list'), scanFrame = $('#scanFrame'), camStatus = $('#camStatus');
-  const startBtn = $('#startBtn'), stopBtn = $('#stopBtn'), switchBtn = $('#switchBtn'), torchBtn = $('#torchBtn'), resetBtn = $('#resetBtn');
-  const manualInput = $('#manualInput'), manualAddBtn = $('#manualAddBtn');
-  const copyBtn = $('#copyBtn'), waBtn = $('#waBtn');
-  const lastBanner = $('#lastBanner'), lastValue = $('#lastValue');
-
-  // --- i18n ---
-  const L = {
-    sq:{ title:"Lista QR", camOn:"Kamera: Hap", camOff:"Kamera: Mbyllur",
-         start:"Start", stop:"Stop", switch:"Ndërro Kamerën", torch:"Dritë",
-         clear:"Pastro", placeholder:"Shkruaj kodin...", add:"Shto",
-         last:"I fundit:", copied:"Kopjuar!", askDel:"A jeni i sigurt për fshirjen?", askClear:"Të pastrohet lista?" },
-    en:{ title:"QR List", camOn:"Camera: On", camOff:"Camera: Off",
-         start:"Start", stop:"Stop", switch:"Switch Camera", torch:"Flash",
-         clear:"Clear", placeholder:"Type a code...", add:"Add",
-         last:"Last:", copied:"Copied!", askDel:"Are you sure to delete?", askClear:"Clear the whole list?" },
-    tr:{ title:"QR Liste", camOn:"Kamera: Açık", camOff:"Kamera: Kapalı",
-         start:"Başlat", stop:"Durdur", switch:"Kamera Değiştir", torch:"Flaş",
-         clear:"Temizle", placeholder:"Kod yaz...", add:"Ekle",
-         last:"Son:", copied:"Kopyalandı!", askDel:"Silmek istediğine emin misin?", askClear:"Liste tamamen temizlensin mi?" },
-  };
-  let lang = 'sq'; // default Albanian
-
-  function setLang(x){
-    lang = x in L ? x : 'sq';
-    $('#t-title').textContent = L[lang].title;
-    $('#t-last').textContent = L[lang].last;
-    camStatus.textContent = scanning ? L[lang].camOn : L[lang].camOff;
-    startBtn.textContent = L[lang].start;
-    stopBtn.textContent = L[lang].stop;
-    switchBtn.textContent = L[lang].switch;
-    torchBtn.textContent = L[lang].torch;
-    resetBtn.textContent = L[lang].clear;
-    manualInput.placeholder = L[lang].placeholder;
-    manualAddBtn.textContent = L[lang].add;
-    copyBtn.textContent = (lang==='tr'?'Kopyala':lang==='en'?'Copy':'Kopjo');
-  }
-  $$('.flags [data-lang]').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
-  setLang('sq');
-
-  // --- State ---
-  let stream=null, track=null, scanning=false, lastScanAt=0, items=[], seen=new Set(), torchOn=false, facing='environment';
-
-  // --- Helpers ---
-  const last4 = s => (s||'').replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();
-  function flashOverlay(dup){
-    scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth;
-    scanFrame.classList.add(dup ? 'glow-red' : 'glow-green');
-    clearTimeout(scanFrame._t); scanFrame._t = setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'), 350);
-  }
-  function showBanner(v, dup){
-    lastValue.textContent = v || '—';
-    lastBanner.style.display = 'flex';
-    lastBanner.classList.toggle('duplicate', !!dup);
-  }
-  function render(){
-    listEl.innerHTML='';
-    items.forEach((v,i)=>{
-      const li=document.createElement('li');
-      li.className='item';
-      li.innerHTML = <div class="index">${i+1}</div><div class="value">${v}</div><button class="del">×</button>;
-      li.querySelector('.del').onclick = () => {
-        if(confirm(L[lang].askDel)){
-          items.splice(i,1);
-          seen = new Set(items);
-          render(); save();
-        }
-      };
-      listEl.appendChild(li);
-    });
-  }
-  const exportText = () => items.map((v,i)=>${i+1}. ${v}).join('\n');
-
-  // --- Camera ---
-  async function startCam(){
-    try{
-      stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing}});
-      video.srcObject = stream;
-      await video.play();
-      scanning = true;
-      camStatus.textContent = L[lang].camOn;
-      track = stream.getVideoTracks()[0] || null;
-      torchOn = false;
-      const caps = track && track.getCapabilities ? track.getCapabilities() : {};
-      torchBtn.disabled = !(caps && 'torch' in caps);
-      scanLoop();
-    }catch(e){
-      alert(e.message || e);
-    }
-  }
-  function stopCam(){
-    scanning = false;
-    if(stream){ stream.getTracks().forEach(t=>t.stop()); }
-    video.srcObject = null;
-    track = null; torchOn = false;
-    torchBtn.disabled = true;
-    camStatus.textContent = L[lang].camOff;
-  }
-  function switchCam(){
-    facing = (facing==='environment') ? 'user' : 'environment';
-    stopCam(); startCam();
-  }
-  async function toggleTorch(){
-    if(!track || !track.applyConstraints) return;
-    const caps = track.getCapabilities ? track.getCapabilities() : {};
-    if(!caps.torch) return;
-    try{
-      torchOn = !torchOn;
-      await track.applyConstraints({advanced:[{torch: torchOn}]});
-    }catch(e){ torchOn=false; }
-  }
-
-  async function scanLoop(){
-    if(!scanning) return;
-    const now = performance.now();
-    if(now - lastScanAt < 140){ return requestAnimationFrame(scanLoop); }
-    lastScanAt = now;
-    if(video.readyState >= 2){
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const img = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const qr = jsQR(img.data, canvas.width, canvas.height);
-      if(qr && qr.data){
-        const v = last4(qr.data.trim());
-        if(v){
-          const dup = seen.has(v);
-          if(!dup){ seen.add(v); items.push(v); render(); save(); }
-          flashOverlay(dup); showBanner(v, dup);
-        }
-      }
-    }
-    requestAnimationFrame(scanLoop);
-  }
-
-  // --- Actions ---
-  function addManual(){
-    const v = last4(manualInput.value.trim());
-    if(!v) return;
-    const dup = seen.has(v);
-    if(!dup){ seen.add(v); items.push(v); render(); save(); }
-    flashOverlay(dup); showBanner(v, dup);
-    manualInput.value='';
-  }
-  function copyAll(){ navigator.clipboard.writeText(exportText()); /* opsiyonel: toast */ }
-  function waShare(){ const t=exportText(); if(t) window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
-  function clearAll(){ if(confirm(L[lang].askClear)){ items=[]; seen.clear(); render(); save(); } }
-
-  // --- Persistence ---
-  const LS_KEY = 'qrItems_clean_v1';
-  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(items)); }
-  function load(){ const raw = localStorage.getItem(LS_KEY); if(raw){ items = JSON.parse(raw)||[]; seen = new Set(items); render(); } }
-  load();
-
-  // --- Bindings ---
-  startBtn.addEventListener('click', startCam);
-  stopBtn.addEventListener('click', stopCam);
-  switchBtn.addEventListener('click', switchCam);
-  torchBtn.addEventListener('click', toggleTorch);
-  resetBtn.addEventListener('click', clearAll);
-  manualAddBtn.addEventListener('click', addManual);
-  manualInput.addEventListener('keyup', e=>{ if(e.key==='Enter') addManual(); });
-  copyBtn.addEventListener('click', copyAll);
-  waBtn.addEventListener('click', waShare);
-
-  // Otomatik: izin daha önce verildiyse kamerayı aç
-  if(navigator.permissions && navigator.permissions.query){
-    navigator.permissions.query({name:'camera'}).then(p => { if(p.state==='granted') startCam(); }).catch(()=>{});
-  }
-});
-</script>
+  <!-- 1) QR kütüphanesi (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
+  <!-- 2) Uygulama kodu (ayrı dosya) -->
+  <script src="app.js" defer></script>
 </body>
 </html>
