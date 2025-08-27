@@ -1,239 +1,401 @@
 <!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QR Listee</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Lista QR</title>
 <style>
-  :root{--bg:#0f1115;--card:#171a21;--muted:#a9b1c3;--text:#e7ebf5;--accent:#29c06f;--danger:#ff5d5d}
+  :root{
+    --bg:#0e0f12; --panel:#14161b; --soft:#1c1f26; --soft2:#0b0c10;
+    --text:#dfe3eb; --muted:#9aa3b2; --accent:#4ade80; --danger:#ef4444; --chip:#2a2f3a;
+    --radius:16px;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-  header{position:sticky;top:0;z-index:30;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,0))}
-  .flags button{background:none;border:none;font-size:20px;cursor:pointer}
-  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:var(--muted);font-size:12px}
-  .container{padding:12px 16px 120px}
-  .camera-card{background:var(--card);border-radius:14px;padding:12px}
-  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:3/4}
-  video{width:100%;height:100%;object-fit:cover;display:block}
-  .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition:box-shadow .12s,border-color .12s}
-  .glow-green{box-shadow:0 0 0 9999px rgba(0,255,0,.15) inset,0 0 20px #0f0 inset;border-color:#0f0}
-  .glow-red{box-shadow:0 0 0 9999px rgba(255,0,0,.15) inset,0 0 20px #f00 inset;border-color:#f00}
-  .controls{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
-  button{border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer;background:#222734;color:#e7ebf5}
-  .btn-primary{background:var(--accent);color:#06160c}
-  .btn-danger{background:var(--danger);color:#260000}
-  .btn-warn{background:#ffc53d;color:#221a00}
-  .manual{display:flex;gap:8px;margin-top:10px}
-  .manual input{flex:1;padding:10px;background:#1b2030;border:1px solid #2a3246;color:#fff;border-radius:8px}
-  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0}
-  .item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px dashed #23293a}
-  .item:last-child{border-bottom:none}
-  .index{width:32px;height:32px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:800;color:#c0c7d9}
-  .value{flex:1;font-size:18px;font-weight:800}
-  .del{background:#23293a;color:#ff9b9b;border-radius:8px;padding:2px 8px}
-  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;gap:10px;padding:10px 16px;background:rgba(10,12,16,.9);backdrop-filter:blur(10px)}
-  .toolbar .btn{flex:1}
-  .last-scan{position:sticky;top:46px;z-index:25;margin:6px 12px;padding:8px 12px;border-radius:10px;display:none;align-items:center;gap:8px;background:#122019;color:#bff4d1;border:1px solid #1b3a2b;border-left:4px solid var(--accent)}
-  .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:#ff8b8b}
-  .warn{margin:10px 0;padding:10px;border-radius:10px;background:#2b1f1f;color:#ffd9d9;display:none}
-  .ok{margin:10px 0;padding:10px;border-radius:10px;background:#122019;color:#bff4d1;border:1px solid #1b3a2b}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#0b0c10 40%,#0a0b0f);
+    color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial;
+  }
+  .wrap{max-width:720px;margin:14px auto 60px;padding:10px}
+  .card{
+    background:linear-gradient(180deg,var(--panel),var(--soft));
+    border-radius:22px; padding:14px 14px 18px; box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    border:1px solid #1a1f28;
+  }
+  .row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .space{flex:1}
+  .title{font-weight:700; font-size:20px}
+  .chip{
+    background:var(--chip); color:#cfd7e6; padding:6px 10px; border-radius:999px; font-size:13px; border:1px solid #2e3440;
+    display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none;
+  }
+  .chip small{color:var(--muted)}
+  .flags{display:flex; gap:10px; font-size:20px; cursor:pointer}
+  .scanner{
+    margin-top:12px; background:var(--soft2); border-radius:18px; padding:14px; border:1px solid #222833;
+  }
+  .scanbox{
+    position:relative; width:100%; aspect-ratio:1/1; border-radius:14px;
+    display:grid; place-items:center; overflow:hidden; background:#0b0d11;
+    border:2px solid #2d3441;
+  }
+  video{width:100%; height:100%; object-fit:cover; display:none;}
+  .frame{
+    position:absolute; inset:18px; border:3px solid rgba(255,255,255,.28); border-radius:14px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  canvas.overlay{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+  .buttons{display:flex; gap:12px; margin-top:14px; flex-wrap:wrap}
+  .btn{
+    flex:1 1 120px; padding:13px 16px; border-radius:12px; text-align:center; font-weight:600; border:0; cursor:pointer;
+    color:#0b0c10; transition:transform .06s ease, opacity .2s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.green{background:var(--accent)}
+  .btn.gray{background:#333a46; color:#e5ecf7}
+  .btn.red{background:var(--danger); color:#fff}
+  .btn[disabled]{opacity:.45; pointer-events:none}
+  .list{
+    margin-top:16px; background:linear-gradient(180deg,var(--panel),var(--soft)); border-radius:18px; padding:14px; border:1px solid #1a1f28;
+  }
+  .list .hd{display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px}
+  .count{opacity:.75}
+  .item{
+    display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center;
+    padding:10px 12px; border-radius:12px; background:#11141a; border:1px solid #222833; margin-bottom:10px;
+  }
+  .badge{
+    width:28px; height:28px; border-radius:50%; display:grid; place-items:center; background:#272e3a; color:#cfe0ff; font-weight:700
+  }
+  .code{font-weight:800; letter-spacing:.5px}
+  .time{color:var(--muted); font-size:12px}
+  .del{
+    width:30px; height:30px; border-radius:10px; background:#212733; color:#ff7b86; display:grid; place-items:center; cursor:pointer; border:1px solid #2f3542
+  }
+  .footbuttons{display:flex; gap:14px; margin-top:14px}
+  .footbtn{
+    flex:1; background:#1b2029; color:#e5ecf7; border:1px solid #2a3140; border-radius:14px; padding:14px 16px; font-weight:700; text-align:center; cursor:pointer
+  }
+  .sr{position:absolute; left:-10000px}
+  /* tiny camera select pop */
+  .camselect{
+    position:absolute; z-index:5; margin-top:6px; background:#0f1218; border:1px solid #2d3441; border-radius:12px; padding:10px; display:none;
+    max-width:min(92vw,560px)
+  }
+  .camselect select{width:100%; background:#121620; color:#dfe3eb; border:1px solid #2a3140; border-radius:10px; padding:10px}
 </style>
 </head>
 <body>
-<header>
-  <div><strong id="t-title">Lista QR SHQIP</strong> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
-  <div class="flags">
-    <button type="button" onclick="setLang('sq')" title="Shqip">🇦🇱</button>
-    <button type="button" onclick="setLang('en')" title="English">🇬🇧</button>
-    <button type="button" onclick="setLang('tr')" title="Türkçe">🇹🇷</button>
-  </div>
-</header>
-
-<div id="lastBanner" class="last-scan"><strong id="t-last">I fundit:</strong> <span id="lastValue">—</span></div>
-
-<div class="container">
-  <div class="camera-card">
-    <div id="libWarn" class="warn">QR kütüphanesi yüklenemedi. İnternet bağlantısını kontrol edin.</div>
-    <div id="statusOk" class="ok" style="display:none">Uygulama hazır ✅ (JS çalışıyor)</div>
-    <div class="video-wrap">
-      <video id="video" playsinline muted></video>
-      <div id="scanFrame" class="scan-frame"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="row" style="position:relative">
+      <div class="title" id="t-title">Lista QR</div>
+      <div class="chip" id="camChip" title="Kamera seç / Camera select">
+        <span id="camState">Kamera: <strong id="camName">Mbyllur</strong></span>
+      </div>
+      <div class="space"></div>
+      <div class="flags" aria-label="Language">
+        <span role="button" data-lang="sq" title="Shqip">🇦🇱</span>
+        <span role="button" data-lang="en" title="English">🇬🇧</span>
+        <span role="button" data-lang="tr" title="Türkçe">🇹🇷</span>
+      </div>
+      <div class="camselect" id="camSelectWrap">
+        <label for="cameraSelect" class="sr">Camera</label>
+        <select id="cameraSelect"></select>
+      </div>
     </div>
-    <div class="controls">
-      <button id="startBtn" class="btn-primary" onclick="startCam()">Start</button>
-      <button id="stopBtn" onclick="stopCam()">Stop</button>
-      <button id="switchBtn" onclick="switchCam()">Kamera Değiştir</button>
-      <button id="torchBtn" onclick="toggleTorch()">Flaş</button>
-      <button id="resetBtn" class="btn-danger" onclick="clearAll()">Pastro</button>
-    </div>
-    <div class="manual">
-      <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin..." onkeyup="if(event.key==='Enter'){addManual()}">
-      <button id="manualAddBtn" class="btn-warn" onclick="addManual()">Shto</button>
-    </div>
-  </div>
 
-  <div class="list-card">
-    <ul id="list"></ul>
+    <div class="scanner">
+      <div class="scanbox" id="scanbox">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay" class="overlay"></canvas>
+        <div class="frame"></div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn green" id="btnStart">Start</button>
+        <button class="btn gray"  id="btnStop"  disabled>Stop</button>
+        <button class="btn gray"  id="btnFlash" disabled>Dritë</button>
+        <button class="btn red"   id="btnClear">Pastro</button>
+      </div>
+    </div>
+
+    <div class="list">
+      <div class="hd"><span id="t-lista">Lista</span> <span class="count">· <span id="count">0</span></span></div>
+      <div id="items"></div>
+      <div class="footbuttons">
+        <button class="footbtn" id="btnCopy">Kopjo</button>
+        <button class="footbtn" id="btnWa">WhatsApp</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="toolbar">
-  <button id="copyBtn" class="btn" onclick="copyAll()">Kopjo</button>
-  <button id="waBtn" class="btn" onclick="waShare()">WhatsApp</button>
-</div>
+<!-- Beep (base64) -->
+<audio id="beep" preload="auto">
+  <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADQ0NDQ0NDQ0NDQ0P/7kGQAAAABSUlJSUlJSUlJSUv/7kGQAAAAAICAgICAgICAgIP/7kGQAAAABMzMzMzMzMzMzM//uQZAAAAAERERERERERERH/7kGQAAAAAH5+fn5+fn5+fn/7kGQAAAAAP//////////////////8AAA==" type="audio/mp3">
+</audio>
 
-<canvas id="capture"></canvas>
-
-<!-- jsQR ana CDN -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<!-- jsQR (pure JS QR decoder) -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-/* === Global değişkenler === */
-const $=s=>document.querySelector(s);
-const video=$('#video'), scanFrame=$('#scanFrame'), camStatus=$('#camStatus'),
-      lastBanner=$('#lastBanner'), lastValue=$('#lastValue'),
-      libWarn=$('#libWarn'), statusOk=$('#statusOk');
-const canvas=$('#capture'), ctx=canvas.getContext('2d',{willReadFrequently:true});
+(() => {
+  const els = {
+    title: document.getElementById('t-title'),
+    camChip: document.getElementById('camChip'),
+    camName: document.getElementById('camName'),
+    camSelectWrap: document.getElementById('camSelectWrap'),
+    camSelect: document.getElementById('cameraSelect'),
+    video: document.getElementById('video'),
+    overlay: document.getElementById('overlay'),
+    start: document.getElementById('btnStart'),
+    stop: document.getElementById('btnStop'),
+    flash: document.getElementById('btnFlash'),
+    clear: document.getElementById('btnClear'),
+    listHd: document.getElementById('t-lista'),
+    items: document.getElementById('items'),
+    count: document.getElementById('count'),
+    copy: document.getElementById('btnCopy'),
+    wa: document.getElementById('btnWa'),
+    beep: document.getElementById('beep')
+  };
 
-const L={
-  sq:{ title:"Lista QR", camOn:"Kamera: Hap", camOff:"Kamera: Mbyllur",
-       start:"Start", stop:"Stop", switch:"Ndërro Kamerën", torch:"Dritë",
-       clear:"Pastro", placeholder:"Shkruaj kodin...", add:"Shto",
-       last:"I fundit:", copied:"Kopjuar!", askDel:"A jeni i sigurt për fshirjen?", askClear:"Të pastrohet lista?", libFail:"QR kütüphanesi yüklenemedi. Kontrolloni lidhjen."},
-  en:{ title:"QR List", camOn:"Camera: On", camOff:"Camera: Off",
-       start:"Start", stop:"Stop", switch:"Switch Camera", torch:"Flash",
-       clear:"Clear", placeholder:"Type a code...", add:"Add",
-       last:"Last:", copied:"Copied!", askDel:"Are you sure to delete?", askClear:"Clear the whole list?", libFail:"QR library couldn't load. Check your connection."},
-  tr:{ title:"QR Liste", camOn:"Kamera: Açık", camOff:"Kamera: Kapalı",
-       start:"Başlat", stop:"Durdur", switch:"Kamera Değiştir", torch:"Flaş",
-       clear:"Temizle", placeholder:"Kod yaz...", add:"Ekle",
-       last:"Son:", copied:"Kopyalandı!", askDel:"Silmek istediğine emin misin?", askClear:"Liste tamamen temizlensin mi?", libFail:"QR kütüphanesi yüklenemedi. Bağlantıyı kontrol edin."}
-};
-const LS_ITEMS="qrItems_ultra_v1", LS_LANG="qr_lang_ultra";
-let stream=null, track=null, scanning=false, lastScanAt=0;
-let items=[], seenDisplay=new Set(), seenRaw=new Set();
-let torchOn=false, facing='environment';
-let lang=localStorage.getItem(LS_LANG)||'sq';
+  const i18n = {
+    sq:{
+      title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro',
+      list:'Lista', copy:'Kopjo', wa:'WhatsApp', camera:'Kamera'
+    },
+    en:{
+      title:'QR List', camClosed:'Camera: Closed', start:'Start', stop:'Stop', light:'Light', clear:'Clear',
+      list:'List', copy:'Copy', wa:'WhatsApp', camera:'Camera'
+    },
+    tr:{
+      title:'QR Listesi', camClosed:'Kamera: Kapalı', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle',
+      list:'Liste', copy:'Kopyala', wa:'WhatsApp', camera:'Kamera'
+    }
+  };
+  let LANG = 'sq';
+  const t = k => (i18n[LANG]||i18n.sq)[k];
 
-function last4(s){return (s||"").replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();}
-function setLang(x){
-  lang=(x in L)?x:'sq'; localStorage.setItem(LS_LANG,lang);
-  $('#t-title').textContent=L[lang].title;
-  $('#t-last').textContent=L[lang].last;
-  camStatus.textContent=scanning?L[lang].camOn:L[lang].camOff;
-  $('#startBtn').textContent=L[lang].start;
-  $('#stopBtn').textContent=L[lang].stop;
-  $('#switchBtn').textContent=L[lang].switch;
-  $('#torchBtn').textContent=L[lang].torch;
-  $('#resetBtn').textContent=L[lang].clear;
-  $('#manualInput').placeholder=L[lang].placeholder;
-  $('#manualAddBtn').textContent=L[lang].add;
-  $('#copyBtn').textContent=(lang==='tr'?'Kopyala':lang==='en'?'Copy':'Kopjo');
-  libWarn.textContent=L[lang].libFail;
-}
-function render(){
-  const list=$('#list'); list.innerHTML='';
-  items.forEach((v,i)=>{
-    const li=document.createElement('li');
-    li.className='item';
-    li.innerHTML=<div class="index">${i+1}</div><div class="value">${v}</div><button class="del" onclick="delItem(${i})">×</button>;
-    list.appendChild(li);
-  });
-}
-function delItem(i){
-  if(confirm(L[lang].askDel)){
-    items.splice(i,1); seenDisplay=new Set(items); render(); save();
+  // UI text sync
+  function syncText(){
+    document.documentElement.lang = LANG;
+    els.title.textContent = t('title');
+    els.start.textContent = t('start');
+    els.stop.textContent = t('stop');
+    els.flash.textContent = t('light');
+    els.clear.textContent = t('clear');
+    els.listHd.textContent = t('list');
+    els.copy.textContent = t('copy');
+    els.wa.textContent   = t('wa');
+    setCamState(false);
   }
-}
-function exportText(){return items.map((v,i)=>${i+1}. ${v}).join('\n');}
-function save(){localStorage.setItem(LS_ITEMS,JSON.stringify(items));}
-function load(){const raw=localStorage.getItem(LS_ITEMS); if(raw){items=JSON.parse(raw)||[]; seenDisplay=new Set(items); render();}}
-function flashOverlay(dup){
-  scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth;
-  scanFrame.classList.add(dup?'glow-red':'glow-green');
-  clearTimeout(scanFrame._t); scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'),350);
-}
-function showBanner(v,dup){
-  lastValue.textContent=v||'—';
-  lastBanner.style.display='flex';
-  lastBanner.classList.toggle('duplicate',!!dup);
-}
-/* === Buton işlevleri (global) === */
-async function startCam(){
-  try{
-    statusOk.style.display='block'; // JS çalıştığını göster
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing}});
-    video.srcObject=stream; await video.play();
-    scanning=true; camStatus.textContent=L[lang].camOn;
-    track=stream.getVideoTracks()[0]||null; torchOn=false;
-    const caps=track&&track.getCapabilities?track.getCapabilities():{};
-    $('#torchBtn').disabled=!(caps && 'torch' in caps);
-    scanLoop();
-  }catch(e){ alert((e&&e.message)||e); }
-}
-function stopCam(){
-  scanning=false;
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
-  video.srcObject=null; track=null; torchOn=false;
-  $('#torchBtn').disabled=true;
-  camStatus.textContent=L[lang].camOff;
-}
-function switchCam(){ facing=(facing==='environment')?'user':'environment'; stopCam(); startCam(); }
-async function toggleTorch(){
-  if(!track||!track.applyConstraints) return;
-  const caps=track.getCapabilities?track.getCapabilities():{};
-  if(!caps.torch) return;
-  try{ torchOn=!torchOn; await track.applyConstraints({advanced:[{torch:torchOn}]}); }catch(e){ torchOn=false; }
-}
-function clearAll(){
-  if(confirm(L[lang].askClear)){ items=[]; seenDisplay.clear(); render(); save(); }
-}
-function addManual(){
-  const v=last4($('#manualInput').value.trim()); if(!v) return;
-  const dup=seenDisplay.has(v);
-  if(!dup){ seenDisplay.add(v); items.push(v); render(); save(); }
-  flashOverlay(dup); showBanner(v, dup);
-  $('#manualInput').value='';
-}
-function copyAll(){ const t=exportText(); if(t) navigator.clipboard.writeText(t); }
-function waShare(){ const t=exportText(); if(t) window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
+  // language clicks
+  document.querySelectorAll('.flags [data-lang]').forEach(b=>{
+    b.addEventListener('click', ()=>{ LANG = b.dataset.lang; syncText(); saveMeta(); });
+  });
 
-async function scanLoop(){
-  if(!scanning) return;
-  const now=performance.now(); if(now-lastScanAt<140){ return requestAnimationFrame(scanLoop); }
-  lastScanAt=now;
-  if(video.readyState>=2 && typeof window.jsQR==='function'){
-    canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-    ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-    const qr=jsQR(img.data,canvas.width,canvas.height);
-    if(qr && qr.data){
-      const raw=qr.data.trim(), disp=last4(raw);
-      if(disp){
-        const dupRaw=seenRaw.has(raw);
-        if(!dupRaw){ seenRaw.add(raw); if(!seenDisplay.has(disp)){ seenDisplay.add(disp); items.push(disp); render(); save(); } }
-        flashOverlay(dupRaw); showBanner(disp, dupRaw);
-      }
+  // persistence
+  const LS_KEY = 'qr_list_items_v1';
+  const META_KEY = 'qr_meta_v1';
+  const loadMeta = () => {
+    try{
+      const m = JSON.parse(localStorage.getItem(META_KEY)||'{}');
+      LANG = m.lang || LANG;
+    }catch{}
+  };
+  const saveMeta = () => {
+    localStorage.setItem(META_KEY, JSON.stringify({lang:LANG}));
+  };
+
+  // state
+  let stream = null, track = null, torchOn = false, scanTimer = null;
+  let codes = [];
+
+  // load existing list
+  function loadList(){
+    try{ codes = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }catch{ codes=[]; }
+    renderList();
+  }
+  function saveList(){
+    localStorage.setItem(LS_KEY, JSON.stringify(codes));
+  }
+  function ts(){
+    const d=new Date();
+    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }
+
+  function renderList(){
+    els.items.innerHTML = '';
+    els.count.textContent = codes.length;
+    codes.forEach((c,idx)=>{
+      const row = document.createElement('div');
+      row.className = 'item';
+      row.innerHTML = `
+        <div class="badge">${idx+1}</div>
+        <div>
+          <div class="code">${escapeHtml(c.value)}</div>
+          <div class="time">${c.time}</div>
+        </div>
+        <div class="del" title="Sil">✕</div>
+      `;
+      row.querySelector('.del').addEventListener('click', ()=>{
+        codes.splice(idx,1); saveList(); renderList();
+      });
+      els.items.appendChild(row);
+    });
+  }
+  function addCode(value){
+    // avoid rapid duplicates
+    const exists = codes.some(x=>x.value===value);
+    if(!exists){
+      codes.unshift({value, time:ts()});
+      saveList(); renderList();
     }
   }
-  requestAnimationFrame(scanLoop);
-}
 
-/* === Başlangıç === */
-load();            // listeyi getir
-setLang(lang);     // varsayılan: sq
-statusOk.style.display='block'; // JS canlı göstergesi
-
-// jsQR yüklendi mi? değilse fallback ve uyarı
-window.addEventListener('load', ()=>{
-  if(typeof window.jsQR!=='function'){
-    const alt=document.createElement('script');
-    alt.src='https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
-    alt.onload=()=>{ if(typeof window.jsQR!=='function'){ libWarn.style.display='block'; } };
-    alt.onerror=()=>{ libWarn.style.display='block'; };
-    document.body.appendChild(alt);
+  // helpers
+  function setCamState(open, label){
+    if(!open){ els.camName.textContent = (t('camClosed').split(':')[1]||' Mbyllur').trim(); }
+    else     { els.camName.textContent = label || '…'; }
   }
-});
+  function escapeHtml(str){ return (str+'').replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])) }
+
+  // camera list
+  async function listCams(){
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d=>d.kind==='videoinput');
+    els.camSelect.innerHTML = cams.map((d,i)=><option value="${d.deviceId}">${d.label || (t('camera')+' '+(i+1))}</option>).join('');
+    return cams;
+  }
+
+  // start scanning
+  async function start(camId){
+    try{
+      const constraints = {
+        audio:false,
+        video: camId ? {deviceId:{exact:camId}} : {facingMode:{ideal:'environment'}}
+      };
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      els.video.srcObject = stream;
+      await els.video.play();
+      els.video.style.display = 'block';
+      track = stream.getVideoTracks()[0];
+      // name
+      const settings = track.getSettings();
+      setCamState(true, settings.label || (settings.facingMode || 'Camera'));
+      // torch availability
+      const caps = track.getCapabilities?.() || {};
+      els.flash.disabled = !('torch' in caps);
+      torchOn = false;
+      // draw/scan loop
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', {willReadFrequently:true});
+      const overlay = els.overlay.getContext('2d');
+      function loop(){
+        if(!stream) return;
+        const w = els.video.videoWidth, h = els.video.videoHeight;
+        if(w&&h){
+          canvas.width=w; canvas.height=h;
+          ctx.drawImage(els.video,0,0,w,h);
+          const img = ctx.getImageData(0,0,w,h);
+          const qr = jsQR(img.data, w, h, { inversionAttempts: 'dontInvert' });
+          overlay.clearRect(0,0,els.overlay.width,els.overlay.height);
+          // keep overlay sized
+          const r = els.scanbox.getBoundingClientRect();
+          els.overlay.width = r.width; els.overlay.height = r.height;
+          if(qr){
+            // draw box
+            overlay.lineWidth = 4; overlay.strokeStyle='rgba(74,222,128,.9)';
+            overlay.beginPath();
+            overlay.moveTo(qr.location.topLeftCorner.x * r.width / w, qr.location.topLeftCorner.y * r.height / h);
+            overlay.lineTo(qr.location.topRightCorner.x * r.width / w, qr.location.topRightCorner.y * r.height / h);
+            overlay.lineTo(qr.location.bottomRightCorner.x * r.width / w, qr.location.bottomRightCorner.y * r.height / h);
+            overlay.lineTo(qr.location.bottomLeftCorner.x * r.width / w, qr.location.bottomLeftCorner.y * r.height / h);
+            overlay.closePath(); overlay.stroke();
+            addCode(qr.data.trim());
+            try{ els.beep.currentTime=0; els.beep.play(); }catch{}
+          }
+        }
+        scanTimer = requestAnimationFrame(loop);
+      }
+      loop();
+      els.start.disabled=true; els.stop.disabled=false;
+    }catch(err){
+      alert('Camera error: ' + err.message);
+      stop();
+    }
+  }
+
+  function stop(){
+    if(scanTimer) cancelAnimationFrame(scanTimer);
+    scanTimer = null;
+    if(track){ try{track.stop();}catch{} track=null; }
+    if(stream){ try{stream.getTracks().forEach(t=>t.stop());}catch{} stream=null; }
+    els.video.pause(); els.video.removeAttribute('srcObject'); els.video.style.display='none';
+    els.flash.disabled=true; torchOn=false;
+    setCamState(false);
+    els.start.disabled=false; els.stop.disabled=true;
+  }
+
+  async function toggleTorch(){
+    if(!track) return;
+    const caps = track.getCapabilities?.() || {};
+    if(!('torch' in caps)) return;
+    torchOn = !torchOn;
+    try{
+      await track.applyConstraints({advanced:[{torch: torchOn}]});
+    }catch(e){
+      torchOn = !torchOn; // revert
+      console.log('Torch not supported:', e);
+    }
+  }
+
+  // events
+  els.start.addEventListener('click', async ()=>{
+    // open camera picker if multiple
+    const cams = await listCams();
+    if(cams.length>1){
+      els.camSelectWrap.style.display='block';
+      els.camSelectWrap.style.left = els.camChip.getBoundingClientRect().left+'px';
+      els.camSelectWrap.style.top  = (els.camChip.getBoundingClientRect().bottom+2+window.scrollY)+'px';
+    }else{
+      await start(cams[0]?.deviceId);
+    }
+  });
+  els.camSelect.addEventListener('change', async ()=>{
+    els.camSelectWrap.style.display='none';
+    await start(els.camSelect.value);
+  });
+  // also clicking chip just shows selector again
+  els.camChip.addEventListener('click', async ()=>{
+    const cams = await listCams();
+    els.camSelectWrap.style.display='block';
+  });
+
+  els.stop.addEventListener('click', stop);
+  els.flash.addEventListener('click', toggleTorch);
+  els.clear.addEventListener('click', ()=>{ codes=[]; saveList(); renderList(); });
+
+  els.copy.addEventListener('click', async ()=>{
+    const text = codes.map(x=>x.value).join('\n');
+    try{ await navigator.clipboard.writeText(text); alert('Kopyalandı / Copied'); }catch{ prompt('Kopyalayın:', text); }
+  });
+
+  els.wa.addEventListener('click', ()=>{
+    const text = encodeURIComponent(codes.map((x,i)=>${i+1}. ${x.value}  (${x.time})).join('\n'));
+    const url = https://wa.me/?text=${text};
+    window.open(url, '_blank');
+  });
+
+  // boot
+  loadMeta();
+  syncText();
+  loadList();
+
+  // close camera when leaving
+  window.addEventListener('pagehide', stop);
+})();
 </script>
 </body>
 </html>
-
