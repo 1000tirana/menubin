@@ -7,7 +7,7 @@
 <style>
   :root{--bg:#0e0f12;--panel:#151821;--soft:#1b202c;--text:#e6ebf3;--muted:#9aa3b2;--chip:#263042;--ok:#22c55e;--bad:#ef4444}
   *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#0d0f14,#0b0d12 40%,#0a0b10);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
+  body{margin:0;background:linear-gradient(180deg,#0d0f14,#0b0d12 40%,#0a0b10);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
   .wrap{max-width:720px;margin:16px auto 60px;padding:12px}
   .card{background:linear-gradient(180deg,#141821,#171c27);border:1px solid #1e2633;border-radius:20px;padding:14px 14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -35,8 +35,6 @@
   .del{width:30px;height:30px;border-radius:10px;background:#212733;color:#ff7b86;display:grid;place-items:center;cursor:pointer;border:1px solid #2f3542}
   .footbuttons{display:flex;gap:14px;margin-top:14px} .footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:800;cursor:pointer}
   .sr{position:absolute;left:-10000px}
-  /* zoom azaltıcı */
-  body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
 </style>
 </head>
 <body>
@@ -86,8 +84,13 @@
 <!-- jsQR -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-(()=>{
+/* ------ Helpers (EN BAŞTA!) ------ */
+function qs(s,sc=document){return sc.querySelector(s)}
+function qa(s,sc=document){return Array.from(sc.querySelectorAll(s))}
+function ce(tag,cls){const e=document.createElement(tag); if(cls)e.className=cls; return e}
+function esc(s){return (s+'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
+(()=>{
 // ---- i18n ----
 const i18n = {
   sq:{title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo', wa:'WhatsApp', sureDel:'Këtë rresht ta fshij?', sureAll:'Të pastroj gjithë listën?', copied:'U kopjua'},
@@ -103,18 +106,16 @@ const el = {
   title:qs('#t-title'), start:qs('#btnStart'), stop:qs('#btnStop'),
   flash:qs('#btnFlash'), clear:qs('#btnClear'), listHd:qs('#t-lista'),
   count:qs('#count'), items:qs('#items'), copy:qs('#btnCopy'), wa:qs('#btnWa'),
-  flags:qa('[data-lang]'), camChip:qs('#camChip'), camName:qs('#camName'),
-  camWrap:qs('#camSelectWrap'), camSel:qs('#cameraSelect'),
+  camChip:qs('#camChip'), camName:qs('#camName'), camWrap:qs('#camSelectWrap'), camSel:qs('#cameraSelect'),
   box:qs('#scanbox'), video:qs('#video'), overlay:qs('#overlay'),
   sndOk:qs('#sndOk'), sndErr:qs('#sndErr')
 };
 function t(k){return (i18n[LANG]||i18n.sq)[k]}
 
-// ---- text sync ----
 function syncText(){
   document.documentElement.lang = LANG;
   el.title.textContent=t('title'); el.start.textContent=t('start'); el.stop.textContent=t('stop');
-  el.flash.textContent=t('light'); el.clear.textContent=t('clear'); qs('#t-lista').textContent=t('list');
+  el.flash.textContent=t('light'); el.clear.textContent=t('clear'); el.listHd.textContent=t('list');
   el.copy.textContent=t('copy'); el.wa.textContent=t('wa'); setCamLabel(false);
   localStorage.setItem(LS_META, JSON.stringify({lang:LANG}));
 }
@@ -165,8 +166,7 @@ async function start(camId){
     track = stream.getVideoTracks()[0];
     setCamLabel(true, track.getSettings().label || track.getSettings().facingMode || 'Camera');
     const caps = track.getCapabilities?.()||{}; el.flash.disabled = !('torch' in caps); torch=false;
-    loop();
-    el.start.disabled=true; el.stop.disabled=false;
+    loop(); el.start.disabled=true; el.stop.disabled=false;
   }catch(e){ alert('Camera error: '+e.message); stop(); }
 }
 function stop(){
@@ -194,19 +194,15 @@ function drawBox(loc,color){
   ctx.lineTo(loc.bottomRightCorner.x*scaleX, loc.bottomRightCorner.y*scaleY);
   ctx.lineTo(loc.bottomLeftCorner.x*scaleX, loc.bottomLeftCorner.y*scaleY);
   ctx.closePath(); ctx.stroke();
-  // fade
   setTimeout(()=>ctx.clearRect(0,0,r.width,r.height), 450);
 }
 
 function parseCode(raw){
   if(!raw) return null;
   let s = String(raw).trim().toUpperCase();
-  // code=AB12 gibi:
   const viaParam = s.match(/(?:^|[?&#])(?:code|kod|qr)=([A-Z0-9]{4})(?:\b|$)/i);
   if(viaParam) return viaParam[1].toUpperCase();
-  // son 4 hane/karakter:
   const tail = s.match(/([A-Z0-9]{4})\W*$/);
-  // tam 4'lüyse veya son 4'lüyü al:
   if(/^[A-Z0-9]{4}$/.test(s)) return s;
   if(tail) return tail[1];
   return null;
@@ -227,7 +223,6 @@ function loop(){
         if(addUnique(val)){ el.sndOk.currentTime=0; el.sndOk.play().catch(()=>{}); drawBox(qr.location,'rgba(34,197,94,.95)'); }
         else{ el.sndErr.currentTime=0; el.sndErr.play().catch(()=>{}); drawBox(qr.location,'rgba(239,68,68,.95)'); }
       }else{
-        // okundu ama 4 hane bulunamadı -> kırmızı çerçeve
         drawBox(qr.location,'rgba(239,68,68,.95)');
       }
     }
@@ -240,8 +235,7 @@ el.start.addEventListener('click', async ()=>{
   const cams = await listCams();
   if(cams.length>1){
     const r = el.camChip.getBoundingClientRect();
-    el.camWrap.style.display='block';
-    el.camWrap.style.left = r.left+'px'; el.camWrap.style.top = (r.bottom+window.scrollY+4)+'px';
+    el.camWrap.style.display='block'; el.camWrap.style.left = r.left+'px'; el.camWrap.style.top = (r.bottom+window.scrollY+4)+'px';
   }else{ await start(cams[0]?.deviceId); }
 });
 el.camSel.addEventListener('change', async ()=>{ el.camWrap.style.display='none'; await start(el.camSel.value); });
@@ -258,27 +252,18 @@ el.copy.addEventListener('click', async ()=>{
 });
 el.wa.addEventListener('click', ()=>{
   const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
-  const url = https://wa.me/?text=${encodeURIComponent(text)};
-  window.open(url,'_blank');
+  window.open(https://wa.me/?text=${encodeURIComponent(text)},'_blank');
 });
-
-// ---- utilities ----
-function qs(s,sc=document){return sc.querySelector(s)}
-function qa(s,sc=document){return [...sc.querySelectorAll(s)]}
-function ce(tag,cls){const e=document.createElement(tag); if(cls)e.className=cls; return e}
-function esc(s){return (s+'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 // ---- init ----
 syncText(); render();
 
-// ---- zoom azaltıcı (mobil & masaüstü) ----
-document.addEventListener('gesturestart', e=>e.preventDefault(), {passive:false});
-document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});
-document.addEventListener('wheel', e=>{
-  if(e.ctrlKey){ e.preventDefault(); }
-},{passive:false});
+// ---- zoom azaltıcı (hata atmasın diye try/catch) ----
+try{document.addEventListener('gesturestart', e=>e.preventDefault(), {passive:false});}catch{}
+try{document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});}catch{}
+try{document.addEventListener('wheel', e=>{ if(e.ctrlKey){ e.preventDefault(); }},{passive:false});}catch{}
 window.addEventListener('pagehide', stop);
-})();
-</script>
+
+})();</script>
 </body>
 </html>
