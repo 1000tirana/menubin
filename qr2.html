@@ -1,268 +1,83 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Skano Kodet (4-shifror)</title>
-<link rel="preconnect" href="https://unpkg.com">
-<style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --text:#e7e9ee; --muted:#a9b0bd;
-    --ok:#1ecb4f; --err:#ff4d4f; --brand:#3b82f6;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
-  header{
-    position:sticky; top:0; z-index:10; background:rgba(15,17,21,.85);
-    backdrop-filter:saturate(150%) blur(8px); border-bottom:1px solid #222831;
-    display:flex; align-items:center; justify-content:space-between; padding:10px 14px;
-  }
-  header h1{margin:0;font-size:16px;letter-spacing:.3px}
-  .lang{display:flex; gap:6px}
-  .lang button{
-    background:#1f2430;border:1px solid #2a3140;border-radius:8px;color:var(--text);
-    padding:6px 10px;cursor:pointer;font-weight:600
-  }
-  .lang button.active{border-color:var(--brand);outline:2px solid #1e40af33}
-  main{max-width:960px;margin:0 auto;padding:12px}
-  #camCard{
-    position:relative;background:var(--card);border:1px solid #232836;border-radius:14px; padding:12px;
-  }
-  #reader{width:100%; aspect-ratio: 3/4; max-height:70vh}
-  #overlay{
-    position:absolute; inset:12px; border:6px solid transparent; border-radius:12px; pointer-events:none;
-    transition:border-color .2s ease;
-  }
-  .bar{
-    display:flex; gap:8px; margin:10px 0; flex-wrap:wrap; align-items:center; justify-content:center
-  }
-  .pill{background:#1f2430;border:1px solid #2a3140;color:var(--muted);padding:6px 10px;border-radius:999px}
-  .counter{font-weight:700;color:var(--text)}
-  ul#list{list-style:none; padding:0; margin:14px 0; background:var(--card); border:1px solid #232836; border-radius:12px}
-  #list li{padding:10px 12px; border-top:1px solid #222831}
-  #list li:first-child{border-top:0}
-  #list .idx{opacity:.65; margin-right:8px}
-  .fab{
-    position:sticky; bottom:0; z-index:9; background:rgba(15,17,21,.85);
-    backdrop-filter:blur(8px); padding:10px; border-top:1px solid #222831;
-  }
-  .fab .row{display:flex; gap:10px}
-  .btn{
-    flex:1; padding:12px 14px; border-radius:10px; font-weight:700; cursor:pointer; border:0
-  }
-  .primary{background:var(--brand); color:white}
-  .wa{background:#25D366; color:#072b10}
-  .danger{background:transparent; color:#ffb4b4; border:1px solid #3a2323}
-  #snack{
-    position:fixed; left:50%; transform:translateX(-50%); top:-80px; z-index:9999;
-    background:#1f2430; border:1px solid #2a3140; color:var(--text); padding:10px 16px; border-radius:10px;
-    transition:top .35s ease; display:flex; gap:10px; align-items:center; font-weight:700
-  }
-  #snack.ok{border-color:#1d4d2a; color:#d6ffe1}
-  #snack.err{border-color:#5b2323; color:#ffd6d6}
-  .muted{color:var(--muted)}
-  /* Orientation tweaks */
-  @media (orientation:landscape){
-    #reader{aspect-ratio: 16/9; max-height:62vh}
-  }
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skano Kodet</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+  body{margin:0;font-family:sans-serif;background:#111;color:#eee;text-align:center}
+  #reader{width:100%;max-width:400px;margin:20px auto}
+  #overlay{position:absolute;inset:0;border:6px solid transparent;pointer-events:none;transition:.3s}
+  .controls{margin:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  select,button{padding:10px 14px;border-radius:8px;border:1px solid #444;background:#222;color:#fff;cursor:pointer}
+  button.primary{background:#007bff}
+  ul{list-style:none;padding:0;margin:20px auto;max-width:400px;text-align:left;background:#222;border-radius:8px}
+  li{padding:8px 12px;border-top:1px solid #333}
+  li:first-child{border-top:0}
+</style>
 </head>
 <body>
+<h2>📷 Skano Kodet</h2>
 
-<header>
-  <h1 id="title">Skano Kodet</h1>
-  <div class="lang">
-    <button data-lang="sq" class="active">SQ</button>
-    <button data-lang="tr">TR</button>
-    <button data-lang="en">EN</button>
-  </div>
-</header>
-
-<main>
-  <section id="camCard">
-    <div id="reader" aria-label="Camera preview"></div>
-    <div id="overlay"></div>
-    <div class="bar">
-      <span class="pill"><span id="hint">Hap kamerën dhe afro kodin.</span></span>
-      <span class="pill counter" id="count">0</span>
-    </div>
-  </section>
-
-  <ul id="list" aria-live="polite"></ul>
-</main>
-
-<div class="fab">
-  <div class="row">
-    <button id="shareBtn" class="btn primary">⇪ <span data-i18n="share">Ndaj / Kopyo</span></button>
-    <button id="waBtn" class="btn wa">WhatsApp</button>
-    <button id="clearBtn" class="btn danger"><span data-i18n="clear">Pastro listën</span></button>
-  </div>
+<div style="position:relative;max-width:400px;margin:auto">
+  <div id="reader"></div>
+  <div id="overlay"></div>
 </div>
 
-<div id="snack" role="status" aria-live="assertive">OK</div>
+<div class="controls">
+  <select id="camSelect"></select>
+  <button id="startBtn" class="primary">Kamerayı Aç</button>
+  <button id="flipBtn">↺ Kamera Değiştir</button>
+  <button id="stopBtn">■ Stop</button>
+</div>
 
-<audio id="okS" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<ul id="list"></ul>
+
+<audio id="okS" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
 <audio id="erS" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
-/* ================= I18N ================= */
-const I18N = {
-  sq:{
-    title:"Skano Kodet",
-    hint:"Hap kamerën dhe afro kodin.",
-    already:"Tashmë i lexuar: ",
-    added:"U shtua: ",
-    share:"Ndaj / Kopyo",
-    clear:"Pastro listën",
-    copied:"Lista u kopjua.",
-    cleared:"Lista u pastrua.",
-    none:"Ende s’ka kod."
-  },
-  tr:{
-    title:"Barkod Tara",
-    hint:"Kamerayı aç ve barkodu yaklaştır.",
-    already:"Zaten okundu: ",
-    added:"Eklendi: ",
-    share:"Paylaş / Kopyala",
-    clear:"Listeyi Temizle",
-    copied:"Liste kopyalandı.",
-    cleared:"Liste temizlendi.",
-    none:"Henüz kod yok."
-  },
-  en:{
-    title:"Scan Codes",
-    hint:"Open camera and show the code.",
-    already:"Already scanned: ",
-    added:"Added: ",
-    share:"Share / Copy",
-    clear:"Clear List",
-    copied:"List copied.",
-    cleared:"List cleared.",
-    none:"No codes yet."
-  }
+let html5=null, scanned=[], cams=[], currentId=null;
+
+function extractCode(txt){
+  try{const u=new URL(txt);const last=u.pathname.split("/").pop();if(last) return last.slice(-4);}catch(e){}
+  return txt.slice(-4);
+}
+function renderList(){list.innerHTML=scanned.map((c,i)=><li>${i+1}. ${c}</li>).join("");}
+function green(){overlay.style.borderColor="lime";setTimeout(()=>overlay.style.borderColor="transparent",500);}
+function red(){overlay.style.borderColor="red";setTimeout(()=>overlay.style.borderColor="transparent",500);}
+
+async function loadCams(){
+  cams=await Html5Qrcode.getCameras();
+  camSelect.innerHTML=cams.map(c=><option value="${c.id}">${c.label||c.id}</option>).join("");
+  // back camera varsayılan
+  const back=cams.find(c=>/back|rear|environment/i.test(c.label));
+  if(back) camSelect.value=back.id;
+}
+async function start(id){
+  if(html5){try{await html5.stop();}catch{}}
+  html5=new Html5Qrcode("reader");
+  const config={fps:10,qrbox:250};
+  await html5.start(id?{deviceId:{exact:id}}:{facingMode:"environment"},config,onScan);
+  currentId=id;
+}
+function onScan(txt){
+  let code=extractCode(txt).toUpperCase();
+  if(scanned.includes(code)){erS.play();red();return;}
+  scanned.push(code);okS.play();green();renderList();
+}
+startBtn.onclick=()=>start(camSelect.value);
+stopBtn.onclick=()=>html5&&html5.stop();
+flipBtn.onclick=()=>{
+  if(!cams.length) return;
+  let idx=cams.findIndex(c=>c.id===currentId);
+  let next=cams[(idx+1)%cams.length];
+  camSelect.value=next.id;
+  start(next.id);
 };
-let lang = localStorage.getItem("qr_lang") || "sq";
-function applyLang(L){
-  lang = L; localStorage.setItem("qr_lang", L);
-  document.getElementById("title").textContent = I18N[L].title;
-  document.getElementById("hint").textContent = I18N[L].hint;
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active", b.dataset.lang===L));
-  document.querySelector('[data-i18n="share"]').textContent = I18N[L].share;
-  document.querySelector('[data-i18n="clear"]').textContent = I18N[L].clear;
-}
-document.querySelectorAll(".lang button").forEach(b=>{
-  b.addEventListener("click", ()=>applyLang(b.dataset.lang));
-});
-applyLang(lang);
 
-/* =============== State =============== */
-const LS_KEY = "qr_scanned_codes_v1";
-let scanned = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-let html5Qrcode = null;
-const overlay = document.getElementById("overlay");
-const okS = document.getElementById("okS");
-const erS = document.getElementById("erS");
-
-/* =============== Helpers =============== */
-function extractCode(text){
-  // prefer last path chunk; else last 4 visible chars
-  try{
-    const u = new URL(text);
-    const last = u.pathname.split("/").filter(Boolean).pop() || "";
-    if(last.length>=4) return last.slice(-4).toUpperCase();
-  }catch(_){}
-  return (text.replace(/[^A-Za-z0-9]/g,"")).slice(-4).toUpperCase();
-}
-
-function save(){
-  localStorage.setItem(LS_KEY, JSON.stringify(scanned));
-  renderList();
-}
-function renderList(){
-  const ul = document.getElementById("list"); ul.innerHTML="";
-  if(scanned.length===0){
-    const li=document.createElement("li");
-    li.className="muted"; li.textContent=I18N[lang].none; ul.appendChild(li);
-  }else{
-    scanned.forEach((c,i)=>{
-      const li=document.createElement("li");
-      li.innerHTML = <span class="idx">${i+1}.</span> <strong>${c}</strong>;
-      ul.appendChild(li);
-    });
-  }
-  document.getElementById("count").textContent = scanned.length;
-}
-function snack(text, ok=true){
-  const s = document.getElementById("snack");
-  s.textContent = text;
-  s.className = ok ? "ok" : "err";
-  s.style.top = "14px";
-  setTimeout(()=> s.style.top="-80px", 1700);
-}
-function greenFlash(){ overlay.style.borderColor="var(--ok)"; setTimeout(()=>overlay.style.borderColor="transparent",450); }
-function redFlash(){ overlay.style.borderColor="var(--err)"; setTimeout(()=>overlay.style.borderColor="transparent",600); }
-
-/* =============== Scanner =============== */
-function qrBoxDimension(){
-  // pick a square size based on viewport
-  const w = Math.min(520, Math.floor(window.innerWidth*0.9));
-  const h = Math.floor(window.innerHeight*0.7);
-  return Math.min(w,h);
-}
-async function startScanner(){
-  const config = { fps:12, qrbox: { width: qrBoxDimension(), height: qrBoxDimension() } };
-  const constraints = { facingMode: { exact: "environment"} };
-  if(html5Qrcode){ try{ await html5Qrcode.stop(); }catch(e){} }
-  html5Qrcode = new Html5Qrcode("reader");
-  html5Qrcode.start({ facingMode:"environment" }, config,
-    onScanSuccess,
-    (err)=>{} // ignore
-  ).catch(async ()=>{
-    // fallback to user (front) camera if env not available
-    try{
-      await html5Qrcode.start({ facingMode:"user" }, config, onScanSuccess);
-    }catch(e){ console.warn(e); }
-  });
-}
-function onScanSuccess(decodedText){
-  const code = extractCode(decodedText);
-  if(!code) return;
-  if(scanned.includes(code)){
-    erS.currentTime=0; erS.play(); redFlash();
-    snack(I18N[lang].already + code, false);
-    return;
-  }
-  scanned.push(code); save();
-  okS.currentTime=0; okS.play(); greenFlash();
-  snack(I18N[lang].added + code, true);
-}
-
-/* =============== Actions =============== */
-document.getElementById("shareBtn").addEventListener("click", async ()=>{
-  const text = scanned.map((c,i)=>${i+1}. ${c}).join("\n");
-  if(navigator.share){
-    try{ await navigator.share({ text }); }catch(_){}
-    return;
-  }
-  await navigator.clipboard.writeText(text);
-  snack(I18N[lang].copied, true);
-});
-document.getElementById("waBtn").addEventListener("click", ()=>{
-  const text = encodeURIComponent(scanned.map((c,i)=>${i+1}. ${c}).join("\n"));
-  window.open("https://wa.me/?text="+text,"_blank");
-});
-document.getElementById("clearBtn").addEventListener("click", ()=>{
-  if(!confirm("Are you sure?\nSigur? / Emin misin?")) return;
-  scanned=[]; save(); snack(I18N[lang].cleared, true);
-});
-
-/* =============== Init =============== */
-renderList();
-startScanner();
-window.addEventListener("resize", ()=>{ startScanner(); });
-
+loadCams();
 </script>
 </body>
 </html>
