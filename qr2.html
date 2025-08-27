@@ -5,49 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>Lista QR</title>
 <style>
-  :root{
-    --bg:#0e0f12; --panel:#14161b; --soft:#1c1f26; --soft2:#0b0c10;
-    --text:#dfe3eb; --muted:#9aa3b2; --accent:#22c55e; --danger:#ef4444; --chip:#2a2f3a;
-  }
-  *{box-sizing:border-box; touch-action:manipulation;}
-  html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,var(--bg),#0b0c10 40%,#0a0b0f);color:var(--text);
-       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial;-webkit-text-size-adjust:100%;}
-  .wrap{max-width:720px;margin:14px auto 60px;padding:10px}
-  .card{background:linear-gradient(180deg,var(--panel),var(--soft));border-radius:22px;padding:14px 14px 18px;
-        box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);border:1px solid #1a1f28;}
-  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .space{flex:1}
-  .title{font-weight:700;font-size:20px}
-  .chip{background:var(--chip);color:#cfd7e6;padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid #2e3440;
-        display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+  :root{--bg:#0e0f12;--panel:#151821;--soft:#1b202c;--text:#e6ebf3;--muted:#9aa3b2;--chip:#263042;--ok:#22c55e;--bad:#ef4444}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0d0f14,#0b0d12 40%,#0a0b10);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial}
+  .wrap{max-width:720px;margin:16px auto 60px;padding:12px}
+  .card{background:linear-gradient(180deg,#141821,#171c27);border:1px solid #1e2633;border-radius:20px;padding:14px 14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .title{font-weight:800;font-size:20px}
+  .chip{background:var(--chip);border:1px solid #2e3748;color:#cfd7ea;border-radius:999px;padding:6px 10px;font-size:13px;display:flex;gap:8px;align-items:center;cursor:pointer}
   .flags{display:flex;gap:10px;font-size:20px;cursor:pointer}
-  .scanner{margin-top:12px;background:var(--soft2);border-radius:18px;padding:14px;border:1px solid #222833;}
-  .scanbox{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;display:grid;place-items:center;overflow:hidden;
-           background:#0b0d11;border:2px solid #2d3441;transition:box-shadow .15s ease;}
-  video{width:100%;height:100%;object-fit:cover;display:none;}
-  .frame{position:absolute;inset:18px;border:3px solid rgba(255,255,255,.28);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);}
-  canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-  .buttons{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-  .btn{flex:1 1 120px;padding:13px 16px;border-radius:12px;text-align:center;font-weight:600;border:0;cursor:pointer;color:#0b0c10}
-  .btn.green{background:#4ade80}
-  .btn.gray{background:#333a46;color:#e5ecf7}
-  .btn.red{background:var(--danger);color:#fff}
-  .btn[disabled]{opacity:.45;pointer-events:none}
-  .list{margin-top:16px;background:linear-gradient(180deg,var(--panel),var(--soft));border-radius:18px;padding:14px;border:1px solid #1a1f28;}
-  .list .hd{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:10px}
-  .count{opacity:.75}
-  .item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;
-        background:#11141a;border:1px solid #222833;margin-bottom:10px;}
-  .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#272e3a;color:#cfe0ff;font-weight:700}
-  .code{font-weight:800;letter-spacing:.5px}
-  .time{color:var(--muted);font-size:12px}
-  .del{width:30px;height:30px;border-radius:10px;background:#212733;color:#ff7b86;display:grid;place-items:center;cursor:pointer;border:1px solid #2f3542}
-  .footbuttons{display:flex;gap:14px;margin-top:14px}
-  .footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:700;text-align:center;cursor:pointer}
-  .sr{position:absolute;left:-10000px}
+  .space{flex:1}
   .camselect{position:absolute;z-index:5;margin-top:6px;background:#0f1218;border:1px solid #2d3441;border-radius:12px;padding:10px;display:none;max-width:min(92vw,560px)}
   .camselect select{width:100%;background:#121620;color:#dfe3eb;border:1px solid #2a3140;border-radius:10px;padding:10px}
+  .scanner{margin-top:12px;background:#0f131b;border:1px solid #1e2633;border-radius:18px;padding:14px}
+  .scanbox{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:#0b0d11;border:2px solid #2d3441}
+  video{width:100%;height:100%;object-fit:cover;display:none}
+  .frame{position:absolute;inset:18px;border:3px solid rgba(255,255,255,.28);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+  canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .buttons{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
+  .btn{flex:1 1 120px;padding:13px 16px;border-radius:12px;text-align:center;font-weight:700;border:0;cursor:pointer;transition:transform .06s}
+  .btn:active{transform:translateY(1px)} .green{background:#4ade80;color:#0b0c10} .gray{background:#333a46;color:#e5ecf7} .red{background:#ef4444;color:#fff}
+  .btn[disabled]{opacity:.45;pointer-events:none}
+  .list{margin-top:16px;background:#121723;border:1px solid #1e2633;border-radius:18px;padding:14px}
+  .hd{display:flex;gap:10px;align-items:center;font-weight:800;margin-bottom:10px}
+  .count{opacity:.75}
+  .item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 12px;background:#0f141f;border:1px solid #202838;border-radius:12px;margin-bottom:10px}
+  .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#273246;color:#cfe0ff;font-weight:800}
+  .code{font-weight:900;letter-spacing:.5px} .time{color:#93a0b5;font-size:12px}
+  .del{width:30px;height:30px;border-radius:10px;background:#212733;color:#ff7b86;display:grid;place-items:center;cursor:pointer;border:1px solid #2f3542}
+  .footbuttons{display:flex;gap:14px;margin-top:14px} .footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:800;cursor:pointer}
+  .sr{position:absolute;left:-10000px}
+  /* zoom azaltıcı */
+  body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
 </style>
 </head>
 <body>
@@ -57,7 +46,11 @@
       <div class="title" id="t-title">Lista QR</div>
       <div class="chip" id="camChip"><span id="camState">Kamera: <strong id="camName">Mbyllur</strong></span></div>
       <div class="space"></div>
-      <div class="flags"><span role="button" data-lang="sq">🇦🇱</span><span role="button" data-lang="en">🇬🇧</span><span role="button" data-lang="tr">🇹🇷</span></div>
+      <div class="flags">
+        <span role="button" data-lang="sq" title="Shqip">🇦🇱</span>
+        <span role="button" data-lang="en" title="English">🇬🇧</span>
+        <span role="button" data-lang="tr" title="Türkçe">🇹🇷</span>
+      </div>
       <div class="camselect" id="camSelectWrap"><label class="sr" for="cameraSelect">Camera</label><select id="cameraSelect"></select></div>
     </div>
 
@@ -86,197 +79,205 @@
   </div>
 </div>
 
-<!-- Sesler -->
-<audio id="ok" preload="auto"><source
-  src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADMzMzMzMzMzMzM/8v/7kGQAAAABVVVVVVVVVVVVVf/L//uQZAAAAAEHBwcHBwcHBwcH/8v/7kGQAAAAAQCQkJCQkJCQkJD/y//7kGQAAAAAB///////////8AAA==" type="audio/mp3"></audio>
-<audio id="err" preload="auto"><source
-  src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADAwMDAwMDAwMDAwP/7kGQAAAAA8PDw8PDw8PDw8P/7kGQAAAAAQUFBQUFBQUFBQP/7kGQAAAAAD///8PDw8PDw8P/7kGQAAAAAB///////////8AAA==" type="audio/mp3"></audio>
+<!-- Sesler (base64) -->
+<audio id="sndOk" preload="auto"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADQ0NDQ0NDQ0NDQ0P/7kGQAAAABSUlJSUlJSUlJSUv/7kGQAAAAAICAgICAgICAgIP/7kGQAQAAAQH4f+H//8AAP//" ></audio>
+<audio id="sndErr" preload="auto"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAAEAAAD///8AAP//AAAAP/7/AAAA/8AAAP//" ></audio>
 
 <!-- jsQR -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-(() => {
-  // Zoom engellemeleri (iOS çift dokunma / pinch)
-  document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});
-  document.addEventListener('gesturestart', e=>e.preventDefault());
-  document.addEventListener('touchmove', e=>{ if(e.scale && e.scale !== 1) e.preventDefault(); }, {passive:false});
+(()=>{
 
-  const els = {
-    title: t('title'), camChip: document.getElementById('camChip'), camName: document.getElementById('camName'),
-    camSelectWrap: document.getElementById('camSelectWrap'), camSelect: document.getElementById('cameraSelect'),
-    video: document.getElementById('video'), overlay: document.getElementById('overlay'),
-    start: document.getElementById('btnStart'), stop: document.getElementById('btnStop'), flash: document.getElementById('btnFlash'),
-    clear: document.getElementById('btnClear'), items: document.getElementById('items'), count: document.getElementById('count'),
-    copy: document.getElementById('btnCopy'), wa: document.getElementById('btnWa'), scanbox: document.getElementById('scanbox'),
-    ok: document.getElementById('ok'), err: document.getElementById('err')
-  };
+// ---- i18n ----
+const i18n = {
+  sq:{title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo', wa:'WhatsApp', sureDel:'Këtë rresht ta fshij?', sureAll:'Të pastroj gjithë listën?', copied:'U kopjua'},
+  en:{title:'QR List',    camClosed:'Camera: Closed', start:'Start', stop:'Stop', light:'Light', clear:'Clear', list:'List',  copy:'Copy',  wa:'WhatsApp', sureDel:'Delete this item?', sureAll:'Clear all items?',  copied:'Copied'},
+  tr:{title:'QR Listesi', camClosed:'Kamera: Kapalı', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle', list:'Liste', copy:'Kopyala', wa:'WhatsApp', sureDel:'Bu satırı silelim mi?', sureAll:'Listeyi tamamen silelim mi?', copied:'Kopyalandı'}
+};
+let LANG='sq';
+const LS_LIST='qr_list_items_v1', LS_META='qr_meta_v1';
+try{LANG = JSON.parse(localStorage.getItem(LS_META)||'{}').lang || LANG;}catch{}
 
-  const i18n = {
-    sq:{title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo', wa:'WhatsApp', askDel:'Këtë kod ta fshij?', askClr:'Lista të pastrohet?'},
-    en:{title:'QR List', camClosed:'Camera: Closed', start:'Start', stop:'Stop', light:'Light', clear:'Clear', list:'List', copy:'Copy', wa:'WhatsApp', askDel:'Delete this code?', askClr:'Clear the whole list?'},
-    tr:{title:'QR Listesi', camClosed:'Kamera: Kapalı', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle', list:'Liste', copy:'Kopyala', wa:'WhatsApp', askDel:'Bu kod silinsin mi?', askClr:'Liste tamamen temizlensin mi?'}
-  };
-  let LANG = 'sq';
-  document.querySelectorAll('.flags [data-lang]').forEach(b=>b.addEventListener('click',()=>{LANG=b.dataset.lang; syncText(); saveMeta();}));
+// ---- elements ----
+const el = {
+  title:qs('#t-title'), start:qs('#btnStart'), stop:qs('#btnStop'),
+  flash:qs('#btnFlash'), clear:qs('#btnClear'), listHd:qs('#t-lista'),
+  count:qs('#count'), items:qs('#items'), copy:qs('#btnCopy'), wa:qs('#btnWa'),
+  flags:qa('[data-lang]'), camChip:qs('#camChip'), camName:qs('#camName'),
+  camWrap:qs('#camSelectWrap'), camSel:qs('#cameraSelect'),
+  box:qs('#scanbox'), video:qs('#video'), overlay:qs('#overlay'),
+  sndOk:qs('#sndOk'), sndErr:qs('#sndErr')
+};
+function t(k){return (i18n[LANG]||i18n.sq)[k]}
 
-  function tkey(k){return (i18n[LANG]||i18n.sq)[k];}
-  function syncText(){
-    document.querySelector('#t-title')?.replaceChildren(document.createTextNode(tkey('title')));
-    document.querySelector('#btnStart').textContent=tkey('start');
-    document.querySelector('#btnStop').textContent=tkey('stop');
-    document.querySelector('#btnFlash').textContent=tkey('light');
-    document.querySelector('#btnClear').textContent=tkey('clear');
-    document.querySelector('#t-lista').textContent=tkey('list');
-    setCamState(false);
-  }
-  function setCamState(open,label){ document.getElementById('camName').textContent = open ? (label||'…') : (tkey('camClosed').split(':')[1]||'Kapalı'); }
+// ---- text sync ----
+function syncText(){
+  document.documentElement.lang = LANG;
+  el.title.textContent=t('title'); el.start.textContent=t('start'); el.stop.textContent=t('stop');
+  el.flash.textContent=t('light'); el.clear.textContent=t('clear'); qs('#t-lista').textContent=t('list');
+  el.copy.textContent=t('copy'); el.wa.textContent=t('wa'); setCamLabel(false);
+  localStorage.setItem(LS_META, JSON.stringify({lang:LANG}));
+}
+qa('.flags [data-lang]').forEach(b=>b.addEventListener('click', ()=>{LANG=b.dataset.lang; syncText()}));
 
-  const LS_KEY='qr_list_items_v1', META_KEY='qr_meta_v1';
-  let codes=[];
-  function loadMeta(){ try{const m=JSON.parse(localStorage.getItem(META_KEY)||'{}'); LANG=m.lang||LANG;}catch{} }
-  function saveMeta(){ localStorage.setItem(META_KEY, JSON.stringify({lang:LANG})); }
+// ---- list data ----
+let codes=[];
+try{codes=JSON.parse(localStorage.getItem(LS_LIST)||'[]')}catch{codes=[]}
+render();
 
-  function loadList(){ try{codes=JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch{codes=[];} renderList(); }
-  function saveList(){ localStorage.setItem(LS_KEY, JSON.stringify(codes)); }
-  function now(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
-
-  function renderList(){
-    els.items.innerHTML='';
-    els.count.textContent=codes.length;
-    codes.forEach((c,i)=>{
-      const row=document.createElement('div'); row.className='item';
-      row.innerHTML = `<div class="badge">${i+1}</div>
-                       <div><div class="code">${escapeHtml(c.value)}</div><div class="time">${c.time}</div></div>
-                       <div class="del" title="Sil">✕</div>`;
-      row.querySelector('.del').addEventListener('click', ()=>{
-        if(confirm(tkey('askDel'))){ codes.splice(i,1); saveList(); renderList(); }
-      });
-      els.items.appendChild(row);
+function render(){
+  el.items.innerHTML='';
+  el.count.textContent=codes.length;
+  codes.forEach((c,idx)=>{
+    const row = ce('div','item');
+    row.innerHTML = `
+      <div class="badge">${idx+1}</div>
+      <div><div class="code">${esc(c.value)}</div><div class="time">${c.time}</div></div>
+      <div class="del" role="button" aria-label="delete">✕</div>`;
+    row.querySelector('.del').addEventListener('click',()=>{
+      if(confirm(t('sureDel'))){ codes.splice(idx,1); save(); render(); }
     });
-  }
-  function escapeHtml(s){return (s+'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+    el.items.appendChild(row);
+  });
+}
+function save(){ localStorage.setItem(LS_LIST, JSON.stringify(codes)); }
+function now(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) }
+function addUnique(val){
+  if(!codes.some(x=>x.value===val)){ codes.unshift({value:val, time:now()}); save(); render(); return true; }
+  return false;
+}
 
-  // * Normalizasyon: uzun linkten son 4 alfasayısalı çek *
-  function normalizeCode(raw){
-    if(!raw) return null;
-    const s = String(raw).trim();
-    const m = s.match(/([A-Za-z0-9]{4})\s*$/);  // sonda 4 karakter
-    return m ? m[1].toUpperCase() : null;
-  }
+// ---- camera / scan ----
+let stream=null, track=null, raf=null, torch=false;
+function setCamLabel(open,label){ el.camName.textContent = open ? (label||'…') : t('camClosed').split(':')[1].trim(); }
 
-  // Kamera
-  let stream=null, track=null, scanTimer=null, torchOn=false;
-  async function listCams(){
-    const devs = await navigator.mediaDevices.enumerateDevices();
-    const cams = devs.filter(d=>d.kind==='videoinput');
-    document.getElementById('cameraSelect').innerHTML = cams.map((d,i)=><option value="${d.deviceId}">${d.label||('Camera '+(i+1))}</option>).join('');
-    return cams;
-  }
-  async function start(camId){
-    try{
-      const cons = {audio:false, video: camId ? {deviceId:{exact:camId}} : {facingMode:{ideal:'environment'}}};
-      stream = await navigator.mediaDevices.getUserMedia(cons);
-      els.video.srcObject=stream; await els.video.play(); els.video.style.display='block';
-      track = stream.getVideoTracks()[0];
-      const settings = track.getSettings(); setCamState(true, settings.label || settings.facingMode || 'Camera');
-      const caps = track.getCapabilities?.()||{}; els.flash.disabled = !('torch' in caps); torchOn=false;
-      loop(); els.start.disabled=true; els.stop.disabled=false;
-    }catch(e){ alert('Camera error: '+e.message); stop(); }
-  }
-  function stop(){
-    if(scanTimer) cancelAnimationFrame(scanTimer); scanTimer=null;
-    if(track){try{track.stop();}catch{} track=null;}
-    if(stream){try{stream.getTracks().forEach(t=>t.stop());}catch{} stream=null;}
-    els.video.pause(); els.video.removeAttribute('srcObject'); els.video.style.display='none';
-    els.flash.disabled=true; torchOn=false; setCamState(false); els.start.disabled=false; els.stop.disabled=true;
-  }
-  async function toggleTorch(){ if(!track) return; const caps=track.getCapabilities?.()||{}; if(!('torch' in caps)) return;
-    try{ torchOn=!torchOn; await track.applyConstraints({advanced:[{torch:torchOn}]}); }catch(e){ torchOn=!torchOn; } }
+async function listCams(){
+  const devs = await navigator.mediaDevices.enumerateDevices();
+  const cams = devs.filter(d=>d.kind==='videoinput');
+  el.camSel.innerHTML = cams.map((d,i)=><option value="${d.deviceId}">${d.label||('Camera '+(i+1))}</option>).join('');
+  return cams;
+}
+async function start(camId){
+  try{
+    const constraints={audio:false, video: camId?{deviceId:{exact:camId}}:{facingMode:{ideal:'environment'}}};
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    el.video.srcObject=stream; await el.video.play(); el.video.style.display='block';
+    track = stream.getVideoTracks()[0];
+    setCamLabel(true, track.getSettings().label || track.getSettings().facingMode || 'Camera');
+    const caps = track.getCapabilities?.()||{}; el.flash.disabled = !('torch' in caps); torch=false;
+    loop();
+    el.start.disabled=true; el.stop.disabled=false;
+  }catch(e){ alert('Camera error: '+e.message); stop(); }
+}
+function stop(){
+  if(raf) cancelAnimationFrame(raf); raf=null;
+  if(track){ try{track.stop()}catch{} track=null; }
+  if(stream){ try{stream.getTracks().forEach(t=>t.stop())}catch{} stream=null; }
+  el.video.pause(); el.video.style.display='none'; el.flash.disabled=true; torch=false;
+  el.start.disabled=false; el.stop.disabled=true; setCamLabel(false);
+}
+async function toggleTorch(){
+  if(!track) return; const caps=track.getCapabilities?.()||{}; if(!('torch' in caps)) return;
+  torch=!torch; try{ await track.applyConstraints({advanced:[{torch}]}); }catch{}
+}
 
-  function flashBox(ok=true){
-    els.scanbox.style.boxShadow = 0 0 0 3px ${ok?'#16a34a':'#ef4444'} inset, 0 0 24px ${ok?'#16a34a55':'#ef444455'};
-    setTimeout(()=>{ els.scanbox.style.boxShadow=''; }, 220);
-  }
+function drawBox(loc,color){
+  const ctx = el.overlay.getContext('2d');
+  const r = el.box.getBoundingClientRect();
+  el.overlay.width=r.width; el.overlay.height=r.height;
+  const scaleX = r.width / el.video.videoWidth, scaleY = r.height / el.video.videoHeight;
+  ctx.clearRect(0,0,r.width,r.height);
+  ctx.lineWidth = 4; ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(loc.topLeftCorner.x*scaleX, loc.topLeftCorner.y*scaleY);
+  ctx.lineTo(loc.topRightCorner.x*scaleX, loc.topRightCorner.y*scaleY);
+  ctx.lineTo(loc.bottomRightCorner.x*scaleX, loc.bottomRightCorner.y*scaleY);
+  ctx.lineTo(loc.bottomLeftCorner.x*scaleX, loc.bottomLeftCorner.y*scaleY);
+  ctx.closePath(); ctx.stroke();
+  // fade
+  setTimeout(()=>ctx.clearRect(0,0,r.width,r.height), 450);
+}
 
-  function drawPolygon(loc, color){
-    const r = els.scanbox.getBoundingClientRect();
-    const w = els.video.videoWidth, h = els.video.videoHeight;
-    const ctx = els.overlay.getContext('2d');
-    els.overlay.width = r.width; els.overlay.height = r.height;
-    ctx.clearRect(0,0,r.width,r.height);
-    ctx.lineWidth = 4; ctx.strokeStyle = color;
-    ctx.beginPath();
-    ctx.moveTo(loc.topLeftCorner.x * r.width / w, loc.topLeftCorner.y * r.height / h);
-    ctx.lineTo(loc.topRightCorner.x * r.width / w, loc.topRightCorner.y * r.height / h);
-    ctx.lineTo(loc.bottomRightCorner.x * r.width / w, loc.bottomRightCorner.y * r.height / h);
-    ctx.lineTo(loc.bottomLeftCorner.x * r.width / w, loc.bottomLeftCorner.y * r.height / h);
-    ctx.closePath(); ctx.stroke();
-  }
+function parseCode(raw){
+  if(!raw) return null;
+  let s = String(raw).trim().toUpperCase();
+  // code=AB12 gibi:
+  const viaParam = s.match(/(?:^|[?&#])(?:code|kod|qr)=([A-Z0-9]{4})(?:\b|$)/i);
+  if(viaParam) return viaParam[1].toUpperCase();
+  // son 4 hane/karakter:
+  const tail = s.match(/([A-Z0-9]{4})\W*$/);
+  // tam 4'lüyse veya son 4'lüyü al:
+  if(/^[A-Z0-9]{4}$/.test(s)) return s;
+  if(tail) return tail[1];
+  return null;
+}
 
-  function addCode(value){
-    const exists = codes.some(x=>x.value===value);
-    if(exists){ els.err.currentTime=0; els.err.play(); flashBox(false); return false; }
-    codes.unshift({value, time:now()}); saveList(); renderList();
-    els.ok.currentTime=0; els.ok.play(); flashBox(true);
-    return true;
-  }
-
-  function loop(){
-    if(!stream) return;
-    const v = els.video, w=v.videoWidth, h=v.videoHeight;
-    const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d', {willReadFrequently:true});
-    function step(){
-      if(!stream) return;
-      if(v.readyState===v.HAVE_ENOUGH_DATA){
-        cvs.width=w; cvs.height=h; ctx.drawImage(v,0,0,w,h);
-        const img = ctx.getImageData(0,0,w,h);
-        const qr = jsQR(img.data, w, h, { inversionAttempts:'dontInvert' });
-        if(qr){
-          const norm = normalizeCode(qr.data);
-          drawPolygon(qr.location, norm ? '#22c55e' : '#ef4444');
-          if(norm){ addCode(norm); }
-          else { els.err.currentTime=0; els.err.play(); flashBox(false); }
-        }else{
-          const oc = els.overlay.getContext('2d'); oc.clearRect(0,0,els.overlay.width,els.overlay.height);
-        }
+function loop(){
+  if(!stream) return;
+  const w=el.video.videoWidth, h=el.video.videoHeight;
+  if(w&&h){
+    const cvs=document.createElement('canvas'); cvs.width=w; cvs.height=h;
+    const ctx=cvs.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(el.video,0,0,w,h);
+    const img=ctx.getImageData(0,0,w,h);
+    const qr=jsQR(img.data,w,h,{inversionAttempts:'dontInvert'});
+    if(qr){
+      const val = parseCode(qr.data);
+      if(val){
+        if(addUnique(val)){ el.sndOk.currentTime=0; el.sndOk.play().catch(()=>{}); drawBox(qr.location,'rgba(34,197,94,.95)'); }
+        else{ el.sndErr.currentTime=0; el.sndErr.play().catch(()=>{}); drawBox(qr.location,'rgba(239,68,68,.95)'); }
+      }else{
+        // okundu ama 4 hane bulunamadı -> kırmızı çerçeve
+        drawBox(qr.location,'rgba(239,68,68,.95)');
       }
-      scanTimer = requestAnimationFrame(step);
     }
-    step();
   }
+  raf=requestAnimationFrame(loop);
+}
 
-  // Butonlar
-  document.getElementById('btnStart').addEventListener('click', async ()=>{
-    const cams = await listCams();
-    if(cams.length>1){
-      const w = document.getElementById('camSelectWrap'); w.style.display='block';
-      const chip = document.getElementById('camChip').getBoundingClientRect();
-      w.style.left = chip.left+'px'; w.style.top = (chip.bottom+2+window.scrollY)+'px';
-    }else{ await start(cams[0]?.deviceId); }
-  });
-  document.getElementById('cameraSelect').addEventListener('change', async ()=>{
-    document.getElementById('camSelectWrap').style.display='none';
-    await start(document.getElementById('cameraSelect').value);
-  });
-  document.getElementById('camChip').addEventListener('click', async ()=>{ await listCams(); document.getElementById('camSelectWrap').style.display='block'; });
-  document.getElementById('btnStop').addEventListener('click', stop);
-  document.getElementById('btnFlash').addEventListener('click', toggleTorch);
-  document.getElementById('btnClear').addEventListener('click', ()=>{ if(confirm(tkey('askClr'))){ codes=[]; saveList(); renderList(); } });
+// ---- actions ----
+el.start.addEventListener('click', async ()=>{
+  const cams = await listCams();
+  if(cams.length>1){
+    const r = el.camChip.getBoundingClientRect();
+    el.camWrap.style.display='block';
+    el.camWrap.style.left = r.left+'px'; el.camWrap.style.top = (r.bottom+window.scrollY+4)+'px';
+  }else{ await start(cams[0]?.deviceId); }
+});
+el.camSel.addEventListener('change', async ()=>{ el.camWrap.style.display='none'; await start(el.camSel.value); });
+el.camChip.addEventListener('click', async ()=>{ await listCams(); el.camWrap.style.display='block'; });
 
-  document.getElementById('btnCopy').addEventListener('click', async ()=>{
-    // Gerçek satır sonu
-    const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
-    try{ await navigator.clipboard.writeText(text); alert('Kopyalandı / Copied'); }catch{ prompt('Kopyalayın:', text); }
-  });
-  document.getElementById('btnWa').addEventListener('click', ()=>{
-    const text = encodeURIComponent(codes.map((x,i)=>${i+1}. ${x.value}).join('\n'));
-    window.open(https://wa.me/?text=${text}, '_blank');
-  });
+el.stop.addEventListener('click', stop);
+el.flash.addEventListener('click', toggleTorch);
 
-  // Boot
-  function init(){ loadMeta(); syncText(); loadList(); }
-  init();
-  window.addEventListener('pagehide', stop);
+el.clear.addEventListener('click', ()=>{ if(confirm(t('sureAll'))){ codes=[]; save(); render(); } });
+
+el.copy.addEventListener('click', async ()=>{
+  const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
+  try{ await navigator.clipboard.writeText(text); alert(t('copied')); }catch{ prompt('', text); }
+});
+el.wa.addEventListener('click', ()=>{
+  const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
+  const url = https://wa.me/?text=${encodeURIComponent(text)};
+  window.open(url,'_blank');
+});
+
+// ---- utilities ----
+function qs(s,sc=document){return sc.querySelector(s)}
+function qa(s,sc=document){return [...sc.querySelectorAll(s)]}
+function ce(tag,cls){const e=document.createElement(tag); if(cls)e.className=cls; return e}
+function esc(s){return (s+'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+
+// ---- init ----
+syncText(); render();
+
+// ---- zoom azaltıcı (mobil & masaüstü) ----
+document.addEventListener('gesturestart', e=>e.preventDefault(), {passive:false});
+document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});
+document.addEventListener('wheel', e=>{
+  if(e.ctrlKey){ e.preventDefault(); }
+},{passive:false});
+window.addEventListener('pagehide', stop);
 })();
 </script>
 </body>
