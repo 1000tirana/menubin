@@ -1,33 +1,51 @@
 <!doctype html>
-<html lang="tr">
+<html lang="sq">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>QR/Barkod Listesi</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Lista QR</title>
 <style>
-  :root{--bg:#0e0f12;--panel:#14161b;--soft:#1c1f26;--soft2:#0b0c10;--text:#e7ecf7;--muted:#9aa3b2;--accent:#22c55e;--danger:#ef4444;--chip:#2a2f3a}
-  *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,var(--bg),#0b0c10 40%,#0a0b0f);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+  :root{
+    --bg:#0e0f12; --panel:#14161b; --soft:#1c1f26; --soft2:#0b0c10;
+    --text:#dfe3eb; --muted:#9aa3b2; --accent:#22c55e; --danger:#ef4444; --chip:#2a2f3a;
+  }
+  *{box-sizing:border-box; touch-action:manipulation;}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,var(--bg),#0b0c10 40%,#0a0b0f);color:var(--text);
+       font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,"Helvetica Neue",Arial;-webkit-text-size-adjust:100%;}
   .wrap{max-width:720px;margin:14px auto 60px;padding:10px}
-  .card{background:linear-gradient(180deg,var(--panel),var(--soft));border:1px solid #1a1f28;border-radius:22px;padding:14px 14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
-  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{flex:1}.title{font-weight:800;font-size:20px}
-  .chip{background:var(--chip);color:#cfd7e6;padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid #2e3440;display:flex;gap:8px;cursor:pointer}
+  .card{background:linear-gradient(180deg,var(--panel),var(--soft));border-radius:22px;padding:14px 14px 18px;
+        box-shadow:0 10px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);border:1px solid #1a1f28;}
+  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .space{flex:1}
+  .title{font-weight:700;font-size:20px}
+  .chip{background:var(--chip);color:#cfd7e6;padding:6px 10px;border-radius:999px;font-size:13px;border:1px solid #2e3440;
+        display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
   .flags{display:flex;gap:10px;font-size:20px;cursor:pointer}
-  .scanner{margin-top:12px;background:var(--soft2);border-radius:18px;padding:14px;border:1px solid #222833}
-  .scanbox{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:#0b0d11;border:2px solid #2d3441}
-  video{width:100%;height:100%;object-fit:cover;display:none}
-  .frame{position:absolute;inset:18px;border:3px solid rgba(255,255,255,.25);border-radius:14px}
+  .scanner{margin-top:12px;background:var(--soft2);border-radius:18px;padding:14px;border:1px solid #222833;}
+  .scanbox{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;display:grid;place-items:center;overflow:hidden;
+           background:#0b0d11;border:2px solid #2d3441;transition:box-shadow .15s ease;}
+  video{width:100%;height:100%;object-fit:cover;display:none;}
+  .frame{position:absolute;inset:18px;border:3px solid rgba(255,255,255,.28);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);}
   canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .buttons{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-  .btn{flex:1 1 120px;padding:13px 16px;border-radius:12px;text-align:center;font-weight:700;border:0;cursor:pointer;transition:transform .06s}
-  .btn:active{transform:translateY(1px)} .green{background:var(--accent);color:#071108}.gray{background:#333a46;color:#e5ecf7}.red{background:var(--danger);color:#fff}
+  .btn{flex:1 1 120px;padding:13px 16px;border-radius:12px;text-align:center;font-weight:600;border:0;cursor:pointer;color:#0b0c10}
+  .btn.green{background:#4ade80}
+  .btn.gray{background:#333a46;color:#e5ecf7}
+  .btn.red{background:var(--danger);color:#fff}
   .btn[disabled]{opacity:.45;pointer-events:none}
-  .list{margin-top:16px;background:linear-gradient(180deg,var(--panel),var(--soft));border-radius:18px;padding:14px;border:1px solid #1a1f28}
-  .hd{display:flex;align-items:center;gap:10px;font-weight:800;margin-bottom:10px}.count{opacity:.75}
-  .item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:#11141a;border:1px solid #222833;border-radius:12px;padding:10px 12px;margin-bottom:10px}
-  .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#272e3a;color:#cfe0ff;font-weight:800}
-  .code{font-weight:900;letter-spacing:.5px}.time{color:var(--muted);font-size:12px}
+  .list{margin-top:16px;background:linear-gradient(180deg,var(--panel),var(--soft));border-radius:18px;padding:14px;border:1px solid #1a1f28;}
+  .list .hd{display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:10px}
+  .count{opacity:.75}
+  .item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;
+        background:#11141a;border:1px solid #222833;margin-bottom:10px;}
+  .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#272e3a;color:#cfe0ff;font-weight:700}
+  .code{font-weight:800;letter-spacing:.5px}
+  .time{color:var(--muted);font-size:12px}
   .del{width:30px;height:30px;border-radius:10px;background:#212733;color:#ff7b86;display:grid;place-items:center;cursor:pointer;border:1px solid #2f3542}
-  .foot{display:flex;gap:14px;margin-top:14px}.footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:800;cursor:pointer}
+  .footbuttons{display:flex;gap:14px;margin-top:14px}
+  .footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:700;text-align:center;cursor:pointer}
+  .sr{position:absolute;left:-10000px}
   .camselect{position:absolute;z-index:5;margin-top:6px;background:#0f1218;border:1px solid #2d3441;border-radius:12px;padding:10px;display:none;max-width:min(92vw,560px)}
   .camselect select{width:100%;background:#121620;color:#dfe3eb;border:1px solid #2a3140;border-radius:10px;padding:10px}
 </style>
@@ -36,15 +54,11 @@
 <div class="wrap">
   <div class="card">
     <div class="row" style="position:relative">
-      <div class="title" id="t-title">QR/Barkod Listesi</div>
-      <div class="chip" id="camChip">Kamera: <strong id="camName">Kapalı</strong></div>
+      <div class="title" id="t-title">Lista QR</div>
+      <div class="chip" id="camChip"><span id="camState">Kamera: <strong id="camName">Mbyllur</strong></span></div>
       <div class="space"></div>
-      <div class="flags">
-        <span role="button" data-lang="sq">🇦🇱</span>
-        <span role="button" data-lang="en">🇬🇧</span>
-        <span role="button" data-lang="tr">🇹🇷</span>
-      </div>
-      <div class="camselect" id="camSelectWrap"><select id="cameraSelect"></select></div>
+      <div class="flags"><span role="button" data-lang="sq">🇦🇱</span><span role="button" data-lang="en">🇬🇧</span><span role="button" data-lang="tr">🇹🇷</span></div>
+      <div class="camselect" id="camSelectWrap"><label class="sr" for="cameraSelect">Camera</label><select id="cameraSelect"></select></div>
     </div>
 
     <div class="scanner">
@@ -54,18 +68,18 @@
         <div class="frame"></div>
       </div>
       <div class="buttons">
-        <button class="btn green" id="btnStart">Başlat</button>
-        <button class="btn gray"  id="btnStop" disabled>Durdur</button>
-        <button class="btn gray"  id="btnFlash" disabled>Işık</button>
-        <button class="btn red"   id="btnClear">Temizle</button>
+        <button class="btn green" id="btnStart">Start</button>
+        <button class="btn gray" id="btnStop" disabled>Stop</button>
+        <button class="btn gray" id="btnFlash" disabled>Dritë</button>
+        <button class="btn red" id="btnClear">Pastro</button>
       </div>
     </div>
 
     <div class="list">
-      <div class="hd"><span id="t-lista">Liste</span> <span class="count">· <span id="count">0</span></span></div>
+      <div class="hd"><span id="t-lista">Lista</span> <span class="count">· <span id="count">0</span></span></div>
       <div id="items"></div>
-      <div class="foot">
-        <button class="footbtn" id="btnCopy">Kopyala</button>
+      <div class="footbuttons">
+        <button class="footbtn" id="btnCopy">Kopjo</button>
         <button class="footbtn" id="btnWa">WhatsApp</button>
       </div>
     </div>
@@ -73,186 +87,196 @@
 </div>
 
 <!-- Sesler -->
-<audio id="snd-ok"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAACQAAABJb2tp/////w8AAP//AAC//wAAAP//AACAgP//AAAAAP//AP8A//8AAA=="></audio>
-<audio id="snd-err"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAACQAAABFcnJvcn////8PAAD//wAA//8AAAD//wAAgID//wAAAAD//wD/AP//AAAA"></audio>
+<audio id="ok" preload="auto"><source
+  src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADMzMzMzMzMzMzM/8v/7kGQAAAABVVVVVVVVVVVVVf/L//uQZAAAAAEHBwcHBwcHBwcH/8v/7kGQAAAAAQCQkJCQkJCQkJD/y//7kGQAAAAAB///////////8AAA==" type="audio/mp3"></audio>
+<audio id="err" preload="auto"><source
+  src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADAwMDAwMDAwMDAwP/7kGQAAAAA8PDw8PDw8PDw8P/7kGQAAAAAQUFBQUFBQUFBQP/7kGQAAAAAD///8PDw8PDw8P/7kGQAAAAAB///////////8AAA==" type="audio/mp3"></audio>
 
-<!-- jsQR (fallback için) -->
+<!-- jsQR -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 (() => {
-  // ============= Elemanlar & metinler
-  const E = (id)=>document.getElementById(id);
-  const els = {title:E('t-title'), camChip:E('camChip'), camName:E('camName'), camSelWrap:E('camSelectWrap'),
-               camSel:E('cameraSelect'), video:E('video'), overlay:E('overlay'), start:E('btnStart'),
-               stop:E('btnStop'), flash:E('btnFlash'), clear:E('btnClear'), items:E('items'), count:E('count'),
-               copy:E('btnCopy'), wa:E('btnWa'), sndOk:E('snd-ok'), sndErr:E('snd-err'), scanbox:E('scanbox')};
+  // Zoom engellemeleri (iOS çift dokunma / pinch)
+  document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});
+  document.addEventListener('gesturestart', e=>e.preventDefault());
+  document.addEventListener('touchmove', e=>{ if(e.scale && e.scale !== 1) e.preventDefault(); }, {passive:false});
+
+  const els = {
+    title: t('title'), camChip: document.getElementById('camChip'), camName: document.getElementById('camName'),
+    camSelectWrap: document.getElementById('camSelectWrap'), camSelect: document.getElementById('cameraSelect'),
+    video: document.getElementById('video'), overlay: document.getElementById('overlay'),
+    start: document.getElementById('btnStart'), stop: document.getElementById('btnStop'), flash: document.getElementById('btnFlash'),
+    clear: document.getElementById('btnClear'), items: document.getElementById('items'), count: document.getElementById('count'),
+    copy: document.getElementById('btnCopy'), wa: document.getElementById('btnWa'), scanbox: document.getElementById('scanbox'),
+    ok: document.getElementById('ok'), err: document.getElementById('err')
+  };
 
   const i18n = {
-    tr:{title:'QR/Barkod Listesi', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle', list:'Liste', copy:'Kopyala'},
-    sq:{title:'Lista QR/Bar',     start:'Start',  stop:'Stop',    light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo'},
-    en:{title:'QR/Barcode List',  start:'Start',  stop:'Stop',    light:'Light', clear:'Clear',  list:'List',  copy:'Copy'}
+    sq:{title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo', wa:'WhatsApp', askDel:'Këtë kod ta fshij?', askClr:'Lista të pastrohet?'},
+    en:{title:'QR List', camClosed:'Camera: Closed', start:'Start', stop:'Stop', light:'Light', clear:'Clear', list:'List', copy:'Copy', wa:'WhatsApp', askDel:'Delete this code?', askClr:'Clear the whole list?'},
+    tr:{title:'QR Listesi', camClosed:'Kamera: Kapalı', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle', list:'Liste', copy:'Kopyala', wa:'WhatsApp', askDel:'Bu kod silinsin mi?', askClr:'Liste tamamen temizlensin mi?'}
   };
-  let LANG = (localStorage.getItem('qr_meta_v1_lang')||'tr');
-  const T = k => (i18n[LANG]||i18n.tr)[k];
+  let LANG = 'sq';
+  document.querySelectorAll('.flags [data-lang]').forEach(b=>b.addEventListener('click',()=>{LANG=b.dataset.lang; syncText(); saveMeta();}));
 
-  document.querySelectorAll('.flags [data-lang]').forEach(b=>{
-    b.addEventListener('click', ()=>{ LANG=b.dataset.lang; syncTexts(); localStorage.setItem('qr_meta_v1_lang',LANG); });
-  });
-  function syncTexts(){
-    els.title.textContent=T('title'); els.start.textContent=T('start'); els.stop.textContent=T('stop');
-    els.flash.textContent=T('light'); els.clear.textContent=T('clear'); document.getElementById('t-lista').textContent=T('list');
-    els.copy.textContent=T('copy');
+  function tkey(k){return (i18n[LANG]||i18n.sq)[k];}
+  function syncText(){
+    document.querySelector('#t-title')?.replaceChildren(document.createTextNode(tkey('title')));
+    document.querySelector('#btnStart').textContent=tkey('start');
+    document.querySelector('#btnStop').textContent=tkey('stop');
+    document.querySelector('#btnFlash').textContent=tkey('light');
+    document.querySelector('#btnClear').textContent=tkey('clear');
+    document.querySelector('#t-lista').textContent=tkey('list');
+    setCamState(false);
   }
-  syncTexts();
+  function setCamState(open,label){ document.getElementById('camName').textContent = open ? (label||'…') : (tkey('camClosed').split(':')[1]||'Kapalı'); }
 
-  // ============= Durum & Kalıcı liste
-  const LS_KEY='qr_list_items_v2';
-  let list = [];
-  try{ list=JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch{}
-  render();
+  const LS_KEY='qr_list_items_v1', META_KEY='qr_meta_v1';
+  let codes=[];
+  function loadMeta(){ try{const m=JSON.parse(localStorage.getItem(META_KEY)||'{}'); LANG=m.lang||LANG;}catch{} }
+  function saveMeta(){ localStorage.setItem(META_KEY, JSON.stringify({lang:LANG})); }
 
-  function save(){ localStorage.setItem(LS_KEY, JSON.stringify(list)); }
-  function now(){ const d=new Date(); return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
-  function render(){
-    els.items.innerHTML=''; els.count.textContent=list.length;
-    list.forEach((x,i)=>{
+  function loadList(){ try{codes=JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch{codes=[];} renderList(); }
+  function saveList(){ localStorage.setItem(LS_KEY, JSON.stringify(codes)); }
+  function now(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+  function renderList(){
+    els.items.innerHTML='';
+    els.count.textContent=codes.length;
+    codes.forEach((c,i)=>{
       const row=document.createElement('div'); row.className='item';
-      row.innerHTML=<div class="badge">${i+1}</div><div><div class="code">${x.value}</div><div class="time">${x.time}</div></div><div class="del">✕</div>;
-      row.querySelector('.del').onclick=()=>{ list.splice(i,1); save(); render(); };
+      row.innerHTML = `<div class="badge">${i+1}</div>
+                       <div><div class="code">${escapeHtml(c.value)}</div><div class="time">${c.time}</div></div>
+                       <div class="del" title="Sil">✕</div>`;
+      row.querySelector('.del').addEventListener('click', ()=>{
+        if(confirm(tkey('askDel'))){ codes.splice(i,1); saveList(); renderList(); }
+      });
       els.items.appendChild(row);
     });
   }
+  function escapeHtml(s){return (s+'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 
-  // ============= Kamera
-  let stream=null, track=null, raf=null, torch=false;
-  function setCamLabel(s){ els.camName.textContent=s; }
-  async function enumerateCams(){
-    const devs=await navigator.mediaDevices.enumerateDevices();
-    return devs.filter(d=>d.kind==='videoinput');
+  // * Normalizasyon: uzun linkten son 4 alfasayısalı çek *
+  function normalizeCode(raw){
+    if(!raw) return null;
+    const s = String(raw).trim();
+    const m = s.match(/([A-Za-z0-9]{4})\s*$/);  // sonda 4 karakter
+    return m ? m[1].toUpperCase() : null;
   }
-  async function start(deviceId){
+
+  // Kamera
+  let stream=null, track=null, scanTimer=null, torchOn=false;
+  async function listCams(){
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    const cams = devs.filter(d=>d.kind==='videoinput');
+    document.getElementById('cameraSelect').innerHTML = cams.map((d,i)=><option value="${d.deviceId}">${d.label||('Camera '+(i+1))}</option>).join('');
+    return cams;
+  }
+  async function start(camId){
     try{
-      const constraints={video: deviceId?{deviceId:{exact:deviceId}}:{facingMode:{ideal:'environment'}}, audio:false};
-      stream=await navigator.mediaDevices.getUserMedia(constraints);
+      const cons = {audio:false, video: camId ? {deviceId:{exact:camId}} : {facingMode:{ideal:'environment'}}};
+      stream = await navigator.mediaDevices.getUserMedia(cons);
       els.video.srcObject=stream; await els.video.play(); els.video.style.display='block';
-      track=stream.getVideoTracks()[0]; setCamLabel(track.getSettings().label||'Kamera');
-      const caps=track.getCapabilities?.()||{}; els.flash.disabled=!('torch' in caps);
-      els.start.disabled=true; els.stop.disabled=false;
-      scanLoop();
-    }catch(e){ alert('Kamera açılamadı: '+e.message); stop(); }
+      track = stream.getVideoTracks()[0];
+      const settings = track.getSettings(); setCamState(true, settings.label || settings.facingMode || 'Camera');
+      const caps = track.getCapabilities?.()||{}; els.flash.disabled = !('torch' in caps); torchOn=false;
+      loop(); els.start.disabled=true; els.stop.disabled=false;
+    }catch(e){ alert('Camera error: '+e.message); stop(); }
   }
   function stop(){
-    if(raf) cancelAnimationFrame(raf);
-    if(track){ try{track.stop();}catch{} track=null; }
-    if(stream){ try{stream.getTracks().forEach(t=>t.stop());}catch{} stream=null; }
+    if(scanTimer) cancelAnimationFrame(scanTimer); scanTimer=null;
+    if(track){try{track.stop();}catch{} track=null;}
+    if(stream){try{stream.getTracks().forEach(t=>t.stop());}catch{} stream=null;}
     els.video.pause(); els.video.removeAttribute('srcObject'); els.video.style.display='none';
-    els.flash.disabled=true; setCamLabel('Kapalı'); els.start.disabled=false; els.stop.disabled=true;
+    els.flash.disabled=true; torchOn=false; setCamState(false); els.start.disabled=false; els.stop.disabled=true;
   }
-  async function toggleTorch(){
-    if(!track) return; torch=!torch;
-    try{ await track.applyConstraints({advanced:[{torch}]}); }catch{ torch=!torch; }
-  }
+  async function toggleTorch(){ if(!track) return; const caps=track.getCapabilities?.()||{}; if(!('torch' in caps)) return;
+    try{ torchOn=!torchOn; await track.applyConstraints({advanced:[{torch:torchOn}]}); }catch(e){ torchOn=!torchOn; } }
 
-  // ============= Okuma (BarcodeDetector -> jsQR yedeği)
-  const hasBD = 'BarcodeDetector' in window;
-  let detector=null;
-  if(hasBD){
-    try{
-      detector=new BarcodeDetector({formats:[
-        'qr_code','code_128','code_39','ean_13','ean_8','codabar','pdf417','aztec','data_matrix','upc_a','upc_e'
-      ]});
-    }catch{}
-  }
-  const workCanvas=document.createElement('canvas'); const wctx=workCanvas.getContext('2d',{willReadFrequently:true});
-  const octx=els.overlay.getContext('2d');
-
-  function drawBox(color){
-    octx.clearRect(0,0,els.overlay.width,els.overlay.height);
-    const r=els.scanbox.getBoundingClientRect(); els.overlay.width=r.width; els.overlay.height=r.height;
-    octx.lineWidth=5; octx.strokeStyle=color; octx.strokeRect(18,18,r.width-36,r.height-36);
-    setTimeout(()=>octx.clearRect(0,0,els.overlay.width,els.overlay.height), 600);
+  function flashBox(ok=true){
+    els.scanbox.style.boxShadow = 0 0 0 3px ${ok?'#16a34a':'#ef4444'} inset, 0 0 24px ${ok?'#16a34a55':'#ef444455'};
+    setTimeout(()=>{ els.scanbox.style.boxShadow=''; }, 220);
   }
 
-  function extractCode(raw){
-    if(!raw) return null;
-    const s=String(raw).trim();
-    const m = s.match(/([A-Za-z0-9]{4})$/);  // sonda 4 alfanümerik
-    if(m) return m[1].toUpperCase();
-    if(/^[A-Za-z0-9]{4}$/.test(s)) return s.toUpperCase();
-    return null; // 4 haneli değilse alma
+  function drawPolygon(loc, color){
+    const r = els.scanbox.getBoundingClientRect();
+    const w = els.video.videoWidth, h = els.video.videoHeight;
+    const ctx = els.overlay.getContext('2d');
+    els.overlay.width = r.width; els.overlay.height = r.height;
+    ctx.clearRect(0,0,r.width,r.height);
+    ctx.lineWidth = 4; ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(loc.topLeftCorner.x * r.width / w, loc.topLeftCorner.y * r.height / h);
+    ctx.lineTo(loc.topRightCorner.x * r.width / w, loc.topRightCorner.y * r.height / h);
+    ctx.lineTo(loc.bottomRightCorner.x * r.width / w, loc.bottomRightCorner.y * r.height / h);
+    ctx.lineTo(loc.bottomLeftCorner.x * r.width / w, loc.bottomLeftCorner.y * r.height / h);
+    ctx.closePath(); ctx.stroke();
   }
 
-  let lastHitAt = 0;
-  function onDetect(raw){
-    const code = extractCode(raw);
-    if(!code) return;
-
-    const dup = list.some(x=>x.value===code);
-    if(dup){
-      drawBox('rgba(239,68,68,.95)'); // kırmızı
-      try{ els.sndErr.currentTime=0; els.sndErr.play(); }catch{}
-      lastHitAt=performance.now();
-      return;
-    }
-    list.unshift({value:code, time:now()}); save(); render();
-    drawBox('rgba(34,197,94,.95)');        // yeşil
-    try{ els.sndOk.currentTime=0; els.sndOk.play(); }catch{}
-    lastHitAt=performance.now();
+  function addCode(value){
+    const exists = codes.some(x=>x.value===value);
+    if(exists){ els.err.currentTime=0; els.err.play(); flashBox(false); return false; }
+    codes.unshift({value, time:now()}); saveList(); renderList();
+    els.ok.currentTime=0; els.ok.play(); flashBox(true);
+    return true;
   }
 
-  async function scanLoop(){
+  function loop(){
     if(!stream) return;
-    const vw=els.video.videoWidth, vh=els.video.videoHeight;
-    if(vw&&vh){
-      workCanvas.width=vw; workCanvas.height=vh;
-      wctx.drawImage(els.video,0,0,vw,vh);
-
-      if(detector){
-        try{
-          const bit=await createImageBitmap(workCanvas);
-          const codes=await detector.detect(bit);
-          if(codes && codes.length){
-            onDetect(codes[0].rawValue || codes[0].rawValueText || codes[0].value);
-          }
-        }catch{}
-      }else{
-        const img=wctx.getImageData(0,0,vw,vh);
-        const qr=jsQR(img.data,vw,vh,{inversionAttempts:'dontInvert'});
-        if(qr){ onDetect(qr.data); }
+    const v = els.video, w=v.videoWidth, h=v.videoHeight;
+    const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d', {willReadFrequently:true});
+    function step(){
+      if(!stream) return;
+      if(v.readyState===v.HAVE_ENOUGH_DATA){
+        cvs.width=w; cvs.height=h; ctx.drawImage(v,0,0,w,h);
+        const img = ctx.getImageData(0,0,w,h);
+        const qr = jsQR(img.data, w, h, { inversionAttempts:'dontInvert' });
+        if(qr){
+          const norm = normalizeCode(qr.data);
+          drawPolygon(qr.location, norm ? '#22c55e' : '#ef4444');
+          if(norm){ addCode(norm); }
+          else { els.err.currentTime=0; els.err.play(); flashBox(false); }
+        }else{
+          const oc = els.overlay.getContext('2d'); oc.clearRect(0,0,els.overlay.width,els.overlay.height);
+        }
       }
+      scanTimer = requestAnimationFrame(step);
     }
-    raf=requestAnimationFrame(scanLoop);
+    step();
   }
 
-  // ============= Eventler
-  els.start.onclick = async ()=>{
-    const cams = await enumerateCams();
+  // Butonlar
+  document.getElementById('btnStart').addEventListener('click', async ()=>{
+    const cams = await listCams();
     if(cams.length>1){
-      els.camSel.innerHTML=cams.map((d,i)=><option value="${d.deviceId}">${d.label||('Kamera '+(i+1))}</option>).join('');
-      const r=els.camChip.getBoundingClientRect();
-      els.camSelWrap.style.left=r.left+'px'; els.camSelWrap.style.top=(r.bottom+2+scrollY)+'px';
-      els.camSelWrap.style.display='block';
-      els.camSel.onchange=async ()=>{ els.camSelWrap.style.display='none'; await start(els.camSel.value); };
-    }else{
-      await start(cams[0]?.deviceId);
-    }
-  };
-  els.camChip.onclick = async ()=>{ const cams=await enumerateCams(); if(cams.length){ els.start.click(); } };
-  els.stop.onclick = stop;
-  els.flash.onclick = toggleTorch;
-  els.clear.onclick = ()=>{ list=[]; save(); render(); };
+      const w = document.getElementById('camSelectWrap'); w.style.display='block';
+      const chip = document.getElementById('camChip').getBoundingClientRect();
+      w.style.left = chip.left+'px'; w.style.top = (chip.bottom+2+window.scrollY)+'px';
+    }else{ await start(cams[0]?.deviceId); }
+  });
+  document.getElementById('cameraSelect').addEventListener('change', async ()=>{
+    document.getElementById('camSelectWrap').style.display='none';
+    await start(document.getElementById('cameraSelect').value);
+  });
+  document.getElementById('camChip').addEventListener('click', async ()=>{ await listCams(); document.getElementById('camSelectWrap').style.display='block'; });
+  document.getElementById('btnStop').addEventListener('click', stop);
+  document.getElementById('btnFlash').addEventListener('click', toggleTorch);
+  document.getElementById('btnClear').addEventListener('click', ()=>{ if(confirm(tkey('askClr'))){ codes=[]; saveList(); renderList(); } });
 
-  els.copy.onclick = async ()=>{
-    const text=list.map(x=>x.value).join('\n');
-    try{ await navigator.clipboard.writeText(text); alert('Kopyalandı'); }catch{ prompt('Kopyalayın:', text); }
-  };
-  els.wa.onclick = ()=>{
-    const text=encodeURIComponent(list.map((x,i)=>${i+1}. ${x.value} (${x.time})).join('\n'));
-    open(https://wa.me/?text=${text},'_blank');
-  };
+  document.getElementById('btnCopy').addEventListener('click', async ()=>{
+    // Gerçek satır sonu
+    const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
+    try{ await navigator.clipboard.writeText(text); alert('Kopyalandı / Copied'); }catch{ prompt('Kopyalayın:', text); }
+  });
+  document.getElementById('btnWa').addEventListener('click', ()=>{
+    const text = encodeURIComponent(codes.map((x,i)=>${i+1}. ${x.value}).join('\n'));
+    window.open(https://wa.me/?text=${text}, '_blank');
+  });
 
-  // sayfa değişince kamerayı kapat
-  addEventListener('pagehide', stop);
+  // Boot
+  function init(){ loadMeta(); syncText(); loadList(); }
+  init();
+  window.addEventListener('pagehide', stop);
 })();
 </script>
 </body>
