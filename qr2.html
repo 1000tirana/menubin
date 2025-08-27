@@ -1,269 +1,106 @@
-<!doctype html>
-<html lang="sq">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>Lista QR</title>
+<meta charset="UTF-8">
+<title>Barkod Okuyucu</title>
 <style>
-  :root{--bg:#0e0f12;--panel:#151821;--soft:#1b202c;--text:#e6ebf3;--muted:#9aa3b2;--chip:#263042;--ok:#22c55e;--bad:#ef4444}
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#0d0f14,#0b0d12 40%,#0a0b10);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Arial;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
-  .wrap{max-width:720px;margin:16px auto 60px;padding:12px}
-  .card{background:linear-gradient(180deg,#141821,#171c27);border:1px solid #1e2633;border-radius:20px;padding:14px 14px 18px;box-shadow:0 10px 28px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .title{font-weight:800;font-size:20px}
-  .chip{background:var(--chip);border:1px solid #2e3748;color:#cfd7ea;border-radius:999px;padding:6px 10px;font-size:13px;display:flex;gap:8px;align-items:center;cursor:pointer}
-  .flags{display:flex;gap:10px;font-size:20px;cursor:pointer}
-  .space{flex:1}
-  .camselect{position:absolute;z-index:5;margin-top:6px;background:#0f1218;border:1px solid #2d3441;border-radius:12px;padding:10px;display:none;max-width:min(92vw,560px)}
-  .camselect select{width:100%;background:#121620;color:#dfe3eb;border:1px solid #2a3140;border-radius:10px;padding:10px}
-  .scanner{margin-top:12px;background:#0f131b;border:1px solid #1e2633;border-radius:18px;padding:14px}
-  .scanbox{position:relative;width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:#0b0d11;border:2px solid #2d3441}
-  video{width:100%;height:100%;object-fit:cover;display:none}
-  .frame{position:absolute;inset:18px;border:3px solid rgba(255,255,255,.28);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
-  canvas.overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-  .buttons{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
-  .btn{flex:1 1 120px;padding:13px 16px;border-radius:12px;text-align:center;font-weight:700;border:0;cursor:pointer;transition:transform .06s}
-  .btn:active{transform:translateY(1px)} .green{background:#4ade80;color:#0b0c10} .gray{background:#333a46;color:#e5ecf7} .red{background:#ef4444;color:#fff}
-  .btn[disabled]{opacity:.45;pointer-events:none}
-  .list{margin-top:16px;background:#121723;border:1px solid #1e2633;border-radius:18px;padding:14px}
-  .hd{display:flex;gap:10px;align-items:center;font-weight:800;margin-bottom:10px}
-  .count{opacity:.75}
-  .item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 12px;background:#0f141f;border:1px solid #202838;border-radius:12px;margin-bottom:10px}
-  .badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#273246;color:#cfe0ff;font-weight:800}
-  .code{font-weight:900;letter-spacing:.5px} .time{color:#93a0b5;font-size:12px}
-  .del{width:30px;height:30px;border-radius:10px;background:#212733;color:#ff7b86;display:grid;place-items:center;cursor:pointer;border:1px solid #2f3542}
-  .footbuttons{display:flex;gap:14px;margin-top:14px} .footbtn{flex:1;background:#1b2029;color:#e5ecf7;border:1px solid #2a3140;border-radius:14px;padding:14px 16px;font-weight:800;cursor:pointer}
-  .sr{position:absolute;left:-10000px}
+  body { font-family: Arial, sans-serif; text-align: center; margin: 0; background: #f2f2f2; }
+  #reader { width: 100%; max-width: 400px; margin: 20px auto; }
+  #resultList { margin: 20px auto; width: 90%; text-align: left; }
+  li { padding: 5px 0; border-bottom: 1px solid #ddd; }
+  .btns { margin: 20px; }
+  button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+  #copyBtn { background: #007bff; color: #fff; }
+  #whatsappBtn { background: #25D366; color: #fff; }
+  #overlay {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    pointer-events:none; border: 10px solid transparent; box-sizing:border-box;
+  }
+  #notify {
+    position: fixed; top:-60px; left:50%; transform:translateX(-50%);
+    background:#4CAF50; color:#fff; padding:15px 25px; border-radius:5px;
+    font-size:18px; transition:top 0.5s; z-index:9999;
+  }
+  #notify.error { background:#E74C3C; }
 </style>
+<script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="row" style="position:relative">
-      <div class="title" id="t-title">Lista QR</div>
-      <div class="chip" id="camChip"><span id="camState">Kamera: <strong id="camName">Mbyllur</strong></span></div>
-      <div class="space"></div>
-      <div class="flags">
-        <span role="button" data-lang="sq" title="Shqip">🇦🇱</span>
-        <span role="button" data-lang="en" title="English">🇬🇧</span>
-        <span role="button" data-lang="tr" title="Türkçe">🇹🇷</span>
-      </div>
-      <div class="camselect" id="camSelectWrap"><label class="sr" for="cameraSelect">Camera</label><select id="cameraSelect"></select></div>
-    </div>
 
-    <div class="scanner">
-      <div class="scanbox" id="scanbox">
-        <video id="video" playsinline muted></video>
-        <canvas id="overlay" class="overlay"></canvas>
-        <div class="frame"></div>
-      </div>
-      <div class="buttons">
-        <button class="btn green" id="btnStart">Start</button>
-        <button class="btn gray" id="btnStop" disabled>Stop</button>
-        <button class="btn gray" id="btnFlash" disabled>Dritë</button>
-        <button class="btn red" id="btnClear">Pastro</button>
-      </div>
-    </div>
+<h2>Barkod Okuyucu</h2>
+<div id="reader"></div>
+<div id="overlay"></div>
+<ul id="resultList"></ul>
 
-    <div class="list">
-      <div class="hd"><span id="t-lista">Lista</span> <span class="count">· <span id="count">0</span></span></div>
-      <div id="items"></div>
-      <div class="footbuttons">
-        <button class="footbtn" id="btnCopy">Kopjo</button>
-        <button class="footbtn" id="btnWa">WhatsApp</button>
-      </div>
-    </div>
-  </div>
+<div class="btns">
+  <button id="copyBtn">📋 Kopyala</button>
+  <button id="whatsappBtn">📲 WhatsApp'tan Gönder</button>
 </div>
 
-<!-- Sesler (base64) -->
-<audio id="sndOk" preload="auto"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAADQ0NDQ0NDQ0NDQ0P/7kGQAAAABSUlJSUlJSUlJSUv/7kGQAAAAAICAgICAgICAgIP/7kGQAQAAAQH4f+H//8AAP//" ></audio>
-<audio id="sndErr" preload="auto"><source type="audio/mp3" src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAAACAAACcQAAAAAAAAAAAAAA//uQZAAAAAEAAAD///8AAP//AAAAP/7/AAAA/8AAAP//" ></audio>
+<div id="notify"></div>
 
-<!-- jsQR -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="errorSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
 <script>
-/* ------ Helpers (EN BAŞTA!) ------ */
-function qs(s,sc=document){return sc.querySelector(s)}
-function qa(s,sc=document){return Array.from(sc.querySelectorAll(s))}
-function ce(tag,cls){const e=document.createElement(tag); if(cls)e.className=cls; return e}
-function esc(s){return (s+'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+let scanned = [];
+let count = 0;
 
-(()=>{
-// ---- i18n ----
-const i18n = {
-  sq:{title:'Lista QR', camClosed:'Kamera: Mbyllur', start:'Start', stop:'Stop', light:'Dritë', clear:'Pastro', list:'Lista', copy:'Kopjo', wa:'WhatsApp', sureDel:'Këtë rresht ta fshij?', sureAll:'Të pastroj gjithë listën?', copied:'U kopjua'},
-  en:{title:'QR List',    camClosed:'Camera: Closed', start:'Start', stop:'Stop', light:'Light', clear:'Clear', list:'List',  copy:'Copy',  wa:'WhatsApp', sureDel:'Delete this item?', sureAll:'Clear all items?',  copied:'Copied'},
-  tr:{title:'QR Listesi', camClosed:'Kamera: Kapalı', start:'Başlat', stop:'Durdur', light:'Işık', clear:'Temizle', list:'Liste', copy:'Kopyala', wa:'WhatsApp', sureDel:'Bu satırı silelim mi?', sureAll:'Listeyi tamamen silelim mi?', copied:'Kopyalandı'}
-};
-let LANG='sq';
-const LS_LIST='qr_list_items_v1', LS_META='qr_meta_v1';
-try{LANG = JSON.parse(localStorage.getItem(LS_META)||'{}').lang || LANG;}catch{}
-
-// ---- elements ----
-const el = {
-  title:qs('#t-title'), start:qs('#btnStart'), stop:qs('#btnStop'),
-  flash:qs('#btnFlash'), clear:qs('#btnClear'), listHd:qs('#t-lista'),
-  count:qs('#count'), items:qs('#items'), copy:qs('#btnCopy'), wa:qs('#btnWa'),
-  camChip:qs('#camChip'), camName:qs('#camName'), camWrap:qs('#camSelectWrap'), camSel:qs('#cameraSelect'),
-  box:qs('#scanbox'), video:qs('#video'), overlay:qs('#overlay'),
-  sndOk:qs('#sndOk'), sndErr:qs('#sndErr')
-};
-function t(k){return (i18n[LANG]||i18n.sq)[k]}
-
-function syncText(){
-  document.documentElement.lang = LANG;
-  el.title.textContent=t('title'); el.start.textContent=t('start'); el.stop.textContent=t('stop');
-  el.flash.textContent=t('light'); el.clear.textContent=t('clear'); el.listHd.textContent=t('list');
-  el.copy.textContent=t('copy'); el.wa.textContent=t('wa'); setCamLabel(false);
-  localStorage.setItem(LS_META, JSON.stringify({lang:LANG}));
-}
-qa('.flags [data-lang]').forEach(b=>b.addEventListener('click', ()=>{LANG=b.dataset.lang; syncText()}));
-
-// ---- list data ----
-let codes=[];
-try{codes=JSON.parse(localStorage.getItem(LS_LIST)||'[]')}catch{codes=[]}
-render();
-
-function render(){
-  el.items.innerHTML='';
-  el.count.textContent=codes.length;
-  codes.forEach((c,idx)=>{
-    const row = ce('div','item');
-    row.innerHTML = `
-      <div class="badge">${idx+1}</div>
-      <div><div class="code">${esc(c.value)}</div><div class="time">${c.time}</div></div>
-      <div class="del" role="button" aria-label="delete">✕</div>`;
-    row.querySelector('.del').addEventListener('click',()=>{
-      if(confirm(t('sureDel'))){ codes.splice(idx,1); save(); render(); }
-    });
-    el.items.appendChild(row);
-  });
-}
-function save(){ localStorage.setItem(LS_LIST, JSON.stringify(codes)); }
-function now(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) }
-function addUnique(val){
-  if(!codes.some(x=>x.value===val)){ codes.unshift({value:val, time:now()}); save(); render(); return true; }
-  return false;
+function showNotification(text, isError=false){
+  const notify = document.getElementById("notify");
+  notify.textContent = text;
+  notify.className = isError ? "error" : "";
+  notify.style.top = "20px";
+  setTimeout(()=>{ notify.style.top = "-60px"; }, 2000);
 }
 
-// ---- camera / scan ----
-let stream=null, track=null, raf=null, torch=false;
-function setCamLabel(open,label){ el.camName.textContent = open ? (label||'…') : t('camClosed').split(':')[1].trim(); }
-
-async function listCams(){
-  const devs = await navigator.mediaDevices.enumerateDevices();
-  const cams = devs.filter(d=>d.kind==='videoinput');
-  el.camSel.innerHTML = cams.map((d,i)=><option value="${d.deviceId}">${d.label||('Camera '+(i+1))}</option>).join('');
-  return cams;
-}
-async function start(camId){
-  try{
-    const constraints={audio:false, video: camId?{deviceId:{exact:camId}}:{facingMode:{ideal:'environment'}}};
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
-    el.video.srcObject=stream; await el.video.play(); el.video.style.display='block';
-    track = stream.getVideoTracks()[0];
-    setCamLabel(true, track.getSettings().label || track.getSettings().facingMode || 'Camera');
-    const caps = track.getCapabilities?.()||{}; el.flash.disabled = !('torch' in caps); torch=false;
-    loop(); el.start.disabled=true; el.stop.disabled=false;
-  }catch(e){ alert('Camera error: '+e.message); stop(); }
-}
-function stop(){
-  if(raf) cancelAnimationFrame(raf); raf=null;
-  if(track){ try{track.stop()}catch{} track=null; }
-  if(stream){ try{stream.getTracks().forEach(t=>t.stop())}catch{} stream=null; }
-  el.video.pause(); el.video.style.display='none'; el.flash.disabled=true; torch=false;
-  el.start.disabled=false; el.stop.disabled=true; setCamLabel(false);
-}
-async function toggleTorch(){
-  if(!track) return; const caps=track.getCapabilities?.()||{}; if(!('torch' in caps)) return;
-  torch=!torch; try{ await track.applyConstraints({advanced:[{torch}]}); }catch{}
-}
-
-function drawBox(loc,color){
-  const ctx = el.overlay.getContext('2d');
-  const r = el.box.getBoundingClientRect();
-  el.overlay.width=r.width; el.overlay.height=r.height;
-  const scaleX = r.width / el.video.videoWidth, scaleY = r.height / el.video.videoHeight;
-  ctx.clearRect(0,0,r.width,r.height);
-  ctx.lineWidth = 4; ctx.strokeStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(loc.topLeftCorner.x*scaleX, loc.topLeftCorner.y*scaleY);
-  ctx.lineTo(loc.topRightCorner.x*scaleX, loc.topRightCorner.y*scaleY);
-  ctx.lineTo(loc.bottomRightCorner.x*scaleX, loc.bottomRightCorner.y*scaleY);
-  ctx.lineTo(loc.bottomLeftCorner.x*scaleX, loc.bottomLeftCorner.y*scaleY);
-  ctx.closePath(); ctx.stroke();
-  setTimeout(()=>ctx.clearRect(0,0,r.width,r.height), 450);
-}
-
-function parseCode(raw){
-  if(!raw) return null;
-  let s = String(raw).trim().toUpperCase();
-  const viaParam = s.match(/(?:^|[?&#])(?:code|kod|qr)=([A-Z0-9]{4})(?:\b|$)/i);
-  if(viaParam) return viaParam[1].toUpperCase();
-  const tail = s.match(/([A-Z0-9]{4})\W*$/);
-  if(/^[A-Z0-9]{4}$/.test(s)) return s;
-  if(tail) return tail[1];
-  return null;
-}
-
-function loop(){
-  if(!stream) return;
-  const w=el.video.videoWidth, h=el.video.videoHeight;
-  if(w&&h){
-    const cvs=document.createElement('canvas'); cvs.width=w; cvs.height=h;
-    const ctx=cvs.getContext('2d',{willReadFrequently:true});
-    ctx.drawImage(el.video,0,0,w,h);
-    const img=ctx.getImageData(0,0,w,h);
-    const qr=jsQR(img.data,w,h,{inversionAttempts:'dontInvert'});
-    if(qr){
-      const val = parseCode(qr.data);
-      if(val){
-        if(addUnique(val)){ el.sndOk.currentTime=0; el.sndOk.play().catch(()=>{}); drawBox(qr.location,'rgba(34,197,94,.95)'); }
-        else{ el.sndErr.currentTime=0; el.sndErr.play().catch(()=>{}); drawBox(qr.location,'rgba(239,68,68,.95)'); }
-      }else{
-        drawBox(qr.location,'rgba(239,68,68,.95)');
-      }
-    }
+function onScanSuccess(decodedText) {
+  // linkten sadece son 4 karakteri al
+  let code = decodedText.slice(-4);
+  
+  const overlay = document.getElementById("overlay");
+  
+  if(scanned.includes(code)){
+    document.getElementById("errorSound").play();
+    overlay.style.borderColor="red";
+    setTimeout(()=> overlay.style.borderColor="transparent",500);
+    showNotification(code + " zaten okutuldu!", true);
+    return;
   }
-  raf=requestAnimationFrame(loop);
+  
+  scanned.push(code);
+  count++;
+  
+  let li = document.createElement("li");
+  li.textContent = count + ". " + code;
+  document.getElementById("resultList").appendChild(li);
+  
+  document.getElementById("successSound").play();
+  overlay.style.borderColor="lime";
+  setTimeout(()=> overlay.style.borderColor="transparent",500);
+  showNotification(code + " eklendi ✅");
 }
 
-// ---- actions ----
-el.start.addEventListener('click', async ()=>{
-  const cams = await listCams();
-  if(cams.length>1){
-    const r = el.camChip.getBoundingClientRect();
-    el.camWrap.style.display='block'; el.camWrap.style.left = r.left+'px'; el.camWrap.style.top = (r.bottom+window.scrollY+4)+'px';
-  }else{ await start(cams[0]?.deviceId); }
-});
-el.camSel.addEventListener('change', async ()=>{ el.camWrap.style.display='none'; await start(el.camSel.value); });
-el.camChip.addEventListener('click', async ()=>{ await listCams(); el.camWrap.style.display='block'; });
+function copyList(){
+  let text = scanned.map((c,i)=> (i+1)+". "+c).join("\n");
+  navigator.clipboard.writeText(text);
+  alert("Liste kopyalandı!");
+}
 
-el.stop.addEventListener('click', stop);
-el.flash.addEventListener('click', toggleTorch);
+function sendWhatsApp(){
+  let text = scanned.map((c,i)=> (i+1)+". "+c).join("%0A");
+  window.open("https://wa.me/?text="+text,"_blank");
+}
 
-el.clear.addEventListener('click', ()=>{ if(confirm(t('sureAll'))){ codes=[]; save(); render(); } });
+document.getElementById("copyBtn").onclick = copyList;
+document.getElementById("whatsappBtn").onclick = sendWhatsApp;
 
-el.copy.addEventListener('click', async ()=>{
-  const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
-  try{ await navigator.clipboard.writeText(text); alert(t('copied')); }catch{ prompt('', text); }
-});
-el.wa.addEventListener('click', ()=>{
-  const text = codes.map((x,i)=>${i+1}. ${x.value}).join('\n');
-  window.open(https://wa.me/?text=${encodeURIComponent(text)},'_blank');
-});
+new Html5Qrcode("reader").start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  onScanSuccess
+);
+</script>
 
-// ---- init ----
-syncText(); render();
-
-// ---- zoom azaltıcı (hata atmasın diye try/catch) ----
-try{document.addEventListener('gesturestart', e=>e.preventDefault(), {passive:false});}catch{}
-try{document.addEventListener('dblclick', e=>e.preventDefault(), {passive:false});}catch{}
-try{document.addEventListener('wheel', e=>{ if(e.ctrlKey){ e.preventDefault(); }},{passive:false});}catch{}
-window.addEventListener('pagehide', stop);
-
-})();</script>
 </body>
 </html>
