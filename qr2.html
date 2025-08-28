@@ -1,186 +1,381 @@
-<!DOCTYPE html>
-<html lang="sq">
+<!doctype html>
+<html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Skano Kodet</title>
-<script src="https://unpkg.com/html5-qrcode"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Barkod Toplayıcı • 4 Hane</title>
+<link rel="preconnect" href="https://unpkg.com" />
 <style>
   :root{
-    --bg:#0f1115; --card:#151a22; --edge:#232b3b; --txt:#e8ecf2; --muted:#9aa3b2;
-    --brand:#3b82f6; --ok:#1ecb4f; --err:#ff4d4f;
+    --bg:#0f1115; --fg:#eaeef2; --muted:#9aa4b2;
+    --accent:#4ade80; /* green */
+    --danger:#f87171; /* red */
+    --card:#171923; --border:#232636;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  header{position:sticky;top:0;z-index:10;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
-  header h1{margin:0;font-size:16px;letter-spacing:.2px}
-  .lang{display:flex;gap:6px}
-  .lang button{padding:6px 10px;border:1px solid var(--edge);background:#1a2030;color:var(--txt);
-    border-radius:8px;cursor:pointer;font-weight:600}
-  .lang button.active{border-color:var(--brand);box-shadow:0 0 0 2px #1e40af33}
-  main{max-width:960px;margin:0 auto;padding:12px}
-  #card{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px}
-  #reader{width:100%;aspect-ratio:3/4;max-height:70vh}
-  @media (orientation:landscape){#reader{aspect-ratio:16/9;max-height:62vh}}
-  #overlay{position:absolute;inset:12px;border:6px solid transparent;border-radius:12px;pointer-events:none;transition:border-color .18s, box-shadow .18s}
-  .bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
-  .pill{background:#1a2030;border:1px solid var(--edge);color:var(--muted);padding:6px 10px;border-radius:999px}
-  .counter{font-weight:700;color:var(--txt)}
-  .controls{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
-  .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--edge);background:#222a3b;color:var(--txt);cursor:pointer}
-  .btn.primary{background:var(--brand);border:0;color:#fff}
-  .btn.ghost{background:#1a2030}
-  ul#list{list-style:none;padding:0;margin:14px 0;background:var(--card);border:1px solid var(--edge);border-radius:12px}
-  #list li{padding:10px 12px;border-top:1px solid #1f2737} #list li:first-child{border-top:0}
-  #list .idx{opacity:.6;margin-right:8px}
-  .actions{position:sticky;bottom:0;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);
-    padding:10px;border-top:1px solid var(--edge)}
-  .row{display:flex;gap:10px}
-  .row .btn{flex:1}
-  .btn.wa{background:#25D366;color:#072b10;border:0}
-  .btn.danger{background:transparent;color:#ffb4b4}
-  #snack{position:fixed;left:50%;transform:translateX(-50%);top:-80px;z-index:9999;background:#1a2030;
-    border:1px solid var(--edge);padding:10px 16px;border-radius:10px;transition:top .35s;font-weight:700}
-  #snack.ok{border-color:#1e5b2a;color:#d9ffe6} #snack.err{border-color:#5b2323;color:#ffd6d6}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--fg); font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    display:flex; flex-direction:column;
+  }
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    padding:14px 16px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,#121420,#0f1115);
+    position:sticky; top:0; z-index:10;
+  }
+  .title{display:flex; align-items:center; gap:10px; font-weight:700}
+  .title .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(180deg,#7c3aed,#22d3ee)}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
+  button, .btn{
+    appearance:none; border:1px solid var(--border); background:#111420; color:var(--fg);
+    padding:9px 12px; border-radius:10px; cursor:pointer; font-weight:600; display:inline-flex; align-items:center; gap:8px;
+  }
+  button:disabled{opacity:.5; cursor:not-allowed}
+  main{padding:12px 12px 18px; display:grid; gap:12px}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden}
+  .camera{
+    position:relative; aspect-ratio: 9/13; background:#000;
+  }
+  video{width:100%; height:100%; object-fit:cover; display:block}
+  .overlay{
+    position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .25s ease;
+  }
+  .overlay.success{background:rgba(74,222,128,.25)}
+  .overlay.error{background:rgba(248,113,113,.25)}
+  .finder{
+    position:absolute; inset:10% 10% 10% 10%; border:2px solid rgba(234,238,242,.65);
+    border-radius:16px; box-shadow: inset 0 0 0 9999px rgba(0,0,0,.15);
+  }
+  .stats{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-top:1px solid var(--border);
+    background:#121420; font-weight:600; color:var(--muted);
+  }
+  .pill{padding:5px 9px; border-radius:999px; border:1px solid var(--border); background:#0f131d; color:var(--fg); font-weight:700}
+  .listWrap{display:grid; gap:10px; padding:12px}
+  .actions{display:flex; gap:8px; flex-wrap:wrap}
+  .codes{
+    background:#0f131d; border:1px dashed var(--border); border-radius:12px; padding:12px; max-height:38vh; overflow:auto;
+  }
+  ol{margin:0; padding-left:22px}
+  li{margin:6px 0; display:flex; align-items:center; gap:8px}
+  .codeBadge{font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight:800; letter-spacing:.6px;}
+  .del{margin-left:auto; font-size:12px; padding:4px 8px}
+  .shareArea{display:flex; gap:8px; flex-wrap:wrap}
+  .toast{
+    position:fixed; top:12px; left:50%; transform:translateX(-50%) translateY(-20px);
+    background:#0b1220; border:1px solid var(--border); color:var(--fg); padding:10px 14px; border-radius:10px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:all .25s ease; z-index:9999;
+    font-weight:700;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
   .muted{color:var(--muted)}
+  .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .grow{flex:1}
+  .hidden{display:none !important}
+  /* small helpers */
+  .icon{width:18px;height:18px; display:inline-block}
+  @media (min-width:900px){
+    main{grid-template-columns: 1.1fr .9fr; align-items:start}
+    .camera{aspect-ratio: 16/9;}
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1 id="title">Skano Kodet</h1>
-  <div class="lang">
-    <button data-lang="sq" class="active">SQ</button>
-    <button data-lang="tr">TR</button>
-    <button data-lang="en">EN</button>
-  </div>
-</header>
+  <div class="toast" id="toast">Yeni kod: <span id="toastCode"></span></div>
 
-<main>
-  <section id="card">
-    <div id="reader"></div>
-    <div id="overlay"></div>
-    <div class="bar">
-      <span class="pill" id="hint">Hap kamerën dhe afro kodin.</span>
-      <span class="pill counter" id="count">0</span>
+  <header>
+    <div class="title">
+      <span class="dot"></span>
+      <div>Barkod Toplayıcı <span class="muted">• 4 Hane</span></div>
     </div>
-    <div class="controls">
-      <button id="startBtn" class="btn primary" data-i18n="start">🎥 Hap kamerën</button>
-      <button id="flipBtn" class="btn ghost">↺ Flip</button>
-      <button id="stopBtn" class="btn ghost">■ Stop</button>
+    <div class="toolbar">
+      <button id="toggleCam" title="Kamerayı değiştir">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h8l-1.5-2H7a5 5 0 0 0-5 5v1h2V10a3 3 0 0 1 3-3zm10 10H9l1.5 2H17a5 5 0 0 0 5-5v-1h-2v1a3 3 0 0 1-3 3z"/><path d="M7 12h10v2H7z"/></svg>
+        Değiştir
+      </button>
+      <button id="torchBtn" title="Fener" disabled>
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h10v4l-3 4v9a2 2 0 1 1-4 0V10L7 6V2z"/></svg>
+        Fener
+      </button>
+      <button id="pauseBtn" title="Durdur/Başlat">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path id="pausePlay" d="M8 5h3v14H8zM13 5h3v14h-3z"/></svg>
+        Duraklat
+      </button>
     </div>
-  </section>
+  </header>
 
-  <ul id="list" aria-live="polite"></ul>
-</main>
+  <main>
+    <section class="card">
+      <div class="camera" id="camBox">
+        <video id="video" playsinline autoplay muted></video>
+        <div class="overlay" id="overlay"></div>
+        <div class="finder"></div>
+      </div>
+      <div class="stats">
+        <div>Cihaz: <span class="pill" id="camName">-</span></div>
+        <div>Toplam: <span class="pill" id="count">0</span></div>
+      </div>
+    </section>
 
-<div class="actions">
-  <div class="row">
-    <button id="copyBtn" class="btn primary">⇪ <span data-i18n="share">Ndaj / Kopyo</span></button>
-    <button id="waBtn" class="btn wa">WhatsApp</button>
-    <button id="clearBtn" class="btn danger"><span data-i18n="clear">Pastro listën</span></button>
-  </div>
-</div>
+    <section class="card listWrap">
+      <div class="row">
+        <div class="grow">
+          <div class="muted" style="font-weight:700;">Okunan Kodlar (her satır 1 kod)</div>
+        </div>
+        <button id="clearAll" class="del" title="Tümünü temizle">Tümünü Temizle</button>
+      </div>
 
-<div id="snack" role="status" aria-live="assertive">OK</div>
+      <div class="codes">
+        <ol id="codeList"></ol>
+      </div>
 
-<script>
-/* ===== Dil (sadece metinler; mantığa dokunmuyoruz) ===== */
-const I18N = {
-  sq:{title:"Skano Kodet",hint:"Hap kamerën dhe afro kodin.",share:"Ndaj / Kopyo",clear:"Pastro listën",none:"Ende s’ka kod.",start:"🎥 Hap kamerën",added:"U shtua: ",already:"Tashmë i lexuar: "},
-  tr:{title:"Barkod Tara",hint:"Kamerayı aç ve barkodu yaklaştır.",share:"Paylaş / Kopyala",clear:"Listeyi Temizle",none:"Henüz kod yok.",start:"🎥 Kamerayı Aç",added:"Eklendi: ",already:"Zaten okundu: "},
-  en:{title:"Scan Codes",hint:"Open camera and show the code.",share:"Share / Copy",clear:"Clear List",none:"No codes yet.",start:"🎥 Start Camera",added:"Added: ",already:"Already scanned: "}
-};
-let lang = localStorage.getItem("qr_lang") || "sq";
-function applyLang(L){
-  lang=L; localStorage.setItem("qr_lang",L);
-  document.getElementById("title").textContent=I18N[L].title;
-  document.getElementById("hint").textContent=I18N[L].hint;
-  document.querySelector('[data-i18n="share"]').textContent=I18N[L].share;
-  document.querySelector('[data-i18n="clear"]').textContent=I18N[L].clear;
-  document.querySelector('[data-i18n="start"]').textContent=I18N[L].start;
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active", b.dataset.lang===L));
-}
-document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>applyLang(b.dataset.lang)));
-applyLang(lang);
+      <div class="actions">
+        <button id="copyBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h9a2 2 0 0 1 2 2v11h-2V4H9V2z"/><path d="M4 6h10a2 2 0 0 1 2 2v12H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v12h12V8H4z"/></svg>
+          Kopyala
+        </button>
+        <button id="waBtn">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3.9A10 10 0 0 0 3.3 17.7L2 22l4.4-1.2A10 10 0 1 0 20 3.9zm-8 16a8 8 0 0 1-4.1-1.1l-.3-.2-2.6.7.7-2.5-.2-.3A8 8 0 1 1 12 19.9zm4.6-5.9c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-1 1-.2.1-.4.1-.7 0-.3-.1-1.3-.5-2.4-1.6-.9-.9-1.6-2-1.7-2.3-.1-.3 0-.5.1-.7.1-.1.3-.4.4-.6.1-.2.1-.3.2-.5.1-.2.1-.3 0-.5l-.9-2.2c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.2-.9.9-.9 2.2 0 1.3 1 2.6 1.2 2.8.1.2 2 3.2 4.8 4.5 2.8 1.3 2.8.9 3.3.9.5 0 1.7-.6 1.9-1.3.2-.7.2-1.2.2-1.3 0-.1-.1-.1-.3-.2z"/></svg>
+          WhatsApp’tan Gönder
+        </button>
+      </div>
+    </section>
+  </main>
 
-/* ===== Basit & sağlam state (ilk koddaki gibi) ===== */
-const LS_KEY = "qr_scanned_codes_v1";
-let scanned = JSON.parse(localStorage.getItem(LS_KEY)||"[]");
-function save(){ localStorage.setItem(LS_KEY, JSON.stringify(scanned)); render(); }
-function render(){
-  const ul=document.getElementById("list"); ul.innerHTML="";
-  if(scanned.length===0){ const li=document.createElement("li"); li.className="muted"; li.textContent=I18N[lang].none; ul.appendChild(li); }
-  else{ scanned.forEach((c,i)=>{ const li=document.createElement("li"); li.innerHTML=<span class="idx">${i+1}.</span> <strong>${c}</strong>; ul.appendChild(li); }); }
-  document.getElementById("count").textContent=scanned.length;
-}
-render();
+  <!-- ZXing (çok formatlı barkod/QR çözücü) -->
+  <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
+  <script>
+  (() => {
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    const toast = document.getElementById('toast');
+    const toastCode = document.getElementById('toastCode');
+    const countEl = document.getElementById('count');
+    const codeList = document.getElementById('codeList');
+    const camName = document.getElementById('camName');
 
-/* ===== Sesler: minimal bip (iOS uyumlu olması için WebAudio değil, kısa simple) ===== */
-let audioCtx;
-function unlockAudio(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) audioCtx=new AC(); } if(audioCtx&&audioCtx.state==="suspended") audioCtx.resume(); }
-function beep(f=900,ms=120){ if(!audioCtx) return; const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type="sine"; o.frequency.value=f; o.connect(g); g.connect(audioCtx.destination); g.gain.value=.12; o.start(); setTimeout(()=>{g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+.05); o.stop();}, ms); }
-function okBeep(){ beep(900,120); }
-function errBeep(){ beep(260,160); setTimeout(()=>beep(180,160),170); }
+    const toggleCamBtn = document.getElementById('toggleCam');
+    const torchBtn = document.getElementById('torchBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const clearAllBtn = document.getElementById('clearAll');
+    const copyBtn = document.getElementById('copyBtn');
+    const waBtn = document.getElementById('waBtn');
 
-/* ===== Çekirdek: html5-qrcode — ilk çalışan mantık ===== */
-let qr = null;
-let facing = "environment"; // sadece environment <-> user
-const overlay = document.getElementById("overlay");
-function flashGreen(){ overlay.style.borderColor="var(--ok)"; overlay.style.boxShadow="0 0 0 9999px #1ecb4f22"; setTimeout(()=>{overlay.style.borderColor="transparent"; overlay.style.boxShadow="none";}, 420); }
-function flashRed(){ overlay.style.borderColor="var(--err)"; overlay.style.boxShadow="0 0 0 9999px #ff4d4f22"; setTimeout(()=>{overlay.style.borderColor="transparent"; overlay.style.boxShadow="none";}, 520); }
+    let codeReader = new ZXing.BrowserMultiFormatReader();
+    let controls = null;
+    let devices = [];
+    let deviceIndex = 0;
+    let track = null;
+    let scanningPaused = false;
 
-function extractCode(text){
-  try{ const u=new URL(text); const last=u.pathname.split("/").filter(Boolean).pop()||""; if(last.length>=4) return last.slice(-4).toUpperCase(); }catch(_){}
-  return (text.replace(/[^A-Za-z0-9]/g,"")).slice(-4).toUpperCase();
-}
+    const codes = [];
+    const set = new Set();
 
-function onScanSuccess(decodedText){
-  const code = extractCode(decodedText);
-  if(!code) return;
-  if(scanned.includes(code)){ errBeep(); flashRed(); snack(I18N[lang].already+code, false); return; }
-  scanned.push(code); save(); okBeep(); flashGreen(); snack(I18N[lang].added+code, true);
-}
+    let lastText = '';
+    let lastAt = 0;
 
-function snack(msg, ok=true){
-  const s=document.getElementById("snack");
-  s.textContent=msg; s.className= ok ? "ok" : "err";
-  s.style.top="14px"; setTimeout(()=>s.style.top="-80px", 1600);
-}
+    function showToast(text){
+      toastCode.textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+    function flash(type='success'){
+      overlay.className = 'overlay ' + (type==='success' ? 'success' : 'error');
+      overlay.style.opacity = '1';
+      setTimeout(()=> overlay.style.opacity = '0', 200);
+      if (navigator.vibrate) navigator.vibrate(type==='success' ? 30 : [40,40,80]);
+      beep(type==='success' ? 880 : 220, type==='success' ? 90 : 140);
+    }
+    // Simple WebAudio beep (no external files)
+    function beep(freq=440, dur=120){
+      try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(freq, ctx.currentTime);
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.02);
+        o.start();
+        setTimeout(()=>{
+          g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.01);
+          o.stop(); ctx.close();
+        }, dur);
+      }catch(e){}
+    }
 
-async function startCamera(){
-  unlockAudio();
-  if(qr){ try{ await qr.stop(); }catch(_){} }
-  qr = new Html5Qrcode("reader");
-  const box = Math.min(Math.floor(window.innerWidth*0.92), Math.floor(window.innerHeight*0.70));
-  // * İlk çalışan çağrı şekli: facingMode ile basit başlatma *
-  await qr.start({ facingMode: facing }, { fps: 10, qrbox: box }, onScanSuccess);
-}
-async function stopCamera(){ if(qr){ try{ await qr.stop(); }catch(_){} } }
+    function extractCode(text){
+      // Önce URL ise path son parça
+      try{
+        const u = new URL(text);
+        const part = (u.pathname.split('/').filter(Boolean).pop()||'').trim();
+        if (/^[A-Z0-9]{4}$/i.test(part)) return part.toUpperCase();
+      }catch(e){}
+      // Değilse son 4 hane benzeri token
+      const m = (text||'').trim().match(/([A-Z0-9]{4})$/i);
+      return m ? m[1].toUpperCase() : null;
+    }
 
-/* ===== Butonlar ===== */
-document.getElementById("startBtn").addEventListener("click", startCamera);
-document.getElementById("stopBtn").addEventListener("click", stopCamera);
-document.getElementById("flipBtn").addEventListener("click", async ()=>{
-  facing = (facing === "environment") ? "user" : "environment";
-  await startCamera();
-});
-document.getElementById("copyBtn").addEventListener("click", async ()=>{
-  const text = scanned.map((c,i)=>${i+1}. ${c}).join("\n");
-  if(navigator.share){ try{ await navigator.share({text}); return;}catch(_){ } }
-  await navigator.clipboard.writeText(text); snack("Kopjuar / Kopyalandı / Copied", true);
-});
-document.getElementById("waBtn").addEventListener("click", ()=>{
-  const text = encodeURIComponent(scanned.map((c,i)=>${i+1}. ${c}).join("\n"));
-  window.open("https://wa.me/?text="+text,"_blank");
-});
-document.getElementById("clearBtn").addEventListener("click", ()=>{
-  if(!confirm("Pastro? / Temizle? / Clear?")) return;
-  scanned=[]; save(); snack("Pastruar / Temizlendi / Cleared", true);
-});
+    function addCode(code){
+      if (!code) return;
 
-/* ===== Resize olduğunda kutu oranını koru (isteğe bağlı) ===== */
-window.addEventListener("resize", ()=>{ if(qr){ startCamera(); }});
-</script>
+      if (set.has(code)){
+        flash('error');
+        showToast('Zaten var: ' + code);
+        return;
+      }
+      set.add(code);
+      codes.push(code);
+      const li = document.createElement('li');
+      const idx = codes.length;
+      li.innerHTML = <span class="muted">${idx}.</span> <span class="codeBadge">${code}</span>;
+      const del = document.createElement('button');
+      del.className = 'del';
+      del.textContent = 'Sil';
+      del.addEventListener('click', ()=>{
+        if (!confirm(code + ' silinsin mi?')) return;
+        // Remove from structures
+        set.delete(code);
+        const pos = codes.indexOf(code);
+        if (pos !== -1) codes.splice(pos, 1);
+        li.remove();
+        // Re-number
+        [...codeList.children].forEach((li,i)=>{
+          li.firstChild.textContent = (i+1)+'.';
+        });
+        countEl.textContent = String(codes.length);
+      });
+      li.appendChild(del);
+      codeList.appendChild(li);
+      countEl.textContent = String(codes.length);
+      flash('success');
+      showToast(code);
+    }
+
+    function listAsText(){
+      // "1. XXXX\n2. YYYY\n..."
+      return codes.map((c,i)=>${i+1}. ${c}).join('\n');
+    }
+
+    copyBtn.addEventListener('click', async ()=>{
+      const txt = listAsText();
+      try{
+        await navigator.clipboard.writeText(txt);
+        showToast('Kopyalandı');
+        flash('success');
+      }catch(e){
+        flash('error');
+        alert('Kopyalanamadı. Manuel kopyalayın:\n\n'+txt);
+      }
+    });
+
+    waBtn.addEventListener('click', ()=>{
+      const txt = encodeURIComponent(listAsText());
+      const wa = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        ? whatsapp://send?text=${txt}
+        : https://wa.me/?text=${txt};
+      window.open(wa, '_blank');
+    });
+
+    clearAllBtn.addEventListener('click', ()=>{
+      if (!codes.length) return;
+      if (!confirm('Tüm kodlar silinsin mi?')) return;
+      codes.splice(0, codes.length);
+      set.clear();
+      codeList.innerHTML = '';
+      countEl.textContent = '0';
+      showToast('Temizlendi');
+    });
+
+    toggleCamBtn.addEventListener('click', async ()=>{
+      if (!devices.length) return;
+      deviceIndex = (deviceIndex + 1) % devices.length;
+      await startWithDevice(devices[deviceIndex].deviceId);
+    });
+
+    pauseBtn.addEventListener('click', ()=>{
+      scanningPaused = !scanningPaused;
+      document.getElementById('pausePlay').setAttribute('d',
+        scanningPaused ? 'M8 5l10 7-10 7V5z' : 'M8 5h3v14H8zM13 5h3v14h-3z'
+      );
+      pauseBtn.lastChild.textContent = scanningPaused ? ' Başlat' : ' Duraklat';
+    });
+
+    torchBtn.addEventListener('click', async ()=>{
+      if (!track) return;
+      try{
+        const caps = track.getCapabilities?.() || {};
+        if (!('torch' in caps)) return;
+        torchBtn.dataset.on = torchBtn.dataset.on === '1' ? '' : '1';
+        const on = torchBtn.dataset.on === '1';
+        await track.applyConstraints({ advanced: [{ torch: on }] });
+        torchBtn.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+      }catch(e){}
+    });
+
+    async function enumerateDevices(){
+      try{
+        devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
+        // Arka kamerayı seçmeye çalış
+        const envIndex = devices.findIndex(d=>/back|arka|environment/i.test(d.label));
+        if (envIndex >= 0) deviceIndex = envIndex;
+        camName.textContent = devices[deviceIndex]?.label || 'Kamera';
+      }catch(e){
+        camName.textContent = 'Kamera bulunamadı';
+      }
+    }
+
+    async function startWithDevice(deviceId){
+      // Önce varsa mevcut akışı durdur
+      if (controls){ controls.stop(); controls = null; }
+      if (track){ try{ track.stop(); }catch(e){} track = null; }
+
+      // ZXing ile başlat
+      try{
+        camName.textContent = (devices.find(d=>d.deviceId===deviceId)?.label) || 'Kamera';
+        controls = await codeReader.decodeFromVideoDevice(deviceId, video, (result, err, ctrl)=>{
+          if (scanningPaused) return;
+          if (result){
+            const now = Date.now();
+            const text = String(result.getText()||'').trim();
+            // Aynı karede tekrar tetiklemeyi engelle
+            if (text === lastText && (now - lastAt) < 1200) return;
+            lastText = text; lastAt = now;
+
+            const code = extractCode(text);
+            if (code){ addCode(code); }
+            else{
+              // Kod çıkarılamadıysa sessizce yok say
+            }
+          }
+          // Hata objesi sürekli gelebilir; görmezden geliyoruz
+        });
+        // Torch yeteneği
+        const stream = video.srcObject;
+        track = stream ? stream.getVideoTracks()[0] : null;
+        try{
+          const caps = track?.getCapabilities?.() || {};
+          torchBtn.disabled = !('torch' in caps);
+        }catch(e){ torchBtn.disabled = true; }
+      }catch(e){
+        alert('Kamera açılamadı. Lütfen HTTPS kullanın ve kamera iznini verin.\n\n' + e);
+      }
+    }
+
+    // Başlatma akışı
+    (async function init(){
+      await enumerateDevices();
+      const chosen = devices[deviceIndex]?.deviceId;
+      await startWithDevice(chosen);
+    })();
+
+    // Kullanıcı örnek link: https://go.gourban.co/gosharing/vehicle/L8KQ
+    // Manuel test için (kamera olmadan):
+    window.__testScan = (text) => {
+      const code = extractCode(text);
+      if (code) addCode(code); else alert('Kod bulunamadı: '+text);
+    };
+  })();
+  </script>
 </body>
 </html>
