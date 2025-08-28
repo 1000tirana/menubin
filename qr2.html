@@ -2,147 +2,155 @@
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
+<title>Lexues Barkodesh</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Skano Kodet</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-  body{margin:0;font-family:system-ui,Arial,sans-serif;background:#0f1115;color:#e7e9ee}
-  header{position:sticky;top:0;background:#141821;border-bottom:1px solid #232836;
-    display:flex;justify-content:space-between;align-items:center;padding:12px 16px;z-index:10}
-  h1{margin:0;font-size:18px}
-  .lang button{margin-left:6px;padding:6px 10px;border:1px solid #2a3140;background:#1f2430;
-    color:#e7e9ee;border-radius:6px;cursor:pointer}
-  .lang button.active{border-color:#3b82f6}
-  main{padding:16px;max-width:600px;margin:auto}
-  #reader{width:100%;aspect-ratio:3/4;max-height:70vh;border:2px solid #232836;border-radius:12px}
-  #overlay{position:absolute;inset:0;border:6px solid transparent;border-radius:12px;pointer-events:none;transition:.3s}
-  #resultList{margin-top:16px;padding:0;list-style:none}
-  #resultList li{background:#1a2030;margin-bottom:6px;padding:10px 12px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
-  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#4CAF50;color:#fff;
-    padding:10px 20px;border-radius:6px;transition:top .5s;z-index:9999}
-  #notify.error{background:#E74C3C}
-  .btns{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
-  button{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
-  #copyBtn{background:#3b82f6;color:#fff} #whatsappBtn{background:#25D366;color:#072b10}
-  #clearBtn{background:#b91c1c;color:#fff} #flashBtn{background:#fbbf24;color:#000}
-  #addBox{margin-top:16px;display:flex;gap:8px}
-  #manualCode{flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:#1f2430;color:#fff}
+  body{font-family:sans-serif;margin:0;background:#0f1115;color:#f2f2f2;text-align:center}
+  header{background:#1a1f2d;padding:12px;font-size:18px;font-weight:600}
+  #reader{width:100%;max-width:420px;margin:10px auto;border-radius:12px;overflow:hidden}
+  #overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border:8px solid transparent;box-sizing:border-box}
+  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#1ecb4f;
+          color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;transition:top .4s;z-index:9999}
+  #notify.error{background:#e74c3c}
+  ul{list-style:none;padding:0;margin:20px auto;max-width:420px;text-align:left;background:#1a1f2d;border-radius:12px;overflow:hidden}
+  li{padding:10px 12px;border-top:1px solid #333;display:flex;justify-content:space-between;align-items:center}
+  li:first-child{border-top:0}
+  .btns,.manual{margin:15px auto;max-width:420px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  #copyBtn{background:#3b82f6;color:#fff}
+  #whatsappBtn{background:#25D366;color:#fff}
+  #clearBtn{background:#e74c3c;color:#fff}
+  #flashBtn{background:#facc15;color:#000}
+  #manualInput{flex:2;padding:10px;border-radius:8px;border:1px solid #555}
+  #addBtn{flex:1;background:#1ecb4f;color:#fff}
 </style>
 </head>
 <body>
 
-<header>
-  <h1 id="title">Skano Kodet</h1>
-  <div class="lang">
-    <button data-lang="sq" class="active">SQ</button>
-    <button data-lang="tr">TR</button>
-    <button data-lang="en">EN</button>
-  </div>
-</header>
+<header>📷 Lexues Barkodesh</header>
 
-<main>
-  <div style="position:relative">
-    <div id="reader"></div>
-    <div id="overlay"></div>
-  </div>
+<div style="position:relative;max-width:420px;margin:auto">
+  <div id="reader"></div>
+  <div id="overlay"></div>
+</div>
 
-  <ul id="resultList"></ul>
+<ul id="resultList"></ul>
 
-  <div id="addBox">
-    <input type="text" id="manualCode" placeholder="Kod yaz...">
-    <button id="addBtn">➕</button>
-  </div>
+<div class="btns">
+  <button id="copyBtn">📋 Kopjo</button>
+  <button id="whatsappBtn">📲 Dërgo në WhatsApp</button>
+  <button id="flashBtn">🔦 Ndiz Fenerin</button>
+  <button id="clearBtn">🗑️ Pastro listen</button>
+</div>
 
-  <div class="btns">
-    <button id="copyBtn">📋 <span data-i18n="copy">Kopjo</span></button>
-    <button id="whatsappBtn">📲 WhatsApp</button>
-    <button id="flashBtn">🔦 Aç</button>
-    <button id="clearBtn">🗑️ <span data-i18n="clear">Pastro</span></button>
-  </div>
-</main>
+<div class="manual">
+  <input type="text" id="manualInput" placeholder="Shkruaj kodin manualisht">
+  <button id="addBtn">➕ Shto</button>
+</div>
 
 <div id="notify"></div>
 
-<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
 <audio id="errorSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
-/* === Çok Dilli === */
-const I18N={
-  sq:{title:"Skano Kodet",copy:"Kopjo",clear:"Pastro",added:"U shtua: ",exists:"Tashmë ekziston!"},
-  tr:{title:"Barkod Tara",copy:"Kopyala",clear:"Temizle",added:"Eklendi: ",exists:"Zaten var!"},
-  en:{title:"Scan Codes",copy:"Copy",clear:"Clear",added:"Added: ",exists:"Already exists!"}
-};
-let lang=localStorage.getItem("qr_lang")||"sq";
-function setLang(L){
-  lang=L;localStorage.setItem("qr_lang",L);
-  document.getElementById("title").textContent=I18N[L].title;
-  document.querySelector('[data-i18n="copy"]').textContent=I18N[L].copy;
-  document.querySelector('[data-i18n="clear"]').textContent=I18N[L].clear;
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active",b.dataset.lang===L));
-}
-document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
-setLang(lang);
+let scanned = JSON.parse(localStorage.getItem("barkodList")||"[]");
+let count = scanned.length;
+renderList();
 
-/* === State === */
-let scanned=JSON.parse(localStorage.getItem("qr_list")||"[]"); render();
-function save(){localStorage.setItem("qr_list",JSON.stringify(scanned));}
-function render(){
+function showNotification(text, isError=false){
+  const notify=document.getElementById("notify");
+  notify.textContent=text;
+  notify.className=isError?"error":"";
+  notify.style.top="20px";
+  setTimeout(()=>{notify.style.top="-60px"},2000);
+}
+
+function renderList(){
   const ul=document.getElementById("resultList"); ul.innerHTML="";
   scanned.forEach((c,i)=>{
-    const li=document.createElement("li");
-    li.innerHTML=${i+1}. ${c} <button onclick="removeCode(${i})">❌</button>;
+    let li=document.createElement("li");
+    li.innerHTML=<span>${i+1}. ${c}</span>;
+    let del=document.createElement("button");
+    del.textContent="❌";
+    del.style.background="transparent"; del.style.color="#ffb4b4";
+    del.onclick=()=>{ if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){ scanned.splice(i,1); save(); } };
+    li.appendChild(del);
     ul.appendChild(li);
   });
 }
 
-/* === Bildirim === */
-function notify(msg,isErr=false){
-  const n=document.getElementById("notify");
-  n.textContent=msg;n.className=isErr?"error":"";n.style.top="20px";
-  setTimeout(()=>n.style.top="-60px",1800);
+function save(){
+  localStorage.setItem("barkodList", JSON.stringify(scanned));
+  count=scanned.length;
+  renderList();
 }
 
-/* === Kod ekleme === */
 function addCode(code){
+  code=code.toUpperCase();
   if(!code) return;
-  if(scanned.includes(code)){document.getElementById("errorSound").play();notify(I18N[lang].exists,true);return;}
-  scanned.push(code);save();render();
+  const overlay=document.getElementById("overlay");
+  if(scanned.includes(code)){
+    document.getElementById("errorSound").play();
+    overlay.style.borderColor="red";
+    setTimeout(()=>overlay.style.borderColor="transparent",500);
+    showNotification(code+" tashmë ekziston!",true);
+    return;
+  }
+  scanned.push(code); save();
   document.getElementById("successSound").play();
-  notify(I18N[lang].added+code);
-}
-function removeCode(i){
-  if(confirm("Emin misiniz? / A je i sigurt?")){scanned.splice(i,1);save();render();}
-}
-document.getElementById("addBtn").onclick=()=>{addCode(document.getElementById("manualCode").value.trim());document.getElementById("manualCode").value="";}
-
-/* === Liste işlemleri === */
-document.getElementById("copyBtn").onclick=()=>{
-  navigator.clipboard.writeText(scanned.join("\n")); alert("Kopyalandı!");
-}
-document.getElementById("whatsappBtn").onclick=()=>{
-  window.open("https://wa.me/?text="+encodeURIComponent(scanned.join("\n")),"_blank");
-}
-document.getElementById("clearBtn").onclick=()=>{
-  if(confirm("Listeyi tamamen silmek istiyor musun?")){scanned=[];save();render();}
+  overlay.style.borderColor="lime";
+  setTimeout(()=>overlay.style.borderColor="transparent",500);
+  showNotification(code+" u shtua ✅");
 }
 
-/* === QR tarama === */
-let html5=new Html5Qrcode("reader"); let flashOn=false;
 function onScanSuccess(decodedText){
-  let code=decodedText.slice(-4).toUpperCase();
+  let code = decodedText.slice(-4);
   addCode(code);
 }
-html5.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
 
-/* === Flash === */
-document.getElementById("flashBtn").onclick=async()=>{
-  try{
-    flashOn=!flashOn;
-    await html5.applyVideoConstraints({advanced:[{torch:flashOn}]});
-    document.getElementById("flashBtn").textContent=flashOn?"🔦 Kapat":"🔦 Aç";
-  }catch(e){alert("Flash desteklenmiyor!");}
-}
+document.getElementById("copyBtn").onclick=()=>{
+  let text=scanned.map((c,i)=>(i+1)+". "+c).join("\n");
+  navigator.clipboard.writeText(text);
+  alert("Lista u kopjua!");
+};
+document.getElementById("whatsappBtn").onclick=()=>{
+  let text=scanned.map((c,i)=>(i+1)+". "+c).join("%0A");
+  window.open("https://wa.me/?text="+text,"_blank");
+};
+document.getElementById("clearBtn").onclick=()=>{
+  if(confirm("Je i sigurt që dëshiron të pastrosh gjithë listën?")){
+    scanned=[]; save();
+  }
+};
+document.getElementById("addBtn").onclick=()=>{
+  const val=document.getElementById("manualInput").value.trim();
+  if(val){ addCode(val); document.getElementById("manualInput").value=""; }
+};
+
+/* 🔦 Flash toggle */
+let torchOn=false;
+document.getElementById("flashBtn").onclick=()=>{
+  const track=html5QrCode.getRunningTrack();
+  if(track){
+    const imageCapture=new ImageCapture(track);
+    imageCapture.getPhotoCapabilities().then(cap=>{
+      if(cap.torch||("fillLightMode" in cap)){
+        track.applyConstraints({advanced:[{torch:!torchOn}]});
+        torchOn=!torchOn;
+        document.getElementById("flashBtn").textContent=torchOn?"🔦 Fik Fenerin":"🔦 Ndiz Fenerin";
+      }else alert("Pajisja nuk mbështet fenerin");
+    });
+  }
+};
+
+let html5QrCode=new Html5Qrcode("reader");
+html5QrCode.start(
+  { facingMode:"environment" },
+  { fps:10, qrbox:250 },
+  onScanSuccess
+);
 </script>
 </body>
 </html>
