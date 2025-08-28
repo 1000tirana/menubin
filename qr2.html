@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lista QR · 4 Shifrat e Fundit</title>
 <style>
+
+  .item .badge-manual{
+  margin-left:auto; 
+  font-size:12px; 
+  opacity:.5; 
+  color:#cfd6e6;
+  white-space:nowrap;
+}
   :root{
     --bg:#0f1115;
     --card:#171a21;
@@ -90,6 +98,11 @@
       <div id="scanFrame" class="scan-frame"></div>
     </div>
     <div class="controls">
+      <div class="controls" style="margin-top:6px; gap:6px;">
+  <input id="manualInput" type="text" inputmode="text" placeholder="Kod gir (link de olur)" 
+         style="flex:1; padding:10px 12px; border-radius:12px; border:1px solid #242a39; background:#1a1f2b; color:#e7ebf5; font-size:14px;">
+  <button id="manualAddBtn" class="btn">Ekle</button>
+</div>
       <button id="startBtn" class="btn-primary">Start</button>
       <button id="stopBtn" class="btn">Stop</button>
       <button id="torchBtn" class="btn">Flaş</button>
@@ -129,6 +142,51 @@ const langs={
 };
 let curLang="sq";
 
+function addManual(raw){
+  const val = last4(raw);
+  if(!val) { showToast(curLang==='tr'?'Geçersiz kod':'Invalid'); return; }
+
+  const manualInput = $('#manualInput');
+const manualAddBtn = $('#manualAddBtn');
+
+manualAddBtn.onclick = ()=>{
+  const v = manualInput.value.trim();
+  if(!v){ showToast(curLang==='tr'?'Kod girin':'Enter code'); return; }
+  addManual(v);
+  manualInput.value='';
+};
+
+// Enter ile ekleme
+manualInput.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){ e.preventDefault(); manualAddBtn.click(); }
+});
+
+// KALICILIK: manual bayrağını da sakla/yükle
+function save(){
+  localStorage.setItem("qrItems_v2", JSON.stringify(items.map(o=>({
+    value:o.value, time:o.time||new Date(), manual: !!o.manual
+  }))));
+}
+function load(){
+  const raw=localStorage.getItem("qrItems_v2");
+  if(raw){
+    try{
+      const arr=JSON.parse(raw)||[];
+      items=arr.map(o=>({value:o.value, time:new Date(o.time), manual: !!o.manual}));
+      renderList();
+    }catch{}
+  }
+}
+
+  // Aynı değerden zaten varsa yine de eklemek istersen bu kontrolü kaldırabilirsin.
+  items.push({value: val, time: new Date(), manual: true});
+  renderList();
+  save();
+  showBanner(val, false);
+  flashOverlay(false);
+  beep(880);
+}
+  
 function setLang(l){
   curLang=l;
   $('#t-title').textContent=langs[l].title;
@@ -152,6 +210,32 @@ function addItem(raw){const val=last4(raw);if(!val)return;const isDup=detectedSe
 
 function renderList(){listEl.innerHTML='';items.forEach((it,idx)=>{const li=document.createElement('li');li.className='item';li.innerHTML=`<div class="index">${idx+1}</div><div class="value">${it.value}</div><div class="time">${new Date(it.time).toLocaleTimeString()}</div><button class="del-btn">×</button>`;li.querySelector('.del-btn').onclick=()=>{items.splice(idx,1);renderList();save();};listEl.appendChild(li);});countEl.textContent=items.length;}
 
+  function renderList(){
+  listEl.innerHTML='';
+  items.forEach((it,idx)=>{
+    const li=document.createElement('li');
+    li.className='item';
+    li.innerHTML = `
+      <div class="index">${idx+1}</div>
+      <div class="value">${it.value}</div>
+      <div class="time">${new Date(it.time).toLocaleTimeString()}</div>
+      ${it.manual ? '<span class="badge-manual">manuel olarak eklendi</span>' : ''}
+      <button class="del-btn">×</button>
+    `;
+    li.querySelector('.del-btn').onclick=()=>{
+      if(confirm(curLang==='tr'?'Silmek istediğinize emin misiniz?':
+                 curLang==='en'?'Are you sure you want to delete?':
+                 'A jeni i sigurt që doni të fshini?')){
+        items.splice(idx,1);
+        renderList();
+        save();
+      }
+    };
+    listEl.appendChild(li);
+  });
+  countEl.textContent=items.length;
+}
+  
 async function startCam(){
   try{
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
@@ -205,7 +289,11 @@ async function scanLoop(){
   requestAnimationFrame(scanLoop);
 }
 
-function copyAll(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }navigator.clipboard.writeText(t).then(()=>showToast(langs[curLang].copied));}
+function copyAll(){
+  const t = items.map((x,i)=>${i+1}. ${x.value}${x.manual?' (manuel kod eklendi)':''}).join("\n");
+  if(!t){ showToast('—'); return; }
+  navigator.clipboard.writeText(t).then(()=>showToast(langs[curLang].copied));
+}
 function whatsapp(){const t=items.map((x,i)=>`${i+1}. ${x.value}`).join("\\n");if(!t){ showToast('—'); return; }window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');}
 
 function save(){localStorage.setItem("qrItems_v2", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));}
@@ -268,4 +356,5 @@ resetBtn.onclick=()=>{
 </script>
 </body>
 </html>
+
 
