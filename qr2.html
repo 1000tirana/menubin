@@ -227,6 +227,45 @@ setLang('sq');
 if (navigator.permissions && navigator.permissions.query){
   navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted'){ startCam(); } }).catch(()=>{});
 }
+
+
+function renderList(){
+  listEl.innerHTML='';
+  items.forEach((it,idx)=>{
+    const li=document.createElement('li');
+    li.className='item';
+    li.innerHTML=`
+      <div class="index">${idx+1}</div>
+      <div class="value">${it.value}</div>
+      <div class="time">${new Date(it.time).toLocaleTimeString()}</div>
+      <button class="del-btn">×</button>`;
+    li.querySelector('.del-btn').onclick=()=>{
+      if(confirm(curLang==='tr'?'Silmek istediğinize emin misiniz?':
+                 curLang==='en'?'Are you sure you want to delete?':
+                 'A jeni i sigurt që doni të fshini?')){
+        items.splice(idx,1);
+        renderList();
+        save();
+      }
+    };
+    listEl.appendChild(li);
+  });
+  countEl.textContent=items.length;
+}
+
+// reset (temizle) butonu
+resetBtn.onclick=()=>{
+  if(confirm(curLang==='tr'?'Tüm listeyi temizlemek istediğinize emin misiniz?':
+             curLang==='en'?'Are you sure you want to clear the list?':
+             'A jeni i sigurt që doni të pastroni listën?')){
+    items=[];
+    detectedSet.clear();
+    renderList();
+    save();
+  }
+};
+  
 </script>
 </body>
 </html>
+
