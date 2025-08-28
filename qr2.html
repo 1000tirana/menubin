@@ -3,37 +3,38 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Barkod Toplayıcı • 4 Hane (Oto Kamera)</title>
-<link rel="preconnect" href="https://unpkg.com" />
+<title>Barkod Toplayıcı • 4 Hane (Native)</title>
 <style>
-  :root{--bg:#0f1115;--fg:#eaeef2;--muted:#9aa4b2;--accent:#4ade80;--danger:#f87171;--card:#171923;--border:#232636}
+  :root{--bg:#0f1115;--fg:#eaeef2;--muted:#9aa4b2;--accent:#22c55e;--danger:#ef4444;--card:#171923;--border:#232636}
   *{box-sizing:border-box} html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--fg);font:14px system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;display:flex;flex-direction:column}
   header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#121420,#0f1115);position:sticky;top:0;z-index:10}
   .title{display:flex;align-items:center;gap:10px;font-weight:700}.title .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(180deg,#7c3aed,#22d3ee)}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-  button{appearance:none;border:1px solid var(--border);background:#111420;color:var(--fg);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px}
+  button{appearance:none;border:1px solid var(--border);background:#111420;color:var(--fg);padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:600}
   button:disabled{opacity:.5;cursor:not-allowed}
   main{padding:12px;display:grid;gap:12px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
   .camera{position:relative;aspect-ratio:16/9;background:#000}
   video{width:100%;height:100%;object-fit:cover;display:block}
   .overlay{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s ease}
-  .overlay.success{background:rgba(74,222,128,.25)} .overlay.error{background:rgba(248,113,113,.25)}
-  .finder{position:absolute;inset:10% 10% 10% 10%;border:2px solid rgba(234,238,242,.65);border-radius:16px;box-shadow:inset 0 0 0 9999px rgba(0,0,0,.15)}
+  .overlay.success{background:rgba(34,197,94,.25)} .overlay.error{background:rgba(239,68,68,.25)}
+  .finder{position:absolute;inset:10% 10% 10% 10%;border:2px solid rgba(234,238,242,.6);border-radius:16px;box-shadow:inset 0 0 0 9999px rgba(0,0,0,.15)}
   .stats{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--border);background:#121420;font-weight:600;color:var(--muted)}
   .pill{padding:5px 9px;border-radius:999px;border:1px solid var(--border);background:#0f131d;color:var(--fg);font-weight:700}
   .listWrap{display:grid;gap:10px;padding:12px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
   .codes{background:#0f131d;border:1px dashed var(--border);border-radius:12px;padding:12px;max-height:38vh;overflow:auto}
   ol{margin:0;padding-left:22px} li{margin:6px 0;display:flex;align-items:center;gap:8px}
   .codeBadge{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:800;letter-spacing:.6px}
-  .del{margin-left:auto;font-size:12px;padding:4px 8px}
+  .del{margin-left:auto;font-size:12px;padding:4px 8px;border-radius:8px}
   .toast{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-20px);background:#0b1220;border:1px solid var(--border);color:var(--fg);padding:10px 14px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:all .25s ease;z-index:9999;font-weight:700}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .muted{color:var(--muted)} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .grow{flex:1} .hidden{display:none!important}
-  @media(min-width:900px){main{grid-template-columns:1.1fr .9fr;align-items:start}}
+  .muted{color:var(--muted)} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .grow{flex:1}
   .warn{padding:10px 12px;border-top:1px solid var(--border);background:#131827;color:#facc15;font-weight:700}
+  .hidden{display:none!important}
+  @media(min-width:900px){main{grid-template-columns:1.1fr .9fr;align-items:start}}
+  .bigStart{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)}
+  .bigStart button{font-size:16px;padding:14px 18px;border:2px solid var(--accent)}
 </style>
 </head>
 <body>
@@ -42,10 +43,9 @@
   <header>
     <div class="title"><span class="dot"></span><div>Barkod Toplayıcı <span class="muted">• 4 Hane</span></div></div>
     <div class="toolbar">
-      <button id="startBtn" class="hidden">Kamerayı Başlat</button>
-      <button id="toggleCam" title="Kamerayı değiştir" disabled>Değiştir</button>
-      <button id="torchBtn" title="Fener" disabled>Fener</button>
-      <button id="pauseBtn" title="Durdur/Başlat" disabled>Duraklat</button>
+      <button id="toggleCam" disabled>Değiştir</button>
+      <button id="torchBtn" disabled>Fener</button>
+      <button id="pauseBtn" disabled>Duraklat</button>
     </div>
   </header>
 
@@ -55,13 +55,14 @@
         <video id="video" playsinline autoplay muted></video>
         <div class="overlay" id="overlay"></div>
         <div class="finder"></div>
+        <div class="bigStart hidden" id="bigStart"><button id="startBtn">Kamerayı Başlat</button></div>
       </div>
       <div class="stats">
         <div>Cihaz: <span class="pill" id="camName">-</span></div>
         <div>Toplam: <span class="pill" id="count">0</span></div>
       </div>
-      <div class="warn" id="httpsWarn" style="display:none">⚠️ Bu sayfayı HTTPS/localhost dışında açtınız. Kamera güvenlik nedeniyle çalışmayabilir.</div>
-      <div class="warn" id="permWarn" style="display:none">⚠️ Tarayıcı izin istiyor olabilir. Engellendiğinde üstteki “Kamerayı Başlat” butonunu kullanın.</div>
+      <div class="warn" id="httpsWarn" style="display:none">⚠️ HTTPS/localhost dışında açtınız. Kamera güvenlik nedeniyle çalışmayabilir.</div>
+      <div class="warn" id="bdWarn" style="display:none">⚠️ Bu tarayıcıda yerleşik tarama (BarcodeDetector) yok. Güncel Chrome/Edge/Android/Safari kullanın.</div>
     </section>
 
     <section class="card listWrap">
@@ -70,217 +71,227 @@
         <button id="clearAll" class="del">Tümünü Temizle</button>
       </div>
       <div class="codes"><ol id="codeList"></ol></div>
-      <div class="actions">
+      <div class="row">
         <button id="copyBtn">Kopyala</button>
         <button id="waBtn">WhatsApp’tan Gönder</button>
       </div>
     </section>
   </main>
 
-  <script src="https://unpkg.com/@zxing/library@0.20.0"></script>
-  <script>
-  (()=> {
-    const video = document.getElementById('video');
-    const overlay = document.getElementById('overlay');
-    const toast = document.getElementById('toast');
-    const toastCode = document.getElementById('toastCode');
-    const countEl = document.getElementById('count');
-    const codeList = document.getElementById('codeList');
-    const camName = document.getElementById('camName');
+<script>
+(()=> {
+  const video = document.getElementById('video');
+  const overlay = document.getElementById('overlay');
+  const toast = document.getElementById('toast');
+  const toastCode = document.getElementById('toastCode');
+  const countEl = document.getElementById('count');
+  const codeList = document.getElementById('codeList');
+  const camName = document.getElementById('camName');
 
-    const startBtn = document.getElementById('startBtn');
-    const toggleCamBtn = document.getElementById('toggleCam');
-    const torchBtn = document.getElementById('torchBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const clearAllBtn = document.getElementById('clearAll');
-    const copyBtn = document.getElementById('copyBtn');
-    const waBtn = document.getElementById('waBtn');
-    const httpsWarn = document.getElementById('httpsWarn');
-    const permWarn = document.getElementById('permWarn');
+  const toggleCamBtn = document.getElementById('toggleCam');
+  const torchBtn = document.getElementById('torchBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const clearAllBtn = document.getElementById('clearAll');
+  const copyBtn = document.getElementById('copyBtn');
+  const waBtn = document.getElementById('waBtn');
 
-    let codeReader = new ZXing.BrowserMultiFormatReader();
-    let controls = null;
-    let devices = [];
-    let deviceIndex = 0;
-    let track = null;
-    let scanningPaused = false;
-    let stream = null;
+  const httpsWarn = document.getElementById('httpsWarn');
+  const bdWarn = document.getElementById('bdWarn');
+  const bigStart = document.getElementById('bigStart');
+  const startBtn = document.getElementById('startBtn');
 
-    const codes = [];
-    const set = new Set();
-    let lastText = '';
-    let lastAt = 0;
+  let stream = null, track = null, devices = [], deviceIndex = 0;
+  let scanning = false, paused = false, rafId = 0;
+  let detector = null;
+  let lastVal = '', lastAt = 0;
 
-    // ==== UI helpers ====
-    function showToast(text){ toastCode.textContent = text; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1400); }
-    function flash(type='success'){
-      overlay.className = 'overlay ' + (type === 'success' ? 'success' : 'error');
-      overlay.style.opacity = '1';
-      setTimeout(()=> overlay.style.opacity = '0', 200);
-      if (navigator.vibrate) navigator.vibrate(type==='success' ? 30 : [40,40,80]);
-      beep(type==='success'?880:220, type==='success'?90:140);
+  const codes = [], set = new Set();
+
+  // Helpers
+  function secureOk(){
+    const ok = location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1';
+    httpsWarn.style.display = ok ? 'none':'block';
+    return ok;
+  }
+  function beep(freq=440, dur=120){
+    try{
+      const C = window.AudioContext||window.webkitAudioContext;
+      const ctx = new C(); const o = ctx.createOscillator(); const g=ctx.createGain();
+      o.type='sine'; o.frequency.value=freq; o.connect(g); g.connect(ctx.destination);
+      g.gain.value=0.0001; g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.02);
+      o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.01); o.stop(); ctx.close(); }, dur);
+    }catch(e){}
+  }
+  function flash(type){
+    overlay.className = 'overlay ' + (type==='ok'?'success':'error');
+    overlay.style.opacity = '1'; setTimeout(()=> overlay.style.opacity='0', 220);
+    if (navigator.vibrate) navigator.vibrate(type==='ok' ? 30 : [50,50,80]);
+    beep(type==='ok'?880:220, type==='ok'?90:140);
+  }
+  function toastShow(txt){ toastCode.textContent=txt; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1400); }
+  function extract4(text){
+    // URL ise path son parça
+    try{
+      const u = new URL(text);
+      const last = (u.pathname.split('/').filter(Boolean).pop()||'').trim();
+      if (/^[A-Z0-9]{4}$/i.test(last)) return last.toUpperCase();
+    }catch(e){}
+    // değilse metnin son 4'ü
+    const m = (text||'').trim().match(/([A-Z0-9]{4})$/i);
+    return m ? m[1].toUpperCase() : null;
+  }
+  function addCode(code){
+    if (!code) return;
+    if (set.has(code)){ flash('err'); toastShow('Zaten var: '+code); return; }
+    set.add(code); codes.push(code);
+    const li = document.createElement('li');
+    li.innerHTML = <span class="muted">${codes.length}.</span> <span class="codeBadge">${code}</span>;
+    const del = document.createElement('button'); del.className='del'; del.textContent='Sil';
+    del.onclick = ()=>{
+      if (!confirm(code+' silinsin mi?')) return;
+      set.delete(code); const i=codes.indexOf(code); if(i>-1) codes.splice(i,1);
+      li.remove(); [...codeList.children].forEach((li,i)=> li.firstChild.textContent=(i+1)+'.');
+      countEl.textContent = codes.length;
+    };
+    li.appendChild(del); codeList.appendChild(li);
+    countEl.textContent = codes.length; flash('ok'); toastShow(code);
+  }
+  function listText(){ return codes.map((c,i)=>${i+1}. ${c}).join('\n'); }
+
+  copyBtn.onclick = async ()=>{
+    try{ await navigator.clipboard.writeText(listText()); toastShow('Kopyalandı'); flash('ok'); }
+    catch(e){ flash('err'); alert('Kopyalanamadı:\n\n'+listText()); }
+  };
+  waBtn.onclick = ()=>{
+    const t = encodeURIComponent(listText());
+    const url = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? whatsapp://send?text=${t} : https://wa.me/?text=${t};
+    window.open(url,'_blank');
+  };
+  clearAllBtn.onclick = ()=>{
+    if (!codes.length) return;
+    if (!confirm('Tüm kodlar silinsin mi?')) return;
+    codes.splice(0); set.clear(); codeList.innerHTML=''; countEl.textContent='0'; toastShow('Temizlendi');
+  };
+
+  toggleCamBtn.onclick = async ()=>{
+    if (!devices.length) return;
+    deviceIndex = (deviceIndex+1)%devices.length;
+    await startCamera(devices[deviceIndex].deviceId);
+  };
+  torchBtn.onclick = async ()=>{
+    if (!track) return;
+    try{
+      const caps = track.getCapabilities?.()||{};
+      if (!('torch' in caps)) return;
+      const on = !(torchBtn.dataset.on==='1');
+      torchBtn.dataset.on = on?'1':'';
+      await track.applyConstraints({advanced:[{torch:on}]});
+      torchBtn.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+    }catch(e){}
+  };
+  pauseBtn.onclick = ()=>{
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Başlat' : 'Duraklat';
+  };
+  startBtn.onclick = ()=> startAll(); // büyük overlay düğmesi
+
+  async function enumerateCams(){
+    try{
+      let list = await navigator.mediaDevices.enumerateDevices();
+      list = list.filter(d=>d.kind==='videoinput');
+      devices = list;
+      toggleCamBtn.disabled = devices.length < 2 ? true : false;
+      // arka kamera label tahmini
+      const env = devices.findIndex(d=>/back|arka|environment/i.test(d.label));
+      if (env>=0) deviceIndex = env; else deviceIndex = 0;
+    }catch(e){}
+  }
+
+  function constraintsFor(deviceId){
+    return {
+      video:{
+        deviceId: deviceId ? {exact:deviceId} : undefined,
+        facingMode: deviceId ? undefined : {ideal:'environment'},
+        width:{ideal:1280}, height:{ideal:720},
+        focusMode:'continuous', advanced:[{focusMode:'continuous'}]
+      },
+      audio:false
+    };
+  }
+
+  async function startCamera(deviceId){
+    if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    try{
+      stream = await navigator.mediaDevices.getUserMedia(constraintsFor(deviceId));
+      video.srcObject = stream;
+      await video.play().catch(()=>{});
+      track = stream.getVideoTracks()[0]||null;
+      camName.textContent = track?.label || (devices[deviceIndex]?.label || 'Kamera');
+      const caps = track?.getCapabilities?.()||{};
+      torchBtn.disabled = !('torch' in caps);
+      pauseBtn.disabled = false;
+      bigStart.classList.add('hidden');
+      return true;
+    }catch(err){
+      bigStart.classList.remove('hidden');
+      console.warn('getUserMedia hata:', err);
+      return false;
     }
-    function beep(freq=440, dur=120){
-      try{ const ctx = new (window.AudioContext||window.webkitAudioContext)();
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type='sine'; o.frequency.value=freq; o.connect(g); g.connect(ctx.destination);
-        g.gain.value=0.0001; g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.02);
-        o.start(); setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.01); o.stop(); ctx.close(); }, dur);
-      }catch(e){}
-    }
+  }
 
-    function extractCode(text){
-      try{ const u = new URL(text); const part=(u.pathname.split('/').filter(Boolean).pop()||'').trim(); if (/^[A-Z0-9]{4}$/i.test(part)) return part.toUpperCase(); }catch(e){}
-      const m=(text||'').trim().match(/([A-Z0-9]{4})$/i); return m ? m[1].toUpperCase() : null;
-    }
-    function addCode(code){
-      if (!code) return;
-      if (set.has(code)){ flash('error'); showToast('Zaten var: '+code); return; }
-      set.add(code); codes.push(code);
-      const li = document.createElement('li');
-      li.innerHTML = <span class="muted">${codes.length}.</span> <span class="codeBadge">${code}</span>;
-      const del = document.createElement('button'); del.className='del'; del.textContent='Sil';
-      del.addEventListener('click', ()=>{
-        if (!confirm(code+' silinsin mi?')) return;
-        set.delete(code); const i=codes.indexOf(code); if (i>-1) codes.splice(i,1);
-        li.remove(); [...codeList.children].forEach((li,i)=> li.firstChild.textContent=(i+1)+'.'); countEl.textContent = codes.length;
-      });
-      li.appendChild(del); codeList.appendChild(li); countEl.textContent = codes.length;
-      flash('success'); showToast(code);
-    }
-    function listAsText(){ return codes.map((c,i)=>${i+1}. ${c}).join('\n'); }
-
-    copyBtn.addEventListener('click', async ()=>{
-      const txt = listAsText();
-      try{ await navigator.clipboard.writeText(txt); showToast('Kopyalandı'); flash('success'); }
-      catch(e){ flash('error'); alert('Kopyalanamadı. Manuel kopyalayın:\n\n'+txt); }
-    });
-    waBtn.addEventListener('click', ()=>{
-      const txt = encodeURIComponent(listAsText());
-      const wa = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? whatsapp://send?text=${txt} : https://wa.me/?text=${txt};
-      window.open(wa,'_blank');
-    });
-    clearAllBtn.addEventListener('click', ()=>{
-      if (!codes.length) return; if(!confirm('Tüm kodlar silinsin mi?')) return;
-      codes.splice(0); set.clear(); codeList.innerHTML=''; countEl.textContent='0'; showToast('Temizlendi');
-    });
-
-    // ==== Camera logic ====
-    function secureOk(){
-      const isHttps = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      httpsWarn.style.display = isHttps ? 'none' : 'block';
-      return isHttps;
-    }
-
-    async function getDevices(){
+  async function scanLoop(){
+    if (!scanning) return;
+    if (!paused && detector && video.readyState>=2){
       try{
-        devices = await navigator.mediaDevices.enumerateDevices();
-        devices = devices.filter(d=>d.kind==='videoinput');
-        if (!devices.length) return;
-        // Arka kamera tercihi
-        const envIdx = devices.findIndex(d=>/back|arka|environment/i.test(d.label));
-        deviceIndex = envIdx >= 0 ? envIdx : 0;
-        camName.textContent = devices[deviceIndex].label || 'Kamera';
-        toggleCamBtn.disabled = devices.length < 2;
-      }catch(e){}
-    }
-
-    function currentConstraints(deviceId){
-      return {
-        video: {
-          deviceId: deviceId ? {exact: deviceId} : undefined,
-          facingMode: deviceId ? undefined : { ideal: 'environment' },
-          width: { ideal: 1280 }, height: { ideal: 720 },
-          focusMode: 'continuous',
-          advanced: [{ focusMode: 'continuous' }]
-        },
-        audio: false
-      };
-    }
-
-    async function openStream(deviceId){
-      if (stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
-      try{
-        stream = await navigator.mediaDevices.getUserMedia(currentConstraints(deviceId));
-        video.srcObject = stream;
-        await video.play().catch(()=>{}); // iOS bazen sessiz play ister
-        track = stream.getVideoTracks()[0] || null;
-        torchBtn.disabled = !(track && track.getCapabilities && track.getCapabilities().torch);
-        pauseBtn.disabled = false;
-        startBtn.classList.add('hidden');
-        permWarn.style.display = 'none';
-        return true;
-      }catch(err){
-        console.warn('getUserMedia hata:', err);
-        permWarn.style.display = 'block';
-        startBtn.classList.remove('hidden');
-        pauseBtn.disabled = true;
-        torchBtn.disabled = true;
-        return false;
-      }
-    }
-
-    async function startDecode(){
-      if (controls){ try{ controls.stop(); }catch(e){} controls=null; }
-      // decodeFromVideoElement → stream'i biz yönetiyoruz
-      controls = await codeReader.decodeFromVideoElement(video, (result, err, ctrl)=>{
-        if (scanningPaused) return;
-        if (result){
+        const codesFound = await detector.detect(video);
+        if (codesFound && codesFound.length){
+          const raw = String(codesFound[0].rawValue||'').trim();
           const now = Date.now();
-          const text = String(result.getText()||'').trim();
-          if (text === lastText && (now - lastAt) < 1200) return;
-          lastText = text; lastAt = now;
-          const code = extractCode(text);
-          if (code) addCode(code);
+          if (!(raw===lastVal && (now-lastAt)<1000)){
+            lastVal = raw; lastAt = now;
+            const four = extract4(raw);
+            if (four) addCode(four);
+          }
         }
-      });
+      }catch(e){ /* sessizce geç */ }
     }
+    rafId = requestAnimationFrame(scanLoop);
+  }
 
-    async function startAll(deviceId){
-      if (!secureOk()) { permWarn.style.display='block'; return; }
-      await getDevices(); // etiketler için en az 1 kez çağır
-      const ok = await openStream(deviceId || (devices[deviceIndex]?.deviceId));
-      if (ok) await startDecode();
-    }
-
-    toggleCamBtn.addEventListener('click', async ()=>{
-      if (!devices.length) return;
-      deviceIndex = (deviceIndex + 1) % devices.length;
-      camName.textContent = devices[deviceIndex].label || 'Kamera';
-      await startAll(devices[deviceIndex].deviceId);
-    });
-
-    pauseBtn.addEventListener('click', ()=>{
-      scanningPaused = !scanningPaused;
-      pauseBtn.textContent = scanningPaused ? 'Başlat' : 'Duraklat';
-    });
-
-    torchBtn.addEventListener('click', async ()=>{
-      if (!track) return;
+  async function startAll(){
+    if (!secureOk()){ bigStart.classList.remove('hidden'); return; }
+    // BarcodeDetector var mı?
+    if ('BarcodeDetector' in window){
       try{
-        const caps = track.getCapabilities?.()||{};
-        if (!('torch' in caps)) return;
-        torchBtn.dataset.on = torchBtn.dataset.on === '1' ? '' : '1';
-        const on = torchBtn.dataset.on === '1';
-        await track.applyConstraints({ advanced:[{ torch:on }] });
-        torchBtn.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
-      }catch(e){}
-    });
+        const supported = await window.BarcodeDetector.getSupportedFormats();
+        // QR + birkaç yaygın barkod
+        const wanted = ['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','itf','codabar','data_matrix','pdf417','aztec'];
+        const use = wanted.filter(f=>supported.includes(f));
+        detector = new window.BarcodeDetector({formats: use.length?use:['qr_code']});
+        bdWarn.style.display = 'none';
+      }catch(e){ detector = null; bdWarn.style.display='block'; }
+    }else{
+      detector = null; bdWarn.style.display='block';
+    }
 
-    startBtn.addEventListener('click', ()=> startAll());
+    await enumerateCams();
+    const ok = await startCamera(devices[deviceIndex]?.deviceId);
+    if (ok){ scanning = true; cancelAnimationFrame(rafId); scanLoop(); }
+  }
 
-    // ==== Auto start on load ====
-    (async function init(){
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-        alert('Kamera desteklenmiyor (mediaDevices/getUserMedia yok). Güncel bir tarayıcı kullanın.');
-        startBtn.classList.remove('hidden'); return;
-      }
-      await startAll(); // otomatik dene
-    })();
-
-    // Manuel test (kamera olmadan): window.__testScan('https://go.gourban.co/gosharing/vehicle/L8KQ')
-    window.__testScan = (text)=> { const c=extractCode(text); if (c) addCode(c); else alert('Kod yok: '+text); };
+  // Otomatik dene (izin çıkarsa direkt çalışır; olmazsa büyük start görünür)
+  (async ()=>{
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      alert('Kamera desteklenmiyor: mediaDevices/getUserMedia yok.');
+      bigStart.classList.remove('hidden'); return;
+    }
+    // iOS için ilk dokunuş gerektirebilir; yine de deneyelim:
+    startAll();
   })();
-  </script>
+
+  // Manuel test (kamera olmadan): window.__test('https://go.gourban.co/gosharing/vehicle/L8KQ')
+  window.__test = (txt)=>{ const c = extract4(txt); if (c) addCode(c); else alert('Kod yok: '+txt); };
+})();
+</script>
 </body>
 </html>
