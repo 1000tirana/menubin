@@ -4,153 +4,277 @@
 <meta charset="UTF-8">
 <title>Lexues Barkodesh</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-  body{font-family:sans-serif;margin:0;background:#0f1115;color:#f2f2f2;text-align:center}
-  header{background:#1a1f2d;padding:12px;font-size:18px;font-weight:600}
-  #reader{width:100%;max-width:420px;margin:10px auto;border-radius:12px;overflow:hidden}
-  #overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;border:8px solid transparent;box-sizing:border-box}
-  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#1ecb4f;
-          color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;transition:top .4s;z-index:9999}
-  #notify.error{background:#e74c3c}
-  ul{list-style:none;padding:0;margin:20px auto;max-width:420px;text-align:left;background:#1a1f2d;border-radius:12px;overflow:hidden}
-  li{padding:10px 12px;border-top:1px solid #333;display:flex;justify-content:space-between;align-items:center}
-  li:first-child{border-top:0}
-  .btns,.manual{margin:15px auto;max-width:420px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-  button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-  #copyBtn{background:#3b82f6;color:#fff}
-  #whatsappBtn{background:#25D366;color:#fff}
-  #clearBtn{background:#e74c3c;color:#fff}
-  #flashBtn{background:#facc15;color:#000}
-  #manualInput{flex:2;padding:10px;border-radius:8px;border:1px solid #555}
-  #addBtn{flex:1;background:#1ecb4f;color:#fff}
+  /* ----- SENİN ORİJİNAL STİLLERİN ----- */
+  body { font-family: Arial, sans-serif; text-align: center; margin: 0; background: #0f1115; color:#e8ecf2; }
+  #reader { width: 100%; max-width: 420px; margin: 16px auto; border-radius:12px; overflow:hidden; }
+  #resultList { margin: 12px auto 90px; width: 92%; max-width: 520px; text-align: left; background:#161b26; border:1px solid #232b3b; border-radius:12px; padding:0 }
+  li { padding: 10px 12px; border-top: 1px solid #222b3a; display:flex; align-items:center; justify-content:space-between; }
+  li:first-child{ border-top:0 }
+  .btns { position:sticky; bottom:0; background:rgba(15,17,21,.9); backdrop-filter:blur(8px); border-top:1px solid #232b3b; padding:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  button { padding: 10px 14px; margin: 0; border: none; border-radius: 10px; cursor: pointer; font-weight:700 }
+  #copyBtn { background: #3b82f6; color: #fff; }
+  #whatsappBtn { background: #25D366; color: #072b10; }
+  /* ----- EK TASARIM ----- */
+  header{background:#151a22; border-bottom:1px solid #232b3b; padding:12px 14px; font-weight:800; letter-spacing:.2px}
+  .chip{display:inline-block; background:#1b2231; border:1px solid #2a364a; color:#9aa3b2; padding:6px 10px; border-radius:999px; margin:8px 4px}
+  .row{display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap; max-width:520px; margin:8px auto}
+  .ghost{background:#1b2231; color:#e8ecf2; border:1px solid #2a364a}
+  .danger{background:#e74c3c; color:#fff}
+  .secondary{background:#0ea5e9; color:#002233}
+  .accent{background:#facc15; color:#1a1a00}
+  .muted{color:#9aa3b2}
+  .idx{opacity:.7; margin-right:8px}
+  .delBtn{background:transparent; color:#ffb4b4; border:1px solid #3a2323; padding:6px 10px; border-radius:8px; cursor:pointer}
+  #manualInput{flex:1 1 200px; padding:10px; border-radius:10px; border:1px solid #2a364a; background:#0f141f; color:#e8ecf2}
+  #overlay {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    pointer-events:none; border: 8px solid transparent; box-sizing:border-box; border-radius:12px;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  #notify {
+    position: fixed; top:-60px; left:50%; transform:translateX(-50%);
+    background:#1ecb4f; color:#0c2a10; padding:12px 18px; border-radius:10px;
+    font-size:16px; font-weight:800; transition:top 0.45s; z-index:9999; border:1px solid #144d28;
+  }
+  #notify.error { background:#ffd6d6; color:#3a0b0b; border-color:#5b2323; }
 </style>
+<script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
 
 <header>📷 Lexues Barkodesh</header>
 
-<div style="position:relative;max-width:420px;margin:auto">
+<!-- Kamera kapsayıcı -->
+<div style="position:relative;max-width:520px;margin:0 auto">
   <div id="reader"></div>
   <div id="overlay"></div>
 </div>
 
+<!-- Durum chip'leri -->
+<div class="row">
+  <span class="chip muted" id="countChip">0 kode</span>
+  <button id="flashBtn" class="accent">🔦 Ndiz Fenerin</button>
+</div>
+
+<!-- Liste -->
 <ul id="resultList"></ul>
 
+<!-- Alt eylem çubuğu -->
 <div class="btns">
   <button id="copyBtn">📋 Kopjo</button>
   <button id="whatsappBtn">📲 Dërgo në WhatsApp</button>
-  <button id="flashBtn">🔦 Ndiz Fenerin</button>
-  <button id="clearBtn">🗑️ Pastro listen</button>
+  <button id="clearAllBtn" class="danger">🗑️ Pastro listen</button>
 </div>
 
-<div class="manual">
-  <input type="text" id="manualInput" placeholder="Shkruaj kodin manualisht">
-  <button id="addBtn">➕ Shto</button>
+<!-- Manuel ekleme -->
+<div class="row" style="margin-bottom:22px">
+  <input id="manualInput" type="text" placeholder="Shkruaj kodin manualisht (p.sh. L8KQ)">
+  <button id="addBtn" class="secondary">➕ Shto</button>
 </div>
 
 <div id="notify"></div>
 
 <audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
-<audio id="errorSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+<audio id="errorSound"   src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
-let scanned = JSON.parse(localStorage.getItem("barkodList")||"[]");
-let count = scanned.length;
-renderList();
+/* ========== SENİN ORİJİNAL DEĞİŞKENLERİN ========== */
+let scanned = [];
+let count = 0;
 
+/* ========== EK: LOCALSTORAGE'DAN GERİ YÜKLEME ========== */
+(function restoreFromStorage(){
+  try{
+    const data = JSON.parse(localStorage.getItem("barkodList")||"[]");
+    if(Array.isArray(data) && data.length){
+      scanned = data.slice();
+      count = scanned.length;
+      rebuildListFromScanned(); // mevcut listeyi ekrana bas
+    }
+    updateCountChip();
+  }catch(e){}
+})();
+
+/* ========== SENİN ORİJİNAL BİLDİRİM FONKSİYONUN ========== */
 function showNotification(text, isError=false){
-  const notify=document.getElementById("notify");
-  notify.textContent=text;
-  notify.className=isError?"error":"";
-  notify.style.top="20px";
-  setTimeout(()=>{notify.style.top="-60px"},2000);
+  const notify = document.getElementById("notify");
+  notify.textContent = text;
+  notify.className = isError ? "error" : "";
+  notify.style.top = "20px";
+  setTimeout(()=>{ notify.style.top = "-60px"; }, 2000);
 }
 
-function renderList(){
-  const ul=document.getElementById("resultList"); ul.innerHTML="";
-  scanned.forEach((c,i)=>{
-    let li=document.createElement("li");
-    li.innerHTML=<span>${i+1}. ${c}</span>;
-    let del=document.createElement("button");
-    del.textContent="❌";
-    del.style.background="transparent"; del.style.color="#ffb4b4";
-    del.onclick=()=>{ if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){ scanned.splice(i,1); save(); } };
+/* ========== YARDIMCI: LİSTEYİ YENİDEN ÇİZ ========== */
+function rebuildListFromScanned(){
+  const ul = document.getElementById("resultList");
+  ul.innerHTML = "";
+  scanned.forEach((code, i)=>{
+    const li = document.createElement("li");
+    li.innerHTML = <span><span class="idx">${i+1}.</span> ${code}</span>;
+    const del = document.createElement("button");
+    del.className = "delBtn";
+    del.textContent = "❌";
+    del.onclick = ()=>{
+      if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){
+        // diziden kaldır
+        const idx = scanned.indexOf(code);
+        if(idx>-1){ scanned.splice(idx,1); localStorage.setItem("barkodList", JSON.stringify(scanned)); }
+        // sayımı ve listeyi güncelle
+        count = scanned.length;
+        rebuildListFromScanned();
+        updateCountChip();
+      }
+    };
     li.appendChild(del);
     ul.appendChild(li);
   });
 }
 
-function save(){
-  localStorage.setItem("barkodList", JSON.stringify(scanned));
-  count=scanned.length;
-  renderList();
+/* ========== YARDIMCI: COUNTER CHIP ========== */
+function updateCountChip(){
+  const chip = document.getElementById("countChip");
+  chip.textContent = (scanned.length||0) + " kode";
 }
 
-function addCode(code){
-  code=code.toUpperCase();
-  if(!code) return;
-  const overlay=document.getElementById("overlay");
+/* ========== EK: YENİ EKLENEN Lİ'YE SİLME TUŞU EKLE (orijinali bozmadan) ========== */
+const listObserver = new MutationObserver((mutations)=>{
+  mutations.forEach(m=>{
+    m.addedNodes.forEach(node=>{
+      if(node.nodeName==="LI" && !node.querySelector(".delBtn")){
+        const text = node.textContent.trim(); // "N. CODE"
+        const parts = text.split(". "); // ["N", "CODE"]
+        const code = parts[1] || "";
+        const wrap = document.createElement("span");
+        wrap.textContent = text;
+        node.innerHTML = "";
+        node.appendChild(wrap);
+
+        const del = document.createElement("button");
+        del.className="delBtn";
+        del.textContent="❌";
+        del.onclick=()=>{
+          if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){
+            const idx = scanned.indexOf(code);
+            if(idx>-1){ scanned.splice(idx,1); localStorage.setItem("barkodList", JSON.stringify(scanned)); }
+            count = scanned.length;
+            rebuildListFromScanned();
+            updateCountChip();
+          }
+        };
+        node.appendChild(del);
+      }
+    });
+  });
+});
+listObserver.observe(document.getElementById("resultList"), {childList:true});
+
+/* ========== SENİN ORİJİNAL TARAYICI CALLBACK'İN ========== */
+function onScanSuccess(decodedText) {
+  // linkten sadece son 4 karakteri al
+  let code = decodedText.slice(-4);
+
+  const overlay = document.getElementById("overlay");
+
   if(scanned.includes(code)){
     document.getElementById("errorSound").play();
     overlay.style.borderColor="red";
-    setTimeout(()=>overlay.style.borderColor="transparent",500);
-    showNotification(code+" tashmë ekziston!",true);
+    overlay.style.boxShadow="0 0 0 9999px #ff4d4f22";
+    setTimeout(()=>{ overlay.style.borderColor="transparent"; overlay.style.boxShadow="none"; },500);
+    showNotification(code + " zaten okutuldu!", true);
     return;
   }
-  scanned.push(code); save();
+
+  scanned.push(code);
+  count++;
+
+  let li = document.createElement("li");
+  li.textContent = count + ". " + code;
+  document.getElementById("resultList").appendChild(li);
+
   document.getElementById("successSound").play();
   overlay.style.borderColor="lime";
-  setTimeout(()=>overlay.style.borderColor="transparent",500);
-  showNotification(code+" u shtua ✅");
+  overlay.style.boxShadow="0 0 0 9999px #1ecb4f22";
+  setTimeout(()=>{ overlay.style.borderColor="transparent"; overlay.style.boxShadow="none"; },500);
+  showNotification(code + " eklendi ✅");
+
+  // EK: kalıcı yap
+  localStorage.setItem("barkodList", JSON.stringify(scanned));
+  updateCountChip();
 }
 
-function onScanSuccess(decodedText){
-  let code = decodedText.slice(-4);
-  addCode(code);
-}
-
-document.getElementById("copyBtn").onclick=()=>{
-  let text=scanned.map((c,i)=>(i+1)+". "+c).join("\n");
+/* ========== SENİN ORİJİNAL KOPYALA / WHATSAPP ========== */
+function copyList(){
+  let text = scanned.map((c,i)=> (i+1)+". "+c).join("\n");
   navigator.clipboard.writeText(text);
   alert("Lista u kopjua!");
-};
-document.getElementById("whatsappBtn").onclick=()=>{
-  let text=scanned.map((c,i)=>(i+1)+". "+c).join("%0A");
+}
+function sendWhatsApp(){
+  let text = scanned.map((c,i)=> (i+1)+". "+c).join("%0A");
   window.open("https://wa.me/?text="+text,"_blank");
-};
-document.getElementById("clearBtn").onclick=()=>{
+}
+document.getElementById("copyBtn").onclick = copyList;
+document.getElementById("whatsappBtn").onclick = sendWhatsApp;
+
+/* ========== EK: TÜMÜNÜ TEMİZLE (emin misin?) ========== */
+document.getElementById("clearAllBtn").onclick = ()=>{
   if(confirm("Je i sigurt që dëshiron të pastrosh gjithë listën?")){
-    scanned=[]; save();
-  }
-};
-document.getElementById("addBtn").onclick=()=>{
-  const val=document.getElementById("manualInput").value.trim();
-  if(val){ addCode(val); document.getElementById("manualInput").value=""; }
-};
-
-/* 🔦 Flash toggle */
-let torchOn=false;
-document.getElementById("flashBtn").onclick=()=>{
-  const track=html5QrCode.getRunningTrack();
-  if(track){
-    const imageCapture=new ImageCapture(track);
-    imageCapture.getPhotoCapabilities().then(cap=>{
-      if(cap.torch||("fillLightMode" in cap)){
-        track.applyConstraints({advanced:[{torch:!torchOn}]});
-        torchOn=!torchOn;
-        document.getElementById("flashBtn").textContent=torchOn?"🔦 Fik Fenerin":"🔦 Ndiz Fenerin";
-      }else alert("Pajisja nuk mbështet fenerin");
-    });
+    scanned = [];
+    count = 0;
+    localStorage.setItem("barkodList", JSON.stringify(scanned));
+    rebuildListFromScanned();
+    updateCountChip();
   }
 };
 
-let html5QrCode=new Html5Qrcode("reader");
-html5QrCode.start(
-  { facingMode:"environment" },
-  { fps:10, qrbox:250 },
+/* ========== EK: MANUEL KOD EKLE ========== */
+document.getElementById("addBtn").onclick = ()=>{
+  const input = document.getElementById("manualInput");
+  let code = (input.value||"").trim().toUpperCase();
+  if(!code) return;
+  if(code.length>4) code = code.slice(-4); // senin mantıkla tutarlı
+  if(scanned.includes(code)){
+    showNotification(code+" tashmë ekziston!", true);
+    return;
+  }
+  scanned.push(code);
+  count++;
+  const li=document.createElement("li");
+  li.textContent = count + ". " + code;
+  document.getElementById("resultList").appendChild(li);
+  localStorage.setItem("barkodList", JSON.stringify(scanned));
+  updateCountChip();
+  input.value="";
+  showNotification(code+" u shtua ✅");
+};
+
+/* ========== EK: FLASH / TORCH AÇ-KAPAT ========== */
+let torchOn = false;
+document.getElementById("flashBtn").onclick = async ()=>{
+  try{
+    // html5-qrcode içindeki video elementini bul
+    const video = document.querySelector("#reader video");
+    const track = video && video.srcObject && video.srcObject.getVideoTracks ? video.srcObject.getVideoTracks()[0] : null;
+    if(!track){ alert("Feneri përdor kamerën — së pari hap kamerën."); return; }
+    const caps = await track.getCapabilities?.();
+    if(!caps || (!caps.torch && !caps.fillLightMode)){ alert("Pajisja nuk mbështet fenerin."); return; }
+    await track.applyConstraints({ advanced: [{ torch: !torchOn }] });
+    torchOn = !torchOn;
+    document.getElementById("flashBtn").textContent = torchOn ? "🔦 Fik Fenerin" : "🔦 Ndiz Fenerin";
+  }catch(e){
+    alert("Fener nuk u aktivizua: " + (e.message||e));
+  }
+};
+
+/* ========== SENİN ORİJİNAL BAŞLATMAN ========== */
+new Html5Qrcode("reader").start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
   onScanSuccess
 );
+
+/* ========== EK: SAYFA YÜKLENİNCE EKRANDAKİ SAYACI GÜNCELLE ========== */
+updateCountChip();
 </script>
 </body>
 </html>
