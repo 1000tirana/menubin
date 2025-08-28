@@ -2,44 +2,31 @@
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
-<title>Skano Kodet • Barkod Okuyucu</title>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Skano Kodet</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --edge:#232836; --text:#e7e9ee; --muted:#a9b0bd;
-    --brand:#3b82f6; --ok:#1ecb4f; --err:#ff4d4f;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column}
-  header{position:sticky;top:0;z-index:20;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
-  header h1{margin:0;font-size:16px;letter-spacing:.2px}
-  .lang{display:flex;gap:6px}
-  .lang button{background:#1f2430;border:1px solid var(--edge);border-radius:8px;color:var(--text);padding:6px 10px;cursor:pointer;font-weight:600}
-  .lang button.active{border-color:var(--brand);box-shadow:0 0 0 2px #1e40af33}
-  main{max-width:960px;width:100%;margin:0 auto;padding:12px;flex:1}
-  .card{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
-  .row.input{margin-bottom:10px}
-  .i{flex:1;min-width:180px;background:#1f2430;border:1px solid var(--edge);color:var(--text);padding:10px 12px;border-radius:10px}
-  .btn{padding:10px 14px;border-radius:10px;border:1px solid var(--edge);background:#222a3b;color:#e7e9ee;cursor:pointer;font-weight:700}
-  .btn.primary{background:var(--brand);border:0;color:#fff}
-  .btn.wa{background:#25D366;border:0;color:#072b10}
-  .btn.danger{background:transparent;color:#ffb4b4;border-color:#3a2323}
-  .cam-wrap{position:relative;width:100%;max-width:520px;margin:0 auto}
-  #reader{width:100%;aspect-ratio:3/4;max-height:70vh;display:block;border-radius:12px;overflow:hidden;background:#0b0e14}
-  @media (orientation:landscape){#reader{aspect-ratio:16/9;max-height:62vh}}
-  #overlay{position:absolute;inset:0;border:8px solid transparent;box-sizing:border-box;pointer-events:none;border-radius:12px;transition:border-color .18s,box-shadow .18s}
-  #resultList{list-style:none;padding:0;margin:14px auto;width:100%;max-width:520px;text-align:left;background:var(--card);border:1px solid var(--edge);border-radius:12px;overflow:hidden}
-  #resultList li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-top:1px solid #202637}
-  #resultList li:first-child{border-top:0}
-  .idx{opacity:.65;margin-right:8px}
-  .code{font-weight:700}
-  .del{background:#2a1f1f;border:1px solid #3a2323;color:#ffbdbd;border-radius:8px;padding:6px 10px;cursor:pointer}
-  .btns{position:sticky;bottom:0;z-index:15;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);border-top:1px solid var(--edge);display:flex;gap:10px;padding:10px;justify-content:center}
-  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#1f2430;border:1px solid var(--edge);color:#fff;padding:12px 16px;border-radius:10px;font-size:14px;transition:top .35s ease;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.35)}
-  #notify.error{background:#3a2222;border-color:#5b2323}
+  body{margin:0;font-family:system-ui,Arial,sans-serif;background:#0f1115;color:#e7e9ee}
+  header{position:sticky;top:0;background:#141821;border-bottom:1px solid #232836;
+    display:flex;justify-content:space-between;align-items:center;padding:12px 16px;z-index:10}
+  h1{margin:0;font-size:18px}
+  .lang button{margin-left:6px;padding:6px 10px;border:1px solid #2a3140;background:#1f2430;
+    color:#e7e9ee;border-radius:6px;cursor:pointer}
+  .lang button.active{border-color:#3b82f6}
+  main{padding:16px;max-width:600px;margin:auto}
+  #reader{width:100%;aspect-ratio:3/4;max-height:70vh;border:2px solid #232836;border-radius:12px}
+  #overlay{position:absolute;inset:0;border:6px solid transparent;border-radius:12px;pointer-events:none;transition:.3s}
+  #resultList{margin-top:16px;padding:0;list-style:none}
+  #resultList li{background:#1a2030;margin-bottom:6px;padding:10px 12px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#4CAF50;color:#fff;
+    padding:10px 20px;border-radius:6px;transition:top .5s;z-index:9999}
+  #notify.error{background:#E74C3C}
+  .btns{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+  button{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+  #copyBtn{background:#3b82f6;color:#fff} #whatsappBtn{background:#25D366;color:#072b10}
+  #clearBtn{background:#b91c1c;color:#fff} #flashBtn{background:#fbbf24;color:#000}
+  #addBox{margin-top:16px;display:flex;gap:8px}
+  #manualCode{flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:#1f2430;color:#fff}
 </style>
 </head>
 <body>
@@ -54,223 +41,108 @@
 </header>
 
 <main>
-  <div class="card">
-    <!-- Manuel giriş satırı -->
-    <div class="row input">
-      <input id="manualInput" class="i" maxlength="50" placeholder="Shkruaj 4 shifrat (p.sh. L8KQ)">
-      <button id="manualAdd" class="btn primary">➕ Shto</button>
-      <button id="clearAll" class="btn danger">🗑️ Fshi të gjitha</button>
-    </div>
-
-    <div class="cam-wrap">
-      <div id="reader"></div>
-      <div id="overlay"></div>
-    </div>
+  <div style="position:relative">
+    <div id="reader"></div>
+    <div id="overlay"></div>
   </div>
 
   <ul id="resultList"></ul>
-</main>
 
-<div class="btns">
-  <button id="copyBtn" class="btn primary">📋 <span data-i18n="copy">Kopjo</span></button>
-  <button id="whatsappBtn" class="btn wa">📲 WhatsApp</button>
-</div>
+  <div id="addBox">
+    <input type="text" id="manualCode" placeholder="Kod yaz...">
+    <button id="addBtn">➕</button>
+  </div>
+
+  <div class="btns">
+    <button id="copyBtn">📋 <span data-i18n="copy">Kopjo</span></button>
+    <button id="whatsappBtn">📲 WhatsApp</button>
+    <button id="flashBtn">🔦 Aç</button>
+    <button id="clearBtn">🗑️ <span data-i18n="clear">Pastro</span></button>
+  </div>
+</main>
 
 <div id="notify"></div>
 
-<!-- Sesler (dokunmadım) -->
-<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
-<audio id="errorSound"   src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+<audio id="errorSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
 <script>
-/* ===================== DİL ===================== */
-const I18N = {
-  sq:{
-    title:"Skano Kodet",
-    placeholder:"Shkruaj 4 shifrat (p.sh. L8KQ)",
-    add:"➕ Shto", clearAll:"🗑️ Fshi të gjitha",
-    already:"Tashmë i lexuar: ", added:"U shtua: ",
-    copy:"Kopjo", copied:"Lista u kopjua!",
-    confirmClear:"Je i sigurt për fshirjen?",
-    confirmDelete:"Ta fshij këtë kod?",
-    duplicated:"Ky kod tashmë ekziston!"
-  },
-  tr:{
-    title:"Barkod Tara",
-    placeholder:"4 haneyi yaz (örn: L8KQ)",
-    add:"➕ Ekle", clearAll:"🗑️ Tümünü Sil",
-    already:"Zaten okundu: ", added:"Eklendi: ",
-    copy:"Kopyala", copied:"Liste kopyalandı!",
-    confirmClear:"Tüm listeyi silmek istediğine emin misin?",
-    confirmDelete:"Bu kodu silmek istediğine emin misin?",
-    duplicated:"Bu kod zaten var!"
-  },
-  en:{
-    title:"Scan Codes",
-    placeholder:"Type 4 chars (e.g. L8KQ)",
-    add:"➕ Add", clearAll:"🗑️ Clear All",
-    already:"Already scanned: ", added:"Added: ",
-    copy:"Copy", copied:"List copied!",
-    confirmClear:"Are you sure to clear all?",
-    confirmDelete:"Delete this code?",
-    duplicated:"This code already exists!"
-  }
+/* === Çok Dilli === */
+const I18N={
+  sq:{title:"Skano Kodet",copy:"Kopjo",clear:"Pastro",added:"U shtua: ",exists:"Tashmë ekziston!"},
+  tr:{title:"Barkod Tara",copy:"Kopyala",clear:"Temizle",added:"Eklendi: ",exists:"Zaten var!"},
+  en:{title:"Scan Codes",copy:"Copy",clear:"Clear",added:"Added: ",exists:"Already exists!"}
 };
-let lang = localStorage.getItem("qr_lang") || "sq";
-function applyLang(L){
-  lang=L; localStorage.setItem("qr_lang",L);
-  document.getElementById("title").textContent = I18N[L].title;
-  document.getElementById("manualInput").placeholder = I18N[L].placeholder;
-  document.getElementById("manualAdd").textContent = I18N[L].add;
-  document.getElementById("clearAll").textContent = I18N[L].clearAll;
-  document.querySelector('[data-i18n="copy"]').textContent = I18N[L].copy;
-  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active", b.dataset.lang===L));
+let lang=localStorage.getItem("qr_lang")||"sq";
+function setLang(L){
+  lang=L;localStorage.setItem("qr_lang",L);
+  document.getElementById("title").textContent=I18N[L].title;
+  document.querySelector('[data-i18n="copy"]').textContent=I18N[L].copy;
+  document.querySelector('[data-i18n="clear"]').textContent=I18N[L].clear;
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active",b.dataset.lang===L));
 }
-document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>applyLang(b.dataset.lang)));
-applyLang(lang);
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+setLang(lang);
 
-/* ============ PERSIST: localStorage ============ */
-const LS_KEY = "qr_scanned_codes_v1";
-
-/* ======= (SENİN ORİJİNAL DEĞİŞKENLERİN) ======= */
-let scanned = JSON.parse(localStorage.getItem(LS_KEY) || "[]"); // kalıcı
-let count   = scanned.length;                                    // sayfa yenilese de doğru başlasın
-
-/* ============== Yardımcılar ============== */
-function normalizeCode(str){
-  return (str||"").replace(/[^A-Za-z0-9]/g,"").slice(-4).toUpperCase();
-}
-function save(){
-  localStorage.setItem(LS_KEY, JSON.stringify(scanned));
-}
-function showNotification(text, isError=false){
-  const notify = document.getElementById("notify");
-  notify.textContent = text;
-  notify.className = isError ? "error" : "";
-  notify.style.top = "20px";
-  setTimeout(()=>{ notify.style.top = "-60px"; }, 2000);
-}
-function renderList(){
-  const ul = document.getElementById("resultList");
-  ul.innerHTML = "";
-  scanned.forEach((code, i)=>{
-    const li = document.createElement("li");
-    const left = document.createElement("div");
-    left.innerHTML = <span class="idx">${i+1}.</span> <span class="code">${code}</span>;
-    const del = document.createElement("button");
-    del.className = "del";
-    del.textContent = "Sil / Fshi / Del";
-    del.addEventListener("click", ()=>{
-      if(confirm(I18N[lang].confirmDelete)){
-        scanned.splice(i,1);
-        count = scanned.length;
-        save(); renderList();
-      }
-    });
-    li.appendChild(left);
-    li.appendChild(del);
+/* === State === */
+let scanned=JSON.parse(localStorage.getItem("qr_list")||"[]"); render();
+function save(){localStorage.setItem("qr_list",JSON.stringify(scanned));}
+function render(){
+  const ul=document.getElementById("resultList"); ul.innerHTML="";
+  scanned.forEach((c,i)=>{
+    const li=document.createElement("li");
+    li.innerHTML=${i+1}. ${c} <button onclick="removeCode(${i})">❌</button>;
     ul.appendChild(li);
   });
 }
 
-/* ============== ORİJİNAL İŞLEYİŞ ============== */
-function onScanSuccess(decodedText) {
-  // linkten sadece son 4 karakteri al (orijinal satır)
-  let code = decodedText.slice(-4);
+/* === Bildirim === */
+function notify(msg,isErr=false){
+  const n=document.getElementById("notify");
+  n.textContent=msg;n.className=isErr?"error":"";n.style.top="20px";
+  setTimeout(()=>n.style.top="-60px",1800);
+}
 
-  // güvenli hale getir (alfanümerik/uppercase) — görünümü bozmaz
-  code = normalizeCode(code);
-
-  const overlay = document.getElementById("overlay");
-
-  if(!code){ return; }
-
-  if(scanned.includes(code)){
-    document.getElementById("errorSound").play();
-    overlay.style.borderColor="var(--err)";
-    overlay.style.boxShadow="0 0 0 9999px #ff4d4f22";
-    setTimeout(()=> { overlay.style.borderColor="transparent"; overlay.style.boxShadow="none"; },500);
-    showNotification(I18N[lang].already + code, true);
-    return;
-  }
-
-  scanned.push(code);
-  count = scanned.length; // sayacı senkron tut
-  save();
-
-  let li = document.createElement("li");
-  const left = document.createElement("div");
-  left.innerHTML = <span class="idx">${count}.</span> <span class="code">${code}</span>;
-  const del = document.createElement("button");
-  del.className = "del";
-  del.textContent = "Sil / Fshi / Del";
-  del.addEventListener("click", ()=>{
-    if(confirm(I18N[lang].confirmDelete)){
-      // listedeki bu öğeyi kaldır
-      const idx = scanned.indexOf(code);
-      if(idx>-1){ scanned.splice(idx,1); save(); renderList(); }
-    }
-  });
-  li.appendChild(left);
-  li.appendChild(del);
-  document.getElementById("resultList").appendChild(li);
-
+/* === Kod ekleme === */
+function addCode(code){
+  if(!code) return;
+  if(scanned.includes(code)){document.getElementById("errorSound").play();notify(I18N[lang].exists,true);return;}
+  scanned.push(code);save();render();
   document.getElementById("successSound").play();
-  overlay.style.borderColor="var(--ok)";
-  overlay.style.boxShadow="0 0 0 9999px #1ecb4f22";
-  setTimeout(()=> { overlay.style.borderColor="transparent"; overlay.style.boxShadow="none"; },500);
-  showNotification(I18N[lang].added + code);
+  notify(I18N[lang].added+code);
+}
+function removeCode(i){
+  if(confirm("Emin misiniz? / A je i sigurt?")){scanned.splice(i,1);save();render();}
+}
+document.getElementById("addBtn").onclick=()=>{addCode(document.getElementById("manualCode").value.trim());document.getElementById("manualCode").value="";}
+
+/* === Liste işlemleri === */
+document.getElementById("copyBtn").onclick=()=>{
+  navigator.clipboard.writeText(scanned.join("\n")); alert("Kopyalandı!");
+}
+document.getElementById("whatsappBtn").onclick=()=>{
+  window.open("https://wa.me/?text="+encodeURIComponent(scanned.join("\n")),"_blank");
+}
+document.getElementById("clearBtn").onclick=()=>{
+  if(confirm("Listeyi tamamen silmek istiyor musun?")){scanned=[];save();render();}
 }
 
-function copyList(){
-  let text = scanned.map((c,i)=> (i+1)+". "+c).join("\n");
-  navigator.clipboard.writeText(text);
-  showNotification(I18N[lang].copied);
+/* === QR tarama === */
+let html5=new Html5Qrcode("reader"); let flashOn=false;
+function onScanSuccess(decodedText){
+  let code=decodedText.slice(-4).toUpperCase();
+  addCode(code);
 }
-function sendWhatsApp(){
-  let text = scanned.map((c,i)=> (i+1)+". "+c).join("%0A");
-  window.open("https://wa.me/?text="+text,"_blank");
+html5.start({facingMode:"environment"},{fps:10,qrbox:250},onScanSuccess);
+
+/* === Flash === */
+document.getElementById("flashBtn").onclick=async()=>{
+  try{
+    flashOn=!flashOn;
+    await html5.applyVideoConstraints({advanced:[{torch:flashOn}]});
+    document.getElementById("flashBtn").textContent=flashOn?"🔦 Kapat":"🔦 Aç";
+  }catch(e){alert("Flash desteklenmiyor!");}
 }
-
-/* ============== Manuel Ekleme ============== */
-document.getElementById("manualAdd").addEventListener("click", ()=>{
-  const inp = document.getElementById("manualInput");
-  const norm = normalizeCode(inp.value);
-  if(!norm) return;
-  if(scanned.includes(norm)){
-    showNotification(I18N[lang].duplicated, true);
-    return;
-  }
-  // onScanSuccess ile aynı davranış
-  onScanSuccess(norm);
-  inp.value = "";
-});
-
-/* ============== Tümünü Sil ============== */
-document.getElementById("clearAll").addEventListener("click", ()=>{
-  if(confirm(I18N[lang].confirmClear)){
-    scanned = [];
-    count   = 0;
-    save(); renderList();
-  }
-});
-
-/* ============== Butonlar (eski id’ler) ============== */
-document.getElementById("copyBtn").onclick = copyList;
-document.getElementById("whatsappBtn").onclick = sendWhatsApp;
-
-/* ============== Kamera başlatma (orijinal çağrı) ============== */
-new Html5Qrcode("reader").start(
-  { facingMode: "environment" },
-  { fps: 10, qrbox: 250 },
-  onScanSuccess
-);
-
-/* ============== İlk açılışta listeyi çiz ============== */
-renderList();
-
-/* ============== Bildirim DIV'i (aynı id) ============== */
-function showNotificationCompat(text, isError=false){ showNotification(text,isError); }
 </script>
 </body>
 </html>
