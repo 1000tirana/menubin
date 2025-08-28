@@ -11,7 +11,6 @@
       :root{--bg:#0b1220;--grad1:#0ea5e9;--grad2:#22d3ee;--panel:#0e1726;--text:#e7eefc;--muted:#a9b4c6;--chip:#101b2a}
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;font:15.5px ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
       color:var(--text);
@@ -28,7 +27,7 @@
     .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
     .logo{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:900;background:radial-gradient(circle at 30% 20%,var(--grad1),var(--grad2));box-shadow:0 8px 26px rgba(34,193,230,.35)}
     .lang{display:flex;gap:8px;align-items:center}
-    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #0001;background:#fff;color:#16222e;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #0001;background:#fff;color:#16222e;padding:6px 10px;border-radius:999px;font-weight:700;font-size:12.5px;cursor:pointer}
     .pill.active{outline:2px solid rgba(34,193,230,.35)}
     @media (prefers-color-scheme: dark){.pill{background:#0f1a2a;color:#e7eefc;border-color:#fff2}}
     .flag{font-size:14px}
@@ -57,11 +56,11 @@
       <div class="brand">
         <div class="logo">QR</div>
         <div>
-          <div id="t.appTitle">QR Studio</div>
-          <div class="subtitle" id="t.appSubtitle">Mjete të shpejta: QR • OCR • IMEI</div>
+          <div id="t_appTitle">QR Studio</div>
+          <div class="subtitle" id="t_appSubtitle">Mjete të shpejta: QR • OCR • IMEI</div>
         </div>
       </div>
-      <div class="lang" role="group" aria-label="Language">
+      <div class="lang">
         <button class="pill" id="btn-tr" data-lang="tr"><span class="flag">🇹🇷</span> TR</button>
         <button class="pill active" id="btn-sq" data-lang="sq"><span class="flag">🇦🇱</span> SQ</button>
       </div>
@@ -73,103 +72,89 @@
       <div class="hero-header">
         <div class="hero-title">
           <span style="display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:linear-gradient(180deg,var(--grad1),var(--grad2));color:#fff;font-weight:900">◎</span>
-          <span id="t.heroTitle">QR Studio Pro</span>
+          <span id="t_heroTitle">QR Studio Pro</span>
         </div>
-        <div class="hero-badge" id="t.badge">Parapamje fikse • 4K+ PNG</div>
+        <div class="hero-badge" id="t_badge">Parapamje fikse • 4K+ PNG</div>
       </div>
 
-      <div class="section-title" id="t.tools">Mjetet</div>
+      <div class="section-title" id="t_tools">Mjetet</div>
       <div class="grid">
-        <!-- qr.html -->
         <article class="card">
           <div class="icon">▦</div>
           <div>
-            <h3 id="t.qr1_h">QR Barkod A4 PRINT</h3>
-            <p id="t.qr1_p">Printo fletë A4 me shumë QR.</p>
+            <h3 id="t_qr1_h">QR Barkod A4 PRINT</h3>
+            <p id="t_qr1_p">Printo fletë A4 me shumë QR.</p>
           </div>
           <div class="file">qr.html</div>
           <a class="stretch" href="qr.html"></a>
         </article>
 
-        <!-- qr2.html -->
         <article class="card">
           <div class="icon">▣</div>
           <div>
-            <h3 id="t.qr2_h">Skano QR dhe kthe ne liste</h3>
-            <p id="t.qr2_p">Përgatit listë barkodesh dhe eksport.</p>
+            <h3 id="t_qr2_h">Skano QR dhe kthe në listë</h3>
+            <p id="t_qr2_p">Përgatit listë barkodesh dhe eksport.</p>
           </div>
           <div class="file">qr2.html</div>
           <a class="stretch" href="qr2.html"></a>
         </article>
 
-                <!-- qr2.html -->
         <article class="card">
           <div class="icon">▣▣</div>
           <div>
-            <h3 id="t.qr2_h">Word ONLINE PRINT</h3>
-            <p id="t.qr2_p">Word.</p>
+            <h3 id="t_qr3_h">Word ONLINE PRINT</h3>
+            <p id="t_qr3_p">Redakto dhe printo dokumente.</p>
           </div>
           <div class="file">wordlike-editor-trilingual.html</div>
           <a class="stretch" href="wordlike-editor-trilingual.html"></a>
         </article>
 
-        <!-- qr_studio_pro_sq.html -->
         <article class="card">
           <div class="icon">◎</div>
           <div>
-            <h3 id="t.qrpro_h">KTHE TEXT OSE URL NE QR</h3>
-            <p id="t.qrpro_p">Krijo QR nga tekst ose URL me cilësi të lartë.</p>
+            <h3 id="t_qr4_h">Kthe tekst ose URL në QR</h3>
+            <p id="t_qr4_p">Krijo QR nga tekst ose URL me cilësi të lartë.</p>
           </div>
           <div class="file">qr_studio_pro_sq.html</div>
           <a class="stretch" href="qr_studio_pro_sq.html"></a>
         </article>
 
-        <!-- ocr.html -->
         <article class="card">
           <div class="icon">𐄫</div>
           <div>
-            <h3 id="t.ocr_h">OCR (Njohje Teksti)</h3>
-            <p id="t.ocr_p">Nxirr tekst nga fotografitë dhe kopjo.</p>
+            <h3 id="t_ocr_h">OCR (Njohje Teksti)</h3>
+            <p id="t_ocr_p">Nxirr tekst nga fotografitë dhe kopjo.</p>
           </div>
           <div class="file">ocr.html</div>
           <a class="stretch" href="ocr.html"></a>
         </article>
 
-        <!-- imeiqrbicycle.html -->
         <article class="card">
           <div class="icon">🚲</div>
           <div>
-            <h3 id="t.imei_h">IMEI • QR Bicycle</h3>
-            <p id="t.imei_p">Ndihmës për IMEI dhe QR biçikletash.</p>
+            <h3 id="t_imei_h">IMEI • QR Bicycle</h3>
+            <p id="t_imei_p">Ndihmës për IMEI dhe QR biçikletash.</p>
           </div>
           <div class="file">imeiqrbicycle.html</div>
           <a class="stretch" href="imeiqrbicycle.html"></a>
         </article>
 
-        <!-- imeiqrbicycle.html -->
         <article class="card">
           <div class="icon">🛴</div>
           <div>
-            <h3 id="t.imei_h">REGJISTREO PJESET QE PERDOR GJAT DITES VERSIONI BETA</h3>
-            <p id="t.imei_p">REGJISTREO PJESET QE PERDOR GJAT DITES VERSIONI BETA.</p>
+            <h3 id="t_parts_h">Regjistro pjesët</h3>
+            <p id="t_parts_p">Mbaj shënim pjesët që përdor gjatë ditës.</p>
           </div>
           <div class="file">parts-tracker.html</div>
           <a class="stretch" href="parts-tracker.html"></a>
         </article>
-        
       </div>
     </section>
   </main>
 
-
-
-
-  
-
   <footer class="footer">v1.2 • SQ default • TR/SQ geçiş</footer>
 
   <script>
-    // Dil sözlükleri
     const dict = {
       tr:{
         appTitle:"QR Studio",
@@ -177,16 +162,20 @@
         heroTitle:"QR Studio Pro",
         badge:"Sabit önizleme • 4K+ PNG",
         tools:"Araçlar",
-        qr1_h:"qr barkod A4 yazdır",
+        qr1_h:"QR Barkod A4 Yazdır",
         qr1_p:"A4 sayfada çoklu QR yazdır.",
-        qr2_h:"barkod listesi hazırla",
-        qr2_p:"Barkod listesi oluştur ve dışa aktar.",
-        qrpro_h:"metin ve url den qr Üret",
-        qrpro_p:"Metin veya URL'den yüksek kaliteli QR üret.",
+        qr2_h:"QR Tara ve Listeye Çevir",
+        qr2_p:"Barkod listesi hazırla ve dışa aktar.",
+        qr3_h:"Word ONLINE PRINT",
+        qr3_p:"Belgeleri düzenle ve yazdır.",
+        qr4_h:"Metin veya URL'den QR üret",
+        qr4_p:"Yüksek kaliteli QR üret.",
         ocr_h:"OCR (Metin Tanıma)",
-        ocr_p:"Fotoğraflardan metni tanı ve kopyala.",
-        imei_h:"IMEI • QR Bicycle",
-        imei_p:"IMEI ve bisiklet QR işlemleri için yardımcı."
+        ocr_p:"Fotoğraflardan metni çıkar ve kopyala.",
+        imei_h:"IMEI • QR Bisiklet",
+        imei_p:"IMEI ve bisiklet QR işlemleri.",
+        parts_h:"Parça Takibi",
+        parts_p:"Gün içinde kullandığın parçaları kaydet."
       },
       sq:{
         appTitle:"QR Studio",
@@ -194,53 +183,45 @@
         heroTitle:"QR Studio Pro",
         badge:"Parapamje fikse • 4K+ PNG",
         tools:"Mjetet",
-        qr1_h:"qr barkod A4 yazdır",
-        qr1_p:"Printo faqe A4 me shumë QR.",
-        qr2_h:"barkod listesi hazırla",
+        qr1_h:"QR Barkod A4 PRINT",
+        qr1_p:"Printo fletë A4 me shumë QR.",
+        qr2_h:"Skano QR dhe kthe në listë",
         qr2_p:"Përgatit listë barkodesh dhe eksport.",
-        qrpro_h:"metin ve url den qr Üret",
-        qrpro_p:"Krijo QR nga tekst ose URL me cilësi të lartë.",
+        qr3_h:"Word ONLINE PRINT",
+        qr3_p:"Redakto dhe printo dokumente.",
+        qr4_h:"Kthe tekst ose URL në QR",
+        qr4_p:"Krijo QR nga tekst ose URL me cilësi të lartë.",
         ocr_h:"OCR (Njohje Teksti)",
         ocr_p:"Nxirr tekst nga fotografitë dhe kopjo.",
         imei_h:"IMEI • QR Bicycle",
-        imei_p:"Ndihmës për IMEI dhe QR biçikletash."
+        imei_p:"Ndihmës për IMEI dhe QR biçikletash.",
+        parts_h:"Regjistro pjesët",
+        parts_p:"Mbaj shënim pjesët që përdor gjatë ditës."
       }
     };
 
-    const els = {
-      appTitle:document.getElementById('t.appTitle'),
-      appSubtitle:document.getElementById('t.appSubtitle'),
-      heroTitle:document.getElementById('t.heroTitle'),
-      badge:document.getElementById('t.badge'),
-      tools:document.getElementById('t.tools'),
-      qr1_h:document.getElementById('t.qr1_h'),
-      qr1_p:document.getElementById('t.qr1_p'),
-      qr2_h:document.getElementById('t.qr2_h'),
-      qr2_p:document.getElementById('t.qr2_p'),
-      qrpro_h:document.getElementById('t.qrpro_h'),
-      qrpro_p:document.getElementById('t.qrpro_p'),
-      ocr_h:document.getElementById('t.ocr_h'),
-      ocr_p:document.getElementById('t.ocr_p'),
-      imei_h:document.getElementById('t.imei_h'),
-      imei_p:document.getElementById('t.imei_p')
-    };
+    const els = {};
+    [
+      "appTitle","appSubtitle","heroTitle","badge","tools",
+      "qr1_h","qr1_p","qr2_h","qr2_p","qr3_h","qr3_p",
+      "qr4_h","qr4_p","ocr_h","ocr_p","imei_h","imei_p",
+      "parts_h","parts_p"
+    ].forEach(id => els[id] = document.getElementById("t_"+id));
 
     function setLang(l){
       const t = dict[l] || dict.sq;
       for(const k in els){ if(els[k]) els[k].textContent = t[k]; }
-      localStorage.setItem('lang', l);
-      document.getElementById('btn-tr').classList.toggle('active', l==='tr');
-      document.getElementById('btn-sq').classList.toggle('active', l==='sq');
+      localStorage.setItem("lang", l);
+      document.getElementById("btn-tr").classList.toggle("active", l==="tr");
+      document.getElementById("btn-sq").classList.toggle("active", l==="sq");
       document.documentElement.lang = l;
     }
 
-    // İlk yüklemede SQ başlat (kayıtlı tercih varsa ona saygı duy)
-    const saved = localStorage.getItem('lang');
-    setLang(saved || 'sq');
+    const saved = localStorage.getItem("lang");
+    setLang(saved || "sq");
 
-    // Dil butonları
-    document.getElementById('btn-tr').addEventListener('click',()=>setLang('tr'));
-    document.getElementById('btn-sq').addEventListener('click',()=>setLang('sq'));
+    document.getElementById("btn-tr").addEventListener("click",()=>setLang("tr"));
+    document.getElementById("btn-sq").addEventListener("click",()=>setLang("sq"));
   </script>
 </body>
 </html>
