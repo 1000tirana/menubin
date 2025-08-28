@@ -28,13 +28,15 @@ Veri kaynağı haritalama (otomatik tespit):
   h1{margin:0;font-size:20px; font-weight:700}
   .sub{font-size:12px; color:var(--muted)}
   .searchbar{display:flex; gap:8px; margin:12px 0 8px}
-  .searchbar input[type=search]{flex:1; padding:12px 12px; border-radius:10px; border:1px solid var(--line); background:#121620; color:var(--text)}
+  .searchbar input[type=search]{flex:1; padding:12px 12px; border-radius:10px; border:1px solid var(--line); background:#121620; color:var(--text); font-size:16px}
   .btn{padding:10px 14px;border:1px solid var(--line);background:#121620;color:var(--text);border-radius:10px;cursor:pointer}
   .btn:hover{filter:brightness(1.1)}
   .btn-accent{background:var(--accent); color:#0a0f0d; border:none}
   .btn-danger{background:var(--danger); border:none; color:#fff}
   .btn-ghost{background:transparent; border:1px dashed var(--line)}
   .row{display:grid; grid-template-columns: 120px 1fr 1fr 140px 88px; gap:10px; padding:10px 12px; align-items:center; border-bottom:1px dashed var(--line)}
+  .row > div{overflow-wrap:anywhere; word-break:break-word}
+  .row.item .code,.row.item .name1,.row.item .name2,.row.item .barcode{min-width:0}
   .row.head{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.05em; position:sticky; top:92px; background:rgba(23,26,33,.85); backdrop-filter: blur(6px); z-index:5}
   .results, .log{background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden}
   .section-title{display:flex; align-items:center; justify-content:space-between; margin:16px 4px 8px}
@@ -42,7 +44,7 @@ Veri kaynağı haritalama (otomatik tespit):
   .muted{color:var(--muted)}
   .stamp{font-variant-numeric:tabular-nums; opacity:.8}
   .qtybox{display:flex; align-items:center; gap:8px}
-  .qtybox input{width:80px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:#0f141e; color:var(--text)}
+  .qtybox input{width:80px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:#0f141e; color:var(--text); font-size:16px}
   .flex{display:flex; gap:8px; flex-wrap:wrap}
   .right{margin-left:auto}
   .empty{text-align:center; opacity:.8; padding:16px}
@@ -53,8 +55,17 @@ Veri kaynağı haritalama (otomatik tespit):
     .row{grid-template-columns: 100px 1fr 1fr 110px 84px}
   }
   @media (max-width:640px){
-    .row{grid-template-columns: 86px 1fr 1fr 100px 80px; font-size:14px}
+    .row{font-size:14px}
     .row.head{display:none}
+    .row.item{grid-template-columns: 1fr 86px}
+    .row.item .code,
+    .row.item .name1,
+    .row.item .name2,
+    .row.item .barcode{grid-column:1 / -1}
+    .row.item .qtybox{grid-column:2 / 3; justify-self:end}
+    .row.line{grid-template-columns: 70px 1fr}
+    .row.line > :nth-child(1){grid-column:1}
+    .row.line > :nth-child(n+2){grid-column:2}
   }
 </style>
 </head>
