@@ -1,306 +1,298 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="UTF-8">
-<title>Lexues Barkodesh 1</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<style>
-  /* ----- ORİJİNALİN GÖRSEL İYİLEŞTİRİLMİŞ HALİ ----- */
-  body { font-family: Arial, sans-serif; text-align: center; margin: 0; background: #0f1115; color:#e8ecf2; }
-  header{background:#151a22; border-bottom:1px solid #232b3b; padding:12px 14px; font-weight:800; letter-spacing:.2px}
-  #reader { width: 100%; max-width: 420px; margin: 16px auto; border-radius:12px; overflow:hidden; }
-  #resultList { margin: 12px auto 120px; width: 92%; max-width: 520px; text-align: left; background:#161b26; border:1px solid #232b3b; border-radius:12px; padding:0 }
-  li { padding: 10px 12px; border-top: 1px solid #222b3a; display:flex; align-items:center; justify-content:space-between; }
-  li:first-child{ border-top:0 }
-  .btns { position:sticky; bottom:0; background:rgba(15,17,21,.9); backdrop-filter:blur(8px); border-top:1px solid #232b3b; padding:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-  button { padding: 10px 14px; margin: 0; border: none; border-radius: 10px; cursor: pointer; font-weight:700 }
-  #copyBtn { background: #3b82f6; color: #fff; }
-  #whatsappBtn { background: #25D366; color: #072b10; }
-  /* Ek butonlar */
-  #clearAllBtn{ background:#e74c3c; color:#fff; }
-  #flashBtn{ background:#facc15; color:#1a1a00; }
-  #manualInput{ flex:1 1 200px; padding:10px; border-radius:10px; border:1px solid #2a364a; background:#0f141f; color:#e8ecf2}
-  #addBtn{ background:#0ea5e9; color:#002233 }
-  .row{display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap; max-width:520px; margin:8px auto}
-  .chip{display:inline-block; background:#1b2231; border:1px solid #2a364a; color:#9aa3b2; padding:6px 10px; border-radius:999px; margin:8px 4px}
-  .delBtn{background:transparent; color:#ffb4b4; border:1px solid #3a2323; padding:6px 10px; border-radius:8px; cursor:pointer}
-
-  /* Overlay ve bildirim (orijinale uyumlu) */
-  #overlay {
-    position: absolute; top:0; left:0; width:100%; height:100%;
-    pointer-events:none; border: 10px solid transparent; box-sizing:border-box; border-radius:12px;
-    transition:border-color .2s, box-shadow .2s;
-  }
-  #notify {
-    position: fixed; top:-60px; left:50%; transform:translateX(-50%);
-    background:#1ecb4f; color:#0c2a10; padding:12px 18px; border-radius:10px;
-    font-size:16px; font-weight:800; transition:top 0.45s; z-index:9999; border:1px solid #144d28;
-  }
-  #notify.error { background:#ffd6d6; color:#3a0b0b; border-color:#5b2323; }
-
-  /* Kamera otomatik açılamazsa alt bant */
-  #fallbackBar{
-    position:fixed; left:0; right:0; bottom:0; z-index:9998;
-    background:#1b2231; border-top:1px solid #2a364a; padding:10px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap
-  }
-  #fallbackBar button{ background:#3b82f6; color:#fff }
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Skano Kodet</title>
 <script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --text:#e7e9ee; --muted:#a9b0bd;
+    --ok:#1ecb4f; --err:#ff4d4f; --brand:#3b82f6; --edge:#232836;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  header{position:sticky;top:0;z-index:10;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--edge);display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+  header h1{margin:0;font-size:16px;letter-spacing:.2px}
+  .lang{display:flex;gap:6px}
+  .lang button{padding:6px 10px;border:1px solid var(--edge);background:#1c2331;color:var(--text);border-radius:8px;cursor:pointer;font-weight:700}
+  .lang button.active{border-color:var(--brand);box-shadow:0 0 0 2px #1e40af33}
+  main{max-width:960px;margin:0 auto;padding:12px}
+  /* Camera card */
+  #camCard{position:relative;background:var(--card);border:1px solid var(--edge);border-radius:14px;padding:12px}
+  #reader{width:100%;aspect-ratio:3/4;max-height:70vh;border-radius:10px;overflow:hidden}
+  @media (orientation:landscape){#reader{aspect-ratio:16/9;max-height:62vh}}
+  #overlay{position:absolute;inset:12px;border:6px solid transparent;border-radius:12px;pointer-events:none;transition:border-color .18s, box-shadow .18s}
+  .bar{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap;align-items:center;justify-content:center}
+  .pill{background:#1c2331;border:1px solid var(--edge);color:var(--muted);padding:6px 10px;border-radius:999px}
+  .counter{font-weight:700;color:var(--text)}
+  .controls{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+  select,button{border-radius:10px;border:1px solid var(--edge);background:#243046;color:#e7e9ee;padding:10px 14px;cursor:pointer}
+  .primary{background:var(--brand);border:0;color:#fff}
+  .ghost{background:#1c2331}
+  .accent{background:#facc15;color:#1a1a00;border:0}
+  /* List */
+  ul#list{list-style:none;padding:0;margin:14px auto;background:var(--card);border:1px solid var(--edge);border-radius:12px;max-width:700px}
+  #list li{padding:10px 12px;border-top:1px solid #222831;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  #list li:first-child{border-top:0}
+  .idx{opacity:.65;margin-right:8px}
+  .del{background:transparent;border:1px solid #3a2323;color:#ffb4b4;border-radius:8px;padding:6px 10px;cursor:pointer}
+  /* Bottom actions */
+  .fab{position:sticky;bottom:0;z-index:9;background:rgba(15,17,21,.9);backdrop-filter:blur(10px);padding:10px;border-top:1px solid var(--edge)}
+  .fab .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .btn{flex:1;min-width:150px;padding:12px 14px;border-radius:10px;font-weight:700;cursor:pointer;border:0}
+  .wa{background:#25D366;color:#072b10}
+  .danger{background:#e74c3c}
+  /* Snack */
+  #snack{position:fixed;left:50%;transform:translateX(-50%);top:-80px;z-index:9999;background:#1c2331;border:1px solid var(--edge);
+    color:var(--text);padding:10px 16px;border-radius:10px;transition:top .35s;font-weight:800}
+  #snack.ok{border-color:#1d4d2a;color:#d6ffe1} #snack.err{border-color:#5b2323;color:#ffd6d6}
+  /* Notify (compat with your earlier pattern) */
+  #notify{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#1ecb4f;color:#0c2a10;padding:10px 16px;border-radius:10px;
+    font-weight:800;transition:top .35s;z-index:9999;border:1px solid #144d28}
+  #notify.error{background:#ffd6d6;color:#3a0b0b;border-color:#5b2323}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+</style>
 </head>
 <body>
+<header>
+  <h1 id="title">Skano Kodet</h1>
+  <div class="lang">
+    <button data-lang="sq" class="active">SQ</button>
+    <button data-lang="tr">TR</button>
+    <button data-lang="en">EN</button>
+  </div>
+</header>
 
-<header>📷 Lexues Barkodesh</header>
+<main>
+  <section id="camCard">
+    <div id="reader" aria-label="Camera preview"></div>
+    <div id="overlay"></div>
+    <div class="bar">
+      <span class="pill" id="hint">Hap kamerën dhe afro kodin.</span>
+      <span class="pill counter"><span id="count">0</span></span>
+    </div>
+    <div class="controls">
+      <select id="camSelect" title="Camera" style="min-width:180px"></select>
+      <button id="startBtn" class="primary" data-i18n="start">🎥 Hap kamerën</button>
+      <button id="flipBtn" class="ghost">↺ Flip</button>
+      <button id="stopBtn" class="ghost">■ Stop</button>
+      <button id="torchBtn" class="accent">🔦 Ndiz Fenerin</button>
+    </div>
+  </section>
 
-<!-- Kamera kapsayıcı -->
-<div style="position:relative;max-width:520px;margin:0 auto">
-  <div id="reader"></div>
-  <div id="overlay"></div>
+  <ul id="list" aria-live="polite"></ul>
+
+  <div class="row" style="max-width:700px;margin:10px auto">
+    <input id="manualInput" placeholder="Shkruaj kodin manualisht (p.sh. L8KQ)" style="flex:1;padding:10px;border-radius:10px;border:1px solid #2a3140;background:#0f141f;color:#e7e9ee">
+    <button id="addBtn" class="primary">➕ <span data-i18n="add">Shto</span></button>
+  </div>
+</main>
+
+<div class="fab">
+  <div class="row">
+    <button id="copyBtn" class="btn" style="background:var(--brand);color:#fff">⇪ <span data-i18n="share">Ndaj / Kopyo</span></button>
+    <button id="waBtn" class="btn wa">WhatsApp</button>
+    <button id="clearBtn" class="btn danger"><span data-i18n="clear">Pastro listën</span></button>
+  </div>
 </div>
 
-<!-- Durum chip'leri -->
-<div class="row">
-  <span class="chip" id="countChip">0 kode</span>
-  <button id="flashBtn">🔦 Ndiz Fenerin</button>
-</div>
-
-<!-- Liste -->
-<ul id="resultList"></ul>
-
-<!-- Alt eylem çubuğu (orijinal butonlar + ekler) -->
-<div class="btns">
-  <button id="copyBtn">📋 Kopjo</button>
-  <button id="whatsappBtn">📲 Dërgo në WhatsApp</button>
-  <button id="clearAllBtn">🗑️ Pastro listen</button>
-</div>
-
-<!-- Manuel ekleme -->
-<div class="row" style="margin-bottom:22px">
-  <input id="manualInput" type="text" placeholder="Shkruaj kodin manualisht (p.sh. L8KQ)">
-  <button id="addBtn">➕ Shto</button>
-</div>
-
-<!-- Yedek başlatma bandı -->
-<div id="fallbackBar" style="display:none">
-  <button id="fallbackStart">🎥 Hap kamerën (nëse nuk u hap automatikisht)</button>
-</div>
-
+<div id="snack"></div>
 <div id="notify"></div>
 
-<audio id="successSound" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
-<audio id="errorSound"   src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
-
 <script>
-/* ================== ORİJİNAL DEĞİŞKENLERİN ================== */
-let scanned = [];
-let count = 0;
+/* ======================= I18N ======================= */
+const I18N = {
+  sq:{title:"Skano Kodet", hint:"Hap kamerën dhe afro kodin.", start:"🎥 Hap kamerën",
+      share:"Ndaj / Kopyo", clear:"Pastro listën", add:"Shto",
+      already:"Tashmë i lexuar: ", added:"U shtua: ", copied:"Lista u kopjua.", cleared:"Lista u pastrua.", none:"Ende s’ka kod."},
+  tr:{title:"Barkod Tara", hint:"Kamerayı aç ve barkodu yaklaştır.", start:"🎥 Kamerayı Aç",
+      share:"Paylaş / Kopyala", clear:"Listeyi Temizle", add:"Ekle",
+      already:"Zaten okundu: ", added:"Eklendi: ", copied:"Liste kopyalandı.", cleared:"Liste temizlendi.", none:"Henüz kod yok."},
+  en:{title:"Scan Codes", hint:"Open camera and show the code.", start:"🎥 Start Camera",
+      share:"Share / Copy", clear:"Clear List", add:"Add",
+      already:"Already scanned: ", added:"Added: ", copied:"List copied.", cleared:"List cleared.", none:"No codes yet."}
+};
+let lang = localStorage.getItem("qr_lang") || "sq";
+function applyLang(L){
+  lang=L; localStorage.setItem("qr_lang",L);
+  title.textContent = I18N[L].title;
+  hint.textContent = I18N[L].hint;
+  document.querySelector('[data-i18n="start"]').textContent = I18N[L].start;
+  document.querySelector('[data-i18n="share"]').textContent = I18N[L].share;
+  document.querySelector('[data-i18n="clear"]').textContent = I18N[L].clear;
+  document.querySelector('[data-i18n="add"]').textContent = I18N[L].add;
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("active", b.dataset.lang===L));
+}
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>applyLang(b.dataset.lang)));
+applyLang(lang);
 
-/* ================== LOCALSTORAGE'DAN GERİ YÜKLE ================== */
-(function restoreFromStorage(){
+/* ======================= STATE ======================= */
+const LS_LIST="qr_scanned_codes_v1", LS_CAM="qr_last_cam";
+let scanned = JSON.parse(localStorage.getItem(LS_LIST) || "[]");
+let html5=null, cameras=[], currentCamId=null, torchOn=false, lastTxt="", lastTs=0;
+
+/* ======================= AUDIO ======================= */
+let audioCtx;
+function ensureAudio(){
+  if(!audioCtx){ const AC = window.AudioContext||window.webkitAudioContext; if(AC) audioCtx=new AC(); }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+}
+function beep(freq=880, ms=120){
+  if(!audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type="sine"; o.frequency.value=freq; o.connect(g); g.connect(audioCtx.destination);
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + ms/1000);
+  o.start(); o.stop(audioCtx.currentTime + ms/1000);
+}
+function okSound(){ beep(880,120); }
+function errSound(){ beep(280,160); setTimeout(()=>beep(180,160),160); }
+
+/* ======================= HELPERS ======================= */
+function extractCode(text){
   try{
-    const data = JSON.parse(localStorage.getItem("barkodList")||"[]");
-    if(Array.isArray(data) && data.length){
-      scanned = data.slice();
-      count = scanned.length;
-      rebuildListFromScanned();
-    }
-    updateCountChip();
-  }catch(e){}
-})();
-
-/* ================== ORİJİNAL BİLDİRİM FONKSİYONU ================== */
-function showNotification(text, isError=false){
-  const notify = document.getElementById("notify");
-  notify.textContent = text;
-  notify.className = isError ? "error" : "";
-  notify.style.top = "20px";
-  setTimeout(()=>{ notify.style.top = "-60px"; }, 2000);
+    const u=new URL(text);
+    const last=u.pathname.split("/").filter(Boolean).pop()||"";
+    if(last.length>=4) return last.slice(-4).toUpperCase();
+  }catch(_){}
+  return (text.replace(/[^A-Za-z0-9]/g,"")).slice(-4).toUpperCase();
 }
-
-/* ================== YARDIMCILAR ================== */
-function rebuildListFromScanned(){
-  const ul = document.getElementById("resultList");
-  ul.innerHTML = "";
-  scanned.forEach((code, i)=>{
-    const li = document.createElement("li");
-    li.innerHTML = <span><span class="idx">${i+1}.</span> ${code}</span>;
-    const del = document.createElement("button");
-    del.className = "delBtn";
-    del.textContent = "❌";
-    del.onclick = ()=>{
-      if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){
-        const idx = scanned.indexOf(code);
-        if(idx>-1){ scanned.splice(idx,1); localStorage.setItem("barkodList", JSON.stringify(scanned)); }
-        count = scanned.length;
-        rebuildListFromScanned();
-        updateCountChip();
-      }
-    };
-    li.appendChild(del);
-    ul.appendChild(li);
-  });
-}
-function updateCountChip(){
-  document.getElementById("countChip").textContent = (scanned.length||0) + " kode";
-}
-
-/* Yeni eklenen <li>’lere ❌ ve kalıcı kayıt (çekirdeğe dokunmadan) */
-const listObserver = new MutationObserver((mutations)=>{
-  let added = false;
-  mutations.forEach(m=>{
-    m.addedNodes.forEach(node=>{
-      if(node.nodeName==="LI" && !node.querySelector(".delBtn")){
-        const text = node.textContent.trim(); // "N. CODE"
-        const parts = text.split(". ");
-        const code = (parts[1]||"").trim();
-        const wrap = document.createElement("span");
-        wrap.textContent = text;
-        node.innerHTML = "";
-        node.appendChild(wrap);
-
-        const del = document.createElement("button");
-        del.className="delBtn";
-        del.textContent="❌";
-        del.onclick=()=>{
-          if(confirm("Je i sigurt që dëshiron ta fshish këtë?")){
-            const idx = scanned.indexOf(code);
-            if(idx>-1){ scanned.splice(idx,1); localStorage.setItem("barkodList", JSON.stringify(scanned)); }
-            count = scanned.length;
-            rebuildListFromScanned();
-            updateCountChip();
-          }
-        };
-        node.appendChild(del);
-        added = true;
-      }
+function save(){ localStorage.setItem(LS_LIST, JSON.stringify(scanned)); render(); }
+function render(){
+  const ul = document.getElementById("list");
+  ul.innerHTML="";
+  if(scanned.length===0){
+    const li=document.createElement("li"); li.className="muted"; li.textContent=I18N[lang].none; ul.appendChild(li);
+  }else{
+    scanned.forEach((c,i)=>{
+      const li=document.createElement("li");
+      const left=document.createElement("span"); left.innerHTML=<span class="idx">${i+1}.</span> <strong>${c}</strong>;
+      const del=document.createElement("button"); del.className="del"; del.textContent="❌";
+      del.onclick=()=>{ if(confirm("Sigur / Emin misin / Sure?")){ scanned.splice(i,1); save(); snack(I18N[lang].added.replace(/.*/,"")+c+" ✖", false); } };
+      li.appendChild(left); li.appendChild(del); ul.appendChild(li);
     });
-  });
-  if(added){
-    // DOM’a yeni satır eklendiyse listeyi kalıcı kaydet ve sayaç güncelle
-    localStorage.setItem("barkodList", JSON.stringify(scanned));
-    updateCountChip();
   }
-});
-listObserver.observe(document.getElementById("resultList"), {childList:true});
+  document.getElementById("count").textContent = scanned.length;
+}
+function snack(msg, ok=true){
+  const s=document.getElementById("snack");
+  s.textContent=msg; s.className= ok ? "ok":"err";
+  s.style.top="14px"; setTimeout(()=>s.style.top="-80px", 1700);
+}
+function flashGreen(){ overlay.style.borderColor="var(--ok)"; overlay.style.boxShadow="0 0 0 9999px #1ecb4f22"; setTimeout(()=>{overlay.style.borderColor="transparent"; overlay.style.boxShadow="none";},420); }
+function flashRed(){ overlay.style.borderColor="var(--err)"; overlay.style.boxShadow="0 0 0 9999px #ff4d4f22"; setTimeout(()=>{overlay.style.borderColor="transparent"; overlay.style.boxShadow="none";},520); }
+function qrBox(){ const w=Math.min(520, Math.floor(window.innerWidth*0.92)); const h=Math.floor(window.innerHeight*0.70); return Math.min(w,h); }
 
-/* ================== ORİJİNAL TARAMA CALLBACK'İN ================== */
-function onScanSuccess(decodedText) {
-  // linkten sadece son 4 karakteri al
-  let code = decodedText.slice(-4);
-  
-  const overlay = document.getElementById("overlay");
-  
+/* ======================= CAMERA ======================= */
+async function enumerateCameras(){
+  try{
+    cameras = await Html5Qrcode.getCameras();
+    camSelect.innerHTML = cameras.map(c=><option value="${c.id}">${c.label||"Camera"}</option>).join("");
+    const last = localStorage.getItem(LS_CAM);
+    const back = cameras.find(c=>/back|rear|environment/i.test(c.label||""));
+    if(last && cameras.find(c=>c.id===last)){ camSelect.value=last; currentCamId=last; }
+    else if(back){ camSelect.value=back.id; currentCamId=back.id; }
+    else if(cameras[0]){ camSelect.value=cameras[0].id; currentCamId=cameras[0].id; }
+  }catch(e){ snack("No camera found / Kamera yok", false); }
+}
+async function start(camId){
+  ensureAudio();
+  try{ if(html5){ await html5.stop(); } }catch(_){}
+  html5 = new Html5Qrcode("reader");
+  const config={ fps:12, qrbox:{ width: qrBox(), height: qrBox() } };
+  const device = camId ? { deviceId:{ exact: camId } } : { facingMode:"environment" };
+  await html5.start(device, config, onScan, (e)=>{ /* frame error ignore */ });
+  currentCamId = camId || currentCamId;
+  if(currentCamId) localStorage.setItem(LS_CAM, currentCamId);
+  torchOn=false; torchBtn.textContent = "🔦 "+(lang==="sq"?"Ndiz Fenerin":lang==="tr"?"Feneri Aç":"Toggle Torch");
+}
+async function stop(){ if(html5){ try{ await html5.stop(); }catch(_){ } } }
+
+/* ======================= SCAN CALLBACK ======================= */
+function onScan(decodedText){
+  // debounce
+  const now=Date.now(); if(now-lastTs<450 && decodedText===lastTxt) return; lastTs=now; lastTxt=decodedText;
+
+  const code = extractCode(decodedText);
+  if(!code) return;
+
   if(scanned.includes(code)){
-    document.getElementById("errorSound").play();
-    overlay.style.borderColor="red";
-    setTimeout(()=> overlay.style.borderColor="transparent",500);
-    showNotification(code + " zaten okutuldu!", true);
+    errSound(); flashRed(); snack(I18N[lang].already + code, false);
     return;
   }
-  
-  scanned.push(code);
-  count++;
-  
-  let li = document.createElement("li");
-  li.textContent = count + ". " + code;
-  document.getElementById("resultList").appendChild(li);
-  
-  document.getElementById("successSound").play();
-  overlay.style.borderColor="lime";
-  setTimeout(()=> overlay.style.borderColor="transparent",500);
-  showNotification(code + " eklendi ✅");
+  scanned.push(code); save(); okSound(); flashGreen(); snack(I18N[lang].added + code, true);
 }
 
-/* ================== ORİJİNAL KOPYALA / WHATSAPP ================== */
-function copyList(){
-  let text = scanned.map((c,i)=> (i+1)+". "+c).join("\n");
-  navigator.clipboard.writeText(text);
-  alert("Lista u kopjua!");
-}
-function sendWhatsApp(){
-  let text = scanned.map((c,i)=> (i+1)+". "+c).join("%0A");
-  window.open("https://wa.me/?text="+text,"_blank");
-}
-document.getElementById("copyBtn").onclick = copyList;
-document.getElementById("whatsappBtn").onclick = sendWhatsApp;
-
-/* ================== HEPSİNİ TEMİZLE (emin misin?) ================== */
-document.getElementById("clearAllBtn").onclick = ()=>{
-  if(confirm("Je i sigurt që dëshiron të pastrosh gjithë listën?")){
-    scanned = [];
-    count = 0;
-    localStorage.setItem("barkodList", JSON.stringify(scanned));
-    rebuildListFromScanned();
-    updateCountChip();
+/* ======================= BUTTONS ======================= */
+startBtn.addEventListener("click", async ()=>{
+  try{
+    // permission poke (iOS Safari requires a user gesture)
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false });
+    stream.getTracks().forEach(t=>t.stop());
+  }catch(e){
+    snack("Kamera izni gerekli / Leje e kamerës", false);
   }
-};
+  await enumerateCameras();
+  await start(camSelect.value || null);
+});
+stopBtn.addEventListener("click", stop);
+flipBtn.addEventListener("click", async ()=>{
+  if(!cameras.length) await enumerateCameras();
+  if(!cameras.length) return;
+  const idx = Math.max(0, cameras.findIndex(c=>c.id===camSelect.value));
+  const next = cameras[(idx+1)%cameras.length];
+  camSelect.value = next.id;
+  await start(next.id);
+});
+camSelect.addEventListener("change", ()=> start(camSelect.value));
 
-/* ================== MANUEL KOD EKLE ================== */
-document.getElementById("addBtn").onclick = ()=>{
-  const input = document.getElementById("manualInput");
-  let code = (input.value||"").trim().toUpperCase();
-  if(!code) return;
-  if(code.length>4) code = code.slice(-4); // senin mantıkla aynı
-  if(scanned.includes(code)){ showNotification(code+" tashmë ekziston!", true); return; }
-  scanned.push(code);
-  count++;
-  const li=document.createElement("li");
-  li.textContent = count + ". " + code;
-  document.getElementById("resultList").appendChild(li);
-  localStorage.setItem("barkodList", JSON.stringify(scanned));
-  updateCountChip();
-  input.value="";
-  showNotification(code+" u shtua ✅");
-};
-
-/* ================== FLASH / TORCH AÇ-KAPAT ================== */
-let torchOn = false;
-document.getElementById("flashBtn").onclick = async ()=>{
+torchBtn.addEventListener("click", async ()=>{
   try{
     const video = document.querySelector("#reader video");
     const track = video && video.srcObject && video.srcObject.getVideoTracks ? video.srcObject.getVideoTracks()[0] : null;
-    if(!track){ alert("Feneri përdor kamerën — së pari hap kamerën."); return; }
+    if(!track){ snack("Hap kamerën / Kamerayı aç", false); return; }
     const caps = track.getCapabilities ? track.getCapabilities() : null;
-    if(!caps || (!caps.torch && !caps.fillLightMode)){ alert("Pajisja nuk mbështet fenerin."); return; }
+    if(!caps || (!caps.torch && !caps.fillLightMode)){ snack("Fener desteklenmiyor", false); return; }
     await track.applyConstraints({ advanced: [{ torch: !torchOn }] });
     torchOn = !torchOn;
-    document.getElementById("flashBtn").textContent = torchOn ? "🔦 Fik Fenerin" : "🔦 Ndiz Fenerin";
-  }catch(e){
-    alert("Fener nuk u aktivizua: " + (e.message||e));
-  }
-};
+    torchBtn.textContent = torchOn ? (lang==="sq"?"🔦 Fik Fenerin":lang==="tr"?"🔦 Feneri Kapat":"🔦 Torch Off")
+                                   : (lang==="sq"?"🔦 Ndiz Fenerin":lang==="tr"?"🔦 Feneri Aç":"🔦 Torch On");
+  }catch(e){ snack("Torch error", false); }
+});
 
-/* ================== YEDEK BAŞLATMA (Kamerayı aç butonu) ================== */
-document.getElementById("fallbackStart").onclick = async ()=>{
-  try{
-    // iOS/Safari için izin diyaloğu
-    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"environment" }, audio:false });
-    // izin alındıysa hemen serbest bırak
-    stream.getTracks().forEach(t=>t.stop());
-    // html5-qrcode altındaki start zaten aşağıda çağrılı; izin sonrası tekrar denemek için sayfayı tazelemek yerine:
-    // basitçe kullanıcıya bilgi verelim
-    showNotification("Kamera gati. Provo sërish të skanosh ✅");
-  }catch(err){
-    showNotification("Leja e kamerës u refuzua: "+(err.name||"")+"", true);
-  }
-};
+copyBtn.addEventListener("click", async ()=>{
+  const text = scanned.map((c,i)=>${i+1}. ${c}).join("\n");
+  if(navigator.share){ try{ await navigator.share({ text }); return; }catch(_){} }
+  await navigator.clipboard.writeText(text);
+  snack(I18N[lang].copied, true);
+});
+waBtn.addEventListener("click", ()=> {
+  const text = encodeURIComponent(scanned.map((c,i)=>${i+1}. ${c}).join("\n"));
+  open("https://wa.me/?text="+text, "_blank");
+});
+clearBtn.addEventListener("click", ()=>{
+  if(!confirm(lang==="sq"?"Je i sigurt?":"Emin misin? / Sure?")) return;
+  scanned=[]; save(); snack(I18N[lang].cleared, true);
+});
+addBtn.addEventListener("click", ()=>{
+  let v = (manualInput.value||"").trim().toUpperCase();
+  if(!v) return;
+  if(v.length>4) v=v.slice(-4);
+  if(scanned.includes(v)){ snack(I18N[lang].already + v, false); return; }
+  scanned.push(v); save(); manualInput.value=""; snack(I18N[lang].added + v, true);
+});
 
-/* ================== ORİJİNAL BAŞLATMAN ================== */
-new Html5Qrcode("reader").start(
-  { facingMode: "environment" },
-  { fps: 10, qrbox: 250 },
-  onScanSuccess
-);
-
-/* İlk yüklemede sayaç chip’ini güncelle */
-updateCountChip();
-
-/* Eğer kamera otomatik açılmazsa kullanıcıya görünür bir tetik verelim */
-setTimeout(()=>{
-  const hasVideo = document.querySelector("#reader video");
-  if(!hasVideo){ document.getElementById("fallbackBar").style.display="flex"; }
-}, 1200);
+/* ======================= INIT ======================= */
+render();
+applyLang(lang);
+// Tip: HTTPS & iframe uyarısı
+if(location.protocol!=="https:"){ snack("Use HTTPS / Përdor HTTPS", false); }
+if(window.top!==window.self){ snack("Open outside iframe", false); }
+// Resize ile kutu boyutu ayarı
+addEventListener("resize", ()=>{ if(html5){ start(currentCamId||null); }});
 </script>
 </body>
 </html>
-
