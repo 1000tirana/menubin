@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Lista QR · Probleme me Biçikleta</title>
+<title>Lista QR · Probleme me Biçikleta (Failsafe)</title>
 <style>
   :root{
     --bg:#0f1115; --card:#171a21; --muted:#a9b1c3; --text:#e7ebf5;
@@ -16,51 +16,47 @@
     font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
     -webkit-tap-highlight-color: transparent; overscroll-behavior: contain;
   }
-  header{
-    position:sticky; top:0; z-index:30;
+  header{position:sticky; top:0; z-index:100;
     background:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,0));
-    padding:10px 16px; display:flex; align-items:center; justify-content:space-between;
-  }
+    padding:10px 16px; display:flex; align-items:center; justify-content:space-between;}
   .flags{display:flex; gap:8px;}
   .flags button{background:none;border:none;font-size:20px;cursor:pointer}
   .app-title{font-size:16px;font-weight:700}
   .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;}
-  .last-scan{
-    position:sticky; top:46px; z-index:25; display:flex; align-items:center; gap:8px;
+  .last-scan{position:sticky; top:46px; z-index:90; display:flex; align-items:center; gap:8px;
     background:#122019; color:#bff4d1; border:1px solid #1b3a2b; border-left:4px solid var(--accent);
-    margin:6px 12px; border-radius:10px; padding:8px 12px; font-size:14px;
-  }
+    margin:6px 12px; border-radius:10px; padding:8px 12px; font-size:14px;}
   .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:var(--danger)}
   .container{padding:10px 16px 120px 16px; max-width:960px; margin:0 auto;}
   .camera-card{background:var(--card);border-radius:14px;padding:12px;}
-  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4;}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4; z-index:1;}
   video{width:100%;height:100%;object-fit:cover;display:block;}
   canvas#capture{display:none;}
   .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition: box-shadow .12s, border-color .12s;}
   .glow-green{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 22px rgba(0,255,144,.75) inset; border-color: rgba(0,255,144,.95); }
   .glow-red{ box-shadow: 0 0 0 9999px rgba(255,0,0,.18) inset, 0 0 22px rgba(255,80,80,.9) inset; border-color: rgba(255,90,90,.95); }
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-  button,.btn{appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer; touch-action: manipulation;}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px; position:relative; z-index:5;}
+  button,.btn{
+    appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);
+    padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer; touch-action: manipulation;
+    pointer-events:auto; position:relative; z-index:5;
+  }
   button:disabled{opacity:.5;cursor:not-allowed}
   .btn-primary{background:var(--accent);color:#07130e}
   .btn-danger{background:var(--danger);color:#260000}
   .btn-warn{background:var(--warn);color:#221a00}
-  .issue-wrap{margin-top:12px}
+  .issue-wrap{margin-top:12px; position:relative; z-index:5;}
   .issue-title{font-size:14px;color:#cfd6e6;margin:0 0 8px 2px}
-  .issue-grid{
-    display:grid; gap:8px;
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .issue-grid{display:grid; gap:8px; grid-template-columns: repeat(2, 1fr);}
   @media (min-width:720px){ .issue-grid{ grid-template-columns: repeat(5, 1fr); } }
   .issue-btn{
-    background:#202634; border:2px solid #2b354b; border-radius:14px; padding:12px;
-    min-height:64px; display:flex; align-items:center; justify-content:center;
-    text-align:center; font-size:15px; line-height:1.1; font-weight:800;
+    background:#202634; border:2px solid #2b354b; border-radius:14px; padding:12px; min-height:64px;
+    display:flex; align-items:center; justify-content:center; text-align:center; font-size:15px; line-height:1.1; font-weight:800;
   }
   .issue-btn.active{ border-color:var(--accent); box-shadow:0 0 0 3px var(--ring) }
-  .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; position:relative; z-index:5;}
   .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:var(--text); padding:12px 14px; border-radius:10px; font-size:16px;}
-  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0;}
+  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0; position:relative; z-index:5;}
   .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;}
   .sum-list{list-style:none;padding:0;margin:0;}
   .sum-item{padding:12px 14px;border-bottom:1px dashed #23293a; cursor:pointer}
@@ -75,21 +71,21 @@
   .d-code{font-size:18px; font-weight:900}
   .d-time{font-size:12px; color:#a9b1c3}
   .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:6px 10px}
-  .toolbar{
-    position:fixed;left:0;right:0;bottom:0;z-index:20;backdrop-filter:blur(10px);
-    background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px; flex-wrap:wrap;
-  }
+  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:80;backdrop-filter:blur(10px);
+    background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px; flex-wrap:wrap;}
   .toolbar .btn{flex:1;justify-content:center}
-  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none; z-index:120;}
+  .errorlog{position:fixed;top:64px;left:50%;transform:translateX(-50%);max-width:92%;
+    background:#2b1515;color:#ffdede;padding:8px 12px;border-radius:10px;border:1px solid #7a2b2b;display:none; z-index:130; font-size:12px; white-space:pre-wrap}
 </style>
 </head>
 <body>
 <header>
   <div><span class="app-title" id="t-title">Lista QR</span> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
   <div class="flags">
-    <button onclick="setLang('sq')" title="Shqip">🇦🇱</button>
-    <button onclick="setLang('en')" title="English">🇬🇧</button>
-    <button onclick="setLang('tr')" title="Türkçe">🇹🇷</button>
+    <button type="button" onclick="setLang('sq')" title="Shqip">🇦🇱</button>
+    <button type="button" onclick="setLang('en')" title="English">🇬🇧</button>
+    <button type="button" onclick="setLang('tr')" title="Türkçe">🇹🇷</button>
   </div>
 </header>
 
@@ -101,13 +97,14 @@
   <div class="camera-card">
     <div class="video-wrap">
       <video id="video" playsinline muted></video>
-      <div id="scanFrame" class="scan-frame"></div>
+      <div id="scanFrame" class="scan-frame" aria-hidden="true"></div>
     </div>
     <div class="controls">
-      <button id="startBtn" class="btn-primary">Start</button>
-      <button id="stopBtn" class="btn">Stop</button>
-      <button id="torchBtn" class="btn">Flaš</button>
-      <button id="resetBtn" class="btn-danger">Pastro</button>
+      <button id="startBtn" type="button" class="btn-primary">Start</button>
+      <button id="stopBtn" type="button" class="btn">Stop</button>
+      <button id="torchBtn" type="button" class="btn">Flaš</button>
+      <button id="resetBtn" type="button" class="btn-danger">Pastro</button>
+      <button id="clickTest" type="button" class="btn-warn">Tıklama Testi: <span id="ct">0</span></button>
     </div>
 
     <div class="issue-wrap">
@@ -117,7 +114,7 @@
 
     <div class="manual">
       <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
-      <button id="manualAddBtn" class="btn-warn">Shto</button>
+      <button id="manualAddBtn" type="button" class="btn-warn">Shto</button>
     </div>
   </div>
 
@@ -130,32 +127,44 @@
 </div>
 
 <div class="toolbar">
-  <button id="copyBtn" class="btn">Kopjo</button>
-  <button id="waBtn" class="btn">WhatsApp</button>
-  <button id="csvBtn" class="btn">Excel (CSV)</button>
-  <button id="docBtn" class="btn">Word (DOC)</button>
+  <button id="copyBtn" type="button" class="btn">Kopjo</button>
+  <button id="waBtn" type="button" class="btn">WhatsApp</button>
+  <button id="csvBtn" type="button" class="btn">Excel (CSV)</button>
+  <button id="docBtn" type="button" class="btn">Word (DOC)</button>
 </div>
 
 <canvas id="capture"></canvas>
 <div id="toast" class="toast"></div>
+<div id="err" class="errorlog"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<!-- jsQR -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
 <script>
-/* ===== Utilities & State ===== */
+/* ===== Basit hata yakalayıcı ===== */
+(function(){
+  const box = document.getElementById('err');
+  window.addEventListener('error', function(e){
+    box.style.display='block';
+    box.textContent = 'JS Hatası: ' + (e.message||'') + '\\nSatır: ' + e.lineno + ' Kolon: ' + e.colno;
+  });
+  window.addEventListener('unhandledrejection', function(e){
+    box.style.display='block';
+    box.textContent = 'Promise Hatası: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason||'')); 
+  });
+})();
+
+/* ===== Kod (işlev aynı, dokunma güvenli) ===== */
 const $=sel=>document.querySelector(sel);
 const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
-const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),resetBtn=$('#resetBtn');
+const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),resetBtn=$('#resetBtn'),clickTest=$('#clickTest'),ct=$('#ct');
 const manualInput=$('#manualInput'),manualAddBtn=$('#manualAddBtn');
 const sumList=$('#sumList'),countEl=$('#count'),lastBanner=$('#lastBanner'),lastValue=$('#lastValue'),scanFrame=$('#scanFrame');
 const copyBtn=$('#copyBtn'),waBtn=$('#waBtn'),camStatus=$('#camStatus'),toastEl=$('#toast'),csvBtn=$('#csvBtn'),docBtn=$('#docBtn');
 const issueGrid=$('#issueGrid');
 
 let stream=null,track=null,scanning=false,lastScanAt=0,torchOn=false;
-let records=[]; // {code, issue, time}
-let seen=new Set(); // key = issue|code (prevent duplicate within same problem)
-let activeIssue=null;
+let records=[], seen=new Set(), activeIssue=null;
 
-/* ===== Problems (10) ===== */
 const ISSUES=[
   {key:'nocharge',      label:{sq:'Nuk karikon', en:'Not charging', tr:'Şarj almıyor'}},
   {key:'lock',          label:{sq:'Kyçi baterisë s’hapet', en:'Battery lock stuck', tr:'Batarya kilidi açılmıyor'}},
@@ -169,149 +178,52 @@ const ISSUES=[
   {key:'nocommand',     label:{sq:'Nuk merr komandë', en:'No command', tr:'Komut almıyor'}}
 ];
 
-/* ===== i18n ===== */
 const langs={
-  sq:{
-    title:"Lista QR", camOn:"Kamera: Hap", camOff:"Kamera: Mbyllur", last:"I fundit:",
-    start:"Start", stop:"Stop", clear:"Pastro", copy:"Kopjo", flash:"Dritë", add:"Shto",
-    placeholder:"Shkruaj kodin...", choose:"Zgjidh problemin aktiv dhe skano",
-    summary:"Përmbledhje sipas problemit", entries:"hyrje", copied:"Kopjuar!",
-    confirmDel:"Ta fshij këtë hyrje?", confirmClear:"Të pastrohet lista?",
-    needIssue:"Zgjidh problemin para skanimit!", csv:"Excel (CSV)", doc:"Word (DOC)"
-  },
-  en:{
-    title:"QR List", camOn:"Camera: On", camOff:"Camera: Off", last:"Last:",
-    start:"Start", stop:"Stop", clear:"Clear", copy:"Copy", flash:"Flash", add:"Add",
-    placeholder:"Type a code...", choose:"Pick active problem then scan",
-    summary:"Summary by problem", entries:"entries", copied:"Copied!",
-    confirmDel:"Delete this entry?", confirmClear:"Clear the list?",
-    needIssue:"Select a problem before scanning!", csv:"Excel (CSV)", doc:"Word (DOC)"
-  },
-  tr:{
-    title:"QR Liste", camOn:"Kamera: Açık", camOff:"Kamera: Kapalı", last:"Son:",
-    start:"Başlat", stop:"Durdur", clear:"Temizle", copy:"Kopyala", flash:"Flaş", add:"Ekle",
-    placeholder:"Kod yaz...", choose:"Aktif problemi seç ve tara",
-    summary:"Probleme göre özet", entries:"kayıt", copied:"Kopyalandı!",
-    confirmDel:"Bu kaydı silelim mi?", confirmClear:"Liste tamamen temizlensin mi?",
-    needIssue:"Taramadan önce problem seç!", csv:"Excel (CSV)", doc:"Word (DOC)"
-  }
+  sq:{title:"Lista QR",camOn:"Kamera: Hap",camOff:"Kamera: Mbyllur",last:"I fundit:",start:"Start",stop:"Stop",clear:"Pastro",copy:"Kopjo",flash:"Dritë",add:"Shto",placeholder:"Shkruaj kodin...",choose:"Zgjidh problemin aktiv dhe skano",summary:"Përmbledhje sipas problemit",entries:"hyrje",copied:"Kopjuar!",confirmDel:"Ta fshij këtë hyrje?",confirmClear:"Të pastrohet lista?",needIssue:"Zgjidh problemin para skanimit!",csv:"Excel (CSV)",doc:"Word (DOC)"},
+  en:{title:"QR List",camOn:"Camera: On",camOff:"Camera: Off",last:"Last:",start:"Start",stop:"Stop",clear:"Clear",copy:"Copy",flash:"Flash",add:"Add",placeholder:"Type a code...",choose:"Pick active problem then scan",summary:"Summary by problem",entries:"entries",copied:"Copied!",confirmDel:"Delete this entry?",confirmClear:"Clear the list?",needIssue:"Select a problem before scanning!",csv:"Excel (CSV)",doc:"Word (DOC)"},
+  tr:{title:"QR Liste",camOn:"Kamera: Açık",camOff:"Kamera: Kapalı",last:"Son:",start:"Başlat",stop:"Durdur",clear:"Temizle",copy:"Kopyala",flash:"Flaş",add:"Ekle",placeholder:"Kod yaz...",choose:"Aktif problemi seç ve tara",summary:"Probleme göre özet",entries:"kayıt",copied:"Kopyalandı!",confirmDel:"Bu kaydı silelim mi?",confirmClear:"Liste tamamen temizlensin mi?",needIssue:"Taramadan önce problem seç!",csv:"Excel (CSV)",doc:"Word (DOC)"}
 };
 let curLang='sq';
 
-/* ===== Helpers ===== */
-function t(key){ return (langs[curLang] && langs[curLang][key]) || key; }
-function nameOf(issueKey){
-  const it=ISSUES.find(i=>i.key===issueKey); return it? (it.label[curLang]||it.label.sq):issueKey;
-}
+function t(k){return (langs[curLang]&&langs[curLang][k])||k;}
+function nameOf(issueKey){const it=ISSUES.find(i=>i.key===issueKey); return it? (it.label[curLang]||it.label.sq):issueKey;}
 function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.slice(-4).toUpperCase();}
-function beep(freq=880){ try{
-  const ac=new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(); const g=ac.createGain();
-  o.type='triangle'; o.frequency.value=freq; o.connect(g); g.connect(ac.destination);
-  g.gain.setValueAtTime(0.001,ac.currentTime); g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);
-  g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);
-  o.start(); o.stop(ac.currentTime+0.16); setTimeout(()=>ac.close(),250);
-}catch{} }
-function showBanner(val,isDup,issueKey){
-  lastValue.textContent = val ? (val + (issueKey? ' · '+nameOf(issueKey):'')) : '—';
-  lastBanner.style.display='flex'; lastBanner.classList.toggle('duplicate', !!isDup);
-}
-function flashOverlay(isDup){
-  scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth;
-  scanFrame.classList.add(isDup?'glow-red':'glow-green');
-  clearTimeout(scanFrame._t); scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'), 350);
-}
+function beep(f=880){ try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0.001,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.16);setTimeout(()=>ac.close(),250);}catch{}}
+function showBanner(val,isDup,issueKey){ lastValue.textContent= val ? (val + (issueKey? ' · '+nameOf(issueKey):'')) : '—'; lastBanner.style.display='flex'; lastBanner.classList.toggle('duplicate',!!isDup); }
+function flashOverlay(isDup){ scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth; scanFrame.classList.add(isDup?'glow-red':'glow-green'); clearTimeout(scanFrame._t); scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'),350); }
 
-/* ===== Issue Grid ===== */
 function renderIssueGrid(){
-  issueGrid.innerHTML='';
-  ISSUES.forEach((it,idx)=>{
-    const b=document.createElement('button');
-    b.className='issue-btn'; b.textContent=it.label[curLang]||it.label.sq;
-    if(activeIssue===it.key) b.classList.add('active');
-    b.onclick=()=>{ activeIssue=it.key; save(); renderIssueGrid(); showToast('✓ ' + nameOf(activeIssue)); };
-    issueGrid.appendChild(b);
-  });
+  issueGrid.innerHTML=''; ISSUES.forEach(it=>{ const b=document.createElement('button'); b.type='button'; b.className='issue-btn'; b.textContent=it.label[curLang]||it.label.sq; if(activeIssue===it.key) b.classList.add('active'); b.onclick=()=>{ activeIssue=it.key; save(); renderIssueGrid(); showToast('✓ '+nameOf(activeIssue)); }; issueGrid.appendChild(b); });
 }
-
-/* ===== Records / Summary ===== */
-function pushRecord(code, issueKey){
-  const key = issueKey + '|' + code;
-  const isDup = seen.has(key);
-  if(!isDup){
-    seen.add(key);
-    records.push({code, issue:issueKey, time:new Date()});
-    renderSummary(); save(); beep(880);
-  }else{
-    beep(440);
-  }
-  showBanner(code, isDup, issueKey);
-  flashOverlay(isDup);
+function pushRecord(code,issueKey){
+  const key=issueKey+'|'+code, isDup=seen.has(key);
+  if(!isDup){ seen.add(key); records.push({code,issue:issueKey,time:new Date()}); renderSummary(); save(); beep(880); }
+  else{ beep(440); }
+  showBanner(code,isDup,issueKey); flashOverlay(isDup);
 }
-
-function addFromScan(raw){
-  if(!activeIssue){ showToast(t('needIssue')); return; }
-  const val=last4(raw); if(val) pushRecord(val, activeIssue);
-}
-function addFromManual(){
-  const raw=manualInput.value.trim(); if(!raw){ showToast('—'); return; }
-  if(!activeIssue){ showToast(t('needIssue')); return; }
-  const val=last4(raw); if(!val){ showToast('—'); return; }
-  pushRecord(val, activeIssue); manualInput.value='';
-}
+function addFromScan(raw){ if(!activeIssue){ showToast(t('needIssue')); return; } const val=last4(raw); if(val) pushRecord(val,activeIssue); }
+function addFromManual(){ const raw=manualInput.value.trim(); if(!raw){ showToast('—'); return; } if(!activeIssue){ showToast(t('needIssue')); return; } const val=last4(raw); if(!val){ showToast('—'); return; } pushRecord(val,activeIssue); manualInput.value=''; }
 
 function renderSummary(){
-  // group by issue
-  const map=new Map();
-  for(const r of records){ const arr=map.get(r.issue)||[]; arr.push(r); map.set(r.issue, arr); }
-  sumList.innerHTML='';
-  let total=records.length;
-  ISSUES.forEach((it)=>{
+  const map=new Map(); for(const r of records){ const arr=map.get(r.issue)||[]; arr.push(r); map.set(r.issue,arr); }
+  sumList.innerHTML=''; let total=records.length;
+  ISSUES.forEach(it=>{
     const arr=map.get(it.key)||[];
     const li=document.createElement('li'); li.className='sum-item';
-    li.innerHTML=`
-      <div class="sum-top">
-        <div class="sum-name">${it.label[curLang]||it.label.sq}</div>
-        <div class="badge">${arr.length}</div>
-      </div>
-      <div class="details"></div>
-    `;
+    li.innerHTML=<div class="sum-top"><div class="sum-name">${it.label[curLang]||it.label.sq}</div><div class="badge">${arr.length}</div></div><div class="details"></div>;
     const details=li.querySelector('.details');
-    li.onclick=(e)=>{ // toggle details
-      if(e.target.closest('.d-del')|| e.target.classList.contains('del-btn')) return;
-      if(details.classList.contains('open')){ details.classList.remove('open'); details.innerHTML=''; return; }
-      details.classList.add('open');
-      details.innerHTML='';
-      arr.slice().sort((a,b)=>b.time-a.time).forEach((rec,idx)=>{
-        const row=document.createElement('div'); row.className='d-row';
-        row.innerHTML=`
-          <div class="d-code">${rec.code}</div>
-          <div class="d-time">${new Date(rec.time).toLocaleString()}</div>
-          <button class="del-btn">×</button>
-        `;
-        row.querySelector('.del-btn').onclick=()=>{
-          if(confirm(t('confirmDel'))){
-            // remove one
-            const i=records.findIndex(x=>x.code===rec.code && x.issue===rec.issue && +new Date(x.time)===+new Date(rec.time));
-            if(i>-1){ records.splice(i,1); rebuildSeen(); renderSummary(); save(); }
-          }
-        };
-        details.appendChild(row);
-      });
-    };
+    li.onclick=(e)=>{ if(e.target.closest('.del-btn')) return; if(details.classList.contains('open')){ details.classList.remove('open'); details.innerHTML=''; return; } details.classList.add('open'); details.innerHTML=''; arr.slice().sort((a,b)=>b.time-a.time).forEach(rec=>{ const row=document.createElement('div'); row.className='d-row'; row.innerHTML=<div class="d-code">${rec.code}</div><div class="d-time">${new Date(rec.time).toLocaleString()}</div><button type="button" class="del-btn">×</button>; row.querySelector('.del-btn').onclick=()=>{ if(confirm(t('confirmDel'))){ const i=records.findIndex(x=>x.code===rec.code && x.issue===rec.issue && +new Date(x.time)===+new Date(rec.time)); if(i>-1){ records.splice(i,1); rebuildSeen(); renderSummary(); save(); } } }; details.appendChild(row); }); };
     sumList.appendChild(li);
   });
   countEl.textContent=String(total);
 }
+function rebuildSeen(){ seen=new Set(records.map(r=>r.issue+'|'+r.code)); }
 
-function rebuildSeen(){
-  seen = new Set(records.map(r=>r.issue+'|'+r.code));
-}
-
-/* ===== Camera ===== */
+/* Kamera */
 async function startCam(){
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    video.srcObject=stream; await video.play();
+    const st = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    stream=st; video.srcObject=stream; await video.play();
     scanning=true; camStatus.textContent=t('camOn');
     track=stream.getVideoTracks()[0]||null; torchOn=false;
     const caps=track && track.getCapabilities ? track.getCapabilities() : {};
@@ -319,156 +231,74 @@ async function startCam(){
     scanLoop();
   }catch(e){ alert(e.message||e.name); }
 }
-function stopCam(){
-  scanning=false;
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
-  video.srcObject=null; track=null; torchOn=false;
-  torchBtn.disabled=true; camStatus.textContent=t('camOff');
-}
+function stopCam(){ scanning=false; if(stream){ stream.getTracks().forEach(t=>t.stop()); } video.srcObject=null; track=null; torchOn=false; torchBtn.disabled=true; camStatus.textContent=t('camOff'); }
 async function toggleTorch(){
   if(!track || !track.applyConstraints){ showToast('No torch'); return; }
   const caps=track.getCapabilities ? track.getCapabilities() : {};
   if(!caps.torch){ showToast('Torch not supported'); return; }
-  try{
-    torchOn=!torchOn;
-    await track.applyConstraints({ advanced:[{ torch: torchOn }] });
-    showToast(torchOn ? (curLang==='tr'?'Flaş: Açık':curLang==='en'?'Flash: On':'Drita: On') : (curLang==='tr'?'Flaş: Kapalı':curLang==='en'?'Flash: Off':'Drita: Off'));
-  }catch(e){ torchOn=false; showToast('Torch error'); }
+  try{ torchOn=!torchOn; await track.applyConstraints({advanced:[{torch:torchOn}]}); showToast(torchOn ? (curLang==='tr'?'Flaş: Açık':curLang==='en'?'Flash: On':'Drita: On') : (curLang==='tr'?'Flaş: Kapalı':curLang==='en'?'Flash: Off':'Drita: Off')); }catch(e){ torchOn=false; showToast('Torch error'); }
 }
 async function scanLoop(){
   if(!scanning) return;
-  const now=performance.now();
-  if(now-lastScanAt<140){ return requestAnimationFrame(scanLoop); }
-  lastScanAt=now;
+  const now=performance.now(); if(!scanLoop._t) scanLoop._t=0;
+  if(now-scanLoop._t<140){ return requestAnimationFrame(scanLoop); }
+  scanLoop._t=now;
   if(video.readyState>=2){
     canvas.width=video.videoWidth; canvas.height=video.videoHeight;
     ctx.drawImage(video,0,0,canvas.width,canvas.height);
     const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-    const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
-    if(qr && qr.data){ addFromScan(qr.data.trim()); }
+    if(window.jsQR){ const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'}); if(qr && qr.data){ addFromScan(qr.data.trim()); } }
   }
   requestAnimationFrame(scanLoop);
 }
 
-/* ===== Share / Export ===== */
+/* Paylaş / Dışa Aktar */
 function summaryText(){
-  const counts = ISSUES.map(it=>{
-    const n = records.filter(r=>r.issue===it.key).length;
-    return ${it.label[curLang]||it.label.sq}: ${n};
-  }).join('\n');
+  const counts = ISSUES.map(it=>${it.label[curLang]||it.label.sq}: ${records.filter(r=>r.issue===it.key).length}).join('\\n');
   const ts = new Date().toLocaleString();
-  return 📋 ${t('summary')} (${ts})\n${counts}\n\nTotali: ${records.length};
+  return 📋 ${t('summary')} (${ts})\\n${counts}\\n\\nTotali: ${records.length};
 }
-function detailsCSV(){
-  const header='Issue,Code,Time';
-  const rows=records.map(r=>[
-    "${nameOf(r.issue).replace(/"/g,'""')}",
-    "${r.code}",
-    "${new Date(r.time).toLocaleString().replace(/"/g,'""')}"
-  ].join(','));
-  return [header,...rows].join('\n');
-}
-function summaryCSV(){
-  const header='Issue,Count';
-  const rows=ISSUES.map(it=>{
-    const n=records.filter(r=>r.issue===it.key).length;
-    return "${(it.label[curLang]||it.label.sq).replace(/"/g,'""')}",${n};
-  });
-  return [header,...rows].join('\n');
-}
-function download(filename, mime, content){
-  const blob=new Blob([content],{type:mime});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename;
-  document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},100);
-}
-function exportCSV(){
-  // One ZIP would require lib; instead download two CSVs quickly:
-  download(summary_${dateStamp()}.csv,'text/csv;charset=utf-8', summaryCSV());
-  setTimeout(()=>download(details_${dateStamp()}.csv,'text/csv;charset=utf-8', detailsCSV()), 150);
-}
+function download(filename, mime, content){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},100); }
+function detailsCSV(){ const header='Issue,Code,Time'; const rows=records.map(r=>["${nameOf(r.issue).replace(/"/g,'""')}","${r.code}","${new Date(r.time).toLocaleString().replace(/"/g,'""')}"].join(',')); return [header,...rows].join('\\n'); }
+function summaryCSV(){ const header='Issue,Count'; const rows=ISSUES.map(it=>"${(it.label[curLang]||it.label.sq).replace(/"/g,'""')}",${records.filter(r=>r.issue===it.key).length}); return [header,...rows].join('\\n'); }
+function exportCSV(){ const stamp=dateStamp(); download(summary_${stamp}.csv,'text/csv;charset=utf-8', summaryCSV()); setTimeout(()=>download(details_${stamp}.csv,'text/csv;charset=utf-8', detailsCSV()), 150); }
 function exportDOC(){
-  const style=`<style>
-    body{font-family:Arial,sans-serif} h2{margin:0 0 8px}
-    table{border-collapse:collapse;width:100%} th,td{border:1px solid #999;padding:6px 8px;font-size:12px}
-    .mt{margin-top:14px}
-  </style>`;
-  const sumRows=ISSUES.map(it=>{
-    const n=records.filter(r=>r.issue===it.key).length;
-    return <tr><td>${(it.label[curLang]||it.label.sq)}</td><td>${n}</td></tr>;
-  }).join('');
+  const style=<style>body{font-family:Arial,sans-serif}h2{margin:0 0 8px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:6px 8px;font-size:12px}.mt{margin-top:14px}</style>;
+  const sumRows=ISSUES.map(it=><tr><td>${(it.label[curLang]||it.label.sq)}</td><td>${records.filter(r=>r.issue===it.key).length}</td></tr>).join('');
   const detRows=records.map(r=><tr><td>${nameOf(r.issue)}</td><td>${r.code}</td><td>${new Date(r.time).toLocaleString()}</td></tr>).join('');
-  const html=`<!doctype html><html><head><meta charset="utf-8">${style}</head><body>
-    <h2>${t('summary')}</h2>
-    <table><tr><th>Issue</th><th>Count</th></tr>${sumRows||''}</table>
-    <h2 class="mt">Detaje</h2>
-    <table><tr><th>Issue</th><th>Code</th><th>Time</th></tr>${detRows||''}</table>
-  </body></html>`;
+  const html=<!doctype html><html><head><meta charset="utf-8">${style}</head><body><h2>${t('summary')}</h2><table><tr><th>Issue</th><th>Count</th></tr>${sumRows}</table><h2 class="mt">Detaje</h2><table><tr><th>Issue</th><th>Code</th><th>Time</th></tr>${detRows}</table></body></html>;
   download(report_${dateStamp()}.doc,'application/msword', html);
 }
-function dateStamp(){
-  const d=new Date(); const pad=n=>String(n).padStart(2,'0');
-  return ${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())};
-}
+function dateStamp(){ const d=new Date(); const pad=n=>String(n).padStart(2,'0'); return ${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}; }
 
-/* ===== Storage ===== */
-function save(){
-  localStorage.setItem('qrRecords_v1', JSON.stringify(records.map(r=>({code:r.code,issue:r.issue,time:r.time}))));
-  localStorage.setItem('qrActiveIssue_v1', activeIssue||'');
-  localStorage.setItem('qrLang_v1', curLang);
-}
-function load(){
-  const raw=localStorage.getItem('qrRecords_v1');
-  if(raw){ try{
-    const arr=JSON.parse(raw)||[]; records=arr.map(o=>({code:o.code,issue:o.issue,time:new Date(o.time)}));
-  }catch{} }
-  rebuildSeen();
-  activeIssue = localStorage.getItem('qrActiveIssue_v1') || null;
-  const langSaved = localStorage.getItem('qrLang_v1'); if(langSaved) curLang=langSaved;
-}
-
-/* ===== Toast & i18n set ===== */
+/* Storage & i18n */
+function save(){ localStorage.setItem('qrRecords_v1', JSON.stringify(records.map(r=>({code:r.code,issue:r.issue,time:r.time})))); localStorage.setItem('qrActiveIssue_v1', activeIssue||''); localStorage.setItem('qrLang_v1', curLang); }
+function load(){ const raw=localStorage.getItem('qrRecords_v1'); if(raw){ try{ const arr=JSON.parse(raw)||[]; records=arr.map(o=>({code:o.code,issue:o.issue,time:new Date(o.time)})); }catch{} } rebuildSeen(); activeIssue=localStorage.getItem('qrActiveIssue_v1')||null; const langSaved=localStorage.getItem('qrLang_v1'); if(langSaved) curLang=langSaved; }
 function showToast(m){ toastEl.textContent=m; toastEl.style.display='block'; clearTimeout(showToast._t); showToast._t=setTimeout(()=>toastEl.style.display='none',1400); }
-function setLang(l){
-  curLang=l;
-  $('#t-title').textContent=t('title');
-  $('#t-last').textContent=t('last');
-  camStatus.textContent=scanning?t('camOn'):t('camOff');
-  startBtn.textContent=t('start'); stopBtn.textContent=t('stop'); resetBtn.textContent=t('clear');
-  copyBtn.textContent=t('copy'); torchBtn.textContent=t('flash'); manualAddBtn.textContent=t('add');
-  manualInput.placeholder=t('placeholder'); $('#t-choose').textContent=t('choose');
-  $('#t-summary').textContent=t('summary'); $('#t-entries').textContent=t('entries');
-  csvBtn.textContent=t('csv'); docBtn.textContent=t('doc');
-  renderIssueGrid(); renderSummary(); save();
-}
+function setLang(l){ curLang=l; $('#t-title').textContent=t('title'); $('#t-last').textContent=t('last'); camStatus.textContent=scanning?t('camOn'):t('camOff'); startBtn.textContent=t('start'); stopBtn.textContent=t('stop'); resetBtn.textContent=t('clear'); copyBtn.textContent=t('copy'); torchBtn.textContent=t('flash'); manualAddBtn.textContent=t('add'); manualInput.placeholder=t('placeholder'); $('#t-choose').textContent=t('choose'); $('#t-summary').textContent=t('summary'); $('#t-entries').textContent=t('entries'); csvBtn.textContent=t('csv'); docBtn.textContent=t('doc'); renderIssueGrid(); renderSummary(); save(); }
 
-/* ===== Events ===== */
-startBtn.onclick=startCam;
-stopBtn.onclick=stopCam;
-torchBtn.onclick=toggleTorch;
-resetBtn.onclick=()=>{
-  if(confirm(t('confirmClear'))){ records=[]; rebuildSeen(); renderSummary(); save(); }
-};
-manualAddBtn.onclick=addFromManual;
-manualInput.addEventListener('keyup',e=>{ if(e.key==='Enter') addFromManual(); });
-copyBtn.onclick=()=>{ const txt=summaryText(); navigator.clipboard.writeText(txt).then(()=>showToast(t('copied'))); };
-waBtn.onclick=()=>{ const txt=summaryText(); window.open("https://wa.me/?text="+encodeURIComponent(txt),'_blank'); };
-csvBtn.onclick=exportCSV;
-docBtn.onclick=exportDOC;
+/* Events */
+startBtn.addEventListener('click', startCam);
+stopBtn.addEventListener('click', stopCam);
+torchBtn.addEventListener('click', toggleTorch);
+resetBtn.addEventListener('click', ()=>{ if(confirm(t('confirmClear'))){ records=[]; rebuildSeen(); renderSummary(); save(); } });
+manualAddBtn.addEventListener('click', addFromManual);
+manualInput.addEventListener('keyup', e=>{ if(e.key==='Enter') addFromManual(); });
+copyBtn.addEventListener('click', ()=>{ navigator.clipboard.writeText(summaryText()).then(()=>showToast(t('copied'))); });
+waBtn.addEventListener('click', ()=>{ window.open('https://wa.me/?text='+encodeURIComponent(summaryText()), '_blank'); });
+csvBtn.addEventListener('click', exportCSV);
+docBtn.addEventListener('click', exportDOC);
+/* Tıklama Testi */
+clickTest.addEventListener('click', ()=>{ ct.textContent = String((+ct.textContent||0)+1); showToast('Click OK'); });
 
-/* ===== Init ===== */
-load();
-setLang(curLang || 'sq');
+/* Init */
+load(); setLang(curLang || 'sq');
 if (navigator.permissions && navigator.permissions.query){
   navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted'){ startCam(); } }).catch(()=>{});
 }
-
-/* Prevent accidental zoom on iOS */
+/* iOS zoom önleme */
 document.addEventListener('gesturestart', e=>e.preventDefault());
-let lastTouch=0;
-document.addEventListener('touchend', e=>{
-  const now=Date.now(); if(now-lastTouch<400){ e.preventDefault(); }
-  lastTouch=now;
-}, {passive:false});
+let lastTouch=0; document.addEventListener('touchend', e=>{ const now=Date.now(); if(now-lastTouch<400){ e.preventDefault(); } lastTouch=now; }, {passive:false});
 </script>
 </body>
 </html>
