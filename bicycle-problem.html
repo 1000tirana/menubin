@@ -1,323 +1,408 @@
 <!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Regjistër Biçikletash • SAFE v2.1</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no" />
+<title>Regjistruesi i Defekteve të Biçikletave</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --ink:#e8edf7; --muted:#a9b1c3;
-    --accent:#29c06f; --accent2:#3db1ff; --danger:#ff5d5d; --ring:rgba(61,177,255,.25);
+    --bg:#0f1115; --card:#171a21; --muted:#aeb6c8; --text:#eef3ff; --accent:#23c06f;
+    --danger:#ff5d5d; --ring:#2b3347; --chip:#101826; --btn:#1e2535; --btn2:#232b3b;
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg:#eaf1fb; --card:#ffffff; --ink:#0f2230; --muted:#4d6477; --accent:#1ca763; --accent2:#1678ff; --danger:#e34b4b; --ring:rgba(22,120,255,.18); }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,#0e1320 0%,#0b101a 100%);
+    color:var(--text); font-family: system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-  header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.2) blur(6px);background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0)),var(--bg);padding:14px 16px 10px;border-bottom:1px solid rgba(255,255,255,.06)}
-  h1{margin:0;font-size:20px;font-weight:800;letter-spacing:.2px}
-  .sub{margin-top:6px;font-size:13px;color:var(--muted)}
-  .bar{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .btn{appearance:none;border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;color:#fff;background:var(--accent2);box-shadow:0 6px 14px -6px var(--ring)}
-  .btn.alt{background:var(--accent)}
-  .btn.ghost{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.15)}
-  .btn.danger{background:var(--danger)}
-  input[type="text"]{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:var(--card);color:var(--ink);outline:none;min-width:180px}
-  main{padding:12px;max-width:1100px;margin:0 auto 120px}
-  .panel{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;margin-bottom:12px}
-  .title{font-weight:800}
-  .muted{color:var(--muted);font-size:12px;margin-top:4px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-  .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;position:relative}
-  .count{min-width:54px;height:54px;border-radius:12px;background:rgba(61,177,255,.1);display:grid;place-items:center;font-weight:800;font-size:18px;border:1px dashed rgba(61,177,255,.35);color:var(--accent2)}
-  .badge{display:inline-block;margin:4px 6px 0 0;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px}
-  .x{border:1px solid rgba(255,0,0,.35);color:#ffb3b3;background:transparent;border-radius:10px;padding:6px 10px;cursor:pointer}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  /* Kamera kutusu */
-  #camBox{display:none;gap:10px;align-items:center}
-  video{width:100%;max-height:42vh;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#000}
-  /* Modal (dialog yerine) */
-  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:50}
-  .modal{width:min(760px,96vw);background:var(--card);border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden}
-  .modal-head{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
-  .modal-body{padding:12px 16px;max-height:62vh;overflow:auto}
-  .issue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-  .issue-btn{padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(61,177,255,.08);font-weight:800;cursor:pointer}
-  .list{list-style:none;margin:0;padding:0}
-  .list li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 8px;border-bottom:1px dashed rgba(255,255,255,.08);font-size:14px}
-  .small{font-size:12px;color:var(--muted)}
-  .footer{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid rgba(255,255,255,.1);padding:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:30}
+  header{position:sticky; top:0; z-index:5; background:#0e1320cc; backdrop-filter: blur(6px); border-bottom:1px solid #151d2e}
+  .wrap{max-width:920px; margin:0 auto; padding:14px 14px}
+  h1{margin:0; font-size:18px; letter-spacing:.2px}
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin:12px 0}
+  button, .btn{
+    appearance:none; border:1px solid #2a344a; background:linear-gradient(#1a2233,#121a29); color:var(--text);
+    padding:14px 16px; border-radius:12px; font-size:16px; font-weight:600; cursor:pointer; user-select:none;
+  }
+  button:active{transform: translateY(1px)}
+  .btn-accent{background:linear-gradient(#1d8f59,#12653f); border-color:#2c7c55}
+  .btn-plain{background:#141a28; border-color:#232b3b}
+  .grid-issues{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  @media (min-width:620px){ .grid-issues{grid-template-columns:1fr 1fr 1fr} }
+  .issue-btn{
+    min-height:72px; text-align:left; line-height:1.2; border:1px solid #2a344a; background:linear-gradient(#1b2335,#121a28);
+    border-radius:14px; padding:14px; font-size:16px; font-weight:700;
+  }
+  .issue-btn small{display:block; color:#93a0b8; font-weight:500; margin-top:4px; font-size:12px}
+  .cards{display:grid; gap:14px; margin:14px 0 90px}
+  .card{background:var(--card); border:1px solid #232b3b; border-radius:14px; padding:14px}
+  .card h3{margin:0 0 8px; font-size:15px}
+  .list{margin:0; padding:0; list-style:none}
+  .item{display:flex; gap:10px; align-items:center; padding:10px 0; border-top:1px dashed #263049}
+  .item:first-child{border-top:none}
+  .badge{background:#0d1424; border:1px solid #2a344a; color:#cfd6e6; padding:6px 10px; border-radius:999px; font-weight:700}
+  .muted{color:var(--muted)}
+  .spacer{flex:1}
+  .link{color:#95caff; text-decoration:none}
+  .kicker{font-size:12px; color:#9fb1d6}
+  .sumline{display:flex; gap:10px; align-items:center; padding:10px 0; border-top:1px dashed #263049}
+  .sumline:first-child{border-top:none}
+  .sumline .count{margin-left:auto; font-weight:800}
+  details{border-top:1px dashed #263049}
+  summary{cursor:pointer; list-style:none; padding:10px 0; font-weight:700}
+  summary::-webkit-details-marker{display:none}
+  .footerbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:6; background:#0e1320f2; backdrop-filter: blur(6px);
+    border-top:1px solid #151d2e;
+  }
+  .footerbar .wrap{display:flex; gap:10px; flex-wrap:wrap}
+  .ok{color:#9df6c9}
+  .warn{color:#ffd18d}
+  .danger{color:#ff9b9b}
+  input[type="text"]{
+    background:#111827; border:1px solid #2a344a; border-radius:12px; color:#eaf1ff;
+    padding:14px 14px; font-size:16px; width:160px; letter-spacing:2px; text-transform:uppercase;
+  }
+  /* Modal */
+  .modal{position:fixed; inset:0; display:none; place-items:center; background:#0b0f18cc; z-index:50}
+  .modal.open{display:grid}
+  .sheet{width:min(900px,92vw); background:var(--card); border:1px solid #2a344a; border-radius:16px; padding:14px}
+  .sheet h2{margin:6px 0 12px; font-size:18px}
+  .sheet .hdr{display:flex; align-items:center; gap:12px; margin-bottom:8px}
+  .chip{background:#0f1626; border:1px solid #2a344a; padding:8px 12px; border-radius:999px; font-weight:700}
+  .right{margin-left:auto}
+  .flash{position:fixed; inset:0; z-index:60; background:transparent; pointer-events:none; opacity:0; transition:opacity .22s ease}
+  .flash.show{opacity:.28}
+  .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:82px; background:#141a28; color:#e7efff; border:1px solid #2a344a; padding:10px 14px; border-radius:12px; font-weight:700; display:none; z-index:70}
+  .toast.show{display:block}
+  .notice{background:#0f1626; border:1px solid #2a344a; border-radius:12px; padding:12px; font-size:14px; color:#cfd6e6}
+  video{width:100%; border-radius:12px; background:#0b1019}
+  .tiny{font-size:12px; opacity:.75}
 </style>
 </head>
 <body>
-<header>
-  <h1>Regjistër Biçikletash (Barkod + Probleme) • SAFE</h1>
-  <div class="sub">Së pari “Elle Barkod Ekle” ile dene. Sonra kamerayı açmayı denersin.</div>
-  <div class="bar">
-    <button class="btn" type="button" id="openCam">Hap kamerën</button>
-    <button class="btn ghost" type="button" id="closeCam" style="display:none">Mbyll kamerën</button>
-    <input id="manualCode" type="text" placeholder="Shkruaj barkodin me dorë">
-    <button class="btn alt" type="button" id="addManual">Shto me dorë</button>
-    <button class="btn danger" type="button" id="resetAll">Rivendos gjithçka</button>
+<header><div class="wrap">
+  <h1>Regjistruesi i Defekteve të Biçikletave</h1>
+  <div class="kicker">Skano <b>QR (4 shifrat e fundit)</b> ose fut kodin manual. Zgjedh defektin me prekje të madhe 👆</div>
+  <div class="toolbar">
+    <button class="btn-accent" id="btnOpenScan">📷 Skano QR</button>
+    <button class="btn-plain" id="btnManual">⌨️ Fut kodin manual</button>
+    <span class="spacer"></span>
+    <button id="btnCsv">⬇️ CSV (Excel)</button>
+    <button id="btnDoc">⬇️ DOC (Word)</button>
+    <button id="btnClear" class="danger">🗑️ Pastroni gjithçka</button>
   </div>
-  <div id="camBox" class="panel">
-    <div class="row">
-      <b>Kamera:</b> <span id="camHint" class="muted">Duke u hapur…</span>
+  <div class="notice tiny">Nëse kamera nuk hapet, përdor “Fut kodin manual”. Aplikacioni ruan të dhënat në pajisje (localStorage).</div>
+</div></header>
+
+<div class="wrap cards">
+  <div class="card">
+    <h3>Totali i regjistrimeve: <span id="total" class="ok">0</span></h3>
+    <div id="emptyState" class="muted">Asnjë regjistrim ende.</div>
+    <ol id="logList" class="list" aria-live="polite"></ol>
+  </div>
+
+  <div class="card">
+    <h3>Përmbledhje sipas problemit</h3>
+    <div id="summary"></div>
+  </div>
+</div>
+
+<!-- Modal: Scanner -->
+<div class="modal" id="scanModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="hdr">
+      <div class="chip">📷 Skanim i QR</div>
+      <div class="right">
+        <button id="btnSwitch">🔁 Ndrysho kamerën</button>
+        <button id="btnStop">🛑 Ndalo</button>
+      </div>
     </div>
     <video id="video" playsinline muted></video>
-  </div>
-</header>
-
-<main>
-  <!-- Përmbledhje -->
-  <section class="panel">
-    <div class="row" style="justify-content:space-between;align-items:flex-end">
-      <div>
-        <div class="title">Përmbledhje</div>
-        <div class="muted">Numërimet rifreskohen automatikisht</div>
-      </div>
-      <div class="row">
-        <button class="btn ghost" type="button" id="expSummary">Shkarko CSV (Përmbledhje)</button>
-        <button class="btn" type="button" id="expDetails">Shkarko CSV (Detaje)</button>
-        <button class="btn alt" type="button" id="expDoc">Shkarko Word (DOC)</button>
-      </div>
-    </div>
-    <div class="grid" id="summaryGrid" style="margin-top:10px"></div>
-  </section>
-
-  <!-- Lista sipas barkodit -->
-  <section class="panel">
-    <div class="title">Barkodet & problemet</div>
-    <div class="muted">Prek “Fshi” për të hequr një hyrje.</div>
-    <ul class="list" id="byCodeList"></ul>
-  </section>
-</main>
-
-<!-- MODAL (dialog yerine) -->
-<div class="modal-back" id="modalBack" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <div class="modal-head">
-      <div>
-        <div id="mTitle" style="font-weight:800">Zgjidh problemin</div>
-        <div id="mCode" class="small"></div>
-      </div>
-      <button class="btn ghost" type="button" id="mClose">Mbyll</button>
-    </div>
-    <div class="modal-body">
-      <div class="issue-grid" id="issueGrid"></div>
+    <div class="notice" style="margin-top:10px">
+      <b>Këshillë:</b> Mbaje kodin në qendër. Sapo dallohet, do të kërkojë defektin.
     </div>
   </div>
 </div>
 
-<div class="footer">
-  <span class="muted">Të dhënat ruhen në këtë pajisje (localStorage).</span>
+<!-- Modal: Choose Issue -->
+<div class="modal" id="issueModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="hdr">
+      <h2 style="margin:0">Kodi: <span id="codeView" class="chip"></span></h2>
+      <div class="right"><button id="btnIssueCancel">Anulo</button></div>
+    </div>
+    <div class="grid-issues" id="issuesGrid"></div>
+  </div>
+</div>
+
+<!-- Modal: Manual -->
+<div class="modal" id="manualModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="hdr"><h2 style="margin:0">Fut kodin (4 shifra/shkronja)</h2></div>
+    <div class="toolbar" style="align-items:center">
+      <input id="manualInput" type="text" inputmode="latin-prose" maxlength="20" placeholder="p.sh. https://…/L8KQ ose L8KQ" />
+      <button id="btnManualOk" class="btn-accent">OK</button>
+      <button id="btnManualCancel">Mbyll</button>
+    </div>
+    <div class="tiny muted">Pranohet link ose vetëm kodi. Aplikacioni merr <b>4 të fundit</b>.</div>
+  </div>
+</div>
+
+<div id="flash" class="flash"></div>
+<div id="toast" class="toast"></div>
+
+<div class="footerbar">
+  <div class="wrap tiny">
+    ⏱️ Ora lokale: <span id="clock"></span> • Të dhënat ruhen lokalisht • Për çdo rresht mund të fshihet nga lista.
+  </div>
 </div>
 
 <script>
 (function(){
-  // ====== PROBLEMET (SQ) ======
+  // ---- Defektet (AL + TR) ----
   const ISSUES = [
-    { id:'nuk-karikon',        name:'Nuk karikon' },
-    { id:'kyci-baterise',      name:'Kyçi i baterisë nuk hapet' },
-    { id:'ekrani-nuk-ndizet',  name:'Ekrani nuk ndizet' },
-    { id:'bateria-zero',       name:'Bateria mbetet në 0%' },
-    { id:'shofer-problem',     name:'Shoferi / kontrollori problematik' },
-    { id:'timeout',            name:'Timeout' },
-    { id:'mungon-priza',       name:'Mungon priza e karikimit' },
-    { id:'rrota-ne-frene',     name:'Rrota bllokohet në frenë' },
-    { id:'probleme-mekanike',  name:'Probleme mekanike' },
-    { id:'s’merre-komande',    name:'Nuk merr komandë' },
+    {id:'no_charge', al:'Nuk ngarkohet (bateria)', tr:'Şarj almıyor'},
+    {id:'lock_not_open', al:'Bllokimi i baterisë nuk hapet', tr:'Batarya kilidi açılmıyor'},
+    {id:'screen_off', al:'Ekrani nuk ndizet', tr:'Ekran açılmıyor'},
+    {id:'battery_zero', al:'Bateria mbetet në 0%', tr:'Batarya %0’da kalıyor'},
+    {id:'controller_fault', al:'Kontrollori me defekt', tr:'Sürücü sorunlu'},
+    {id:'timeout', al:'Timeout', tr:'Timeout'},
+    {id:'no_charge_port', al:'Mungon priza e karikimit', tr:'Şarj soketi yok'},
+    {id:'wheel_brake_locked', al:'Rrota e bllokuar në frenë', tr:'Teker frende tıkalı kalmış'},
+    {id:'mechanical', al:'Probleme mekanike', tr:'Mekanik sorunlar'},
+    {id:'no_command', al:'Nuk merr komandë', tr:'Komut almıyor'}
   ];
-  const ISSUE_BY_ID = Object.fromEntries(ISSUES.map(i=>[i.id,i]));
+  const byId = Object.fromEntries(ISSUES.map(x=>[x.id,x]));
+  // ---- ELEMENTE ----
+  const $ = s => document.querySelector(s);
+  const logList = $('#logList');
+  const totalEl = $('#total');
+  const summaryEl = $('#summary');
+  const emptyState = $('#emptyState');
+  const toast = $('#toast');
+  const flash = $('#flash');
+  const clock = $('#clock');
 
-  // ====== DATA ======
-  const LS_KEY = 'bike-reg-safe-v21';
-  let state = loadState();
-  function loadState(){ try{ const raw=localStorage.getItem(LS_KEY); if(raw) return JSON.parse(raw);}catch(_){ } return {entries:[]} }
-  function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); renderAll(); }
-  function nowStr(){ try{ return new Date().toLocaleString('sq-AL',{timeZone:'Europe/Tirane',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});}catch(_){ return new Date().toLocaleString(); } }
+  // ---- STATE ----
+  let records = load() || []; // [{code, issueId, ts}]
+  let seen = new Set(records.map(r=>r.code+'|'+r.issueId)); // për të shmangur duplikat të njëjtit problem për të njëjtin kod
+  renderAll();
 
-  // ====== EL’ler ======
-  const openCamBtn = document.getElementById('openCam');
-  const closeCamBtn = document.getElementById('closeCam');
-  const camBox = document.getElementById('camBox');
-  const camHint = document.getElementById('camHint');
-  const video = document.getElementById('video');
-  const manualCode = document.getElementById('manualCode');
-  const addManual = document.getElementById('addManual');
-  const resetAll = document.getElementById('resetAll');
-  const summaryGrid = document.getElementById('summaryGrid');
-  const byCodeList = document.getElementById('byCodeList');
-  const expSummary = document.getElementById('expSummary');
-  const expDetails  = document.getElementById('expDetails');
-  const expDoc = document.getElementById('expDoc');
+  // ---- ORA ----
+  setInterval(()=>{ clock.textContent = new Date().toLocaleString('sq-AL'); }, 1000);
 
-  // Modal
-  const modalBack = document.getElementById('modalBack');
-  const mCode = document.getElementById('mCode');
-  const mClose = document.getElementById('mClose');
-  const issueGrid = document.getElementById('issueGrid');
-
-  // Issue butonları
-  ISSUES.forEach(i=>{
-    const b=document.createElement('button');
-    b.className='issue-btn'; b.type='button'; b.textContent=i.name;
-    b.addEventListener('click', ()=> chooseIssue(i.id));
-    issueGrid.appendChild(b);
-  });
-
-  let pendingCode = null;
-  function openIssueChooser(code){
-    pendingCode = code;
-    mCode.textContent = 'Barkod: ' + code;
-    modalBack.style.display = 'flex';
-    modalBack.setAttribute('aria-hidden','false');
-    document.body.style.overflow='hidden';
+  // ---- AUDIOS ----
+  async function beep(freq=880, dur=120){
+    const Ctx = window.AudioContext||window.webkitAudioContext;
+    const ctx = beep.ctx || (beep.ctx = new Ctx());
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.frequency.value=freq; g.gain.value=.15;
+    o.connect(g).connect(ctx.destination);
+    o.start();
+    setTimeout(()=>o.stop(), dur);
   }
-  function closeIssueChooser(){
-    modalBack.style.display = 'none';
-    modalBack.setAttribute('aria-hidden','true');
-    document.body.style.overflow='';
-  }
-  mClose.addEventListener('click', closeIssueChooser);
-  modalBack.addEventListener('click', (e)=>{ if(e.target===modalBack) closeIssueChooser(); });
+  function successFx(){ flashColor('rgba(35,192,111,.6)'); beep(920,140); if(navigator.vibrate) navigator.vibrate(40); }
+  function errorFx(){ flashColor('rgba(255,93,93,.6)'); beep(220,160); if(navigator.vibrate) navigator.vibrate([20,40,20]); }
+  function flashColor(c){ flash.style.background=c; flash.classList.add('show'); setTimeout(()=>flash.classList.remove('show'),220); }
+  function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1500); }
 
-  function chooseIssue(issueId){
-    if(!pendingCode) return;
-    const exists = state.entries.some(e=> e.code===pendingCode && e.issueId===issueId);
-    if(exists){
-      if(!confirm('Ky barkod është regjistruar tashmë me këtë problem. Shto përsëri?')) return;
-    }
-    state.entries.push({ code: pendingCode, issueId, ts: nowStr() });
-    saveState();
-    closeIssueChooser();
-    vibrate(20);
-  }
+  // ---- PERSIST ----
+  function save(){ localStorage.setItem('bike_faults', JSON.stringify(records)); }
+  function load(){ try{ return JSON.parse(localStorage.getItem('bike_faults')||'[]'); }catch(_){ return []; } }
 
-  // ====== Render ======
-  function renderAll(){ renderSummary(); renderByCode(); }
-  function renderSummary(){
-    const byIssue = new Map(ISSUES.map(i=>[i.id,0]));
-    const uniq = new Set();
-    state.entries.forEach(e=>{ uniq.add(e.code); byIssue.set(e.issueId,(byIssue.get(e.issueId)||0)+1); });
-    summaryGrid.innerHTML='';
-    summaryGrid.appendChild(stat('Gjithsej regjistrime', String(state.entries.length)));
-    summaryGrid.appendChild(stat('Barkode unike', String(uniq.size)));
-    ISSUES.forEach(i=> summaryGrid.appendChild(stat(i.name, String(byIssue.get(i.id)||0))));
-  }
-  function stat(title, value){
-    const d=document.createElement('div'); d.className='card';
-    const c=document.createElement('div'); c.className='count'; c.textContent=value;
-    const t=document.createElement('div'); t.innerHTML='<div class="title">'+title+'</div><div class="muted">—</div>';
-    d.appendChild(c); d.appendChild(t); return d;
-  }
-  function renderByCode(){
-    const map=new Map();
-    state.entries.forEach(e=>{ if(!map.has(e.code)) map.set(e.code,[]); map.get(e.code).push(e); });
-    const rows=Array.from(map.entries()).sort((a,b)=> (a[1][a[1].length-1]?.ts||'') < (b[1][b[1].length-1]?.ts||'') ? 1 : -1);
-    byCodeList.innerHTML='';
-    if(!rows.length){
-      const li=document.createElement('li'); li.innerHTML='<span class="small">S’ka të dhëna ende. Skano ose shto me dorë.</span>'; byCodeList.appendChild(li); return;
-    }
-    rows.forEach(([code, arr])=>{
-      const li=document.createElement('li');
-      const left=document.createElement('div'), right=document.createElement('div');
-      const head=document.createElement('div'); head.innerHTML='<b>'+code+'</b> · <span class="small">'+arr.length+' regj.</span>';
-      left.appendChild(head);
-      const probs=document.createElement('div');
-      arr.forEach((e,i)=>{
-        const sp=document.createElement('span'); sp.className='badge'; sp.textContent=ISSUE_BY_ID[e.issueId]?.name||e.issueId; sp.title=e.ts;
-        const del=document.createElement('button'); del.className='x'; del.type='button'; del.textContent='Fshi';
-        del.addEventListener('click', ()=>{
-          const idx=state.entries.findIndex(x=> x.code===e.code && x.issueId===e.issueId && x.ts===e.ts);
-          if(idx>=0){ state.entries.splice(idx,1); saveState(); }
+  // ---- RENDER ----
+  function renderAll(){
+    totalEl.textContent = records.length;
+    emptyState.style.display = records.length ? 'none':'block';
+    // Lista
+    logList.innerHTML = '';
+    records.forEach((r,idx)=>{
+      const it = document.createElement('li'); it.className='item';
+      const n = document.createElement('div'); n.className='badge'; n.textContent = (idx+1)+'.';
+      const mid = document.createElement('div');
+      mid.innerHTML = `<div><b>${r.code}</b> — ${byId[r.issueId].al} <span class="muted tiny">(${byId[r.issueId].tr})</span></div>
+                       <div class="tiny muted">${new Date(r.ts).toLocaleString('sq-AL')}</div>`;
+      const del = document.createElement('button'); del.textContent='Fshi'; del.className='btn';
+      del.onclick = ()=>{
+        if(!confirm('Ta fshij këtë rresht?')) return;
+        records.splice(idx,1);
+        seen.delete(r.code+'|'+r.issueId);
+        save(); renderAll();
+      };
+      it.append(n, mid, del);
+      logList.appendChild(it);
+    });
+    // Përmbledhja
+    const groups = {};
+    for(const r of records){ groups[r.issueId]=(groups[r.issueId]||[]).concat([r]); }
+    summaryEl.innerHTML='';
+    ISSUES.forEach(issue=>{
+      const arr = groups[issue.id]||[];
+      const det = document.createElement('details');
+      const sum = document.createElement('summary');
+      sum.innerHTML = ${issue.al} <span class="muted tiny">(${issue.tr})</span> <span class="count">${arr.length}</span>;
+      det.appendChild(sum);
+      if(arr.length){
+        const ul = document.createElement('ul'); ul.className='list';
+        arr.forEach(r=>{
+          const li = document.createElement('li'); li.className='sumline';
+          li.innerHTML = `<span class="badge">${r.code}</span>
+                          <span class="muted tiny">${new Date(r.ts).toLocaleString('sq-AL')}</span>`;
+          ul.appendChild(li);
         });
-        probs.appendChild(sp); probs.appendChild(del);
-        if(i<arr.length-1){ const sep=document.createElement('span'); sep.className='small'; sep.style.margin='0 4px'; sep.textContent='·'; probs.appendChild(sep); }
-      });
-      left.appendChild(probs);
-      const addBtn=document.createElement('button'); addBtn.className='btn ghost'; addBtn.type='button'; addBtn.textContent='Shto problem'; addBtn.addEventListener('click', ()=> openIssueChooser(code));
-      right.appendChild(addBtn);
-      li.appendChild(left); li.appendChild(right);
-      byCodeList.appendChild(li);
+        det.appendChild(ul);
+      }else{
+        const p = document.createElement('div'); p.className='sumline muted tiny'; p.textContent='—';
+        det.appendChild(p);
+      }
+      summaryEl.appendChild(det);
     });
   }
 
-  // ====== Manual ======
-  document.getElementById('addManual').addEventListener('click', ()=>{
-    const code=sanitize(manualCode.value);
-    if(!code){ alert('Shkruaj një barkod.'); return; }
-    manualCode.value=''; openIssueChooser(code);
-  });
+  // ---- MANUAL INPUT MODAL ----
+  const manualModal = $('#manualModal');
+  $('#btnManual').onclick = ()=> openModal(manualModal);
+  $('#btnManualCancel').onclick = ()=> closeModal(manualModal);
+  $('#btnManualOk').onclick = ()=>{
+    const raw = $('#manualInput').value.trim();
+    const code = extractCode(raw);
+    if(!code){ errorFx(); showToast('Kodi i pavlefshëm'); return; }
+    $('#manualInput').value='';
+    closeModal(manualModal);
+    askIssueFor(code);
+  };
 
-  // ====== Export ======
-  function csvEscape(v){ if(v==null) return ''; v=String(v); return /[",\n,;]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
-  function downloadText(text, name, mime){ const blob=new Blob([text],{type:mime||'text/plain;charset=utf-8;'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); }
-  expDetails.addEventListener('click', ()=>{
-    const rows=[['Barkod','Kategori','Data & Ora']];
-    state.entries.forEach(e=> rows.push([e.code, ISSUE_BY_ID[e.issueId]?.name||e.issueId, e.ts]));
-    downloadText(rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'detaje_bicikleta.csv','text/csv;charset=utf-8;');
-  });
-  expSummary.addEventListener('click', ()=>{
-    const byIssue=new Map(ISSUES.map(i=>[i.id,0])); state.entries.forEach(e=> byIssue.set(e.issueId,(byIssue.get(e.issueId)||0)+1));
-    const rows=[['Kategori','Sasia']]; ISSUES.forEach(i=> rows.push([i.name, byIssue.get(i.id)||0]));
-    downloadText(rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'permbledhje_bicikleta.csv','text/csv;charset=utf-8;');
-  });
-  expDoc.addEventListener('click', ()=>{
-    const stamp=nowStr();
-    const map=new Map(); state.entries.forEach(e=>{ if(!map.has(e.code)) map.set(e.code,[]); map.get(e.code).push(e); });
-    const byIssue=new Map(ISSUES.map(i=>[i.id,0])); state.entries.forEach(e=> byIssue.set(e.issueId,(byIssue.get(e.issueId)||0)+1));
-    let html=`<html><head><meta charset="utf-8"></head><body>
-    <h2>Raport Biçikletash (Barkod + Probleme)</h2><p><b>Gjeneruar:</b> ${stamp}</p>
-    <h3>Përmbledhje</h3><table border="1" cellspacing="0" cellpadding="6"><tr><th>Kategori</th><th>Sasia</th></tr>
-    ${ISSUES.map(i=> <tr><td>${i.name}</td><td>${byIssue.get(i.id)||0}</td></tr>).join('')}</table>
-    <h3>Detaje sipas barkodit</h3>
-    ${Array.from(map.entries()).map(([code,arr])=> `<h4>${code} (${arr.length})</h4>
-      <table border="1" cellspacing="0" cellpadding="6"><tr><th>#</th><th>Kategoria</th><th>Data & Ora</th></tr>
-      ${arr.map((e,i)=> <tr><td>${i+1}</td><td>${ISSUE_BY_ID[e.issueId]?.name||e.issueId}</td><td>${e.ts}</td></tr>).join('')}
-      </table>`).join('')}
-    </body></html>`;
-    downloadText(html,'raport_bicikleta.doc','application/msword;charset=utf-8;');
-  });
-
-  // ====== Kamera (opsiyonel) ======
-  let stream=null, detector=null, rafId=0; const coolSet=new Set();
-  async function startCam(){
-    camBox.style.display='block'; camHint.textContent='Duke u hapur…';
-    openCamBtn.style.display='none'; closeCamBtn.style.display='inline-block';
-    try{
-      if('BarcodeDetector' in window){ const formats=['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','itf','codabar','data_matrix','pdf417','aztec']; detector=new window.BarcodeDetector({formats}); } else { detector=null; }
-      stream=await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'environment', width:{ideal:1280}, height:{ideal:720} }, audio:false });
-      video.srcObject=stream; await video.play();
-      camHint.textContent = detector ? 'Gati për skanim. Drejto barkodin te kamera.' : 'Skanim automatik jo i mbështetur. Përdor “Shto me dorë”.';
-      if(detector) loopDetect();
-    }catch(err){ camHint.textContent='S’ u hap kamera: ' + (err && err.message ? err.message : err); openCamBtn.style.display='inline-block'; closeCamBtn.style.display='none'; }
+  // ---- ISSUE CHOOSER ----
+  const issueModal = $('#issueModal'), codeView = $('#codeView'), issuesGrid = $('#issuesGrid');
+  function askIssueFor(code){
+    codeView.textContent = code;
+    issuesGrid.innerHTML='';
+    ISSUES.forEach(it=>{
+      const b=document.createElement('button');
+      b.className='issue-btn';
+      b.innerHTML = ${it.al}<small>${it.tr}</small>;
+      b.onclick = ()=> addRecord(code, it.id);
+      issuesGrid.appendChild(b);
+    });
+    openModal(issueModal);
   }
-  function stopCam(){ try{ if(rafId) cancelAnimationFrame(rafId);}catch(_){} rafId=0; if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } video.srcObject=null; camBox.style.display='none'; openCamBtn.style.display='inline-block'; closeCamBtn.style.display='none'; }
-  async function loopDetect(){
-    if(!detector || !video || video.readyState<2){ rafId=requestAnimationFrame(loopDetect); return; }
+  $('#btnIssueCancel').onclick = ()=> closeModal(issueModal);
+
+  function addRecord(code, issueId){
+    const key = code+'|'+issueId;
+    if(seen.has(key)){ errorFx(); showToast('Ky kod për këtë problem ekziston'); return; }
+    records.push({code, issueId, ts: Date.now()});
+    seen.add(key); save(); renderAll(); successFx();
+    closeModal(issueModal);
+  }
+
+  // ---- SCANNER (BarcodeDetector) ----
+  const scanModal = $('#scanModal'); const video = $('#video');
+  let stream=null, facing='environment', scanning=false, detector=null, lastAt=0;
+
+  $('#btnOpenScan').onclick = startScan;
+  $('#btnStop').onclick = stopScan;
+  $('#btnSwitch').onclick = async ()=>{
+    facing = (facing==='environment')?'user':'environment';
+    await startCamera();
+  };
+
+  async function startScan(){
     try{
-      const codes=await detector.detect(video);
-      if(codes && codes.length){
-        const raw=codes[0].rawValue||''; const code=sanitize(raw);
-        if(code && !coolSet.has(code)){ coolSet.add(code); setTimeout(()=>coolSet.delete(code),2000); vibrate(20); openIssueChooser(code); }
+      if(!('BarcodeDetector' in window)){
+        alert('Ky shfletues nuk e mbështet skanimin live. Përdorni “Fut kodin manual”.');
+        return;
+      }
+      detector = new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
+      await startCamera();
+      openModal(scanModal);
+      scanning=true; loop();
+    }catch(err){
+      alert('S’po hapet kamera: '+err.message);
+    }
+  }
+  async function startCamera(){
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:facing, width:{ideal:1280}, height:{ideal:720}}, audio:false});
+    video.srcObject = stream; await video.play();
+  }
+  function stopScan(){
+    scanning=false;
+    if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; }
+    closeModal(scanModal);
+  }
+  async function loop(){
+    if(!scanning) return;
+    try{
+      const now=performance.now();
+      if(now - lastAt > 250){ // ~4 herë/sek
+        const codes = await detector.detect(video);
+        if(codes && codes.length){
+          const val = codes[0].rawValue || '';
+          const code = extractCode(val);
+          if(code){
+            stopScan(); successFx();
+            askIssueFor(code);
+            return;
+          }
+        }
+        lastAt = now;
       }
     }catch(_){}
-    rafId=requestAnimationFrame(loopDetect);
+    requestAnimationFrame(loop);
   }
 
-  // ====== Helpers ======
-  function sanitize(s){ if(s==null) return ''; return String(s).trim(); }
-  function vibrate(ms){ if(navigator.vibrate) try{ navigator.vibrate(ms); }catch(_){ } }
+  // ---- HELPERS ----
+  function extractCode(input){
+    if(!input) return null;
+    let s = String(input).trim();
+    s = s.replace(/[^A-Za-z0-9]+$/,''); // hiq simbolet në fund
+    const m = s.match(/([A-Za-z0-9]{4})$/);
+    return m ? m[1].toUpperCase() : null;
+  }
+  function openModal(m){ m.classList.add('open'); m.setAttribute('aria-hidden','false'); }
+  function closeModal(m){ m.classList.remove('open'); m.setAttribute('aria-hidden','true'); }
 
-  // ====== Events ======
-  openCamBtn.addEventListener('click', startCam);
-  closeCamBtn.addEventListener('click', stopCam);
-  addManual.addEventListener('click', ()=> document.getElementById('addManual').blur());
-  resetAll.addEventListener('click', ()=>{ if(!confirm('Je i sigurt? Kjo do t’i fshijë të gjitha regjistrimet.')) return; state={entries:[]}; saveState(); });
+  // ---- EXPORTS ----
+  $('#btnCsv').onclick = ()=>{
+    const rows = [['#','Kodi','Problemi (AL)','Problemi (TR)','Data & Ora']];
+    records.forEach((r,i)=> rows.push([i+1, r.code, byId[r.issueId].al, byId[r.issueId].tr, new Date(r.ts).toLocaleString('sq-AL')]));
+    const csv = rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    download(csv, 'bicikleta-defekte.csv', 'text/csv');
+  };
+  $('#btnDoc').onclick = ()=>{
+    const counts = Object.fromEntries(ISSUES.map(x=>[x.id,0]));
+    records.forEach(r=>counts[r.issueId]++);
+    let html = `
+      <html><head><meta charset="utf-8"><title>Raport Biçikleta</title></head><body>
+      <h2>Raport i Defekteve të Biçikletave</h2>
+      <p><b>Të krijuar:</b> ${new Date().toLocaleString('sq-AL')}</p>
+      <h3>Përmbledhje</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <tr><th>Problemi</th><th>Adet</th></tr>
+        ${ISSUES.map(it=><tr><td>${it.al} (${it.tr})</td><td align="right">${counts[it.id]||0}</td></tr>).join('')}
+      </table>
+      <h3>Lista e regjistrimeve (${records.length})</h3>
+      <table border="1" cellspacing="0" cellpadding="6">
+        <tr><th>#</th><th>Kodi</th><th>Problemi (AL)</th><th>Problemi (TR)</th><th>Data & Ora</th></tr>
+        ${records.map((r,i)=><tr><td>${i+1}</td><td>${r.code}</td><td>${byId[r.issueId].al}</td><td>${byId[r.issueId].tr}</td><td>${new Date(r.ts).toLocaleString('sq-AL')}</td></tr>).join('')}
+      </table></body></html>`;
+    download(html, 'bicikleta-defekte.doc', 'application/msword');
+  };
+  function download(content, filename, type){
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 500);
+  }
 
-  // İlk render
-  renderAll();
+  // ---- CLEAR ALL ----
+  $('#btnClear').onclick = ()=>{
+    if(!records.length) return showToast('S’ka asgjë për të fshirë');
+    if(!confirm('Pastroni TË GJITHA të dhënat?')) return;
+    records = []; seen = new Set(); save(); renderAll(); showToast('U pastrua');
+  };
 })();
 </script>
 </body>
