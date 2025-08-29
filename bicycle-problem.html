@@ -3,177 +3,123 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Regjistri i Biçikletave me Defekt</title>
+<title>Regjistri i Biçikletave · Single File (BarcodeDetector/jsQR)</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --muted:#a9b1c3; --text:#e7ebf5;
-    --accent:#2dd4bf; --accent-2:#22c55e; --danger:#ff6363; --ring:rgba(45,212,191,.25);
-    --chip:#0d1420; --chip2:#101826; --border:#212a3a;
-  }
+  :root{ --bg:#0f1115; --card:#171a21; --muted:#a9b1c3; --text:#e7ebf5;
+         --accent:#2dd4bf; --danger:#ff6363; --ring:rgba(45,212,191,.25);
+         --chip:#0d1420; --chip2:#101826; --border:#212a3a; }
   *{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
   html,body{height:100%}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
-    line-height:1.4;
-  }
-  header{
-    position:sticky; top:0; z-index:50;
-    background:linear-gradient(180deg,rgba(15,17,21,.96),rgba(15,17,21,.7));
-    backdrop-filter: saturate(120%) blur(8px);
-    border-bottom:1px solid var(--border);
-  }
+  body{ margin:0; background:var(--bg); color:var(--text);
+        font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif; }
+  header{ position:sticky; top:0; z-index:50; background:linear-gradient(180deg,rgba(15,17,21,.96),rgba(15,17,21,.7)); border-bottom:1px solid var(--border); }
   .wrap{max-width:940px; margin:0 auto; padding:14px 16px}
-  h1{font-size:22px; margin:0 0 6px; letter-spacing:.2px}
+  h1{font-size:22px; margin:0 0 6px}
   p{margin:0; color:var(--muted); font-size:14px}
   .grid{display:grid; gap:12px}
-  .card{
-    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,.25);
-  }
+  .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; box-shadow:0 10px 30px rgba(0,0,0,.25); }
   .issues{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px}
   @media (min-width:520px){ .issues{grid-template-columns: repeat(3, minmax(0,1fr));} }
   @media (min-width:760px){ .issues{grid-template-columns: repeat(4, minmax(0,1fr));} }
-  .issue{
-    display:flex; align-items:center; gap:10px; padding:16px; border-radius:12px;
-    background: linear-gradient(180deg, var(--chip), var(--chip2));
-    border:1px solid var(--border);
-    font-size:16px; font-weight:600; cursor:pointer; user-select:none;
-    justify-content:flex-start;
-    touch-action: manipulation;
-  }
-  .issue input{ display:none }
+  .issue{ display:flex; align-items:center; gap:10px; padding:16px; border-radius:12px; background: linear-gradient(180deg, var(--chip), var(--chip2)); border:1px solid var(--border); font-size:16px; font-weight:600; cursor:pointer; }
   .issue.selected{ outline:2px solid var(--accent); box-shadow:0 0 0 6px var(--ring); }
-  .issue small{color:var(--muted); font-weight:500}
   .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding:14px 16px; border-radius:12px; border:1px solid var(--border);
-    background: linear-gradient(180deg,#121826,#0e1522);
-    color:var(--text); font-weight:700; font-size:16px; text-decoration:none; cursor:pointer;
-    touch-action: manipulation;
-  }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background: linear-gradient(180deg,#121826,#0e1522); color:var(--text); font-weight:700; font-size:16px; cursor:pointer; }
   .btn[disabled]{opacity:.5; pointer-events:none}
   .btn.primary{ background: linear-gradient(180deg,#093a36,#0b2e2b); border-color:#12413b }
   .btn.green{ background: linear-gradient(180deg,#0b3822,#0a2e1c); border-color:#174a32 }
-  .btn.red{ background: linear-gradient(180deg,#3d0f0f,#2a0b0b); border-color:#552121 }
-  .btn.ghost{ background: transparent }
+  .btn.red{ background: linear-gradient(180deg,#0f0b0b,#2a0b0b); border-color:#552121 }
   .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-  input[type="text"]{
-    width:100%; padding:14px 14px; border-radius:12px; border:1px solid var(--border);
-    background:#0e1421; color:var(--text); font-size:16px;
-  }
-  .hint{color:var(--muted); font-size:13px}
+  input[type="text"]{ width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:#0e1421; color:var(--text); font-size:16px; }
   .split{display:grid; gap:12px}
   @media(min-width:880px){ .split{grid-template-columns: 1.5fr 1fr} }
   .summary{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px }
   @media(min-width:520px){ .summary{ grid-template-columns:repeat(3, minmax(0,1fr));} }
-  .chip{
-    border:1px solid var(--border); background:linear-gradient(180deg,#0f1626,#0c1220);
-    padding:12px; border-radius:12px; display:flex; align-items:center; gap:10px;
-    justify-content:space-between; cursor:pointer;
-  }
-  .chip b{font-size:18px}
+  .chip{ border:1px solid var(--border); background:linear-gradient(180deg,#0f1626,#0c1220); padding:12px; border-radius:12px; display:flex; align-items:center; gap:10px; justify-content:space-between; cursor:pointer; }
   .list{ display:grid; gap:8px; max-height:420px; overflow:auto; padding-right:4px }
-  .item{
-    display:flex; gap:8px; align-items:center; padding:10px 12px; border-radius:12px;
-    border:1px solid var(--border); background:linear-gradient(180deg,#0e1522,#0b111c);
-  }
-  .badge{ font-size:12px; padding:4px 8px; border-radius:999px; background:#0f2030; border:1px solid var(--border); color:var(--muted) }
-  .ts{ margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap }
+  .item{ display:flex; gap:8px; align-items:center; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:linear-gradient(180deg,#0e1522,#0b111c); }
+  .badge{ font-size:12px; padding:4px 8px; border-radius:999px; background:#0f2030; border:1px solid var(--border); color:#a9b1c3 }
+  .ts{ margin-left:auto; font-size:12px; color:#a9b1c3; white-space:nowrap }
   .tabs{ display:flex; gap:8px; border-bottom:1px solid var(--border); margin-bottom:12px }
   .tab{ padding:10px 12px; border-radius:10px; cursor:pointer; font-weight:700 }
   .tab.active{ background:#10192a; border:1px solid var(--border) }
-  .modal{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:80 }
-  .modal.open{ display:flex }
-  .modal .sheet{ width:min(760px,94vw); max-height:86vh; overflow:auto; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px }
-  .modal h3{ margin:0 0 8px }
-  .close{ position:sticky; top:0; margin-left:auto; display:inline-flex; padding:8px 10px; border:1px solid var(--border); border-radius:10px; cursor:pointer; background:#0f1626 }
-  .flash{ position:fixed; inset:0; pointer-events:none; opacity:0; transition:opacity .25s ease; z-index:70 }
-  .flash.ok{ background:rgba(34,197,94,.2) }
-  .flash.err{ background:rgba(239,68,68,.25) }
-  footer{padding:30px 0 60px; text-align:center; color:var(--muted); font-size:12px}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4;max-width:560px;margin:0 auto}
+  video{width:100%;height:100%;object-fit:cover;display:block}
+  .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition: box-shadow .12s, border-color .12s;}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <h1>Regjistri i Biçikletave me Defekt</h1>
-    <p>Skano kodin QR (ose shkruaje manualisht), zgjidh defektin dhe shto në listë. Fundi: Eksporto në Excel/Word.</p>
+    <p>Skano QR (ose shkruaj manualisht), zgjidh defektin dhe shto në listë. Fundi: Eksporto në Excel/Word.</p>
   </div>
 </header>
 
 <main class="wrap grid" style="padding-top:10px">
-  <!-- 1) Zgjedh defektin -->
   <section class="card">
     <div class="row" style="justify-content:space-between; gap:10px 16px">
       <div>
         <b>1) Zgjidh defektin</b><br>
         <span class="hint">Prek një nga butonat më poshtë (butona të mëdhenj për përdorim me një dorë).</span>
       </div>
-      <button class="btn ghost" id="clearSel">Hiqe përzgjedhjen</button>
+      <button class="btn" id="clearSel">Hiqe përzgjedhjen</button>
     </div>
     <div id="issueGrid" class="issues" style="margin-top:10px"></div>
   </section>
 
-  <!-- 2) Skanim / Shkrim manual -->
   <section class="card">
     <div class="grid">
-      <div class="row">
-        <b>2) Skano ose shkruaj barkodin</b>
-      </div>
-
+      <b>2) Skano ose shkruaj barkodin</b>
       <div class="toolbar">
         <button class="btn primary" id="btnStartScan">📷 Fillo skanimin</button>
         <button class="btn" id="btnStopScan" disabled>✖︎ Ndalo</button>
         <button class="btn" id="btnSwitchCam" disabled>🔄 Ndërro kamerën</button>
+        <button class="btn" id="btnTorch" disabled>💡 Flaş</button>
+        <button class="btn" id="btnClipboard">📋 Ngjit nga kujtesa</button>
       </div>
-
       <div id="scanBox" class="card" style="padding:0; display:none">
-        <div id="reader" style="width:100%; max-width:560px; margin:0 auto"></div>
+        <div class="video-wrap">
+          <video id="qrVideo" playsinline muted></video>
+          <div id="qrFrame" class="scan-frame"></div>
+        </div>
       </div>
-
+      <canvas id="qrCanvas" style="display:none"></canvas>
       <div class="grid">
-        <label for="manual" class="hint">Ngjit linkun e QR-it <i>(p.sh. https://domain/.../L8KQ)</i> ose shkruaj kodin (4 shkronja/shifra):</label>
+        <label for="manual" class="hint">Ngjit linkun e QR-it ose shkruaj kodin (4 shkronja/shifra):</label>
         <div class="row" style="gap:8px">
-          <input id="manual" type="text" placeholder="Lipe linkun ose shkruaj kodin (p.sh. L8KQ)" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="64">
+          <input id="manual" type="text" placeholder="p.sh. https://.../L8KQ OSE L8KQ" inputmode="text" autocomplete="off" autocapitalize="characters" maxlength="64">
           <button class="btn green" id="btnAddManual">➕ Shto në listë</button>
         </div>
-        <span class="hint">Shënim: Nga çdo link merren vetëm 4 shkronjat/shifrat e fundit.</span>
       </div>
-
       <div class="toolbar">
         <button class="btn" id="btnUndo">↶ Kthe veprimin e fundit</button>
         <button class="btn red" id="btnClearAll">🗑️ Pastro gjithçka</button>
       </div>
+      <p class="hint">Nëse kamera nuk hapet: faqja duhet të jetë HTTPS. Në iOS, Safari → Camera → *Allow*.</p>
     </div>
   </section>
 
-  <!-- 3) Listat -->
   <section class="card split">
     <div>
       <div class="tabs">
         <div class="tab active" data-tab="by-barcode">Lista sipas barkodit</div>
         <div class="tab" data-tab="by-summary">Përmbledhje sipas defekteve</div>
       </div>
-
       <div id="pane-by-barcode" class="list"></div>
       <div id="pane-by-summary" class="list" style="display:none"></div>
     </div>
-
     <aside>
       <b>Eksporto</b>
       <div class="grid" style="margin-top:10px">
-        <button class="btn" id="btnExportCSV">⬇️ Eksporto (Detaje) – CSV</button>
-        <button class="btn" id="btnExportSummaryCSV">⬇️ Eksporto (Përmbledhje) – CSV</button>
-        <button class="btn" id="btnExportDOC">⬇️ Eksporto – Word (.doc)</button>
+        <button class="btn" id="btnExportCSV">⬇️ Detaje – CSV</button>
+        <button class="btn" id="btnExportSummaryCSV">⬇️ Përmbledhje – CSV</button>
+        <button class="btn" id="btnExportDOC">⬇️ Word (.doc)</button>
       </div>
-
       <div class="card" style="margin-top:12px">
         <b>Statistika e shpejtë</b>
         <div id="quick" class="summary" style="margin-top:8px"></div>
       </div>
-      <p class="hint" style="margin-top:8px">Prek një kuti në “Përmbledhje” për të parë detajet (me datë/orë).</p>
     </aside>
   </section>
 </main>
@@ -190,330 +136,141 @@
 
 <div class="flash" id="flash"></div>
 
-<footer>
-  © Regjistri i Biçikletave – Punon offline, ruan lokalisht (LocalStorage).
-</footer>
+<footer class="wrap" style="text-align:center; color:#a9b1c3; font-size:12px; padding:20px 0 60px">Punon offline · LocalStorage</footer>
 
-<!-- Opsionale: skanimi me HTML5-QR (fallback automatik nëse nuk ngarkohet) -->
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.10/minified/html5-qrcode.min.js"></script>
 <script>
-  // ====== KONFIGURIMI ======
-  const ISSUES = [
-    {id:'chg-no',   name:'Nuk merr karikim',                hint:'(Şarj almıyor)'},
-    {id:'lock',     name:'Bllokimi i baterisë nuk hapet',  hint:'(Batarya kilidi açılmıyor)'},
-    {id:'lcd',      name:'Ekrani nuk ndizet',              hint:'(Ekran açılmıyor)'},
-    {id:'bat0',     name:'Bateria ngelet në 0%',           hint:'(Batarya %0’da kalıyor)'},
-    {id:'ctrl',     name:'Kontrolleri problematik',        hint:'(Sürücü sorunlu)'},
-    {id:'timeout',  name:'Koha skadoi (Timeout)',          hint:'(Timeout)'},
-    {id:'port-miss',name:'Mungon priza e karikimit',       hint:'(Şarj soketi yok)'},
-    {id:'brake',    name:'Rrota e bllokuar nga frena',     hint:'(Teker frende tıkalı)'},
-    {id:'mech',     name:'Probleme mekanike',              hint:'(Mekanik)'},
-    {id:'no-cmd',   name:'Nuk merr komandë',               hint:'(Komut almıyor)'},
+  // ---- Helper UI ----
+  const $=q=>document.querySelector(q);
+  function fmtTS(ts){return new Date(ts).toLocaleString('sq-AL',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
+  function beep(ok=true){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=ok?'triangle':'sawtooth';o.frequency.value=ok?880:320;g.gain.setValueAtTime(.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.05,ctx.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.22);o.start();o.stop(ctx.currentTime+.24);}catch{}}
+  function flash(ok){const el=$('#flash');el.className='flash '+(ok?'ok':'err');el.style.opacity='1';setTimeout(()=>el.style.opacity='0',220);}
+  function extract4(s){return String(s||'').trim().replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();}
+</script>
+<script>
+  // ---- Data & Issues ----
+  const ISSUES=[
+    {id:'chg-no',name:'Nuk merr karikim'},
+    {id:'lock',name:'Bllokimi i baterisë nuk hapet'},
+    {id:'lcd',name:'Ekrani nuk ndizet'},
+    {id:'bat0',name:'Bateria ngelet në 0%'},
+    {id:'ctrl',name:'Kontrolleri problematik'},
+    {id:'timeout',name:'Koha skadoi (Timeout)'},
+    {id:'port-miss',name:'Mungon priza e karikimit'},
+    {id:'brake',name:'Rrota e bllokuar nga frena'},
+    {id:'mech',name:'Probleme mekanike'},
+    {id:'no-cmd',name:'Nuk merr komandë'},
   ];
-  const LS_KEY = 'bikeq_records_v1';
+  const LS_KEY='bikeq_v4';
+  let selectedIssue=null; let records=load();
+  function load(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch{return []}}
+  function save(){localStorage.setItem(LS_KEY,JSON.stringify(records));}
+  function addRecordFrom(raw){const code=extract4(raw); if(!code){alert('Kodi i pavlefshëm.');flash(false);beep(false);return;} if(!selectedIssue){alert('Zgjidh defektin fillimisht.');flash(false);beep(false);return;} if(records.some(r=>r.code===code && r.issue===selectedIssue)){flash(false);beep(false);return;} records.push({code,issue:selectedIssue,ts:Date.now()}); save(); render(); flash(true);beep(true);}
+  function undo(){if(records.length){records.pop();save();render();}}
+  function clearAll(){if(confirm('Je i sigurt?')){records=[];save();render();}}
+  function byBarcode(){const m=new Map();for(const r of records){if(!m.has(r.code))m.set(r.code,[]);m.get(r.code).push(r);}for(const v of m.values())v.sort((a,b)=>b.ts-a.ts);return [...m.entries()].sort((a,b)=>a[0].localeCompare(b[0]));}
+  function byIssue(){const m=new Map();for(const r of records){if(!m.has(r.issue))m.set(r.issue,[]);m.get(r.issue).push(r);}return ISSUES.map(it=>({id:it.id,name:it.name,count:(m.get(it.id)||[]).length,rows:(m.get(it.id)||[])}));}
+</script>
+<script>
+  // ---- Render ----
+  function renderIssues(){const grid=$('#issueGrid');grid.innerHTML='';ISSUES.forEach(it=>{const b=document.createElement('button');b.className='issue';b.textContent=it.name; b.onclick=()=>{selectedIssue=it.id;[...grid.children].forEach(c=>c.classList.remove('selected'));b.classList.add('selected');};grid.appendChild(b);});}
+  function render(){ // barcode list
+    const pane=$('#pane-by-barcode'); pane.innerHTML=''; const g=byBarcode(); if(!g.length){pane.innerHTML='<div class="hint">S’ka të dhëna ende.</div>'} else { for(const [code,arr] of g){ const el=document.createElement('div'); el.className='item'; el.innerHTML='<b>'+code+'</b> '+arr.map(x=>'<span class="badge">'+(ISSUES.find(i=>i.id===x.issue)?.name||x.issue)+'</span>').join(' ')+' <span class="ts">'+fmtTS(arr[0].ts)+'</span>'; pane.appendChild(el);} }
+    // summary
+    const sp=$('#pane-by-summary'); sp.innerHTML=''; const quick=$('#quick'); quick.innerHTML=''; for(const row of byIssue()){ const chip=document.createElement('div'); chip.className='chip'; chip.innerHTML='<div>'+row.name+'</div><b>'+row.count+'</b>'; chip.onclick=()=>openDetails(row.id); sp.appendChild(chip); const q=chip.cloneNode(true); q.onclick=()=>openDetails(row.id); quick.appendChild(q);} }
+  function openDetails(issueId){ const issue=ISSUES.find(i=>i.id===issueId); const rows=records.filter(r=>r.issue===issueId).sort((a,b)=>b.ts-a.ts); $('#modalTitle').textContent=issue?.name||issueId; const body=$('#modalBody'); body.innerHTML=''; if(!rows.length){body.innerHTML='<div class="hint">S’ka hyrje.</div>'; showModal(true); return;} for(const r of rows){ const el=document.createElement('div'); el.className='item'; el.innerHTML='<b>'+r.code+'</b> <span class="badge">'+(issue?.name||r.issue)+'</span> <span class="ts">'+fmtTS(r.ts)+'</span>'; body.appendChild(el);} showModal(true); }
+  function showModal(open){ $('#modal').classList.toggle('open',!!open); }
+  function initTabs(){ const tabs=document.querySelectorAll('.tab'); tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); const n=t.getAttribute('data-tab'); $('#pane-by-barcode').style.display=(n==='by-barcode')? '' : 'none'; $('#pane-by-summary').style.display=(n==='by-summary')? '' : 'none'; })); }
+</script>
+<script>
+  // ---- Exports ----
+  function toCSV(rows){return rows.map(r=>r.map(x=>('"' + String(x??'').replace(/"/g,'""') + '"')).join(',')).join('\r\n');}
+  function dl(name,mime,content){const blob=new Blob([content],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+  function exportDetails(){const rows=[["Kodi (4-sh)","Defekti","Data/Ora"]]; for(const r of records){rows.push([r.code, ISSUES.find(i=>i.id===r.issue)?.name||r.issue, fmtTS(r.ts)])} dl('detaje.csv','text/csv;charset=utf-8', toCSV(rows));}
+  function exportSummary(){const rows=[["Defekti","Sasia"]]; for(const s of byIssue()){rows.push([s.name,s.count])} dl('permbledhje.csv','text/csv;charset=utf-8', toCSV(rows));}
+  function exportDoc(){ const sum=byIssue(); const html=<html><head><meta charset="utf-8"></head><body style="font-family:Arial"><h2>Raport – Biçikleta</h2><p>${fmtTS(Date.now())}</p><h3>Përmbledhje</h3><table border=1 cellpadding=6 cellspacing=0><tr><th>Defekti</th><th>Sasia</th></tr>${sum.map(s=><tr><td>${s.name}</td><td>${s.count}</td></tr>).join('')}</table><h3>Detaje</h3><table border=1 cellpadding=6 cellspacing=0><tr><th>#</th><th>Kodi</th><th>Defekti</th><th>Data/Ora</th></tr>${records.map((r,i)=><tr><td>${i+1}</td><td>${r.code}</td><td>${ISSUES.find(x=>x.id===r.issue)?.name||r.issue}</td><td>${fmtTS(r.ts)}</td></tr>).join('')}</table></body></html>; dl('raport.doc','application/msword',html); }
+</script>
+<script>
+  // ---- Scanner (BarcodeDetector preferred, jsQR fallback) ----
+  let stream=null, track=null, scanning=false, lastTick=0, detector=null, useBD=('BarcodeDetector' in window);
 
-  // ====== GJENDJA ======
-  let selectedIssue = null;
-  let records = loadRecords();   // [{code, issue, ts}]
-  let lastCameraId = null;
-  let scanner = null;
-  let cameras = [];
-  const $ = (q) => document.querySelector(q);
-
-  // ====== UTILS ======
-  function nowTs(){ return Date.now(); }
-  function fmtTS(ts){
-    try{
-      return new Date(ts).toLocaleString('sq-AL', {
-        year:'numeric', month:'2-digit', day:'2-digit',
-        hour:'2-digit', minute:'2-digit'
-      });
-    }catch(_){ return ts+''; }
-  }
-  function extractCode(input){
-    if(!input) return '';
-    let s = (''+input).trim();
-    // Merr vetëm 4 shkronjat/shifrat e fundit nga çdo tekst/link
-    let m = s.match(/[A-Z0-9]{4}(?:[^A-Z0-9]*)$/i);
-    if(!m) return '';
-    return m[0].replace(/[^A-Z0-9]/ig,'').slice(-4).toUpperCase();
-  }
-  function saveRecords(){ localStorage.setItem(LS_KEY, JSON.stringify(records)); }
-  function loadRecords(){
-    try{ return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }catch(_){ return []; }
-  }
-  function beep(ok=true){
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = ok ? 'triangle' : 'sawtooth';
-    o.frequency.value = ok ? 880 : 240;
-    g.gain.setValueAtTime(.0001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.05, ctx.currentTime+.02);
-    g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime+.22);
-    o.start(); o.stop(ctx.currentTime+.24);
-  }
-  function flash(ok=true){
-    const el = $('#flash');
-    el.className = 'flash ' + (ok ? 'ok':'err');
-    el.style.opacity = '1';
-    setTimeout(()=>{ el.style.opacity = '0'; }, 220);
-  }
-
-  // ====== UI: Issues ======
-  function renderIssues(){
-    const grid = $('#issueGrid'); grid.innerHTML = '';
-    ISSUES.forEach(it=>{
-      const btn = document.createElement('button');
-      btn.className = 'issue';
-      btn.innerHTML = '<div>🔧</div><div>'+it.name+'<br><small>'+it.hint+'</small></div>';
-      btn.onclick = ()=>{
-        selectedIssue = it.id;
-        [...grid.children].forEach(c=>c.classList.remove('selected'));
-        btn.classList.add('selected');
-      };
-      grid.appendChild(btn);
-    });
-  }
-
-  // ====== RECORD LOGIC ======
-  function addRecordFrom(raw){
-    const code = extractCode(raw);
-    if(!code){ alert('Kodi nuk u gjet. Ngjit një link të vlefshëm ose shkruaj 4-shin.'); flash(false); beep(false); return; }
-    if(!selectedIssue){ alert('Ju lutem zgjidhni fillimisht defektin.'); flash(false); beep(false); return; }
-    // Parandalon duplikimin e saktë të njëjtë (i njëjti kod + i njëjti defekt)
-    const exists = records.some(r=> r.code===code && r.issue===selectedIssue);
-    if(exists){ flash(false); beep(false); return; }
-    records.push({code, issue:selectedIssue, ts: nowTs()});
-    saveRecords();
-    $('#manual').value='';
-    renderAll();
-    flash(true); beep(true);
-  }
-
-  function undoLast(){
-    if(records.length===0) return;
-    records.pop();
-    saveRecords(); renderAll();
-  }
-  function clearAll(){
-    if(!confirm('Je i sigurt? E gjithë lista do të fshihet.')) return;
-    records = []; saveRecords(); renderAll();
-  }
-
-  // ====== GROUPINGS ======
-  function groupByBarcode(){
-    const map = new Map(); // code => [{issue, ts}]
-    for(const r of records){
-      if(!map.has(r.code)) map.set(r.code, []);
-      map.get(r.code).push({issue:r.issue, ts:r.ts});
+  async function ensureScanner(){
+    if(useBD){
+      try{detector=new BarcodeDetector({formats:['qr_code','code_128','code_39']}); return true;}
+      catch(e){ useBD=false; }
     }
-    // sort by time desc per barcode
-    for(const arr of map.values()) arr.sort((a,b)=>b.ts-a.ts);
-    // overall sort by code
-    return [...map.entries()].sort((a,b)=> a[0].localeCompare(b[0]));
-  }
-
-  function summaryByIssue(){
-    const map = new Map(); // issue => [records]
-    for(const r of records){
-      if(!map.has(r.issue)) map.set(r.issue, []);
-      map.get(r.issue).push(r);
+    // jsQR fallback loader (multi-CDN)
+    if(window.jsQR) return true;
+    const cdns=[
+      'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js',
+      'https://unpkg.com/jsqr@1.4.0/dist/jsQR.js'
+    ];
+    for(const url of cdns){
+      try{
+        await new Promise((res,rej)=>{const s=document.createElement('script'); s.src=url; s.onload=res; s.onerror=rej; document.head.appendChild(s);});
+        if(window.jsQR) return true;
+      }catch(e){}
     }
-    const rows = ISSUES.map(it=>({issue:it.id, name:it.name, count:(map.get(it.id)||[]).length, rows:(map.get(it.id)||[])}));
-    return rows;
+    return !!window.jsQR;
   }
-
-  // ====== UI: Lists ======
-  function renderByBarcode(){
-    const pane = $('#pane-by-barcode'); pane.innerHTML='';
-    const grouped = groupByBarcode();
-    if(grouped.length===0){ pane.innerHTML = '<div class="hint">S’ka të dhëna ende. Shtoni disa.</div>'; return; }
-    for(const [code, arr] of grouped){
-      const el = document.createElement('div'); el.className='item';
-      const tags = arr.map(x=>{
-        const issue = ISSUES.find(i=>i.id===x.issue);
-        return '<span class="badge">'+issue?.name||x.issue+'</span>';
-      }).join(' ');
-      el.innerHTML = '<b>'+code+'</b> '+tags+' <span class="ts">'+fmtTS(arr[0].ts)+'</span>';
-      pane.appendChild(el);
-    }
-  }
-
-  function renderSummary(){
-    const pane = $('#pane-by-summary'); pane.innerHTML='';
-    const quick = $('#quick'); quick.innerHTML='';
-    const sum = summaryByIssue();
-    for(const row of sum){
-      const el = document.createElement('div'); el.className='chip';
-      el.innerHTML = '<div>'+row.name+'</div><b>'+row.count+'</b>';
-      el.onclick = ()=> openDetails(row.issue);
-      pane.appendChild(el);
-
-      // quick cards (same)
-      const q = document.createElement('div'); q.className='chip'; q.innerHTML = '<div>'+row.name+'</div><b>'+row.count+'</b>';
-      q.onclick = ()=> openDetails(row.issue);
-      quick.appendChild(q);
-    }
-  }
-
-  function openDetails(issueId){
-    const issue = ISSUES.find(i=>i.id===issueId);
-    const rows = records.filter(r=>r.issue===issueId).sort((a,b)=>b.ts-a.ts);
-    $('#modalTitle').textContent = issue?.name || issueId;
-    const body = $('#modalBody'); body.innerHTML='';
-    if(rows.length===0){ body.innerHTML='<div class="hint">S’ka hyrje.</div>'; showModal(true); return; }
-    for(const r of rows){
-      const el = document.createElement('div'); el.className='item';
-      el.innerHTML = '<b>'+r.code+'</b> <span class="badge">'+(issue?.name||r.issue)+'</span> <span class="ts">'+fmtTS(r.ts)+'</span>';
-      body.appendChild(el);
-    }
-    showModal(true);
-  }
-
-  // ====== Tabs & Modal ======
-  function initTabs(){
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(t=> t.addEventListener('click', ()=>{
-      tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
-      const name = t.getAttribute('data-tab');
-      $('#pane-by-barcode').style.display = (name==='by-barcode') ? '' : 'none';
-      $('#pane-by-summary').style.display = (name==='by-summary') ? '' : 'none';
-    }));
-  }
-  function showModal(open){
-    $('#modal').classList.toggle('open', !!open);
-  }
-
-  // ====== EXPORTS ======
-  function toCSV(rows){
-    return rows.map(r=> r.map(x=> {
-      const s = (x==null?'':String(x)).replace(/"/g,'""');
-      return '"'+s+'"';
-    }).join(',')).join('\r\n');
-  }
-  function download(name, mime, content){
-    const blob = new Blob([content], {type:mime});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = name; a.click();
-    setTimeout(()=> URL.revokeObjectURL(url), 1500);
-  }
-  function exportDetailsCSV(){
-    const rows = [['Kodi (4-sh)','Defekti','Data/Ora']];
-    for(const r of records){
-      const issue = ISSUES.find(i=>i.id===r.issue)?.name || r.issue;
-      rows.push([r.code, issue, fmtTS(r.ts)]);
-    }
-    download('biçikleta-detaje.csv','text/csv;charset=utf-8', toCSV(rows));
-  }
-  function exportSummaryCSV(){
-    const rows = [['Defekti','Sasia']];
-    for(const s of summaryByIssue()){
-      rows.push([s.name, s.count]);
-    }
-    download('biçikleta-përmbledhje.csv','text/csv;charset=utf-8', toCSV(rows));
-  }
-  function exportDOC(){
-    const sum = summaryByIssue();
-    const html = `
-      <html><head><meta charset="utf-8"><title>Raport Biçikletash</title></head>
-      <body style="font-family:Arial,Helvetica,sans-serif">
-        <h2>Raport – Biçikleta me Defekt</h2>
-        <p>Gjeneruar: ${fmtTS(nowTs())}</p>
-        <h3>Përmbledhje</h3>
-        <table border="1" cellpadding="6" cellspacing="0">
-          <tr><th>Defekti</th><th>Sasia</th></tr>
-          ${sum.map(s=>`<tr><td>${s.name}</td><td>${s.count}</td></tr>`).join('')}
-        </table>
-        <h3>Detaje</h3>
-        <table border="1" cellpadding="6" cellspacing="0">
-          <tr><th>#</th><th>Kodi (4-sh)</th><th>Defekti</th><th>Data/Ora</th></tr>
-          ${records.map((r,i)=>{
-            const issue = ISSUES.find(x=>x.id===r.issue)?.name || r.issue;
-            return `<tr><td>${i+1}</td><td>${r.code}</td><td>${issue}</td><td>${fmtTS(r.ts)}</td></tr>`
-          }).join('')}
-        </table>
-      </body></html>`;
-    download('raport-bicikleta.doc','application/msword', html);
-  }
-
-  // ====== SCANNER ======
+  async function listCameras(){ try{ const dev=await navigator.mediaDevices.enumerateDevices(); return dev.filter(d=>d.kind==='videoinput'); }catch{return []} }
   async function startScan(){
-    if(!window.Html5Qrcode){
-      alert('Skaneri i kamerës nuk u ngarkua. Përdorni shkrimin manual më poshtë.');
-      return;
-    }
+    const ok=await ensureScanner();
+    if(!ok){ alert('Skaneri nuk u ngarkua. Përdorni “Ngjit nga kujtesa” ose shkrimin manual.'); return; }
     $('#scanBox').style.display='block';
     $('#btnStopScan').disabled=false;
-    $('#btnSwitchCam').disabled=false;
-    try{
-      cameras = await Html5Qrcode.getCameras();
-    }catch(e){ cameras = []; }
-    const camId = lastCameraId || (cameras[0]?.id);
-    if(!scanner){
-      scanner = new Html5Qrcode('reader', { formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39 ] });
-    }
-    await scanner.start(
-      camId ? {deviceId: {exact: camId}} : { facingMode: "environment" },
-      { fps: 10, qrbox: (viewW, viewH)=> Math.min(280, Math.floor(Math.min(viewW, viewH)*0.7)) },
-      (text)=>{
-        const code = extractCode(text);
-        if(code){
-          addRecordFrom(code);
-        }else{
-          flash(false); beep(false);
+    const cams=await listCameras(); $('#btnSwitchCam').disabled=(cams.length<=1);
+    const cons = window._lastCam ? {video:{deviceId:{exact:window._lastCam}}} : {video:{facingMode:'environment'}};
+    stream=await navigator.mediaDevices.getUserMedia(cons);
+    const v=$('#qrVideo'); v.srcObject=stream; await v.play();
+    track=stream.getVideoTracks()[0]||null;
+    $('#btnTorch').disabled=!(track && track.getCapabilities && track.getCapabilities().torch);
+    scanning=true; lastTick=0; requestAnimationFrame(loop);
+  }
+  function stopScan(){ scanning=false; if(stream){ stream.getTracks().forEach(t=>t.stop()); } $('#qrVideo').srcObject=null; track=null; }
+  async function switchCam(){ const cams=await listCameras(); if(cams.length<=1) return; const ids=cams.map(c=>c.deviceId); const idx=Math.max(0, ids.indexOf(window._lastCam)); window._lastCam = ids[(idx+1)%ids.length]; stopScan(); startScan(); }
+  async function toggleTorch(){ if(!track||!track.applyConstraints) return; const caps=track.getCapabilities?track.getCapabilities():{}; if(!caps.torch) return; toggleTorch._on=!toggleTorch._on; try{ await track.applyConstraints({advanced:[{torch:toggleTorch._on}]}); }catch{ toggleTorch._on=false; } }
+  function glow(ok){ const f=$('#qrFrame'); if(!f) return; f.style.boxShadow = ok? '0 0 0 9999px rgba(0,255,144,.18) inset, 0 0 22px rgba(0,255,144,.75) inset' : '0 0 0 9999px rgba(255,0,0,.18) inset, 0 0 22px rgba(255,80,80,.9) inset'; f.style.borderColor = ok? 'rgba(0,255,144,.95)' : 'rgba(255,90,90,.95)'; clearTimeout(f._t); f._t=setTimeout(()=>{ f.style.boxShadow=''; f.style.borderColor='rgba(255,255,255,.55)'; }, 350); }
+  function drawFrame(){ const v=$('#qrVideo'), c=$('#qrCanvas'), ctx=c.getContext('2d',{willReadFrequently:true}); c.width=v.videoWidth; c.height=v.videoHeight; ctx.drawImage(v,0,0,c.width,c.height); return ctx.getImageData(0,0,c.width,c.height); }
+
+  async function loop(ts){
+    if(!scanning) return;
+    if(ts-lastTick<120) return requestAnimationFrame(loop);
+    lastTick=ts; const v=$('#qrVideo');
+
+    if(useBD && detector){
+      try{
+        const codes=await detector.detect(v);
+        if(codes && codes[0]){
+          const code=extract4(codes[0].rawValue);
+          if(code){ addRecordFrom(code); glow(true); beep(true); } else { glow(false); beep(false); }
         }
-      },
-      (err)=>{ /* ignore */ }
-    );
-  }
-  async function stopScan(){
-    if(scanner && scanner._isScanning){
-      await scanner.stop();
-      await scanner.clear();
+      }catch(e){}
+    } else if(window.jsQR && v.readyState>=2){
+      const frame=drawFrame();
+      const qr=jsQR(frame.data, frame.width, frame.height, {inversionAttempts:'dontInvert'});
+      if(qr && qr.data){
+        const code=extract4(qr.data);
+        if(code){ addRecordFrom(code); glow(true); beep(true);} else { glow(false); beep(false);}
+      }
     }
-    $('#btnStopScan').disabled=true;
-    $('#btnSwitchCam').disabled = cameras.length <= 1;
+    requestAnimationFrame(loop);
   }
-  async function switchCam(){
-    if(!scanner || !scanner._isScanning || cameras.length<=1) return;
-    // pick next camera
-    const ids = cameras.map(c=>c.id);
-    const idx = Math.max(0, ids.indexOf(lastCameraId));
-    const next = ids[(idx+1)%ids.length];
-    await scanner.stop(); await scanner.clear();
-    lastCameraId = next;
-    await startScan();
-  }
-
-  // ====== RENDER ALL ======
-  function renderAll(){
-    renderByBarcode();
-    renderSummary();
-  }
-
-  // ====== EVENTS ======
-  window.addEventListener('load', ()=>{
-    renderIssues(); initTabs(); renderAll();
-    $('#btnAddManual').onclick = ()=> addRecordFrom($('#manual').value);
-    $('#btnUndo').onclick = undoLast;
-    $('#btnClearAll').onclick = clearAll;
-    $('#btnExportCSV').onclick = exportDetailsCSV;
-    $('#btnExportSummaryCSV').onclick = exportSummaryCSV;
-    $('#btnExportDOC').onclick = exportDOC;
-    $('#btnStartScan').onclick = startScan;
-    $('#btnStopScan').onclick = stopScan;
-    $('#btnSwitchCam').onclick = switchCam;
-    $('#clearSel').onclick = ()=>{
-      selectedIssue=null;
-      [...document.querySelectorAll('.issue')].forEach(c=>c.classList.remove('selected'));
-    };
-    $('#closeModal').onclick = ()=> showModal(false);
-    $('#modal').addEventListener('click', (e)=>{ if(e.target.id==='modal') showModal(false); });
-    // Enter key on manual
-    $('#manual').addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ addRecordFrom($('#manual').value); } });
+</script>
+<script>
+  // ---- Wire UI ----
+  function exportButtons(){ $('#btnExportCSV').onclick=exportDetails; $('#btnExportSummaryCSV').onclick=exportSummary; $('#btnExportDOC').onclick=exportDoc; }
+  window.addEventListener('load',()=>{
+    renderIssues(); initTabs(); render(); exportButtons();
+    $('#btnAddManual').onclick=()=>addRecordFrom($('#manual').value);
+    $('#btnUndo').onclick=undo; $('#btnClearAll').onclick=clearAll;
+    $('#btnStartScan').onclick=startScan; $('#btnStopScan').onclick=stopScan;
+    $('#btnSwitchCam').onclick=switchCam; $('#btnTorch').onclick=toggleTorch;
+    $('#btnClipboard').onclick=async()=>{ try{const t=await navigator.clipboard.readText(); if(t) addRecordFrom(t);}catch{alert('Clipboard i bllokuar. Jep leje.');} };
+    $('#manual').addEventListener('keydown',e=>{ if(e.key==='Enter') addRecordFrom($('#manual').value); });
+    if(navigator.permissions&&navigator.permissions.query){
+      navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted') startScan(); }).catch(()=>{});
+    }
   });
 </script>
 </body>
