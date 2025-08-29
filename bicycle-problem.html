@@ -58,6 +58,7 @@
   video{width:100%;height:100%;object-fit:cover;display:block}
   .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition: box-shadow .12s, border-color .12s;}
   /* Error overlay */
+  #flash{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .25s ease;z-index:70}
   #err{position:fixed;right:12px;bottom:12px;z-index:9999;background:#2a0f0f;color:#ffd2d2;border:1px solid #5a1f1f;border-radius:12px;padding:10px 12px;max-width:90vw;font-size:12px;display:none;white-space:pre-wrap}
 </style>
 </head>
@@ -147,7 +148,7 @@
   </div>
 </div>
 
-<div class="flash" id="flash"></div>
+<div id="flash"></div>
 <div id="err"></div>
 <footer class="wrap" style="text-align:center; color:#a9b1c3; font-size:12px; padding:20px 0 60px">Punon offline · LocalStorage</footer>
 
@@ -164,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const $=q=>document.querySelector(q);
   const fmtTS=ts=>new Date(ts).toLocaleString('sq-AL',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
   const beep=(ok=true)=>{try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type=ok?'triangle':'sawtooth';o.frequency.value=ok?880:320;g.gain.setValueAtTime(.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.05,ctx.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.22);o.start();o.stop(ctx.currentTime+.24);}catch{}};
-  const flash=(ok)=>{const el=$('#flash');el.className='flash '+(ok?'ok':'err');el.style.opacity='1';setTimeout(()=>el.style.opacity='0',220);};
+  const flash=(ok)=>{const el=$('#flash');el.style.background=ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.25)';el.style.opacity='1';setTimeout(()=>el.style.opacity='0',220);};
   const extract4=s=>String(s||'').trim().replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();
 
   // ---------- Data ----------
@@ -180,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {id:'mech',name:'Probleme mekanike'},
     {id:'no-cmd',name:'Nuk merr komandë'},
   ];
-  const LS_KEY='bikeq_v5';
+  const LS_KEY='bikeq_v7';
   let selectedIssue=null;
   let records = [];
   try { records = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch{}
@@ -235,13 +236,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // summary
     const sp=$('#pane-by-summary'); sp.innerHTML='';
-    const quick=$('#quick'); quick.innerHTML='';
+    const quick=$('#quick'); if(quick) quick.innerHTML='';
     for(const row of byIssue()){
       const chip=document.createElement('div'); chip.className='chip';
       chip.innerHTML='<div>'+row.name+'</div><b>'+row.count+'</b>';
       chip.onclick=()=>openDetails(row.id);
       sp.appendChild(chip);
-      const q=chip.cloneNode(true); q.onclick=()=>openDetails(row.id); quick.appendChild(q);
+      if(quick){ const q=chip.cloneNode(true); q.onclick=()=>openDetails(row.id); quick.appendChild(q); }
     }
   }
   function openDetails(issueId){
@@ -352,15 +353,20 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#btnStartScan').onclick=startScan; $('#btnStopScan').onclick=stopScan;
   $('#btnSwitchCam').onclick=switchCam; $('#btnTorch').onclick=toggleTorch;
   $('#btnClipboard').onclick=async()=>{ try{const t=await navigator.clipboard.readText(); if(t) addRecordFrom(t);}catch{alert('Clipboard i bllokuar. Jep leje.');} };
+  $('#clearSel').onclick=()=>{ selectedIssue=null; [...document.querySelectorAll('.issue')].forEach(c=>c.classList.remove('selected')); };
+  $('#closeModal').onclick=()=>showModal(false);
+  $('#modal').addEventListener('click',e=>{ if(e.target.id==='modal') showModal(false); });
   $('#manual').addEventListener('keydown',e=>{ if(e.key==='Enter') addRecordFrom($('#manual').value); });
+
+  // Kamera izni önceden verilmişse otomatik başlat
   if(navigator.permissions&&navigator.permissions.query){
     navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted') startScan(); }).catch(()=>{});
   }
 
-  // ---------- Exports buttons ----------
-  $('#btnExportCSV').onclick=()=>exportDetails();
-  $('#btnExportSummaryCSV').onclick=()=>exportSummary();
-  $('#btnExportDOC').onclick=()=>exportDoc();
+  // Export düğmeleri
+  $('#btnExportCSV').onclick=exportDetails;
+  $('#btnExportSummaryCSV').onclick=exportSummary;
+  $('#btnExportDOC').onclick=exportDoc;
 }); // DOMContentLoaded
 </script>
 </body>
