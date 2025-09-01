@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Numërim Pjesësh · I thjeshtë & offline</title>
-<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "barcode_col": null, "generated_at": "2025-09-01T05:39:01"} -->
+<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "barcode_col": null, "generated_at": "2025-09-01T06:57:18"} -->
 <style>
   :root{--bg:#0f1115;--panel:#151a24;--line:#232b3b;--text:#e7ebf5;--muted:#9aa4b8;--accent:#29c06f;--danger:#ff5d5d}
   *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.45}
@@ -33,7 +33,7 @@
   .empty{text-align:center;color:var(--muted);padding:12px}
   .pill{font-size:12px;color:var(--muted);padding:4px 8px;border:1px solid var(--line);border-radius:999px}
   .footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 40px}
-  @media(max-width:640px){ .row{grid-template-columns:1fr 100px} .row.head{display:none} .row .code,.row .n1,.row .n2,.row .bc{grid-column:1 / -1} .row .qty{grid-column:2 / 3;justify-self:end} }
+  @media(max-width:640px){ .row{grid-template-columns:1fr 100px} .row.head{display:none} .row .code,.row .n1,.row .n2{grid-column:1 / -1} .row .qty{grid-column:2 / 3;justify-self:end} }
 </style>
 </head>
 <body>
@@ -73,7 +73,7 @@
         </div>
       </div>
       <div class="count" id="countBox">
-        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Sasia</div></div>
+        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Shënim</div><div>Sasia</div></div>
         <div class="empty" id="noCount">Ende s’ka të dhëna.</div>
       </div>
     </section>
@@ -99,13 +99,35 @@ function getToday(){ const s=getStore(); const k=todayISO(); return Array.isArra
 function pushToday(e){ const s=getStore(); const k=todayISO(); if(!Array.isArray(s[k])) s[k]=[]; s[k].push(e); setStore(s) }
 function resetToday(){ const s=getStore(); const k=todayISO(); s[k]=[]; setStore(s) }
 
+function addEntryWithDuplicatePolicy(entry){
+  const store = getStore();
+  const key = todayISO();
+  const list = Array.isArray(store[key]) ? store[key] : [];
+  const idx = list.findIndex(x => x.code === entry.code);
+  if (idx >= 0){
+    const merge = confirm("Aynı parçadan kayıt var. Üstüne ekleyeyim mi?\nOK: mevcut kayda ekle · Cancel: ayrı kaydet (notla)");
+    if (merge){
+      list[idx].qty = (parseInt(list[idx].qty,10)||0) + (parseInt(entry.qty,10)||0);
+      store[key] = list; setStore(store);
+      return "merged";
+    } else {
+      const note = prompt("Not eklemek ister misin? (opsiyonel)", "");
+      if (note){ entry.note = note; }
+      pushToday(entry);
+      return "separate";
+    }
+  } else {
+    pushToday(entry);
+    return "new";
+  }
+}
+
 function norm(x){ return (x||"").toString().toLowerCase() }
 function search(q){
   const t=norm(q); if(!t) return [];
   return PARTS.filter(p=> norm(p.code).includes(t) ||
                            norm(p.name1).includes(t) ||
-                           norm(p.name2).includes(t) ||
-                           norm(p.barcode).includes(t)).slice(0,100);
+                           norm(p.name2).includes(t)).slice(0,100);
 }
 
 function renderResults(list){
@@ -127,12 +149,11 @@ function renderResults(list){
       const n=parseInt(qty.value,10);
       if(isNaN(n) || n<=0) return alert("Vendos një sasi (>0).");
       const now=new Date();
-      pushToday({
+      addEntryWithDuplicatePolicy({
         ts: now.toISOString(),
         time: timeHM(now),
         code: item.code||"",
         name: item.name1||item.name2||"",
-        barcode: item.barcode||"",
         qty: n
       });
       qty.value="0";
@@ -150,20 +171,18 @@ function renderCount(){
   const list=getToday();
   $$("#noCount").style.display=list.length? "none":"block";
   list.forEach(e=>{
-    const val=(e.barcode||e.code||"");
     const r=document.createElement("div"); r.className="row line";
-    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.qty}</div>`;
+    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.note||""}</div><div>${e.qty}</div>`;
     box.appendChild(r);
   });
 }
 
 function toCSV(){
   const list=getToday();
-  const head=["date","time","code","name","qty"];
+  const head=["date","time","code","name","note","qty"];
   const lines=[head.join(",")];
   list.forEach(e=> { 
-    const boc=(e.barcode||e.code||"").replace(/"/g,'""');
-    lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, e.qty].join(","));
+    lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, `"${(e.note||"").replace(/"/g,'""')}"`, e.qty].join(","));
   });
   return lines.join("\n");
 }
@@ -180,7 +199,7 @@ function downloadCSV(){
 function compileText(){
   const list=getToday(); if(!list.length) return "S’ka të dhëna për sot.";
   const head=`Numërim — ${todayISO()}\n`;
-  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}`).join("\n");
+  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}${e.note? " — Not: "+e.note:""}`).join("\n");
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
