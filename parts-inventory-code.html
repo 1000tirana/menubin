@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Numërim Pjesësh · I thjeshtë & offline</title>
+<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "barcode_col": null, "generated_at": "2025-09-01T05:29:31"} -->
+<style>
+  :root{--bg:#0f1115;--panel:#151a24;--line:#232b3b;--text:#e7ebf5;--muted:#9aa4b8;--accent:#29c06f;--danger:#ff5d5d}
+  *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.45}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(15,17,21,.95),rgba(15,17,21,.82));border-bottom:1px solid var(--line)}
+  .wrap{max-width:1024px;margin:0 auto;padding:16px}
+  h1{margin:0;font-size:20px;font-weight:700}
+  .sub{font-size:12px;color:var(--muted)}
+  .bar{display:flex;gap:8px;margin:12px 0}
+  input[type=search]{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#121721;color:var(--text);font-size:16px}
+  .btn{padding:12px 14px;border:1px solid var(--line);background:#121721;color:var(--text);border-radius:12px;cursor:pointer;min-width:64px}
+  .btn:hover{filter:brightness(1.08)}
+  .btn-acc{background:var(--accent);color:#0a0e0d;border:none}
+  .btn-dan{background:var(--danger);color:#fff;border:none}
+  .split{display:grid;grid-template-columns: 1fr;gap:16px}
+  @media(min-width:900px){.split{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0}
+  .hint{color:var(--muted);font-size:12px}
+  .results, .count{padding:8px}
+  .row{display:grid;grid-template-columns:160px 1fr 1fr 220px 120px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
+  .row.head{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .row > div{overflow-wrap:anywhere}
+  .qty{display:flex;gap:8px;align-items:center}
+  .qty input{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--text);font-size:16px}
+  .empty{text-align:center;color:var(--muted);padding:12px}
+  .pill{font-size:12px;color:var(--muted);padding:4px 8px;border:1px solid var(--line);border-radius:999px}
+  .footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 40px}
+  /* Mobile stacking */
+  @media(max-width:640px){
+    .row{grid-template-columns:1fr 100px}
+    .row.head{display:none}
+    .row .code,.row .n1,.row .n2,.row .bc{grid-column:1 / -1}
+    .row .qty{grid-column:2 / 3;justify-self:end}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Numërim Pjesësh <span class="sub">· Punon offline · i thjeshtë për përdorim</span></h1>
+    <div class="bar">
+      <input id="q" type="search" placeholder="Kërko: p.sh. 'arka çamurluk'…">
+      <button class="btn" id="btnFind">Kërko</button>
+      <button class="btn" id="btnClear">Pastro</button>
+    </div>
+    <div class="bar" style="margin-top:-6px">
+      <span class="pill" id="metaCount">—</span>
+      <span class="pill">Sot: <span id="today">—</span></span>
+      <span class="hint" style="margin-left:auto">Shkruaj sasinë dhe shtyp <b>Enter</b> ose <b>Shto</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="split">
+    <section class="card">
+      <div class="section-title"><h3>Rezultatet</h3><div class="hint">“A e kishe fjalën për këtë?”</div></div>
+      <div class="results" id="results">
+        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Barkod</div><div>Veprim</div></div>
+        <div class="empty" id="noRes">Bëj një kërkim.</div>
+      </div>
+    </section>
+    <section class="card">
+      <div class="section-title">
+        <h3>Lista e Numërimit</h3>
+        <div>
+          <button class="btn" id="btnCopy">Kopjo</button>
+          <button class="btn" id="btnDL">Shkarko CSV</button>
+          <button class="btn btn-dan" id="btnReset">Pastro Ditën</button>
+        </div>
+      </div>
+      <div class="count" id="countBox">
+        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Barkod</div><div>Sasia</div></div>
+        <div class="empty" id="noCount">Ende s’ka të dhëna.</div>
+      </div>
+    </section>
+  </div>
+  <section class="footer">
+    Të dhënat ruhen në shfletues (localStorage). Funksionon edhe pa internet. Mund të hapet në telefon ose laptop.
+  </section>
+</main>
+
+<script>
+const PARTS = [{"code": "AB.50.0025.04", "name1": "10 İnch Ön Çamurluk V2.3", "name2": "SP_10 inch front fender V2.3", "barcode": ""}, {"code": "SH.50.0025.04", "name1": "10 İnch Ön Çamurluk V2.3 -Çıkma", "name2": "SP_10 inch front fender V2.3 v -Second Hand", "barcode": ""}, {"code": "14.02.0124.00", "name1": "AC kablosu(ABD)-siyah ve düz-harici şarj cihazı", "name2": "SP_ AC cable(EU)-black-for external charger", "barcode": ""}, {"code": "90.0.0001.38", "name1": "Arka Ayak Pedi V2.2 -Yerli", "name2": "Rear Foot Pad V2.2 -Domestic", "barcode": ""}, {"code": "90.0.0030.25", "name1": "Arka Ayak Pedi V2.3 -Yerli", "name2": "Rear Foot Pad V2.3 -Domestic", "barcode": ""}, {"code": "14.01.0310.00", "name1": "Arka Çamurluk İç Koruma V2.2", "name2": "SP_ Protective plate", "barcode": ""}, {"code": "SH.50.0029.97", "name1": "Arka Çamurluk İç Koruma V2.3 -Çıkma", "name2": "SP_Protective plate V2.3 Second Hand", "barcode": ""}, {"code": "90.50.0029.97", "name1": "Arka Çamurluk İç Koruma V2.3 -Yerli", "name2": "Protective plate V2.3-Domestic", "barcode": ""}, {"code": "90.0004.16", "name1": "Arka çamurluk koruma demiri", "name2": "Rear Fender Protective Iron", "barcode": ""}, {"code": "AB.50.0030.76", "name1": "Arka Çamurluk Takım V2.3", "name2": "Rear Fender Assembly V2.3", "barcode": ""}, {"code": "AB.50.0004.14", "name1": "Arka Çamurluk Takımı V2.2", "name2": "Rear Fender Assembly V2.2", "barcode": ""}, {"code": "AB.50.0004.15", "name1": "Arka Çamurluk V2.2", "name2": "Rear Fender V2.2", "barcode": ""}, {"code": "AB.50.0029.96", "name1": "Arka Çamurluk V2.3", "name2": "Rear Fender V2.3", "barcode": ""}, {"code": "SH.50.0029.96", "name1": "Arka Çamurluk V2.3 -Çıkma", "name2": "Rear Fender V2.3 Second Hand", "barcode": ""}, {"code": "90.50.0029.96", "name1": "Arka Çamurluk V2.3 -Yerli", "name2": "Rear Fender V2.3 - Domestic", "barcode": ""}, {"code": "90.0.0335.00", "name1": "Arka Çatal Kapama -Yerli", "name2": "Rear fork decorative cover -Domestic", "barcode": ""}, {"code": "AB.00.0005.68", "name1": "Arka Fren Kampana V2.3", "name2": "Rear Drum Brake Assembly V2.3", "barcode": ""}, {"code": "AB.16.02.00.3291", "name1": "Arka Fren Kampana Vidası V2.3", "name2": "Rear drum brake rotating shaft V2.3", "barcode": ""}, {"code": "AB.00.0025.88", "name1": "Arka Kampana Fren Manivelası V2.3", "name2": "Rear Drum Brake Crank V2.3", "barcode": ""}, {"code": "AB.00.0001.45", "name1": "Arka Stop Lamba Kablosu v.All", "name2": "SP_ Tail lamp cable", "barcode": ""}, {"code": "AB.00.0005.70", "name1": "Arka Stop Lamba Tokası", "name2": "SP_ Tail lamp cable buckle", "barcode": ""}, {"code": "14.02.0179.00", "name1": "Arka Stop Lambası V2.2", "name2": "SP_ Tail lamp", "barcode": ""}, {"code": "AB.50.0029.98", "name1": "Arka Stop Lambası V2.3", "name2": "Rear light V2.3", "barcode": ""}, {"code": "14.01.0312.00", "name1": "Arka Stop Soket Sabitleyici", "name2": "Tail Talp Socket", "barcode": ""}, {"code": "14.01.0327.00", "name1": "Ayaklık Sabitleme Parçası", "name2": "Kickstand fixing part", "barcode": ""}, {"code": "14.01.0270.00", "name1": "Ayaklık V2.2", "name2": "SP_ Kickstand", "barcode": ""}, {"code": "AB.00.0005.76", "name1": "Batarya Kapak Altı Kopça Vidası M4x10", "name2": "Battery Cabin Cover Hasp Screw M4x10", "barcode": ""}, {"code": "AB.00.0023.67", "name1": "Batarya Kapak Kilidi", "name2": "Battery Cabin Cover Lock", "barcode": ""}, {"code": "RP.AB.00.0023.67", "name1": "Batarya Kapak Kilidi -Repair", "name2": "Repair Battery Cabin Cover Lock", "barcode": ""}, {"code": "AB.00.0008.18", "name1": "Batarya Kilidi Açma Anahtarı", "name2": "Battery Lock Key", "barcode": ""}, {"code": "AB.00.0021.03", "name1": "Batarya Kilidi Koruyucu Kapak", "name2": "Protective cover for battery cabin cover lock", "barcode": ""}, {"code": "AB.50.0030.09", "name1": "Batarya Kutusu Arka Muhafaza", "name2": "Rear Cover Of Battery Shell", "barcode": ""}, {"code": "AB.00.0025.03", "name1": "Batarya LED", "name2": "Battery LED Components", "barcode": ""}, {"code": "AB.50.0030.89", "name1": "Batarya Muhafaza Parçası", "name2": "Battery Anti Falling Support", "barcode": ""}, {"code": "AB.00.0007.14", "name1": "Batarya Ön Kapağı", "name2": "Front cover of Battery shell", "barcode": ""}, {"code": "AB.50.0020.73", "name1": "Batarya Soketi", "name2": "Discharge Port Cable", "barcode": ""}, {"code": "AB.50.0002.54", "name1": "Batarya Üst Kapağı V2.2&V2.3", "name2": "Battery cabin cover kits", "barcode": ""}, {"code": "SH.AB.50.0002.54", "name1": "Batarya Üst Kapağı V2.2&V2.3 -Çıkma", "name2": "Second Hand_ Battery cabin cover kits", "barcode": ""}, {"code": "AB.00.0005.32", "name1": "Batarya Yan Koruma", "name2": "Side Rubber Cushion for Battery assembly", "barcode": ""}, {"code": "14.01.0483.00", "name1": "Beşgen Bits Batarya Kapak Anahtarı", "name2": "Pentagon Bit Battery Lock Key", "barcode": ""}, {"code": "AB.00.0005.55", "name1": "Bilye Kapağı V2.2 - V2.3", "name2": "SP_ Ringent fastening ring", "barcode": ""}, {"code": "90.00.0005.55", "name1": "Bilye Kapağı V2.2 - V2.3 - Yerli", "name2": "SP_ Ringent fastening ring - Domestic", "barcode": ""}, {"code": "AB.00.0007.16", "name1": "Çalınmaya Karşı Üçgen uçlu Vida 2.3x50mm", "name2": "SP_ Triangle anti-theft bit-TA2.3x50mm", "barcode": ""}, {"code": "AB.00.0013.14", "name1": "Dikme Arka Üst ve Alt Vidası M7x20", "name2": "Special screw assembly for hidding line in vertical tube", "barcode": ""}, {"code": "AB.00.0007.67", "name1": "Elcik Sabitleme", "name2": "SP_ Handlebar grip fixing ring", "barcode": ""}, {"code": "90.0.0449.00", "name1": "Elcik Sonlandırma -Yerli", "name2": "Handlebar End Cap -Domestic", "barcode": ""}, {"code": "86.0004.11", "name1": "Elektronik Kilit -Kablolu -SOLEBE", "name2": "Electronic Lock", "barcode": ""}, {"code": "RP.86.0004.11", "name1": "Elektronik Kilit -Solebe -Repair", "name2": "Repair Wired Lock", "barcode": ""}, {"code": "86.0004.17", "name1": "Elektronik Kilit Halat", "name2": "Electronic Lock Rope", "barcode": ""}, {"code": "86.0004.12", "name1": "Elektronik Kilit Sırtlığı", "name2": "Electronic Lock Backrest", "barcode": ""}, {"code": "SH.86.0004.12", "name1": "Elektronik Kilit Sırtlığı & Halatı -Çıkma", "name2": "Second Hand Electronic Lock Backrest", "barcode": ""}, {"code": "AB.00.0010.97", "name1": "Fener Montaj Aparatı", "name2": "Headlight fastener", "barcode": ""}, {"code": "14.01.0572.00", "name1": "Fren Ara Levhası V2.3", "name2": "Brake spacer V2.3", "barcode": ""}, {"code": "14.01.0372.00", "name1": "Fren Ayarlama Hortumu", "name2": "SP_ Anti-dust cover&spring", "barcode": ""}, {"code": "90.01.0372.00", "name1": "Fren Ayarlama Hortumu -Yerli", "name2": "SP_ Anti-dust cover&spring -Domestic", "barcode": ""}, {"code": "AB.00.0006.43", "name1": "Fren Bölgesi Muhafaza Parçası V2.3", "name2": "Brake line protector V2.3", "barcode": ""}, {"code": "AB.50.0003.20", "name1": "Fren Kablosu Bağlantı Kutusu", "name2": "SP_ Connecting box of brake line", "barcode": ""}, {"code": "AB.00.0001.24", "name1": "Fren Kolu V2.2", "name2": "SP_ Brake handle assembly", "barcode": ""}, {"code": "SH.AB.00.0001.24", "name1": "Fren Kolu V2.2 -Çıkma", "name2": "Second Hand - Brake handle assembly", "barcode": ""}, {"code": "AB.00.0001.37", "name1": "Fren Teli Alt V2.2", "name2": "Brake Line Long V2.2", "barcode": ""}, {"code": "SH.AB.00.0001.37", "name1": "Fren Teli Alt V2.2 -Çıkma", "name2": "Brake Line Long V2.2 -Second Hand", "barcode": ""}, {"code": "90.00.0001.37", "name1": "Fren Teli Alt V2.2 -Yerli", "name2": "Brake Line Long V2.2 -Domestic", "barcode": ""}, {"code": "AB.00.0007.34", "name1": "Fren Teli Üst V2.2", "name2": "Brake Line Upper-Short V2.2", "barcode": ""}, {"code": "SH.00.0007.34", "name1": "Fren Teli Üst V2.2 -Çıkma", "name2": "Brake Line Upper-Short V2.2 -Second hand", "barcode": ""}, {"code": "90.0.0007.34", "name1": "Fren Teli Üst V2.2 -Yerli", "name2": "Brake Line Upper-Short V2.2 -Domestic", "barcode": ""}, {"code": "RP.50.0015.52", "name1": "Gaz V.All -Repair", "name2": "Repair Electric throttle", "barcode": ""}, {"code": "AB.50.0015.52", "name1": "Gaz V2.3", "name2": "Electric throttle V2.3", "barcode": ""}, {"code": "AB.50.0020.29", "name1": "Gidon Alt Muhafaza V2.3", "name2": "Stem Decorative Cover-Down V2.3", "barcode": ""}, {"code": "AB.00.0001.16", "name1": "Gidon Borusu V2.2", "name2": "Handlebar V2.2", "barcode": ""}, {"code": "SH.AB.00.0001.16", "name1": "Gidon Borusu V2.2 -Çıkma", "name2": "Repair Handlebar V2.2", "barcode": ""}, {"code": "AB.00.0005.39", "name1": "Gidon Borusu V2.3", "name2": "Handlebar V2.3", "barcode": ""}, {"code": "AB.50.0029.83", "name1": "Gidon Gövde V2.3", "name2": "Handlebar Stem V2.3", "barcode": ""}, {"code": "AB.00.0012.10", "name1": "Gidon Gövdesi V2.2", "name2": "Stem Body Parts", "barcode": ""}, {"code": "SH.AB.00.0012.10", "name1": "Gidon GövdesiV2.2 -Çıkma", "name2": "Second Hand_Stem Body Parts", "barcode": ""}, {"code": "AB.00.0001.20", "name1": "Gidon Halkası Sağ V2.2", "name2": "SP_ Handlebar casing -right", "barcode": ""}, {"code": "AB.50.0030.27", "name1": "Gidon Sabitleme Parçası V2.3", "name2": "Handlebar locking block V2.3", "barcode": ""}, {"code": "AB.00.0008.46", "name1": "Gidon Su Geçirmez Tıpa V2.2", "name2": "SP_ Stem waterproof plug", "barcode": ""}, {"code": "AB.00.0001.15", "name1": "Gidon Takımı V2.2", "name2": "SP_ Stem assembly", "barcode": ""}, {"code": "AB.50.0030.26", "name1": "Gidon Takımı V2.3", "name2": "Stem assembly V2.3", "barcode": ""}, {"code": "AB.50.0020.32", "name1": "Gidon Üst Muhafaza V2.3", "name2": "Stem decorative cover-upper V2.3", "barcode": ""}, {"code": "AB.00.0001.19", "name1": "Gösterge Panel Kapağı", "name2": "Dashboard Cover", "barcode": ""}, {"code": "SH.AB.00.0001.19", "name1": "Gösterge Panel Kapağı -Çıkma", "name2": "Second Hand_Dashboard Cover", "barcode": ""}, {"code": "90.0.0001.19", "name1": "Güçlendirilmiş Panel Kapağı -Yerli", "name2": "Strengthened Dashboard Cover", "barcode": ""}, {"code": "AB.00.0009.50", "name1": "Gösterge Panel Kapak Desteği", "name2": "Support For Dashboard Cover", "barcode": ""}, {"code": "AB.50.0002.51", "name1": "Gösterge Paneli V2.2", "name2": "Dashboard V2.2", "barcode": ""}, {"code": "RP.50.0002.51", "name1": "Gösterge Paneli V2.2 -Repair", "name2": "RP_ Dashboard", "barcode": ""}, {"code": "AB.50.0032.57", "name1": "Gösterge Paneli V2.3", "name2": "Dashboard V2.3", "barcode": ""}, {"code": "RP.50.0032.57", "name1": "Gösterge Paneli V2.3 -Repair", "name2": "Repair Dashboard V2.3", "barcode": ""}, {"code": "AB.50.0002.56", "name1": "Gövde (Şase) V2.2", "name2": "Frame base V2.2", "barcode": ""}, {"code": "AB.50.0030.37", "name1": "Gövde (Şase) V2.3", "name2": "Frame Base V2.3", "barcode": ""}, {"code": "SH.50.0030.37", "name1": "Gövde (Şase) V2.3 -Çıkma", "name2": "Frame Base V2.3 -Second Hand", "barcode": ""}, {"code": "AB.00.0009.45", "name1": "Güç Fişi İçin Su Geçirmez Halka", "name2": "SP_ Rubber waterproof ring for power plug", "barcode": ""}, {"code": "AB.00.0009.46", "name1": "Güç Fişi Kolu", "name2": "SP_ Power plug handle", "barcode": ""}, {"code": "AB.50.0028.28", "name1": "Güçlendirme Plakası Sağ V2.3", "name2": "SP_Right rear reinforcing plate", "barcode": ""}, {"code": "AB.50.0028.27", "name1": "Güçlendirme Plakası Sol V2.3", "name2": "SP_Left rear reinforcing plate", "barcode": ""}, {"code": "14.02.0190.00", "name1": "Hızlı Şarj", "name2": "SP_ External charger", "barcode": ""}, {"code": "90.0020.22", "name1": "Iot kelepçe", "name2": "Iot Cuff", "barcode": ""}, {"code": "RP.90.0020.21", "name1": "IoT MQTT -Repair", "name2": "Repair IoT", "barcode": ""}, {"code": "AB.00.0001.47", "name1": "Kablo Koruma Plakası Arka", "name2": "Tail lamp cable cover", "barcode": ""}, {"code": "AB.00.0001.50", "name1": "Kablo Koruma Plakası Ön", "name2": "Front Cable cover", "barcode": ""}, {"code": "14.01.0294.00", "name1": "Kampana Fren V2.1 - V2.2", "name2": "SP_ Drum brake V2.1 - V2.2", "barcode": ""}, {"code": "AB.00.0009.14", "name1": "Kapak kilidi açma adaptörü", "name2": "Cover unlock adapter", "barcode": ""}, {"code": "AB.00.0005.33", "name1": "Kauçuk Batarya Koruma", "name2": "Rubber Cushion for Battery assembly", "barcode": ""}, {"code": "AB.00.0005.36", "name1": "Kısa Arka Fren Teli V2.3", "name2": "Rear short brake line V2.3", "barcode": ""}, {"code": "90.0.0005.36", "name1": "Kısa Arka Fren Teli V2.3 -Yerli", "name2": "Rear short brake line V2.3 -Domestic", "barcode": ""}, {"code": "AB.00.0005.46", "name1": "Kısa Ön Fren Teli V2.3", "name2": "Front short brake line V2.3", "barcode": ""}, {"code": "90.0.0005.46", "name1": "Kısa Ön Fren Teli V2.3 -Yerli", "name2": "Front short brake line V2.3 -Domestic", "barcode": ""}, {"code": "90.0004.18", "name1": "Kilit Koruma Demiri Oval", "name2": "Lock Shield Oval", "barcode": ""}, {"code": "AB.50.0004.04", "name1": "Kontrol Kablosu Üst Segment -Segway V2.3", "name2": "Control cable Front Segment V2.3", "barcode": ""}, {"code": "AB.00.0007.23", "name1": "Kontrol Kablosu Üst Segment V.All", "name2": "SP_ Front segment of control cable", "barcode": ""}, {"code": "90.0004.20", "name1": "Mavi Kilit Kapağı", "name2": "Blue Lock Cover", "barcode": ""}, {"code": "AB.00.0001.40", "name1": "Motor Kablo Koruma Kapağı", "name2": "SP_ Motor cable cover", "barcode": ""}, {"code": "AB.00.0021.59", "name1": "Motor Kilit Muhafaza", "name2": "SP_ Anti-theft piece for battery cabin cover lock", "barcode": ""}, {"code": "SH.AB.00.0021.59", "name1": "Motor Kilit Muhafaza V2.2 -Çıkma", "name2": "Second Hand_ Anti-theft piece for battery cabin cover lock", "barcode": ""}, {"code": "90.0005.71", "name1": "Motor Rulman 6003 RS", "name2": "Motor Bearing 6003 RS", "barcode": ""}, {"code": "86.0006.70", "name1": "Motor Sensör Seti", "name2": "Motor Sensor Set", "barcode": ""}, {"code": "AB.00.0001.39", "name1": "Motor V2.2", "name2": "Motor V2.2", "barcode": ""}, {"code": "RP.AB.00.0001.39", "name1": "Motor V2.2 -Repair", "name2": "Repair Motor V2.2", "barcode": ""}, {"code": "AB.00.0005.69", "name1": "Motor V2.3", "name2": "Motor V2.3", "barcode": ""}, {"code": "RP.00.0005.69", "name1": "Motor V2.3 -Repair", "name2": "Repair Motor V2.3", "barcode": ""}, {"code": "AB.50.0002.55", "name1": "Orta Ayak Pedi V2.2&V2.3", "name2": "Footpad-middle V2.2&V2.3", "barcode": ""}, {"code": "90.0.0002.55", "name1": "Orta Ayak Pedi -Yerli", "name2": "Middle Foot Pad -Domestic", "barcode": ""}, {"code": "AB.50.0011.45", "name1": "Orta Ayaklık V2.3", "name2": "Central Kickstand V2.3", "barcode": ""}, {"code": "AB.00.0005.59", "name1": "Ön Aks V2.3", "name2": "Front axle V2.3", "barcode": ""}, {"code": "AB.00.0005.58", "name1": "Ön Aks Vidası V2.3 M9x16", "name2": "SP_ Front axle screw", "barcode": ""}, {"code": "AB.00.0013.02", "name1": "Ön Amortisör Çatalı V2.3", "name2": "Front Shock absorption fork V2.3", "barcode": ""}, {"code": "AB.00.0008.45", "name1": "Ön Ayak Pedi V2.2", "name2": "Front Foot Pad V2.2", "barcode": ""}, {"code": "90.0.0008.45", "name1": "Ön Ayak Pedi V2.2 -Yerli", "name2": "Front Foot Pad V2.2 -Domestic", "barcode": ""}, {"code": "AB.00.0009.56", "name1": "Ön Ayak Pedi V2.3", "name2": "Front Foot Pad -V2.3", "barcode": ""}, {"code": "90.0.0009.56", "name1": "Ön Ayak Pedi V2.3 -Yerli", "name2": "Front Foot Pad -V2.3 -Domestic", "barcode": ""}, {"code": "AB.00.0001.27", "name1": "Ön Çamurluk V2.2", "name2": "SP_ Front fender V2.2", "barcode": ""}, {"code": "SH.AB.00.0001.27", "name1": "Ön Çamurluk V2.2 -Çıkma", "name2": "Second Hand_Front Fender V2.2", "barcode": ""}, {"code": "AB.00.0005.54", "name1": "Ön Çatal Borusu Kauçuk Plaka V2.3", "name2": "SP_ Front fork tube rubber plug", "barcode": ""}, {"code": "14.01.0605.00", "name1": "Ön çatal iç Somun", "name2": "SP_ Front fork hollow bolt", "barcode": ""}, {"code": "90.01.0605.00", "name1": "Ön Çatal iç Somun -Yerli", "name2": "", "barcode": ""}, {"code": "14.01.0297.00", "name1": "Ön Çatal Kapama Sağ", "name2": "SP_ Front fork cover-right", "barcode": ""}, {"code": "AB.00.0001.26", "name1": "Ön Çatal Kapama Sağ V2.2", "name2": "SP_ Front fork cover-right", "barcode": ""}, {"code": "SH.AB.00.0001.26", "name1": "Ön Çatal Kapama Sağ V2.2 -Çıkma", "name2": "Second Hand_ Front fork cover-right", "barcode": ""}, {"code": "14.01.0296.00", "name1": "Ön Çatal Kapama Sol", "name2": "SP_ Front fork cover-left", "barcode": ""}, {"code": "SH.14.01.0296.00", "name1": "Ön Çatal Kapama Sol V2.2 -Çıkma", "name2": "Second Hand_Front Fork cover-left V2.2", "barcode": ""}, {"code": "AB.00.0001.25", "name1": "Ön Çatal V2.2", "name2": "SP_ Front fork V2.2", "barcode": ""}, {"code": "AB.50.0036.34", "name1": "Ön dikme -Segway V2.3", "name2": "Vertical Tube -Segway V2.3", "barcode": ""}, {"code": "AB.00.0001.31", "name1": "Ön Dikme Alüminyum Parça V2.2-V2.3", "name2": "SP_ Vertiacal tube adapter", "barcode": ""}, {"code": "SH.AB.00.0001.31", "name1": "Ön Dikme Alüminyum Parça V2.2-V2.3 -Çıkma", "name2": "Second Hand_Vertiacal Tube Adapter V2.2-V2.3", "barcode": ""}, {"code": "90.00.0001.31", "name1": "Ön Dikme Alüminyum Parça V2.2-V2.3 -Yerli", "name2": "SP_ Vertiacal tube adapter -Domestic", "barcode": ""}, {"code": "SH.00.0009.53", "name1": "Ön Dikme Sabitleyici V2.2 V2.3 -Çıkma", "name2": "Second Hand_Plastic vertical tube protector V2.2 V2.3", "barcode": ""}, {"code": "AB.00.0009.53", "name1": "Ön Dikme Sabitleyici V2.2-V2.3", "name2": "SP_ Plastic vertical tube protector", "barcode": ""}, {"code": "AB.50.0022.28", "name1": "Ön Dikme V2.2", "name2": "Two-hole IOT vertical tube V2.2", "barcode": ""}, {"code": "AB.50.0030.33", "name1": "Ön Dikme V2.3", "name2": "Vertical tube V2.3", "barcode": ""}, {"code": "90.50.0030.33", "name1": "Ön Dikme V2.3 - Yerli", "name2": "Vertical tube V2.3 - Domestic", "barcode": ""}, {"code": "SH.AB.50.0030.33", "name1": "Ön Dikme V2.3 -Çıkma", "name2": "Vertical tube V2.3 -Second Hand", "barcode": ""}, {"code": "AB.00.0001.23", "name1": "Ön Far V2.1 - V2.2 - V2.3", "name2": "SP_ Headlight", "barcode": ""}, {"code": "AB.50.0012.85", "name1": "Ön Far V2.3", "name2": "Headlight V2.3", "barcode": ""}, {"code": "AB.50.0030.32", "name1": "Ön Fren Adaptör Bloğu V2.3", "name2": "Front brake adapter block V2.3", "barcode": ""}, {"code": "86.0005.61", "name1": "Ön Fren Kampana Balatası V.All", "name2": "Front Break Drum Lining V.All", "barcode": ""}, {"code": "AB.00.0005.60", "name1": "Ön Fren Kampana V2.3", "name2": "Front Drum brake V2.3", "barcode": ""}, {"code": "AB.50.0030.31", "name1": "Ön Fren Teli Uzun V2.3", "name2": "Front brake line-long V2.3", "barcode": ""}, {"code": "90.50.0030.31", "name1": "Ön Fren Teli Uzun V2.3 -Yerli", "name2": "SP_ Front brake line-long V2.3 -Domestic", "barcode": ""}, {"code": "AB.00.0025.87", "name1": "Ön Kampana Fren manivela", "name2": "Crank of front drum brake", "barcode": ""}, {"code": "AB.00.0005.75", "name1": "Ön Reflektör", "name2": "Front reflector", "barcode": ""}, {"code": "14.01.0576.00", "name1": "Ön Teker Jant V2.2", "name2": "Front hub", "barcode": ""}, {"code": "AB.50.0008.03", "name1": "Ön Teker Jant V2.3", "name2": "Front Rim Hub", "barcode": ""}, {"code": "90.0579.00", "name1": "Ön Teker Rulman", "name2": "Front Wheel Bearing", "barcode": ""}, {"code": "14.01.0575.00", "name1": "Ön Teker Takım", "name2": "Front Wheel Assembly", "barcode": ""}, {"code": "SH.14.01.0575.00", "name1": "Ön Teker Takım -Çıkma", "name2": "Front Wheel Assembly Second Hand", "barcode": ""}, {"code": "AB.50.0008.02", "name1": "Ön Teker Takım V2.3", "name2": "Front wheel assembly V2.3", "barcode": ""}, {"code": "AB.00.0023.94", "name1": "Rulman -Şase", "name2": "SP_ Bearing -Chassis", "barcode": ""}, {"code": "90.00.0018.98", "name1": "Sağ Elcik -Yerli V.All", "name2": "Handle Rubber Right -Domestic V.All", "barcode": ""}, {"code": "AB.00.0018.98", "name1": "Sağ Elcik V2.3", "name2": "Handle Rubber Right V2.3", "barcode": ""}, {"code": "AB.00.0005.45", "name1": "Sağ Fren V2.3", "name2": "Brake Right V2.3", "barcode": ""}, {"code": "AB.50.0004.10", "name1": "Segway Elektronik Kilit", "name2": "SP_ Vertical tube lock", "barcode": ""}, {"code": "RP.AB.50.0004.10", "name1": "Segway Elektronik Kilit -Repair", "name2": "Repair Segway Lock", "barcode": ""}, {"code": "AB.50.0036.35", "name1": "Segway IOT", "name2": "Segway IOT", "barcode": ""}, {"code": "RP.50.0036.35", "name1": "Segway IOT -Repair", "name2": "Repair Segway IOT", "barcode": ""}, {"code": "90.00.0018.97", "name1": "Sol Elcik -Yerli V.All", "name2": "Handle Rubber Left -Domestic V.All", "barcode": ""}, {"code": "AB.00.0018.97", "name1": "Sol Elcik V2.3", "name2": "Handle Rubber Left V2.3", "barcode": ""}, {"code": "AB.00.0005.44", "name1": "Sol Fren V2.3", "name2": "Brake Left V2.3", "barcode": ""}, {"code": "86.0005.02", "name1": "Solebe Kilit Kablosu", "name2": "Solebe Lock Cable", "barcode": ""}, {"code": "86.0005.01", "name1": "Solebe Kilit Motoru", "name2": "Solebe Lock Motor", "barcode": ""}, {"code": "86.0005.03", "name1": "Solebe Kilit Pini", "name2": "Solebe Lock Pin", "barcode": ""}, {"code": "90.0029.99", "name1": "Stop Lambası Camı V2.3", "name2": "Rear Light Glass V2.3", "barcode": ""}, {"code": "AB.50.0002.53", "name1": "Sürücü V2.2", "name2": "Controller V2.2", "barcode": ""}, {"code": "RP.50.0002.53", "name1": "Sürücü V2.2 -Repair", "name2": "Repair Controller assembly", "barcode": ""}, {"code": "AB.50.0030.36", "name1": "Sürücü V2.3", "name2": "Controller V2.3", "barcode": ""}, {"code": "RP.50.0030.36", "name1": "Sürücü V2.3 -Repair", "name2": "SP_ Controller assembly", "barcode": ""}, {"code": "AB.50.0030.40", "name1": "Şase LED Aydınlatma Kablosu V2.3", "name2": "Chassis LED Lighting Cable V2.3", "barcode": ""}, {"code": "AB.50.0030.39", "name1": "Şase LED Işık Sonlandırma", "name2": "Atmosphere Lamp Fixture End", "barcode": ""}, {"code": "AB.50.0025.06", "name1": "Şase Led Işık V2.3", "name2": "Vertical tube atmosphere light V2.3", "barcode": ""}, {"code": "14.01.0361.00", "name1": "Şase Ön Su Geçirmez Tıpa - Büyük", "name2": "SP_ Waterproof plug for Head tube -big", "barcode": ""}, {"code": "14.01.0362.00", "name1": "Şase Ön Su Geçirmez Tıpa - Küçük", "name2": "Waterproof plug for Head tube -small", "barcode": ""}, {"code": "14.01.0334.00", "name1": "Tampon Arka Sağ Koruma", "name2": "Rear bumper-right", "barcode": ""}, {"code": "AB.00.0008.05", "name1": "Tampon Arka Sol Koruma", "name2": "Rear bumper-left", "barcode": ""}, {"code": "AB.00.0008.04", "name1": "Tampon Koruma Ön Takım", "name2": "Front bumper Assembly", "barcode": ""}, {"code": "SH.AB.00.0008.04", "name1": "Tampon Koruma Ön Takım V2.2 -Çıkma", "name2": "Second Hand_Front Bumper Package V2.2", "barcode": ""}, {"code": "14.01.0577.00", "name1": "Tekerlek", "name2": "Tire", "barcode": ""}, {"code": "86.01.0577.00", "name1": "Tekerlek - CST", "name2": "Tire - CST", "barcode": ""}, {"code": "90.01.0577.00", "name1": "Tekerlek - Yerli", "name2": "Tire -Domestic", "barcode": ""}, {"code": "SH.14.01.0577.00", "name1": "Tekerlek -Çıkma", "name2": "Second Hand_Tire", "barcode": ""}, {"code": "14.01.0378.00", "name1": "Toz Koruma Kapağı", "name2": "SP_ Dust-proof cover", "barcode": ""}, {"code": "AB.50.0003.62", "name1": "Uzun Arka Fren Teli V2.3", "name2": "Rear brake line-long V2.3", "barcode": ""}, {"code": "90.50.0003.62", "name1": "Uzun Arka Fren Teli V2.3 -Yerli", "name2": "Rear brake line-long V2.3 -Domestic", "barcode": ""}, {"code": "90.0020.74", "name1": "Vago Klemens", "name2": "Vago Klemens", "barcode": ""}, {"code": "AB.00.0002.30", "name1": "Yan Reflektör Sağ", "name2": "Side reflector -right", "barcode": ""}, {"code": "AB.00.0002.31", "name1": "Yan Reflektör Sol", "name2": "Side reflector -left", "barcode": ""}, {"code": "SH.50.0012.60", "name1": "Zil -Çıkma", "name2": "Bell -Second Hand", "barcode": ""}, {"code": "AB.50.0012.60", "name1": "Zil V2.3 -Siyah", "name2": "Bell V2.3 -Black", "barcode": ""}];
+
+const $$ = (s,r=document)=>r.querySelector(s);
+const $$$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+const pad2 = n=>String(n).padStart(2,'0');
+const todayISO = ()=>new Date().toISOString().slice(0,10);
+const timeHM = d=>pad2(d.getHours())+":"+pad2(d.getMinutes());
+const STORE="inv_count_v1";
+
+function getStore(){ try{return JSON.parse(localStorage.getItem(STORE))||{}}catch(_){ return {} } }
+function setStore(o){ localStorage.setItem(STORE, JSON.stringify(o)) }
+function getToday(){ const s=getStore(); const k=todayISO(); return Array.isArray(s[k])?s[k]:[] }
+function pushToday(e){ const s=getStore(); const k=todayISO(); if(!Array.isArray(s[k])) s[k]=[]; s[k].push(e); setStore(s) }
+function resetToday(){ const s=getStore(); const k=todayISO(); s[k]=[]; setStore(s) }
+
+function norm(x){ return (x||"").toString().toLowerCase() }
+function search(q){
+  const t=norm(q); if(!t) return [];
+  return PARTS.filter(p=> norm(p.code).includes(t) ||
+                           norm(p.name1).includes(t) ||
+                           norm(p.name2).includes(t) ||
+                           norm(p.barcode).includes(t)).slice(0,100);
+}
+
+function renderResults(list){
+  const box=$$("#results");
+  $$$(".row.item",box).forEach(el=>el.remove());
+  $$("#noRes").style.display=list.length? "none":"block";
+  list.forEach(item=>{
+    const row=document.createElement("div"); row.className="row item";
+    row.innerHTML=`
+      <div class="code">${item.code||""}</div>
+      <div class="n1">${item.name1||""}</div>
+      <div class="n2">${item.name2||""}</div>
+      <div class="bc">${item.barcode||""}</div>
+      <div class="qty">
+        <input type="number" min="0" step="1" value="0" inputmode="numeric" pattern="\d*">
+        <button class="btn btn-acc">Shto</button>
+      </div>`;
+    const qty=$$("input",row);
+    const add=()=>{
+      const n=parseInt(qty.value,10);
+      if(isNaN(n) || n<=0) return alert("Vendos një sasi (>0).");
+      const now=new Date();
+      pushToday({
+        ts: now.toISOString(),
+        time: timeHM(now),
+        code: item.code||"",
+        name: item.name1||item.name2||"",
+        barcode: item.barcode||"",
+        qty: n
+      });
+      qty.value="0";
+      renderCount();
+    };
+    $$("button",row).addEventListener("click",add);
+    qty.addEventListener("keydown",e=>{ if(e.key==="Enter") add(); });
+    box.appendChild(row);
+  });
+}
+
+function renderCount(){
+  const box=$$("#countBox");
+  $$$(".row.line",box).forEach(el=>el.remove());
+  const list=getToday();
+  $$("#noCount").style.display=list.length? "none":"block";
+  list.forEach(e=>{
+    const r=document.createElement("div"); r.className="row line";
+    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.barcode||""}</div><div>${e.qty}</div>`;
+    box.appendChild(r);
+  });
+}
+
+function toCSV(){
+  const list=getToday();
+  const head=["date","time","code","name","barcode","qty"];
+  const lines=[head.join(",")];
+  list.forEach(e=> lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, `"${(e.barcode||"").replace(/"/g,'""')}"`, e.qty].join(",")));
+  return lines.join("\n");
+}
+
+function downloadCSV(){
+  const blob=new Blob([toCSV()],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download="numerim-"+todayISO()+".csv";
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+function compileText(){
+  const list=getToday(); if(!list.length) return "S’ka të dhëna për sot.";
+  const head=`Numërim — ${todayISO()}\n`;
+  return head + list.map((e,i)=>`${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}${e.barcode? " — Barkod: "+e.barcode:""}`).join("\n");
+}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  $$("#metaCount").textContent = PARTS.length + " pjesë";
+  $$("#today").textContent = todayISO();
+
+  const q=$$("#q");
+  const run=()=> renderResults(search(q.value));
+  $$("#btnFind").addEventListener("click", run);
+  $$("#btnClear").addEventListener("click", ()=>{ q.value=""; renderResults([]) });
+  q.addEventListener("input", run);
+  q.addEventListener("keydown", e=>{ if(e.key==="Enter") run(); });
+
+  $$("#btnDL").addEventListener("click", downloadCSV);
+  $$("#btnCopy").addEventListener("click", ()=> navigator.clipboard.writeText(compileText()).then(()=>alert("U kopjua."),()=>alert("S’u kopjua.")));
+  $$("#btnReset").addEventListener("click", ()=>{ if(confirm("T’i fshij regjistrimet e ditës?")){ resetToday(); renderCount(); } });
+
+  renderCount();
+});
+</script>
+</body>
+</html>
