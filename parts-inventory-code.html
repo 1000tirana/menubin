@@ -25,7 +25,7 @@
   .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0}
   .hint{color:var(--muted);font-size:12px}
   .results, .count{padding:8px}
-  .row{display:grid;grid-template-columns:160px 1fr 1fr 220px 120px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
+  .row{display:grid;grid-template-columns:160px 1fr 1fr 120px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
   .row.head{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
   .row > div{overflow-wrap:anywhere}
   .qty{display:flex;gap:8px;align-items:center}
@@ -58,7 +58,7 @@
     <section class="card">
       <div class="section-title"><h3>Rezultatet</h3><div class="hint">“A e kishe fjalën për këtë?”</div></div>
       <div class="results" id="results">
-        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Barkod</div><div>Veprim</div></div>
+        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Veprim</div></div>
         <div class="empty" id="noRes">Bëj një kërkim.</div>
       </div>
     </section>
@@ -73,7 +73,7 @@
         </div>
       </div>
       <div class="count" id="countBox">
-        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Barkod</div><div>Sasia</div></div>
+        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Sasia</div></div>
         <div class="empty" id="noCount">Ende s’ka të dhëna.</div>
       </div>
     </section>
@@ -118,7 +118,6 @@ function renderResults(list){
       <div class="code">${item.code||""}</div>
       <div class="n1">${item.name1||""}</div>
       <div class="n2">${item.name2||""}</div>
-      <div class="bc">${item.barcode||""}</div>
       <div class="qty">
         <input type="number" min="0" step="1" value="0" inputmode="numeric" pattern="\d*">
         <button class="btn btn-acc">Shto</button>
@@ -153,18 +152,18 @@ function renderCount(){
   list.forEach(e=>{
     const val=(e.barcode||e.code||"");
     const r=document.createElement("div"); r.className="row line";
-    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${val}</div><div>${e.qty}</div>`;
+    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.qty}</div>`;
     box.appendChild(r);
   });
 }
 
 function toCSV(){
   const list=getToday();
-  const head=["date","time","code","name","barcode_or_code","qty"];
+  const head=["date","time","code","name","qty"];
   const lines=[head.join(",")];
   list.forEach(e=> { 
     const boc=(e.barcode||e.code||"").replace(/"/g,'""');
-    lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, `"`+boc+`"`, e.qty].join(","));
+    lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, e.qty].join(","));
   });
   return lines.join("\n");
 }
@@ -181,7 +180,7 @@ function downloadCSV(){
 function compileText(){
   const list=getToday(); if(!list.length) return "S’ka të dhëna për sot.";
   const head=`Numërim — ${todayISO()}\n`;
-  return head + list.map((e,i)=>{ const boc=e.barcode||e.code||""; return `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}${boc? " — Barkod: "+boc:""}`; }).join("\n");
+  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}`).join("\n");
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
