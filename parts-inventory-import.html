@@ -4,56 +4,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Numërim Pjesësh · Final</title>
-<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "generated_at": "2025-09-02T06:16:01"} -->
+<title>Numërim Pjesësh · Offline</title>
 <style>
   :root{--bg:#0f1115;--panel:#151a24;--line:#232b3b;--text:#e7ebf5;--muted:#9aa4b8;--accent:#29c06f;--danger:#ff5d5d}
-  *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.45}
+  *{box-sizing:border-box} html,body{height:100%} 
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.45}
   header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(15,17,21,.95),rgba(15,17,21,.82));border-bottom:1px solid var(--line)}
-  .wrap{max-width:1060px;margin:0 auto;padding:16px}
+  .wrap{max-width:1024px;margin:0 auto;padding:16px}
   h1{margin:0;font-size:20px;font-weight:700}
   .sub{font-size:12px;color:var(--muted)}
-  .bar{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
-  input[type=search]{flex:1;min-width:260px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#121721;color:var(--text);font-size:16px}
-  .btn{padding:12px 14px;border:1px solid var(--line);background:#121721;color:var(--text);border-radius:12px;cursor:pointer;min-width:64px}
+  .bar{display:flex;gap:8px;margin:12px 0}
+  input[type=search]{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#121721;color:#e7ebf5;font-size:16px}
+  .btn{padding:10px 14px;border:1px solid var(--line);background:#121721;color:#e7ebf5;border-radius:10px;cursor:pointer;min-width:64px}
   .btn:hover{filter:brightness(1.08)}
   .btn-acc{background:var(--accent);color:#0a0e0d;border:none}
   .btn-dan{background:var(--danger);color:#fff;border:none}
   .split{display:grid;grid-template-columns: 1fr;gap:16px}
   @media(min-width:900px){.split{grid-template-columns:1fr 1fr}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0;gap:10px;flex-wrap:wrap}
+  .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0}
   .hint{color:var(--muted);font-size:12px}
   .results, .count{padding:8px}
-  .row{display:grid;grid-template-columns:160px 1fr 1fr 140px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
+  .row{display:grid;grid-template-columns:160px 1fr 1fr 1fr 120px;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px dashed var(--line)}
   .row.head{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
   .row > div{overflow-wrap:anywhere}
-  .qty{display:flex;gap:8px;align-items:center;justify-content:flex-end}
-  .qty input[type=number]{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--text);font-size:16px}
+  .qty{display:flex;gap:6px;align-items:center}
+  .qty input{padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#0f141e;color:#e7ebf5;font-size:14px}
+  .qty input.note{width:130px}
+  .qty input.num{width:80px}
   .empty{text-align:center;color:var(--muted);padding:12px}
   .pill{font-size:12px;color:var(--muted);padding:4px 8px;border:1px solid var(--line);border-radius:999px}
   .footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 40px}
-  @media(max-width:640px){ .row{grid-template-columns:1fr 120px} .row.head{display:none} .row .code,.row .n1,.row .n2{grid-column:1 / -1} .row .qty{grid-column:2 / 3;justify-self:end} }
+  @media(max-width:640px){ .row{grid-template-columns:1fr 100px} .row.head{display:none} .row .code,.row .n1,.row .n2{grid-column:1 / -1} .row .qty{grid-column:1 / -1} }
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>Numërim Pjesësh <span class="sub">· Punon offline · final</span></h1>
+    <h1>Numërim Pjesësh <span class="sub">· offline · CSV</span></h1>
     <div class="bar">
       <input id="q" type="search" placeholder="Kërko: p.sh. 'arka çamurluk'…">
       <button class="btn" id="btnFind">Kërko</button>
       <button class="btn" id="btnClear">Pastro</button>
     </div>
-    <div class="bar" style="margin-top:-6px;gap:10px">
+    <div class="bar" style="margin-top:-6px">
       <span class="pill" id="metaCount">—</span>
       <span class="pill">Sot: <span id="today">—</span></span>
-      <button class="btn" id="btnImport">Ngjit & Importo</button>
-      <button class="btn" id="btnCopy">Kopjo</button>
-      <button class="btn" id="btnWA">WhatsApp</button>
-      <button class="btn" id="btnDL">Shkarko CSV</button>
-      <button class="btn btn-dan" id="btnReset">Pastro Ditën</button>
-      <span class="hint" style="margin-left:auto">Shto sasinë dhe shtyp <b>Enter</b> ose <b>Shto</b></span>
+      <span class="hint" style="margin-left:auto">Shkruaj sasinë dhe shtyp Enter ose Shto</span>
     </div>
   </div>
 </header>
@@ -63,21 +60,28 @@
     <section class="card">
       <div class="section-title"><h3>Rezultatet</h3><div class="hint">“A e kishe fjalën për këtë?”</div></div>
       <div class="results" id="results">
-        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Veprim</div></div>
+        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Shënim</div><div>Veprim</div></div>
         <div class="empty" id="noRes">Bëj një kërkim.</div>
       </div>
     </section>
     <section class="card">
-      <div class="section-title"><h3>Lista e Numërimit</h3></div>
+      <div class="section-title">
+        <h3>Lista e Numërimit</h3>
+        <div>
+          <button class="btn" id="btnCopy">Kopjo</button>
+          <button class="btn" id="btnDL">Shkarko CSV</button>
+          <button class="btn" id="btnUL">CSV Yükle</button>
+          <input type="file" id="fileCSV" accept=".csv,text/csv" style="display:none">
+          <button class="btn btn-dan" id="btnReset">Pastro Ditën</button>
+        </div>
+      </div>
       <div class="count" id="countBox">
-        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Sasia</div></div>
+        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Shënim</div><div>Sasia</div></div>
         <div class="empty" id="noCount">Ende s’ka të dhëna.</div>
       </div>
     </section>
   </div>
-  <section class="footer">
-    Të dhënat ruhen në shfletues (localStorage). Funksionon edhe pa internet. Mund të hapet në telefon ose laptop.
-  </section>
+  <section class="footer">Të dhënat ruhen në shfletues (localStorage). Mund të hapet në telefon ose laptop.</section>
 </main>
 
 <script>
@@ -89,44 +93,29 @@ const pad2 = n=>String(n).padStart(2,'0');
 const todayISO = ()=>new Date().toISOString().slice(0,10);
 const timeHM = d=>pad2(d.getHours())+":"+pad2(d.getMinutes());
 const STORE="inv_count_v1";
-
 function getStore(){ try{return JSON.parse(localStorage.getItem(STORE))||{}}catch(_){ return {} } }
 function setStore(o){ localStorage.setItem(STORE, JSON.stringify(o)) }
 function getToday(){ const s=getStore(); const k=todayISO(); return Array.isArray(s[k])?s[k]:[] }
 function pushToday(e){ const s=getStore(); const k=todayISO(); if(!Array.isArray(s[k])) s[k]=[]; s[k].push(e); setStore(s) }
 function resetToday(){ const s=getStore(); const k=todayISO(); s[k]=[]; setStore(s) }
-
+function addEntryWithDuplicatePolicy(entry){
+  const store = getStore();
+  const key = todayISO();
+  const list = Array.isArray(store[key]) ? store[key] : [];
+  const idx = list.findIndex(x => x.code === entry.code);
+  if (idx >= 0){
+    const merge = confirm("Aynı parçadan kayıt var. Üstüne ekleyeyim mi?\nOK: mevcut kayda ekle · Cancel: ayrı kaydet (notla)");
+    if (merge){
+      list[idx].qty = (parseInt(list[idx].qty,10)||0) + (parseInt(entry.qty,10)||0);
+      store[key] = list; setStore(store);
+    } else { pushToday(entry); }
+  } else { pushToday(entry); }
+}
 function norm(x){ return (x||"").toString().toLowerCase() }
 function search(q){
   const t=norm(q); if(!t) return [];
-  return PARTS.filter(p=> norm(p.code).includes(t) ||
-                           norm(p.name1).includes(t) ||
-                           norm(p.name2).includes(t)).slice(0,150);
+  return PARTS.filter(p=> norm(p.code).includes(t) || norm(p.name1).includes(t) || norm(p.name2).includes(t)).slice(0,100);
 }
-
-// Import from pasted text (robust)
-function parseLinesFromText(text){
-  const lines = text.split(/\r?\n/).map(s=>s.replace(/\u00A0/g,' ').trim()).filter(Boolean);
-  const out = [];
-  const re = /^\s*(?:\d+\.)?\s*(\d{1,2}:\d{2})\s*[—–-]\s*(.+?)\s*\(([^)]+)\)\s*[xX]\s*(\d+)\s*$/;
-  for(const line of lines){
-    if (/^num/i.test(line)) continue;
-    const m = line.match(re);
-    if (!m) continue;
-    const [, time, name, code, qty] = m;
-    out.push({ time, name, code, qty: parseInt(qty,10)||0 });
-  }
-  return out;
-}
-function importFromText(text){
-  const entries = parseLinesFromText(text);
-  if(!entries.length){ alert("Asgjë për të importuar (format i panjohur)."); return; }
-  if(!confirm(entries.length + " rreshta do të shtohen për sot. Vazhdoni?")) return;
-  entries.forEach(e=> pushToday({ ts:new Date().toISOString(), time:e.time, code:e.code, name:e.name, qty:e.qty }));
-  renderCount();
-  alert("U importuan " + entries.length + " rreshta.");
-}
-
 function renderResults(list){
   const box=$$("#results");
   $$$(".row.item",box).forEach(el=>el.remove());
@@ -138,38 +127,33 @@ function renderResults(list){
       <div class="n1">${item.name1||""}</div>
       <div class="n2">${item.name2||""}</div>
       <div class="qty">
-        <input type="number" min="0" step="1" value="0" inputmode="numeric" pattern="\d*">
+        <input class="note" type="text" placeholder="Shënim (ops.)">
+        <input class="num" type="number" min="0" step="1" value="0">
         <button class="btn btn-acc">Shto</button>
       </div>`;
-    const qty=$$("input",row);
+    const note=row.querySelector(".note");
+    const qty=row.querySelector(".num");
     const add=()=>{
       const n=parseInt(qty.value,10);
-      if(isNaN(n) || n<=0) return alert("Vendos një sasi (>0).");
+      if(isNaN(n)||n<=0) return alert("Vendos një sasi >0");
       const now=new Date();
-      // duplicate policy
-      const store = getStore(); const key=todayISO(); const list = Array.isArray(store[key])?store[key]:[];
-      const idx = list.findIndex(x=>x.code === (item.code||""));
-      if(idx>=0){
-        const merge = confirm("Aynı parçadan kayıt var. Üstüne ekleyeyim mi?\nOK: mevcut kayda ekle · Cancel: ayrı kaydet (notla)");
-        if(merge){
-          list[idx].qty = (parseInt(list[idx].qty,10)||0) + n;
-          store[key]=list; setStore(store);
-        }else{
-          const note = prompt("Not eklemek ister misin? (opsiyonel)", "");
-          pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n, note: note||"" });
-        }
-      }else{
-        pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n });
-      }
-      qty.value="0";
+      addEntryWithDuplicatePolicy({
+        ts: now.toISOString(),
+        time: timeHM(now),
+        code: item.code||"",
+        name: item.name1||item.name2||"",
+        note: note.value || "",
+        qty: n
+      });
+      qty.value="0"; note.value="";
       renderCount();
     };
-    $$("button",row).addEventListener("click",add);
+    row.querySelector("button").addEventListener("click",add);
     qty.addEventListener("keydown",e=>{ if(e.key==="Enter") add(); });
+    note.addEventListener("keydown",e=>{ if(e.key==="Enter") add(); });
     box.appendChild(row);
   });
 }
-
 function renderCount(){
   const box=$$("#countBox");
   $$$(".row.line",box).forEach(el=>el.remove());
@@ -177,51 +161,83 @@ function renderCount(){
   $$("#noCount").style.display=list.length? "none":"block";
   list.forEach(e=>{
     const r=document.createElement("div"); r.className="row line";
-    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.qty}</div>`;
+    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.note||""}</div><div>${e.qty}</div>`;
     box.appendChild(r);
   });
 }
-
 function toCSV(){
   const list=getToday();
-  const head=["date","time","code","name","qty"];
+  const head=["date","time","code","name","note","qty"];
   const lines=[head.join(",")];
-  list.forEach(e=> lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, e.qty].join(",")));
+  list.forEach(e=> { 
+    lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, `"${(e.note||"").replace(/"/g,'""')}"`, e.qty].join(","));
+  });
   return lines.join("\n");
 }
-
 function downloadCSV(){
   const blob=new Blob([toCSV()],{type:"text/csv;charset=utf-8"});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download="numerim-"+todayISO()+".csv";
+  const a=document.createElement("a"); a.href=url; a.download="numerim-"+todayISO()+".csv";
   document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
+  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },500);
 }
-
-function compileText(){
-  const list=getToday(); if(!list.length) return "S’ka të dhëna për sot.";
-  const head=`Numërim — ${todayISO()}\n`;
-  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}`).join("\n");
+function splitCSVLine(line){
+  const out=[]; let cur=""; let q=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch === '"'){ if(q && line[i+1] === '"'){ cur+='"'; i++; } else { q=!q; } }
+    else if(ch===',' && !q){ out.push(cur); cur=""; }
+    else cur+=ch;
+  }
+  out.push(cur); return out;
 }
-
+function parseCSV(text){
+  const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(x=>x.trim().length>0);
+  if(!lines.length) return [];
+  const header=splitCSVLine(lines[0]).map(h=>h.trim().toLowerCase());
+  const idx={date:header.indexOf("date"),time:header.indexOf("time"),code:header.indexOf("code"),name:header.indexOf("name"),note:header.indexOf("note"),qty:header.indexOf("qty")};
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const parts=splitCSVLine(lines[i]);
+    const get=(k)=> idx[k]>=0 ? (parts[idx[k]]||"").trim() : "";
+    const e={time:get("time")||timeHM(new Date()),code:get("code"),name:get("name"),note:get("note"),qty:parseInt(get("qty"),10)||0};
+    if(!e.code||!e.qty) continue; rows.push(e);
+  }
+  return rows;
+}
+function importCSVRows(rows,mode){
+  const store=getStore(); const key=todayISO();
+  const existing=Array.isArray(store[key])?store[key]:[];
+  store[key]=(mode==="replace")?rows:existing.concat(rows);
+  setStore(store); renderCount();
+  alert("CSV içeri aktarıldı ("+rows.length+" satır, kip: "+mode+").");
+}
 window.addEventListener("DOMContentLoaded",()=>{
-  $$("#metaCount").textContent = PARTS.length + " pjesë";
-  $$("#today").textContent = todayISO();
-
+  $$("#metaCount").textContent=PARTS.length+" pjesë";
+  $$("#today").textContent=todayISO();
   const q=$$("#q");
-  const run=()=> renderResults(search(q.value));
-  $$("#btnFind").addEventListener("click", run);
-  $$("#btnClear").addEventListener("click", ()=>{ q.value=""; renderResults([]) });
-  q.addEventListener("input", run);
-  q.addEventListener("keydown", e=>{ if(e.key==="Enter") run(); });
-
-  $$("#btnImport").addEventListener("click", ()=>{ const t=prompt("Ngjit tekstin këtu:", ""); if(t!==null) importFromText(t); });
-  $$("#btnDL").addEventListener("click", downloadCSV);
-  $$("#btnCopy").addEventListener("click", ()=> navigator.clipboard.writeText(compileText()).then(()=>alert("U kopjua."),()=>alert("S’u kopjua.")));
-  $$("#btnWA").addEventListener("click", ()=>{ const t=compileText(); const u="https://wa.me/?text="+encodeURIComponent(t); window.open(u,"_blank"); });
-  $$("#btnReset").addEventListener("click", ()=>{ if(confirm("T’i fshij regjistrimet e ditës?")){ resetToday(); renderCount(); } });
-
+  const run=()=>renderResults(search(q.value));
+  $$("#btnFind").addEventListener("click",run);
+  $$("#btnClear").addEventListener("click",()=>{q.value="";renderResults([])});
+  q.addEventListener("input",run);
+  q.addEventListener("keydown",e=>{if(e.key==="Enter")run();});
+  $$("#btnDL").addEventListener("click",downloadCSV);
+  $$("#btnUL").addEventListener("click",()=> $$("#fileCSV").click());
+  $$("#fileCSV").addEventListener("change",(ev)=>{
+    const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const text=String(r.result||""); const rows=parseCSV(text);
+        if(!rows.length){alert("CSV boş ya da tanınmadı.");return;}
+        const merge=confirm("CSV'deki kayıtları bugüne ekleyeyim mi?\nOK: Üstüne ekle · Cancel: Bugünü sıfırla ve sadece CSV yükle");
+        importCSVRows(rows,merge?"merge":"replace");
+      }catch(e){alert("CSV okunamadı: "+e);}
+    };
+    r.readAsText(f); ev.target.value="";
+  });
+  $$("#btnCopy").addEventListener("click",()=>navigator.clipboard.writeText(toCSV()).then(()=>alert("U kopjua."),()=>alert("S’u kopjua.")));
+  $$("#btnReset").addEventListener("click",()=>{if(confirm("T’i fshij regjistrimet e ditës?")){resetToday();renderCount();}});
   renderCount();
 });
 </script>
