@@ -101,12 +101,22 @@ function pushToday(e){ const s=getStore(); const k=todayISO(); if(!Array.isArray
 function resetToday(){ const s=getStore(); const k=todayISO(); s[k]=[]; setStore(s) }
 
 // Import from pasted text
+
 function parseLinesFromText(text){
-  const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const lines = text.split(/\r?\n/).map(s=>s.replace(/\u00A0/g,' ').trim()).filter(Boolean);
   const out = [];
+  // regex: optional numbering, time(HH:MM), dash (hyphen/en dash/em dash), name, (CODE), xQTY
+  const re = /^\s*(?:\d+\.)?\s*(\d{1,2}:\d{2})\s*[—–-]\s*(.+?)\s*\(([^)]+)\)\s*[xX]\s*(\d+)\s*$/;
   for(const line of lines){
-    if(/^numërim/i.test(line) || /^num\u00ebrim/i.test(line)) continue;
-    const m = line.match(/^\d+\.\s*(\d{2}:\d{2})\s*[—-]\s*(.+?)\s*\(([^)]+)\)\s*x\s*(\d+)\s*$/i);
+    if (/^num/i.test(line)) continue; // header like "Numërim — 2025-09-01"
+    const m = line.match(re);
+    if (!m) continue;
+    const [, time, name, code, qty] = m;
+    out.push({ time, name, code, qty: parseInt(qty,10)||0 });
+  }
+  return out;
+}
+:\d{2})\s*[—-]\s*(.+?)\s*\(([^)]+)\)\s*x\s*(\d+)\s*$/i);
     if(!m) continue;
     const [, time, name, code, qty] = m;
     out.push({ time, name, code, qty: parseInt(qty,10)||0 });
