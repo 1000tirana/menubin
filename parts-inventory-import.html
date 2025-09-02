@@ -4,17 +4,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Numërim Pjesësh · Import nga tekst</title>
-<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "generated_at": "2025-09-02T06:00:37"} -->
+<title>Numërim Pjesësh · Final</title>
+<!-- Mapping: {"source_file": "Tirana Spare Parts FollowUp Form.xlsx", "row_count": 206, "code_col": "Part\nCode", "name1_col": "Name\nTürkçe", "name2_col": "Part Name \nEnglish", "generated_at": "2025-09-02T06:16:01"} -->
 <style>
   :root{--bg:#0f1115;--panel:#151a24;--line:#232b3b;--text:#e7ebf5;--muted:#9aa4b8;--accent:#29c06f;--danger:#ff5d5d}
   *{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;line-height:1.45}
   header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(15,17,21,.95),rgba(15,17,21,.82));border-bottom:1px solid var(--line)}
-  .wrap{max-width:1024px;margin:0 auto;padding:16px}
+  .wrap{max-width:1060px;margin:0 auto;padding:16px}
   h1{margin:0;font-size:20px;font-weight:700}
   .sub{font-size:12px;color:var(--muted)}
-  .bar{display:flex;gap:8px;margin:12px 0}
-  input[type=search]{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#121721;color:var(--text);font-size:16px}
+  .bar{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+  input[type=search]{flex:1;min-width:260px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#121721;color:var(--text);font-size:16px}
   .btn{padding:12px 14px;border:1px solid var(--line);background:#121721;color:var(--text);border-radius:12px;cursor:pointer;min-width:64px}
   .btn:hover{filter:brightness(1.08)}
   .btn-acc{background:var(--accent);color:#0a0e0d;border:none}
@@ -22,24 +22,24 @@
   .split{display:grid;grid-template-columns: 1fr;gap:16px}
   @media(min-width:900px){.split{grid-template-columns:1fr 1fr}}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0}
+  .section-title{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 0;gap:10px;flex-wrap:wrap}
   .hint{color:var(--muted);font-size:12px}
   .results, .count{padding:8px}
-  .row{display:grid;grid-template-columns:160px 1fr 1fr 1fr 120px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
+  .row{display:grid;grid-template-columns:160px 1fr 1fr 140px;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px dashed var(--line)}
   .row.head{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
   .row > div{overflow-wrap:anywhere}
-  .qty{display:flex;gap:8px;align-items:center}
-  .qty input{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--text);font-size:16px}
+  .qty{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+  .qty input[type=number]{width:110px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--text);font-size:16px}
   .empty{text-align:center;color:var(--muted);padding:12px}
   .pill{font-size:12px;color:var(--muted);padding:4px 8px;border:1px solid var(--line);border-radius:999px}
   .footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 0 40px}
-  @media(max-width:640px){ .row{grid-template-columns:1fr 100px} .row.head{display:none} .row .code,.row .n1,.row .n2,.row .note{grid-column:1 / -1} .row .qty{grid-column:2 / 3;justify-self:end} }
+  @media(max-width:640px){ .row{grid-template-columns:1fr 120px} .row.head{display:none} .row .code,.row .n1,.row .n2{grid-column:1 / -1} .row .qty{grid-column:2 / 3;justify-self:end} }
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>Numërim Pjesësh <span class="sub">· Importo me ngjitje</span></h1>
+    <h1>Numërim Pjesësh <span class="sub">· Punon offline · final</span></h1>
     <div class="bar">
       <input id="q" type="search" placeholder="Kërko: p.sh. 'arka çamurluk'…">
       <button class="btn" id="btnFind">Kërko</button>
@@ -49,7 +49,11 @@
       <span class="pill" id="metaCount">—</span>
       <span class="pill">Sot: <span id="today">—</span></span>
       <button class="btn" id="btnImport">Ngjit & Importo</button>
-      <span class="hint" style="margin-left:auto">Shto sasinë me Enter ose përdor importimin nga teksti</span>
+      <button class="btn" id="btnCopy">Kopjo</button>
+      <button class="btn" id="btnWA">WhatsApp</button>
+      <button class="btn" id="btnDL">Shkarko CSV</button>
+      <button class="btn btn-dan" id="btnReset">Pastro Ditën</button>
+      <span class="hint" style="margin-left:auto">Shto sasinë dhe shtyp <b>Enter</b> ose <b>Shto</b></span>
     </div>
   </div>
 </header>
@@ -59,22 +63,14 @@
     <section class="card">
       <div class="section-title"><h3>Rezultatet</h3><div class="hint">“A e kishe fjalën për këtë?”</div></div>
       <div class="results" id="results">
-        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Shënim</div><div>Veprim</div></div>
+        <div class="row head"><div>Kodi</div><div>Emri 1</div><div>Emri 2</div><div>Veprim</div></div>
         <div class="empty" id="noRes">Bëj një kërkim.</div>
       </div>
     </section>
     <section class="card">
-      <div class="section-title">
-        <h3>Lista e Numërimit</h3>
-        <div>
-          <button class="btn" id="btnCopy">Kopjo</button>
-          <button class="btn" id="btnDL">Shkarko CSV</button>
-          <button class="btn" id="btnWA">WhatsApp</button>
-          <button class="btn btn-dan" id="btnReset">Pastro Ditën</button>
-        </div>
-      </div>
+      <div class="section-title"><h3>Lista e Numërimit</h3></div>
       <div class="count" id="countBox">
-        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Shënim</div><div>Sasia</div></div>
+        <div class="row head"><div>Ora</div><div>Kodi</div><div>Emri</div><div>Sasia</div></div>
         <div class="empty" id="noCount">Ende s’ka të dhëna.</div>
       </div>
     </section>
@@ -100,14 +96,23 @@ function getToday(){ const s=getStore(); const k=todayISO(); return Array.isArra
 function pushToday(e){ const s=getStore(); const k=todayISO(); if(!Array.isArray(s[k])) s[k]=[]; s[k].push(e); setStore(s) }
 function resetToday(){ const s=getStore(); const k=todayISO(); s[k]=[]; setStore(s) }
 
-// Import from pasted text
+function norm(x){ return (x||"").toString().toLowerCase() }
+function search(q){
+  const t=norm(q); if(!t) return [];
+  return PARTS.filter(p=> norm(p.code).includes(t) ||
+                           norm(p.name1).includes(t) ||
+                           norm(p.name2).includes(t)).slice(0,150);
+}
+
+// Import from pasted text (robust)
 function parseLinesFromText(text){
-  const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const lines = text.split(/\r?\n/).map(s=>s.replace(/\u00A0/g,' ').trim()).filter(Boolean);
   const out = [];
+  const re = /^\s*(?:\d+\.)?\s*(\d{1,2}:\d{2})\s*[—–-]\s*(.+?)\s*\(([^)]+)\)\s*[xX]\s*(\d+)\s*$/;
   for(const line of lines){
-    if(/^numërim/i.test(line) || /^num\u00ebrim/i.test(line)) continue;
-    const m = line.match(/^\d+\.\s*(\d{2}:\d{2})\s*[—-]\s*(.+?)\s*\(([^)]+)\)\s*x\s*(\d+)\s*$/i);
-    if(!m) continue;
+    if (/^num/i.test(line)) continue;
+    const m = line.match(re);
+    if (!m) continue;
     const [, time, name, code, qty] = m;
     out.push({ time, name, code, qty: parseInt(qty,10)||0 });
   }
@@ -117,17 +122,9 @@ function importFromText(text){
   const entries = parseLinesFromText(text);
   if(!entries.length){ alert("Asgjë për të importuar (format i panjohur)."); return; }
   if(!confirm(entries.length + " rreshta do të shtohen për sot. Vazhdoni?")) return;
-  entries.forEach(e=> pushToday({ ts:new Date().toISOString(), time:e.time, code:e.code, name:e.name, qty:e.qty, note:"importuar" }));
+  entries.forEach(e=> pushToday({ ts:new Date().toISOString(), time:e.time, code:e.code, name:e.name, qty:e.qty }));
   renderCount();
   alert("U importuan " + entries.length + " rreshta.");
-}
-
-function norm(x){ return (x||"").toString().toLowerCase() }
-function search(q){
-  const t=norm(q); if(!t) return [];
-  return PARTS.filter(p=> norm(p.code).includes(t) ||
-                           norm(p.name1).includes(t) ||
-                           norm(p.name2).includes(t)).slice(0,100);
 }
 
 function renderResults(list){
@@ -141,17 +138,15 @@ function renderResults(list){
       <div class="n1">${item.name1||""}</div>
       <div class="n2">${item.name2||""}</div>
       <div class="qty">
-        <input class="note" type="text" placeholder="Shënim (ops.)" style="width:160px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f141e;color:var(--text)">
         <input type="number" min="0" step="1" value="0" inputmode="numeric" pattern="\d*">
         <button class="btn btn-acc">Shto</button>
       </div>`;
-    const note=$$("input.note",row);
-    const qty=$$("input[type=number]",row);
+    const qty=$$("input",row);
     const add=()=>{
       const n=parseInt(qty.value,10);
       if(isNaN(n) || n<=0) return alert("Vendos një sasi (>0).");
       const now=new Date();
-      // duplicate policy prompt
+      // duplicate policy
       const store = getStore(); const key=todayISO(); const list = Array.isArray(store[key])?store[key]:[];
       const idx = list.findIndex(x=>x.code === (item.code||""));
       if(idx>=0){
@@ -160,12 +155,13 @@ function renderResults(list){
           list[idx].qty = (parseInt(list[idx].qty,10)||0) + n;
           store[key]=list; setStore(store);
         }else{
-          pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n, note: note.value||"" });
+          const note = prompt("Not eklemek ister misin? (opsiyonel)", "");
+          pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n, note: note||"" });
         }
       }else{
-        pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n, note: note.value||"" });
+        pushToday({ ts:now.toISOString(), time:timeHM(now), code:item.code||"", name:item.name1||item.name2||"", qty:n });
       }
-      qty.value="0"; note.value="";
+      qty.value="0";
       renderCount();
     };
     $$("button",row).addEventListener("click",add);
@@ -181,16 +177,16 @@ function renderCount(){
   $$("#noCount").style.display=list.length? "none":"block";
   list.forEach(e=>{
     const r=document.createElement("div"); r.className="row line";
-    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.note||""}</div><div>${e.qty}</div>`;
+    r.innerHTML=`<div>${e.time}</div><div>${e.code}</div><div>${e.name}</div><div>${e.qty}</div>`;
     box.appendChild(r);
   });
 }
 
 function toCSV(){
   const list=getToday();
-  const head=["date","time","code","name","note","qty"];
+  const head=["date","time","code","name","qty"];
   const lines=[head.join(",")];
-  list.forEach(e=> lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, `"${(e.note||"").replace(/"/g,'""')}"`, e.qty].join(",")));
+  list.forEach(e=> lines.push([todayISO(), e.time, `"${(e.code||"").replace(/"/g,'""')}"`, `"${(e.name||"").replace(/"/g,'""')}"`, e.qty].join(",")));
   return lines.join("\n");
 }
 
@@ -206,7 +202,7 @@ function downloadCSV(){
 function compileText(){
   const list=getToday(); if(!list.length) return "S’ka të dhëna për sot.";
   const head=`Numërim — ${todayISO()}\n`;
-  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}${e.note? " — Not: "+e.note:""}`).join("\n");
+  return head + list.map((e,i)=> `${i+1}. ${e.time} — ${e.name} (${e.code}) x${e.qty}`).join("\n");
 }
 
 window.addEventListener("DOMContentLoaded",()=>{
