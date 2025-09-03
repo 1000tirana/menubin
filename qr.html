@@ -119,21 +119,17 @@ display: none;
 </head>
 <body>
 
-
-
 <div id="controls">
-<div class="input-group">
-<input type="text" id="barcodeInput" placeholder="Barkodları 4'lü aralıksız yaz (örn: ASDF1234)" oninput="checkSingleCode()"/>
-<button id="doubleButton" onclick="generateDoubleLabel()">İki Adet Üret</button>
-<button onclick="window.location.href='https://1000tirana.github.io/menubin/'" style="position:absolute; left: 20px; top: 20px; padding: 8px 16px; background-color:#4CAF50; border:none; color:white; border-radius:4px;">Kthehu në faqen kryesore</button>
+  <div class="input-group">
+    <input type="text" id="barcodeInput" placeholder="Barkodları 4'lü aralıksız yaz (örn: ASDF1234)" oninput="checkSingleCode()"/>
+    <button id="doubleButton" onclick="generateDoubleLabel()">İki Adet Üret</button>
+    <button onclick="window.location.href='https://1000tirana.github.io/menubin/'" style="position:absolute; left: 20px; top: 20px; padding: 8px 16px; background-color:#4CAF50; border:none; color:white; border-radius:4px;">Kthehu në faqen kryesore</button>
+  </div>
+  <div>
+    <button onclick="addLabels()">Barcode</button>
+    <button onclick="window.print()">Yazdır</button>
+  </div>
 </div>
-<div>
-<button onclick="addLabels()">Barcode</button>
-<button onclick="window.print()">Yazdır</button>
-</div>
-</div>
-
-
 
 <div id="printArea"></div>
 
@@ -143,81 +139,101 @@ const printArea = document.getElementById('printArea');
 const doubleButton = document.getElementById('doubleButton');
 
 function checkSingleCode() {
-const raw = input.value.replace(/\s+/g, '').toUpperCase();
-doubleButton.style.display = (raw.length === 4) ? 'inline-block' : 'none';
+  const raw = input.value.replace(/\s+/g, '').toUpperCase();
+  doubleButton.style.display = (raw.length === 4) ? 'inline-block' : 'none';
+}
+
+function renderQR(qrContainer, text) {
+  qrContainer.innerHTML = '';
+
+  // Geçici div içine üret
+  const tempDiv = document.createElement('div');
+  new QRCode(tempDiv, {
+    text: text,
+    width: 600,
+    height: 600,
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // QR çıktısı <img> veya <canvas> olabilir
+  const qrEl = tempDiv.querySelector('img, canvas');
+
+  // Canvas’a çevirip kutuya ölçekle
+  const canvas = document.createElement('canvas');
+  canvas.width = 300;  // yeterli DPI
+  canvas.height = 300;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false; // keskin kenarlar
+  ctx.drawImage(qrEl, 0, 0, canvas.width, canvas.height);
+
+  // Kutunun içine yerleştir
+  qrContainer.appendChild(canvas);
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.display = 'block';
 }
 
 function generateDoubleLabel() {
-const raw = input.value.replace(/\s+/g, '').toUpperCase();
-if (raw.length !== 4) return;
+  const raw = input.value.replace(/\s+/g, '').toUpperCase();
+  if (raw.length !== 4) return;
 
-printArea.innerHTML = '';
+  printArea.innerHTML = '';
 
-for (let i = 0; i < 2; i++) {
-const label = document.createElement('div');
-label.className = 'label';
+  for (let i = 0; i < 2; i++) {
+    const label = document.createElement('div');
+    label.className = 'label';
 
-const qrDiv = document.createElement('div');
-qrDiv.className = 'qr';
+    const qrDiv = document.createElement('div');
+    qrDiv.className = 'qr';
 
-const caption = document.createElement('div');
-caption.className = 'caption';
-caption.textContent = raw;
+    const caption = document.createElement('div');
+    caption.className = 'caption';
+    caption.textContent = raw;
 
-label.appendChild(qrDiv);
-label.appendChild(caption);
-printArea.appendChild(label);
+    label.appendChild(qrDiv);
+    label.appendChild(caption);
+    printArea.appendChild(label);
 
-new QRCode(qrDiv, {
-text: raw,
-width: 77,
-height: 77,
-correctLevel: QRCode.CorrectLevel.H
-});
-}
+    renderQR(qrDiv, raw);
+  }
 
-input.value = '';
-doubleButton.style.display = 'none';
-input.focus();
+  input.value = '';
+  doubleButton.style.display = 'none';
+  input.focus();
 }
 
 function addLabels() {
-const raw = input.value.replace(/\s+/g, '').toUpperCase();
-const values = [];
-for (let i = 0; i < raw.length; i += 4) {
-const segment = raw.substr(i, 4);
-if (segment.length === 4) values.push(segment);
-}
+  const raw = input.value.replace(/\s+/g, '').toUpperCase();
+  const values = [];
+  for (let i = 0; i < raw.length; i += 4) {
+    const segment = raw.substr(i, 4);
+    if (segment.length === 4) values.push(segment);
+  }
 
-if (values.length === 0) return;
-printArea.innerHTML = '';
+  if (values.length === 0) return;
+  printArea.innerHTML = '';
 
-values.forEach(value => {
-const label = document.createElement('div');
-label.className = 'label';
+  values.forEach(value => {
+    const label = document.createElement('div');
+    label.className = 'label';
 
-const qrDiv = document.createElement('div');
-qrDiv.className = 'qr';
+    const qrDiv = document.createElement('div');
+    qrDiv.className = 'qr';
 
-const caption = document.createElement('div');
-caption.className = 'caption';
-caption.textContent = value;
+    const caption = document.createElement('div');
+    caption.className = 'caption';
+    caption.textContent = value;
 
-label.appendChild(qrDiv);
-label.appendChild(caption);
-printArea.appendChild(label);
+    label.appendChild(qrDiv);
+    label.appendChild(caption);
+    printArea.appendChild(label);
 
-new QRCode(qrDiv, {
-text: value,
-width: 77,
-height: 77,
-correctLevel: QRCode.CorrectLevel.H
-});
-});
+    renderQR(qrDiv, value);
+  });
 
-input.value = '';
-doubleButton.style.display = 'none';
-input.focus();
+  input.value = '';
+  doubleButton.style.display = 'none';
+  input.focus();
 }
 </script>
 
