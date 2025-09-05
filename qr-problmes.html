@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lista QR · 4 Shifrat e Fundit</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#171a21;
+    --muted:#a9b1c3;
+    --text:#e7ebf5;
+    --accent:#29c06f;
+    --danger:#ff5d5d;
+    --warn:#ffc53d;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+  }
+  header{
+    position:sticky; top:0; z-index:30;
+    background:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,0));
+    padding:10px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .app-title{font-size:16px;font-weight:700}
+  .pill{padding:4px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;}
+  .last-scan{
+    position:sticky; top:46px; z-index:25;
+    display:flex; align-items:center; gap:8px;
+    background:#122019; color:#bff4d1;
+    border:1px solid #1b3a2b; border-left:4px solid var(--accent);
+    margin:6px 12px; border-radius:10px; padding:8px 12px;
+    font-size:14px;
+  }
+  .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:var(--danger)}
+  .container{padding:10px 16px 140px 16px; max-width:920px; margin:0 auto;}
+  .camera-card{background:var(--card);border-radius:14px;padding:12px;}
+  .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4;}
+  video{width:100%;height:100%;object-fit:cover;display:block;}
+  canvas#capture{display:none;}
+  .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:12px;pointer-events:none;transition: box-shadow .12s, border-color .12s;}
+  .glow-green{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 22px rgba(0,255,144,.75) inset; border-color: rgba(0,255,144,.95); }
+  .glow-red{ box-shadow: 0 0 0 9999px rgba(255,0,0,.18) inset, 0 0 22px rgba(255,80,80,.9) inset; border-color: rgba(255,90,90,.95); }
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  button,.btn{appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btn-primary{background:var(--accent);color:#07130e}
+  .btn-danger{background:var(--danger);color:#260000}
+  .btn-warn{background:var(--warn);color:#221a00}
+  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0;}
+  .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;gap:10px;flex-wrap:wrap}
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:6px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;cursor:pointer;border:1px solid #2a3246}
+  .tab.active{background:#20302a;color:#bff4d1;border-color:#2f6046}
+  .list{list-style:none;padding:0;margin:0;}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px dashed #23293a;}
+  .item:last-child{border-bottom:none}
+  .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto;}
+  .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px}
+  .time{color:#a9b1c3;font-size:12px;margin-top:4px}
+  .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px}
+  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;backdrop-filter:blur(10px);background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px;flex-wrap:wrap}
+  .toolbar .btn{flex:1;justify-content:center;min-width:140px}
+  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
+  .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+  .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:var(--text); padding:10px 12px; border-radius:10px; font-size:14px;}
+  /* Modal */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:40}
+  .modal{background:#141924;border:1px solid #27324a;border-radius:14px;max-width:680px;width:92%;padding:14px}
+  .modal h3{margin:0 0 10px 0;font-size:16px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .chip{padding:8px 10px;border-radius:999px;background:#1f2430;border:1px solid #2a3246;cursor:pointer;font-size:12px}
+  .chip.sel{background:#22352c;border-color:#2c6a49}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .row input, .row textarea{flex:1;background:#1b2030;border:1px solid #2a3246;color:var(--text);padding:10px 12px;border-radius:10px;font-size:14px}
+  .muted{color:#a9b1c3;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="app-title">Lista QR</span> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
+  <div style="height:24px"></div><!-- flags removed -->
+</header>
+
+<div id="lastBanner" class="last-scan" style="display:none;">
+  <strong>I fundit:</strong> <span id="lastValue">—</span>
+</div>
+
+<div class="container">
+  <div class="camera-card">
+    <div class="video-wrap">
+      <video id="video" playsinline muted></video>
+      <div id="scanFrame" class="scan-frame"></div>
+    </div>
+    <div class="controls">
+      <button id="startBtn" class="btn-primary">Start</button>
+      <button id="stopBtn" class="btn">Stop</button>
+      <button id="torchBtn" class="btn">Dritë</button>
+      <button id="resetBtn" class="btn-danger">Pastro</button>
+    </div>
+    <div class="manual">
+      <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
+      <button id="manualAddBtn" class="btn-warn">Shto</button>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="list-header">
+      <div class="tabbar">
+        <div id="tabList" class="tab active">Lista</div>
+        <div id="tabIssues" class="tab">Problemet</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span id="countWrap" class="pill">Numri: <b id="count">0</b></span>
+        <span id="issuesCountWrap" class="pill">Problemet: <b id="issuesCount">0</b></span>
+      </div>
+    </div>
+    <ul id="list" class="list"></ul>
+    <ul id="issuesList" class="list" style="display:none"></ul>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button id="copyBtn" class="btn">Kopjo</button>
+  <button id="waBtn" class="btn">WhatsApp</button>
+  <button id="exportListBtn" class="btn">Eksporto Lista (CSV)</button>
+  <button id="importListBtn" class="btn">Ngarko Lista (CSV)</button>
+  <button id="exportIssuesBtn" class="btn">Eksporto Problemet (CSV)</button>
+  <button id="importIssuesBtn" class="btn">Ngarko Problemet (CSV)</button>
+  <input id="fileList" type="file" accept=".csv,text/csv" style="display:none">
+  <input id="fileIssues" type="file" accept=".csv,text/csv" style="display:none">
+</div>
+
+<!-- Modal: Problemi ka? -->
+<div id="askModal" class="modal-back">
+  <div class="modal">
+    <h3>Skuteri ka problem?</h3>
+    <div class="row">
+      <button id="mNo" class="btn" style="flex:1">Jo</button>
+      <button id="mYes" class="btn-warn" style="flex:1">Po</button>
+    </div>
+    <p class="muted" style="margin-top:10px">Zgjedh “Po” për të regjistruar si problem; “Jo” vetëm e shton në Listë.</p>
+  </div>
+</div>
+
+<!-- Modal: Zgjedh problemet -->
+<div id="pickModal" class="modal-back">
+  <div class="modal">
+    <h3>Zgjidh problemet (mund të zgjedhësh disa)</h3>
+    <div id="chips" class="chips"></div>
+    <div class="row">
+      <input id="who" type="text" placeholder="Kush ta bëjë? (opsionale) p.sh. Arbri">
+    </div>
+    <div class="row">
+      <textarea id="note" rows="3" placeholder="Shënim manual (opsionale)"></textarea>
+    </div>
+    <div class="row">
+      <button id="mCancel" class="btn">Anulo</button>
+      <button id="mSave" class="btn-primary">Ruaj si problem</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="capture"></canvas>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+/* ======= Ekzistuesit (mbetur identik), vetëm përkthyer dhe zgjeruar ======= */
+const $=sel=>document.querySelector(sel);
+const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
+const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),resetBtn=$('#resetBtn');
+const manualInput=$('#manualInput'),manualAddBtn=$('#manualAddBtn');
+const listEl=$('#list'),issuesEl=$('#issuesList'),countEl=$('#count'),issuesCountEl=$('#issuesCount');
+const lastBanner=$('#lastBanner'),lastValue=$('#lastValue'),scanFrame=$('#scanFrame');
+const copyBtn=$('#copyBtn'),waBtn=$('#waBtn'),camStatus=$('#camStatus'),toastEl=$('#toast');
+const exportListBtn=$('#exportListBtn'),importListBtn=$('#importListBtn'),fileList=$('#fileList');
+const exportIssuesBtn=$('#exportIssuesBtn'),importIssuesBtn=$('#importIssuesBtn'),fileIssues=$('#fileIssues');
+const tabList=$('#tabList'),tabIssues=$('#tabIssues');
+const askModal=$('#askModal'),pickModal=$('#pickModal'),chipsWrap=$('#chips'),noteEl=$('#note'),whoEl=$('#who');
+const mNo=$('#mNo'),mYes=$('#mYes'),mCancel=$('#mCancel'),mSave=$('#mSave');
+
+let stream=null,track=null,scanning=false,lastScanAt=0,torchOn=false;
+
+/* Data structures */
+let items=[];         // [{value, time}]
+let issues=[];        // [{value, time, problems:[...], note, who}]
+let seen=new Map();   // value -> info { where: 'list'|'issue', index, time, problems? }
+
+const PROBLEMS = [
+  "Iot nuk ka",
+  "Iot dhe bravë nuk ka",
+  "Bravë nuk ka",
+  "Rrota do të ndërrohet",
+  "Frena nuk punon",
+  "Frena kampana do të ndërrohet",
+  "Shtylla e përparme lëkundet (tundet timonin)",
+  "Etiketat mungojnë",
+  "Rrota do të ndërrohet (përsëritje)",
+  "Parafango do të ndërrohet (përpara ose mbrapa)"
+];
+
+/* Helpers */
+function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.slice(-4).toUpperCase();}
+function beep(freq=880){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.type='triangle';o.frequency.value=freq;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0.001,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.16);setTimeout(()=>ac.close(),250);}catch{}}
+function showBanner(val,isDup){lastValue.textContent=val||'—';lastBanner.style.display='flex';lastBanner.classList.toggle('duplicate', !!isDup);}
+function flashOverlay(isDup){scanFrame.classList.remove('glow-green','glow-red');scanFrame.offsetWidth;scanFrame.classList.add(isDup?'glow-red':'glow-green');clearTimeout(scanFrame._t);scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'), 350);}
+function fmtTime(d){return new Date(d).toLocaleString();}
+
+function updateSeen(){
+  seen.clear();
+  items.forEach((it,idx)=>{ seen.set(it.value,{where:'list',index:idx,time:it.time}); });
+  issues.forEach((it,idx)=>{ if(!seen.has(it.value)) seen.set(it.value,{where:'issue',index:idx,time:it.time,problems:it.problems}); });
+}
+
+function renderList(){
+  listEl.innerHTML='';
+  items.forEach((it,idx)=>{
+    const li=document.createElement('li');
+    li.className='item';
+    li.innerHTML=`
+      <div class="index">${idx+1}</div>
+      <div class="value">${it.value}</div>
+      <div class="time">${fmtTime(it.time)}</div>
+      <button class="del-btn">×</button>`;
+    li.querySelector('.del-btn').onclick=()=>{
+      if(confirm("Të fshihet ky rresht?")){
+        items.splice(idx,1);
+        saveAll(); drawAll();
+      }
+    };
+    listEl.appendChild(li);
+  });
+  countEl.textContent=items.length;
+}
+
+function renderIssues(){
+  issuesEl.innerHTML='';
+  issues.forEach((it,idx)=>{
+    const li=document.createElement('li');
+    li.className='item';
+    const probs = it.problems && it.problems.length ? it.problems.join(' • ') : '-';
+    const meta = [];
+    if (it.who) meta.push("Përgj.: "+it.who);
+    if (it.note) meta.push("Shënim: "+it.note);
+    li.innerHTML=`
+      <div class="index">${idx+1}</div>
+      <div class="value">${it.value}</div>
+      <div style="flex:2">
+        <div><b>Problemet:</b> ${probs}</div>
+        <div class="time">${fmtTime(it.time)}${meta.length?(" · "+meta.join(" · ")):""}</div>
+      </div>
+      <button class="del-btn">×</button>`;
+    li.querySelector('.del-btn').onclick=()=>{
+      if(confirm("Të fshihet ky problem?")){
+        issues.splice(idx,1);
+        saveAll(); drawAll();
+      }
+    };
+    issuesEl.appendChild(li);
+  });
+  issuesCountEl.textContent=issues.length;
+}
+
+function drawAll(){ renderList(); renderIssues(); updateSeen(); }
+
+function saveAll(){
+  localStorage.setItem("qrItems_v3", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));
+  localStorage.setItem("qrIssues_v1", JSON.stringify(issues.map(o=>({value:o.value,time:o.time||new Date(),problems:o.problems||[],note:o.note||"",who:o.who||""}))));
+}
+
+function loadAll(){
+  const rawL=localStorage.getItem("qrItems_v3");
+  if(rawL){ try{ const arr=JSON.parse(rawL)||[]; items=arr.map(o=>({value:o.value,time:new Date(o.time)})); }catch{} }
+  const rawI=localStorage.getItem("qrIssues_v1");
+  if(rawI){ try{ const arr=JSON.parse(rawI)||[]; issues=arr.map(o=>({value:o.value,time:new Date(o.time),problems:o.problems||[],note:o.note||"",who:o.who||""})); }catch{} }
+  drawAll();
+}
+
+function showToast(m){toastEl.textContent=m;toastEl.style.display='block';clearTimeout(showToast._t);showToast._t=setTimeout(()=>toastEl.style.display='none',1400);}
+
+/* Core add flows */
+function pushItemValue(value){
+  items.push({value,time:new Date()});
+  saveAll(); drawAll(); beep(880); showBanner(value,false); flashOverlay(false);
+}
+
+function pushIssueValue(value, problems, note, who){
+  issues.push({value,time:new Date(),problems:[...problems],note:note||"",who:who||""});
+  saveAll(); drawAll(); beep(880); showBanner(value,false); flashOverlay(false);
+}
+
+/* Duplicate check & prompt */
+function handleDuplicate(value, chosenProblems){
+  // chosenProblems optional (array) if coming from issues modal
+  const info = seen.get(value);
+  if(!info) return false; // not duplicate
+  // Message
+  let msg = Ky kod është regjistruar më parë.\n\nKod: ${value}\nKur: ${fmtTime(info.time)};
+  if(info.where==='issue' && info.problems && info.problems.length){
+    msg += \nLloj: PROBLEM\nProblemet: ${info.problems.join(', ')};
+  }else{
+    msg += \nLloj: LISTË e thjeshtë;
+  }
+  // If we are adding issue and same problems as before?
+  if (chosenProblems && info.where==='issue') {
+    const same = JSON.stringify([...chosenProblems].sort()) === JSON.stringify([...info.problems].sort());
+    if (same) msg += \n\nKëtë barkod për të njëjtat probleme e ke regjistruar tashmë.;
+  }
+  msg += \n\nTë fshihet regjistrimi i mëparshëm?;
+  const del = confirm(msg);
+  if(del){
+    if(info.where==='list'){ items.splice(info.index,1); }
+    else { issues.splice(info.index,1); }
+    saveAll(); drawAll();
+    showToast("U fshi i mëparshmi");
+  }else{
+    showToast("U ruajt i mëparshmi");
+    return true; // stop adding new one
+  }
+  return false;
+}
+
+/* Scan flow */
+function addFromScan(raw){
+  const val=last4(raw);
+  if(!val){ showToast('—'); return; }
+  // Ask problem?
+  pendingValue = val;
+  openAskModal();
+}
+function addFromManual(){
+  const raw=manualInput.value.trim(); const val=last4(raw);
+  if(!val){ showToast('—'); return; }
+  pendingValue = val;
+  openAskModal();
+  manualInput.value='';
+}
+
+/* Camera & scanner (unchanged except texts) */
+async function startCam(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    video.srcObject=stream;
+    await video.play();
+    scanning=true;
+    camStatus.textContent="Kamera: Hap";
+    track=stream.getVideoTracks()[0]||null;
+    torchOn=false;
+    const caps=track && track.getCapabilities ? track.getCapabilities() : {};
+    torchBtn.disabled = !(caps && 'torch' in caps);
+    scanLoop();
+  }catch(e){ alert(e.message||e.name); }
+}
+function stopCam(){
+  scanning=false;
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
+  video.srcObject=null;
+  track=null; torchOn=false;
+  torchBtn.disabled=true;
+  camStatus.textContent="Kamera: Mbyllur";
+}
+async function toggleTorch(){
+  if(!track || !track.applyConstraints){ showToast('Pa dritë'); return; }
+  const caps=track.getCapabilities ? track.getCapabilities() : {};
+  if(!caps.torch){ showToast('Drita nuk suportohet'); return; }
+  try{
+    torchOn=!torchOn;
+    await track.applyConstraints({ advanced:[{ torch: torchOn }] });
+    showToast(torchOn ? "Drita: On" : "Drita: Off");
+  }catch(e){
+    torchOn=false;
+    showToast('Gabim drita');
+  }
+}
+async function scanLoop(){
+  if(!scanning) return;
+  const now=performance.now();
+  if(now-lastScanAt<140){ return requestAnimationFrame(scanLoop); }
+  lastScanAt=now;
+  if(video.readyState>=2){
+    canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+    ctx.drawImage(video,0,0,canvas.width,canvas.height);
+    const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+    const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
+    if(qr && qr.data){ addFromScan(qr.data.trim()); }
+  }
+  requestAnimationFrame(scanLoop);
+}
+
+/* Copy & WA */
+function copyAll(){
+  const activeIssues = isIssuesActive();
+  const arr = activeIssues ? issues.map((x,i)=> ${i+1}. ${x.value} - ${ (x.problems||[]).join(' - ') }${x.who?(' - '+x.who):''}${x.note?(' - '+x.note):''} )
+                           : items.map((x,i)=> ${i+1}. ${x.value});
+  const t = arr.join("\n");
+  if(!t){ showToast('—'); return; }
+  navigator.clipboard.writeText(t).then(()=>showToast("Kopjuar!"));
+}
+function whatsapp(){
+  const activeIssues = isIssuesActive();
+  const arr = activeIssues ? issues.map((x,i)=> ${i+1}. ${x.value} - ${ (x.problems||[]).join(' - ') }${x.who?(' - '+x.who):''}${x.note?(' - '+x.note):''} )
+                           : items.map((x,i)=> ${i+1}. ${x.value});
+  const t = arr.join("\n");
+  if(!t){ showToast('—'); return; }
+  window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');
+}
+
+/* CSV */
+function toCSV(rows){
+  return rows.map(r=>r.map(v=>{
+    const s = (v===null||v===undefined)?'':String(v);
+    if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    return s;
+  }).join(",")).join("\n");
+}
+function parseCSV(text){
+  // very small CSV parser (handles quotes)
+  const lines = text.replace(/\r/g,'').split('\n');
+  const out=[];
+  for(const line of lines){
+    if(line.trim()==="") continue;
+    const row=[]; let cur='', inq=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(inq){
+        if(c==='"'){
+          if(line[i+1]==='"'){ cur+='"'; i++; }
+          else inq=false;
+        }else cur+=c;
+      }else{
+        if(c===','){ row.push(cur); cur=''; }
+        else if(c==='"'){ inq=true; }
+        else cur+=c;
+      }
+    }
+    row.push(cur);
+    out.push(row);
+  }
+  return out;
+}
+
+function exportListCSV(){
+  const rows = [["index","value","time"]];
+  items.forEach((it,i)=> rows.push([i+1, it.value, new Date(it.time).toISOString()]));
+  download("lista.csv", toCSV(rows));
+}
+function exportIssuesCSV(){
+  const rows = [["index","value","time","problems","note","who"]];
+  issues.forEach((it,i)=> rows.push([i+1, it.value, new Date(it.time).toISOString(), (it.problems||[]).join("; "), it.note||"", it.who||""]));
+  download("problemet.csv", toCSV(rows));
+}
+function download(filename, text){
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(text);
+  a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+function importListCSV(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const rows=parseCSV(r.result);
+      const header = rows[0].map(h=>h.trim().toLowerCase());
+      const vi = header.indexOf("value");
+      const ti = header.indexOf("time");
+      if(vi===-1) throw new Error("Shtylla 'value' mungon");
+      for(let i=1;i<rows.length;i++){
+        const v = last4(rows[i][vi]);
+        if(!v) continue;
+        const t = ti>-1 ? new Date(rows[i][ti]) : new Date();
+        // duplicate check
+        const dup = handleDuplicate(v);
+        if(dup) continue;
+        items.push({value:v,time:t});
+      }
+      saveAll(); drawAll(); showToast("U ngarkua Lista");
+    }catch(e){ alert("Gabim CSV: "+(e.message||e)); }
+  };
+  r.readAsText(file);
+}
+
+function importIssuesCSV(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const rows=parseCSV(r.result);
+      const header = rows[0].map(h=>h.trim().toLowerCase());
+      const vi = header.indexOf("value");
+      const ti = header.indexOf("time");
+      const pi = header.indexOf("problems");
+      const ni = header.indexOf("note");
+      const wi = header.indexOf("who");
+      if(vi===-1) throw new Error("Shtylla 'value' mungon");
+      for(let i=1;i<rows.length;i++){
+        const v = last4(rows[i][vi]);
+        if(!v) continue;
+        const t = ti>-1 ? new Date(rows[i][ti]) : new Date();
+        const probs = pi>-1 ? String(rows[i][pi]||"").split(/;\s*/).filter(Boolean) : [];
+        const note = ni>-1 ? rows[i][ni] : "";
+        const who  = wi>-1 ? rows[i][wi] : "";
+        const dup = handleDuplicate(v, probs);
+        if(dup) continue;
+        issues.push({value:v,time:t,problems:probs,note,who});
+      }
+      saveAll(); drawAll(); showToast("U ngarkuan Problemet");
+    }catch(e){ alert("Gabim CSV: "+(e.message||e)); }
+  };
+  r.readAsText(file);
+}
+
+/* Tabs */
+function isIssuesActive(){ return tabIssues.classList.contains('active'); }
+function setTab(which){
+  if(which==='issues'){
+    tabIssues.classList.add('active'); tabList.classList.remove('active');
+    issuesEl.style.display='block'; listEl.style.display='none';
+  }else{
+    tabList.classList.add('active'); tabIssues.classList.remove('active');
+    listEl.style.display='block'; issuesEl.style.display='none';
+  }
+}
+
+/* Modals */
+let pendingValue=null;
+function openAskModal(){ askModal.style.display='flex'; }
+function closeAskModal(){ askModal.style.display='none'; }
+function openPickModal(){
+  // build chips
+  chipsWrap.innerHTML='';
+  PROBLEMS.forEach(txt=>{
+    const c=document.createElement('div'); c.className='chip'; c.textContent=txt;
+    c.onclick=()=>c.classList.toggle('sel');
+    chipsWrap.appendChild(c);
+  });
+  noteEl.value=''; whoEl.value='';
+  pickModal.style.display='flex';
+}
+function closePickModal(){ pickModal.style.display='none'; }
+
+/* Events (existing + new) */
+startBtn.onclick=startCam;
+stopBtn.onclick=stopCam;
+torchBtn.onclick=toggleTorch;
+resetBtn.onclick=()=>{
+  if(confirm("Të pastrohet plotësisht lista? (Lista + Problemet)")){
+    items=[]; issues=[]; saveAll(); drawAll();
+  }
+};
+manualAddBtn.onclick=addFromManual;
+manualInput.addEventListener('keyup',e=>{ if(e.key==='Enter') addFromManual(); });
+
+copyBtn.onclick=copyAll;
+waBtn.onclick=whatsapp;
+
+exportListBtn.onclick=exportListCSV;
+exportIssuesBtn.onclick=exportIssuesCSV;
+importListBtn.onclick=()=>fileList.click();
+importIssuesBtn.onclick=()=>fileIssues.click();
+fileList.onchange=e=>{ const f=e.target.files[0]; if(f) importListCSV(f); e.target.value=''; };
+fileIssues.onchange=e=>{ const f=e.target.files[0]; if(f) importIssuesCSV(f); e.target.value=''; };
+
+tabList.onclick=()=>setTab('list');
+tabIssues.onclick=()=>setTab('issues');
+
+/* Ask modal actions */
+mNo.onclick=()=>{
+  if(!pendingValue) return closeAskModal();
+  const dup = handleDuplicate(pendingValue);
+  if(!dup) pushItemValue(pendingValue);
+  pendingValue=null; closeAskModal();
+};
+mYes.onclick=()=>{ closeAskModal(); openPickModal(); };
+mCancel.onclick=()=>{ pendingValue=null; closePickModal(); };
+mSave.onclick=()=>{
+  if(!pendingValue) return closePickModal();
+  const chosen=[...chipsWrap.querySelectorAll('.chip.sel')].map(x=>x.textContent);
+  if(chosen.length===0 && !noteEl.value.trim()){
+    alert("Zgjidh të paktën një problem ose shkruaj shënim."); return;
+  }
+  const dup = handleDuplicate(pendingValue, chosen);
+  if(!dup) pushIssueValue(pendingValue, chosen, noteEl.value.trim(), whoEl.value.trim());
+  pendingValue=null; closePickModal();
+};
+
+/* On load */
+function showToastInit(){
+  if (location.protocol!=='https:') {
+    showToast("Kujdes: Kamera kërkon HTTPS në GitHub Pages");
+  }
+}
+loadAll();
+setTab('list');
+if (navigator.permissions && navigator.permissions.query){
+  navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted'){ startCam(); } }).catch(()=>{});
+}
+showToastInit();
+
+/* WhatsApp & copy choose active tab toast */
+</script>
+</body>
+</html>
