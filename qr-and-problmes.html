@@ -179,7 +179,17 @@
 <canvas id="capture"></canvas>
 <div id="toast" class="toast"></div>
 
+<!-- jsQR (primary) -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<!-- Fallback loader -->
+<script>
+if (typeof jsQR === 'undefined') {
+  var s=document.createElement('script');
+  s.src='https://unpkg.com/jsqr@1.4.0/dist/jsQR.js';
+  document.head.appendChild(s);
+}
+</script>
+
 <script>
 const $=sel=>document.querySelector(sel);
 const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
@@ -195,9 +205,9 @@ const copyIssuesBtn=$('#copyIssuesBtn'),waIssuesBtn=$('#waIssuesBtn');
 let stream=null,track=null,scanning=false,lastScanAt=0,items=[],torchOn=false;
 let seen=new Set(); // track by displayed last4
 
-// NEW: issues store
+// Issues store
 let issues=[]; // {value, time, problems:[...], note:''}
-let pendingValue=null; // holds last code while modal flow
+let pendingValue=null; // holds last code during modal flow
 
 const langs={
  sq:{title:"Lista QR",camOn:"Kamera: Hap",camOff:"Kamera: Mbyllur",list:"Lista",last:"I fundit:",copied:"Kopjuar!",start:"Start",stop:"Stop",clear:"Pastro",copy:"Kopjo",flash:"Dritë",placeholder:"Shkruaj kodin...",add:"Shto",confirmDel:"A jeni i sigurt për fshirjen?", confirmClear:"Të pastrohet lista?",
@@ -209,7 +219,7 @@ const langs={
 };
 let curLang="sq";
 
-// PRESET problem options (tam listedeki metinlerle)
+// PROBLEM OPTIONS
 const PROBLEM_OPTIONS=[
   "Iot yok",
   "Iot ve kilit yok",
@@ -257,7 +267,7 @@ function beep(freq=880){try{const ac=new (window.AudioContext||window.webkitAudi
 function showBanner(val,isDup){lastValue.textContent=val||'—';lastBanner.style.display='flex';lastBanner.classList.toggle('duplicate', !!isDup);}
 function flashOverlay(isDup){scanFrame.classList.remove('glow-green','glow-red');scanFrame.offsetWidth;scanFrame.classList.add(isDup?'glow-red':'glow-green');clearTimeout(scanFrame._t);scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'), 350);}
 
-function pushNormal(value){ // adds to main list only
+function pushNormal(value){ // add to main list only
   const isDup = seen.has(value);
   if(!isDup){
     seen.add(value);
@@ -270,7 +280,7 @@ function pushNormal(value){ // adds to main list only
   flashOverlay(isDup);
 }
 
-// === NEW: modal flow ===
+// === Modal flow ===
 const modalBack=$('#modalBack');
 const mStep1=$('#m-step1'),mStep2=$('#m-step2');
 const mNoIssue=$('#m-noIssue'),mHasIssue=$('#m-hasIssue'),mCancel=$('#m-cancel'),mBack=$('#m-back'),mSaveIssue=$('#m-saveIssue');
@@ -278,21 +288,32 @@ const mGrid=$('#m-grid'),mNote=$('#m-note');
 
 function openModalFor(value){
   pendingValue=value;
-  // build checkboxes each time to reflect default unchecked
+  // rebuild options fresh each time
   mGrid.innerHTML='';
   PROBLEM_OPTIONS.forEach((txt,i)=>{
     const id='opt_'+i;
-    const div=document.createElement('label');
-    div.className='chk';
-    div.innerHTML=<input id="${id}" type="checkbox"> <span>${txt}</span>;
-    mGrid.appendChild(div);
+    const lbl=document.createElement('label');
+    lbl.className='chk';
+    lbl.innerHTML=<input id="${id}" type="checkbox"> <span>${txt}</span>;
+    mGrid.appendChild(lbl);
   });
   mNote.value='';
   mStep1.classList.remove('hidden');
   mStep2.classList.add('hidden');
   modalBack.style.display='flex';
+  // PAUSE scanning while modal open
+  scanning=false;
 }
-function closeModal(){ modalBack.style.display='none'; pendingValue=null; }
+
+function closeModal(){
+  modalBack.style.display='none';
+  pendingValue=null;
+  // RESUME scanning if camera active
+  if (video.srcObject) {
+    scanning=true;
+    requestAnimationFrame(scanLoop);
+  }
+}
 
 mNoIssue.onclick=()=>{ if(pendingValue){ pushNormal(pendingValue); } closeModal(); }
 mHasIssue.onclick=()=>{ mStep1.classList.add('hidden'); mStep2.classList.remove('hidden'); }
@@ -300,21 +321,16 @@ mBack.onclick=()=>{ mStep2.classList.add('hidden'); mStep1.classList.remove('hid
 mCancel.onclick=()=> closeModal();
 mSaveIssue.onclick=()=>{
   if(!pendingValue){ return; }
-  const chosen=[...mGrid.querySelectorAll('input[type="checkbox"]:checked')].map((inp,i)=>inp.parentElement.querySelector('span').textContent);
+  const chosen=[...mGrid.querySelectorAll('input[type="checkbox"]:checked')].map(inp=>inp.parentElement.querySelector('span').textContent);
   const note=mNote.value.trim();
-  // even if empty chosen, treat as issue record (user manuel not yazabilir)
   issues.push({value:pendingValue, time:new Date(), problems:chosen, note});
-  // her iki durumda da Normal listeye de sayım olarak ekleyelim:
+  // also count it in normal list
   pushNormal(pendingValue);
   renderIssues(); save();
   closeModal();
 }
 
-// === integration points: when a code comes ===
-function addFromScan(raw){ const val=last4(raw); if(!val){return;} openModalFor(val); }
-function addFromManual(){ const raw=manualInput.value.trim(); const val=last4(raw); if(!val){ showToast('—'); return; } openModalFor(val); manualInput.value=''; }
-
-// === renderers ===
+// === Renderers ===
 function renderList(){
   listEl.innerHTML='';
   items.forEach((it,idx)=>{
@@ -362,10 +378,18 @@ function renderIssues(){
   issuesCountEl.textContent=issues.length;
 }
 
-// === camera & scan loop (aynı) ===
+// === Camera & scan loop (with stronger constraints + toast errors) ===
 async function startCam(){
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    };
+    stream=await navigator.mediaDevices.getUserMedia(constraints);
     video.srcObject=stream;
     await video.play();
     scanning=true;
@@ -375,7 +399,9 @@ async function startCam(){
     const caps=track && track.getCapabilities ? track.getCapabilities() : {};
     torchBtn.disabled = !(caps && 'torch' in caps);
     scanLoop();
-  }catch(e){ alert(e.message||e.name); }
+  }catch(e){
+    showToast((e && (e.message||e.name)) || 'Camera error');
+  }
 }
 function stopCam(){
   scanning=false;
@@ -408,9 +434,12 @@ async function scanLoop(){
   if(video.readyState>=2){
     canvas.width=video.videoWidth; canvas.height=video.videoHeight;
     ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-    const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
-    if(qr && qr.data){ addFromScan(qr.data.trim()); }
+    // jsQR might not yet be loaded if fallback is fetching
+    if (typeof jsQR !== 'undefined') {
+      const img=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
+      if(qr && qr.data){ addFromScan(qr.data.trim()); }
+    }
   }
   requestAnimationFrame(scanLoop);
 }
@@ -448,7 +477,7 @@ manualAddBtn.onclick=addFromManual;
 manualInput.addEventListener('keyup',e=>{ if(e.key==='Enter') addFromManual(); });
 
 copyBtn.onclick=copyAll; waBtn.onclick=whatsapp;
-copyBtnBottom.onclick=()=>{ // alt çubuk: aktif sekmeye göre kopyala
+copyBtnBottom.onclick=()=>{ // bottom bar copies active tab
   if(!cardIssues.classList.contains('hidden')) copyIssues(); else copyAll();
 };
 waBtnBottom.onclick=()=>{ if(!cardIssues.classList.contains('hidden')) whatsappIssues(); else whatsapp(); }
