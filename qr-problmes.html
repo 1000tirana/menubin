@@ -39,7 +39,7 @@
     font-size:14px;
   }
   .last-scan.duplicate{background:#2b1515;color:#f8c6c6;border-color:var(--danger)}
-  .container{padding:10px 16px 140px 16px; max-width:920px; margin:0 auto;}
+  .container{padding:10px 16px 40px 16px; max-width:920px; margin:0 auto;}
   .camera-card{background:var(--card);border-radius:14px;padding:12px;}
   .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0c10;aspect-ratio:3/4;}
   video{width:100%;height:100%;object-fit:cover;display:block;}
@@ -48,44 +48,49 @@
   .glow-green{ box-shadow: 0 0 0 9999px rgba(0,128,0,.18) inset, 0 0 22px rgba(0,255,144,.75) inset; border-color: rgba(0,255,144,.95); }
   .glow-red{ box-shadow: 0 0 0 9999px rgba(255,0,0,.18) inset, 0 0 22px rgba(255,80,80,.9) inset; border-color: rgba(255,90,90,.95); }
   .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-  button,.btn{appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
+  button,.btn{appearance:none;border:none;border-radius:12px;background:#222734;color:var(--text);padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer; user-select:none;}
   button:disabled{opacity:.5;cursor:not-allowed}
   .btn-primary{background:var(--accent);color:#07130e}
   .btn-danger{background:var(--danger);color:#260000}
   .btn-warn{background:var(--warn);color:#221a00}
-  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0;}
-  .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;gap:10px;flex-wrap:wrap}
+  .list-card{margin-top:16px;background:var(--card);border-radius:14px;padding:8px 0; -webkit-user-select:text; user-select:text;}
+  .list-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid #242a39;gap:10px;flex-wrap:wrap; -webkit-user-select:text; user-select:text;}
   .tabbar{display:flex;gap:8px;flex-wrap:wrap}
-  .tab{padding:6px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;cursor:pointer;border:1px solid #2a3246}
+  .tab{padding:6px 10px;border-radius:999px;background:#1f2430;color:#a9b1c3;font-size:12px;cursor:pointer;border:1px solid #2a3246; user-select:none;}
   .tab.active{background:#20302a;color:#bff4d1;border-color:#2f6046}
   .list{list-style:none;padding:0;margin:0;}
-  .item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px dashed #23293a;}
+  .item{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-bottom:1px dashed #23293a; -webkit-user-select:text; user-select:text;}
   .item:last-child{border-bottom:none}
-  .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto;}
-  .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px}
-  .time{color:#a9b1c3;font-size:12px;margin-top:4px}
-  .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px}
-  .toolbar{position:fixed;left:0;right:0;bottom:0;z-index:20;backdrop-filter:blur(10px);background:rgba(10,12,16,.8);border-top:1px solid #242a39;padding:10px 16px;display:flex;gap:10px;flex-wrap:wrap}
+  .index{width:28px;height:28px;border-radius:999px;background:#242a39;display:flex;align-items:center;justify-content:center;font-weight:700;color:#c0c7d9;flex:0 0 auto; user-select:none;}
+  .value{flex:1;font-size:18px;font-weight:700;letter-spacing:.5px; -webkit-user-select:text; user-select:text;}
+  .time{color:#a9b1c3;font-size:12px;margin-top:4px; -webkit-user-select:text; user-select:text;}
+  .del-btn{background:#23293a;color:#ff9b9b;border-radius:10px;padding:4px 8px; user-select:none;}
+  /* Toolbar artık sabit değil: akış içinde */
+  .toolbar{position:static;left:auto;right:auto;bottom:auto;z-index:auto;
+    backdrop-filter:none;background:transparent;border-top:0;padding:12px 0 0 0;
+    display:flex;gap:10px;flex-wrap:wrap}
   .toolbar .btn{flex:1;justify-content:center;min-width:140px}
-  .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#161d2a;color:#e7f1ff;padding:8px 12px;border-radius:10px;border:1px solid #27324a;display:none;}
   .manual{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
   .manual input{flex:1; min-width:160px; background:#1b2030; border:1px solid #2a3246; color:var(--text); padding:10px 12px; border-radius:10px; font-size:14px;}
   /* Modal */
   .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:40}
   .modal{background:#141924;border:1px solid #27324a;border-radius:14px;max-width:680px;width:92%;padding:14px}
   .modal h3{margin:0 0 10px 0;font-size:16px}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .chip{padding:8px 10px;border-radius:999px;background:#1f2430;border:1px solid #2a3246;cursor:pointer;font-size:12px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0; -webkit-user-select:text; user-select:text;}
+  .chip{padding:8px 10px;border-radius:999px;background:#1f2430;border:1px solid #2a3246;cursor:pointer;font-size:12px; user-select:none;}
   .chip.sel{background:#22352c;border-color:#2c6a49}
   .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .row input, .row textarea{flex:1;background:#1b2030;border:1px solid #2a3246;color:var(--text);padding:10px 12px;border-radius:10px;font-size:14px}
   .muted{color:#a9b1c3;font-size:12px}
+  /* İşaretleme görünürlüğü (kopyalamayı kolaylaştırır) */
+  ::selection{background:#2a6b43;color:#fff}
 </style>
 </head>
 <body>
 <header>
   <div><span class="app-title">Lista QR</span> <span id="camStatus" class="pill">Kamera: Mbyllur</span></div>
-  <div style="height:24px"></div><!-- flags removed -->
+  <div style="height:24px"></div>
 </header>
 
 <div id="lastBanner" class="last-scan" style="display:none;">
@@ -105,7 +110,7 @@
       <button id="resetBtn" class="btn-danger">Pastro</button>
     </div>
     <div class="manual">
-      <input id="manualInput" type="text" maxlength="64" placeholder="Shkruaj kodin...">
+      <input id="manualInput" type="text" maxlength:="64" placeholder="Shkruaj kodin...">
       <button id="manualAddBtn" class="btn-warn">Shto</button>
     </div>
   </div>
@@ -124,17 +129,19 @@
     <ul id="list" class="list"></ul>
     <ul id="issuesList" class="list" style="display:none"></ul>
   </div>
-</div>
 
-<div class="toolbar">
-  <button id="copyBtn" class="btn">Kopjo</button>
-  <button id="waBtn" class="btn">WhatsApp</button>
-  <button id="exportListBtn" class="btn">Eksporto Lista (CSV)</button>
-  <button id="importListBtn" class="btn">Ngarko Lista (CSV)</button>
-  <button id="exportIssuesBtn" class="btn">Eksporto Problemet (CSV)</button>
-  <button id="importIssuesBtn" class="btn">Ngarko Problemet (CSV)</button>
-  <input id="fileList" type="file" accept=".csv,text/csv" style="display:none">
-  <input id="fileIssues" type="file" accept=".csv,text/csv" style="display:none">
+  <!-- Toolbar artık sayfa akışında, sabit değil -->
+  <div class="toolbar">
+    <button id="copyBtn" class="btn">Kopjo</button>
+    <button id="shareBtn" class="btn">Ndaj / Share</button>
+    <button id="waBtn" class="btn">WhatsApp</button>
+    <button id="exportListBtn" class="btn">Eksporto Lista (CSV)</button>
+    <button id="importListBtn" class="btn">Ngarko Lista (CSV)</button>
+    <button id="exportIssuesBtn" class="btn">Eksporto Problemet (CSV)</button>
+    <button id="importIssuesBtn" class="btn">Ngarko Problemet (CSV)</button>
+    <input id="fileList" type="file" accept=".csv,text/csv" style="display:none">
+    <input id="fileIssues" type="file" accept=".csv,text/csv" style="display:none">
+  </div>
 </div>
 
 <!-- Modal: Problemi ka? -->
@@ -172,14 +179,50 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
-/* ======= Ekzistuesit (mbetur identik), vetëm përkthyer dhe zgjeruar ======= */
+/* ======= Helpers for safe storage ======= */
+function safeGet(key, fallback=null){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, val); return true; }catch(e){ return false; }
+}
+
+/* ======= Clipboard & Share (güçlü kopyalama yedeği) ======= */
+function copyTextWithFallback(text){
+  if(!text) return;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text).then(()=>showToast("Kopjuar!")).catch(()=>{
+      legacyCopy(text);
+    });
+  }else{
+    legacyCopy(text);
+  }
+}
+function legacyCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); showToast("Kopjuar!"); }catch(e){ alert("Kopjimi dështoi"); }
+  document.body.removeChild(ta);
+}
+function shareText(text){
+  if(!text) return;
+  if(navigator.share){
+    navigator.share({text}).catch(()=>{ /* kapatma/red */ });
+  }else{
+    // WhatsApp fallback
+    window.open("https://wa.me/?text="+encodeURIComponent(text),'_blank');
+  }
+}
+
+/* ======= App ======= */
 const $=sel=>document.querySelector(sel);
 const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
 const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),resetBtn=$('#resetBtn');
 const manualInput=$('#manualInput'),manualAddBtn=$('#manualAddBtn');
 const listEl=$('#list'),issuesEl=$('#issuesList'),countEl=$('#count'),issuesCountEl=$('#issuesCount');
 const lastBanner=$('#lastBanner'),lastValue=$('#lastValue'),scanFrame=$('#scanFrame');
-const copyBtn=$('#copyBtn'),waBtn=$('#waBtn'),camStatus=$('#camStatus'),toastEl=$('#toast');
+const copyBtn=$('#copyBtn'),waBtn=$('#waBtn'),shareBtn=$('#shareBtn'),camStatus=$('#camStatus'),toastEl=$('#toast');
 const exportListBtn=$('#exportListBtn'),importListBtn=$('#importListBtn'),fileList=$('#fileList');
 const exportIssuesBtn=$('#exportIssuesBtn'),importIssuesBtn=$('#importIssuesBtn'),fileIssues=$('#fileIssues');
 const tabList=$('#tabList'),tabIssues=$('#tabIssues');
@@ -188,7 +231,7 @@ const mNo=$('#mNo'),mYes=$('#mYes'),mCancel=$('#mCancel'),mSave=$('#mSave');
 
 let stream=null,track=null,scanning=false,lastScanAt=0,torchOn=false;
 
-/* Data structures */
+/* Data */
 let items=[];         // [{value, time}]
 let issues=[];        // [{value, time, problems:[...], note, who}]
 let seen=new Map();   // value -> info { where: 'list'|'issue', index, time, problems? }
@@ -206,7 +249,7 @@ const PROBLEMS = [
   "Parafango do të ndërrohet (përpara ose mbrapa)"
 ];
 
-/* Helpers */
+/* Basic helpers */
 function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.slice(-4).toUpperCase();}
 function beep(freq=880){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.type='triangle';o.frequency.value=freq;o.connect(g);g.connect(ac.destination);g.gain.setValueAtTime(0.001,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+0.02);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.16);setTimeout(()=>ac.close(),250);}catch{}}
 function showBanner(val,isDup){lastValue.textContent=val||'—';lastBanner.style.display='flex';lastBanner.classList.toggle('duplicate', !!isDup);}
@@ -224,17 +267,12 @@ function renderList(){
   items.forEach((it,idx)=>{
     const li=document.createElement('li');
     li.className='item';
+    li.dataset.index=idx; li.dataset.type='list';
     li.innerHTML=`
       <div class="index">${idx+1}</div>
       <div class="value">${it.value}</div>
       <div class="time">${fmtTime(it.time)}</div>
-      <button class="del-btn">×</button>`;
-    li.querySelector('.del-btn').onclick=()=>{
-      if(confirm("Të fshihet ky rresht?")){
-        items.splice(idx,1);
-        saveAll(); drawAll();
-      }
-    };
+      <button class="del-btn" data-role="del">×</button>`;
     listEl.appendChild(li);
   });
   countEl.textContent=items.length;
@@ -245,6 +283,7 @@ function renderIssues(){
   issues.forEach((it,idx)=>{
     const li=document.createElement('li');
     li.className='item';
+    li.dataset.index=idx; li.dataset.type='issue';
     const probs = it.problems && it.problems.length ? it.problems.join(' • ') : '-';
     const meta = [];
     if (it.who) meta.push("Përgj.: "+it.who);
@@ -256,13 +295,7 @@ function renderIssues(){
         <div><b>Problemet:</b> ${probs}</div>
         <div class="time">${fmtTime(it.time)}${meta.length?(" · "+meta.join(" · ")):""}</div>
       </div>
-      <button class="del-btn">×</button>`;
-    li.querySelector('.del-btn').onclick=()=>{
-      if(confirm("Të fshihet ky problem?")){
-        issues.splice(idx,1);
-        saveAll(); drawAll();
-      }
-    };
+      <button class="del-btn" data-role="del">×</button>`;
     issuesEl.appendChild(li);
   });
   issuesCountEl.textContent=issues.length;
@@ -271,19 +304,32 @@ function renderIssues(){
 function drawAll(){ renderList(); renderIssues(); updateSeen(); }
 
 function saveAll(){
-  localStorage.setItem("qrItems_v3", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));
-  localStorage.setItem("qrIssues_v1", JSON.stringify(issues.map(o=>({value:o.value,time:o.time||new Date(),problems:o.problems||[],note:o.note||"",who:o.who||""}))));
+  const ok1 = safeSet("qrItems_v3", JSON.stringify(items.map(o=>({value:o.value,time:o.time||new Date()}))));
+  const ok2 = safeSet("qrIssues_v1", JSON.stringify(issues.map(o=>({value:o.value,time:o.time||new Date(),problems:o.problems||[],note:o.note||"",who:o.who||""}))));
+  if(!ok1 || !ok2){ showToast("Kujdes: Ruajtja lokale u kufizua"); }
 }
 
 function loadAll(){
-  const rawL=localStorage.getItem("qrItems_v3");
+  const rawL = safeGet("qrItems_v3");
   if(rawL){ try{ const arr=JSON.parse(rawL)||[]; items=arr.map(o=>({value:o.value,time:new Date(o.time)})); }catch{} }
-  const rawI=localStorage.getItem("qrIssues_v1");
+  const rawI = safeGet("qrIssues_v1");
   if(rawI){ try{ const arr=JSON.parse(rawI)||[]; issues=arr.map(o=>({value:o.value,time:new Date(o.time),problems:o.problems||[],note:o.note||"",who:o.who||""})); }catch{} }
   drawAll();
 }
 
 function showToast(m){toastEl.textContent=m;toastEl.style.display='block';clearTimeout(showToast._t);showToast._t=setTimeout(()=>toastEl.style.display='none',1400);}
+
+/* Compose helpers (satır metni oluştur) */
+function composeRowText(type, obj, i){
+  if(type==='issue'){
+    const probs=(obj.problems||[]).join(' - ');
+    const who=obj.who?(' - '+obj.who):'';
+    const note=obj.note?(' - '+obj.note):'';
+    return ${i+1}. ${obj.value} - ${probs}${who}${note};
+  }else{
+    return ${i+1}. ${obj.value};
+  }
+}
 
 /* Core add flows */
 function pushItemValue(value){
@@ -298,17 +344,14 @@ function pushIssueValue(value, problems, note, who){
 
 /* Duplicate check & prompt */
 function handleDuplicate(value, chosenProblems){
-  // chosenProblems optional (array) if coming from issues modal
   const info = seen.get(value);
-  if(!info) return false; // not duplicate
-  // Message
+  if(!info) return false;
   let msg = Ky kod është regjistruar më parë.\n\nKod: ${value}\nKur: ${fmtTime(info.time)};
   if(info.where==='issue' && info.problems && info.problems.length){
     msg += \nLloj: PROBLEM\nProblemet: ${info.problems.join(', ')};
   }else{
     msg += \nLloj: LISTË e thjeshtë;
   }
-  // If we are adding issue and same problems as before?
   if (chosenProblems && info.where==='issue') {
     const same = JSON.stringify([...chosenProblems].sort()) === JSON.stringify([...info.problems].sort());
     if (same) msg += \n\nKëtë barkod për të njëjtat probleme e ke regjistruar tashmë.;
@@ -322,7 +365,7 @@ function handleDuplicate(value, chosenProblems){
     showToast("U fshi i mëparshmi");
   }else{
     showToast("U ruajt i mëparshmi");
-    return true; // stop adding new one
+    return true;
   }
   return false;
 }
@@ -331,7 +374,6 @@ function handleDuplicate(value, chosenProblems){
 function addFromScan(raw){
   const val=last4(raw);
   if(!val){ showToast('—'); return; }
-  // Ask problem?
   pendingValue = val;
   openAskModal();
 }
@@ -343,10 +385,16 @@ function addFromManual(){
   manualInput.value='';
 }
 
-/* Camera & scanner (unchanged except texts) */
+/* Camera & scanner */
 async function startCam(){
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const constraintsPrimary = { video: { facingMode: { ideal: 'environment' } }, audio: false };
+    const constraintsFallback = { video: true, audio: false };
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraintsPrimary);
+    } catch (e1) {
+      stream = await navigator.mediaDevices.getUserMedia(constraintsFallback);
+    }
     video.srcObject=stream;
     await video.play();
     scanning=true;
@@ -356,7 +404,10 @@ async function startCam(){
     const caps=track && track.getCapabilities ? track.getCapabilities() : {};
     torchBtn.disabled = !(caps && 'torch' in caps);
     scanLoop();
-  }catch(e){ alert(e.message||e.name); }
+  }catch(e){
+    alert("Kamera nuk u hap: " + (e.message||e.name));
+    camStatus.textContent="Kamera: Mbyllur";
+  }
 }
 function stopCam(){
   scanning=false;
@@ -368,7 +419,7 @@ function stopCam(){
 }
 async function toggleTorch(){
   if(!track || !track.applyConstraints){ showToast('Pa dritë'); return; }
-  const caps=track.getCapabilities ? track.getCapabilities() : {};
+  const caps=track && track.getCapabilities ? track.getCapabilities() : {};
   if(!caps.torch){ showToast('Drita nuk suportohet'); return; }
   try{
     torchOn=!torchOn;
@@ -394,20 +445,28 @@ async function scanLoop(){
   requestAnimationFrame(scanLoop);
 }
 
-/* Copy & WA */
-function copyAll(){
+/* Copy / Share tüm liste */
+function getActiveArray(){
   const activeIssues = isIssuesActive();
-  const arr = activeIssues ? issues.map((x,i)=> ${i+1}. ${x.value} - ${ (x.problems||[]).join(' - ') }${x.who?(' - '+x.who):''}${x.note?(' - '+x.note):''} )
-                           : items.map((x,i)=> ${i+1}. ${x.value});
-  const t = arr.join("\n");
-  if(!t){ showToast('—'); return; }
-  navigator.clipboard.writeText(t).then(()=>showToast("Kopjuar!"));
+  return activeIssues
+    ? issues.map((x,i)=> composeRowText('issue', x, i))
+    : items.map((x,i)=> composeRowText('list', x, i));
 }
-function whatsapp(){
-  const activeIssues = isIssuesActive();
-  const arr = activeIssues ? issues.map((x,i)=> ${i+1}. ${x.value} - ${ (x.problems||[]).join(' - ') }${x.who?(' - '+x.who):''}${x.note?(' - '+x.note):''} )
-                           : items.map((x,i)=> ${i+1}. ${x.value});
-  const t = arr.join("\n");
+function copyAll(){
+  const arr=getActiveArray();
+  const t=arr.join("\n");
+  if(!t){ showToast('—'); return; }
+  copyTextWithFallback(t);
+}
+function shareAll(){
+  const arr=getActiveArray();
+  const t=arr.join("\n");
+  if(!t){ showToast('—'); return; }
+  shareText(t);
+}
+function whatsappAll(){
+  const arr=getActiveArray();
+  const t=arr.join("\n");
   if(!t){ showToast('—'); return; }
   window.open("https://wa.me/?text="+encodeURIComponent(t),'_blank');
 }
@@ -416,12 +475,11 @@ function whatsapp(){
 function toCSV(rows){
   return rows.map(r=>r.map(v=>{
     const s = (v===null||v===undefined)?'':String(v);
-    if(/[",\n]/.test(s)) return '"'+s.replace(/"/g,'""')+'"';
+    if(/[\",\n]/.test(s)) return '\"'+s.replace(/\"/g,'\"\"')+'\"';
     return s;
   }).join(",")).join("\n");
 }
 function parseCSV(text){
-  // very small CSV parser (handles quotes)
   const lines = text.replace(/\r/g,'').split('\n');
   const out=[];
   for(const line of lines){
@@ -430,13 +488,13 @@ function parseCSV(text){
     for(let i=0;i<line.length;i++){
       const c=line[i];
       if(inq){
-        if(c==='"'){
-          if(line[i+1]==='"'){ cur+='"'; i++; }
+        if(c==='\"'){
+          if(line[i+1]==='\"'){ cur+='\"'; i++; }
           else inq=false;
         }else cur+=c;
       }else{
         if(c===','){ row.push(cur); cur=''; }
-        else if(c==='"'){ inq=true; }
+        else if(c==='\"'){ inq=true; }
         else cur+=c;
       }
     }
@@ -476,7 +534,6 @@ function importListCSV(file){
         const v = last4(rows[i][vi]);
         if(!v) continue;
         const t = ti>-1 ? new Date(rows[i][ti]) : new Date();
-        // duplicate check
         const dup = handleDuplicate(v);
         if(dup) continue;
         items.push({value:v,time:t});
@@ -530,10 +587,15 @@ function setTab(which){
 
 /* Modals */
 let pendingValue=null;
-function openAskModal(){ askModal.style.display='flex'; }
-function closeAskModal(){ askModal.style.display='none'; }
+function openAskModal(){
+  askModal.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeAskModal(){
+  askModal.style.display='none';
+  document.body.style.overflow='';
+}
 function openPickModal(){
-  // build chips
   chipsWrap.innerHTML='';
   PROBLEMS.forEach(txt=>{
     const c=document.createElement('div'); c.className='chip'; c.textContent=txt;
@@ -542,10 +604,14 @@ function openPickModal(){
   });
   noteEl.value=''; whoEl.value='';
   pickModal.style.display='flex';
+  document.body.style.overflow='hidden';
 }
-function closePickModal(){ pickModal.style.display='none'; }
+function closePickModal(){
+  pickModal.style.display='none';
+  document.body.style.overflow='';
+}
 
-/* Events (existing + new) */
+/* Events: başlatıcılar */
 startBtn.onclick=startCam;
 stopBtn.onclick=stopCam;
 torchBtn.onclick=toggleTorch;
@@ -558,7 +624,8 @@ manualAddBtn.onclick=addFromManual;
 manualInput.addEventListener('keyup',e=>{ if(e.key==='Enter') addFromManual(); });
 
 copyBtn.onclick=copyAll;
-waBtn.onclick=whatsapp;
+shareBtn.onclick=shareAll;
+waBtn.onclick=whatsappAll;
 
 exportListBtn.onclick=exportListCSV;
 exportIssuesBtn.onclick=exportIssuesCSV;
@@ -567,6 +634,64 @@ importIssuesBtn.onclick=()=>fileIssues.click();
 fileList.onchange=e=>{ const f=e.target.files[0]; if(f) importListCSV(f); e.target.value=''; };
 fileIssues.onchange=e=>{ const f=e.target.files[0]; if(f) importIssuesCSV(f); e.target.value=''; };
 
+/* Liste/Problemler: tek tık kopyala, uzun bas paylaş */
+let longPressTimer=null;
+function onRowShortPress(target){
+  const li=target.closest('.item'); if(!li) return;
+  const idx=Number(li.dataset.index); const type=li.dataset.type;
+  if(Number.isNaN(idx)) return;
+  if(type==='list'){
+    const txt=composeRowText('list', items[idx], idx);
+    copyTextWithFallback(txt);
+  }else{
+    const txt=composeRowText('issue', issues[idx], idx);
+    copyTextWithFallback(txt);
+  }
+}
+function onRowLongPress(target){
+  const li=target.closest('.item'); if(!li) return;
+  const idx=Number(li.dataset.index); const type=li.dataset.type;
+  if(Number.isNaN(idx)) return;
+  const txt = (type==='list') ? composeRowText('list', items[idx], idx)
+                              : composeRowText('issue', issues[idx], idx);
+  shareText(txt);
+}
+function attachRowGestures(root){
+  root.addEventListener('click', (e)=>{
+    if(e.target?.dataset?.role==='del') {
+      // Silme butonu zaten ayrı ele alınıyor aşağıda
+      return;
+    }
+    const li=e.target.closest('.item');
+    if(li) onRowShortPress(li);
+  });
+  root.addEventListener('touchstart', (e)=>{
+    const li=e.target.closest('.item');
+    if(!li || e.target?.dataset?.role==='del') return;
+    clearTimeout(longPressTimer);
+    longPressTimer=setTimeout(()=>onRowLongPress(li), 550);
+  }, {passive:true});
+  ['touchend','touchmove','touchcancel','scroll'].forEach(ev=>{
+    root.addEventListener(ev, ()=>clearTimeout(longPressTimer), {passive:true});
+  });
+}
+attachRowGestures(document);
+
+/* Silme butonları (event delegation) */
+document.addEventListener('click',(e)=>{
+  if(e.target?.dataset?.role==='del'){
+    const li=e.target.closest('.item'); if(!li) return;
+    const idx=Number(li.dataset.index); const type=li.dataset.type;
+    if(Number.isNaN(idx)) return;
+    if(type==='list'){
+      if(confirm("Të fshihet ky rresht?")){ items.splice(idx,1); saveAll(); drawAll(); }
+    }else{
+      if(confirm("Të fshihet ky problem?")){ issues.splice(idx,1); saveAll(); drawAll(); }
+    }
+  }
+});
+
+/* Tablar */
 tabList.onclick=()=>setTab('list');
 tabIssues.onclick=()=>setTab('issues');
 
@@ -593,7 +718,7 @@ mSave.onclick=()=>{
 /* On load */
 function showToastInit(){
   if (location.protocol!=='https:') {
-    showToast("Kujdes: Kamera kërkon HTTPS në GitHub Pages");
+    showToast("Kujdes: Kamera kërkon HTTPS (GitHub Pages)");
   }
 }
 loadAll();
@@ -602,8 +727,6 @@ if (navigator.permissions && navigator.permissions.query){
   navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted'){ startCam(); } }).catch(()=>{});
 }
 showToastInit();
-
-/* WhatsApp & copy choose active tab toast */
 </script>
 </body>
 </html>
