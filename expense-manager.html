@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
 <title>Andi Ev Harcamaları</title>
 <style>
 :root{
@@ -19,93 +19,64 @@ html.light{
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{
-  margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  background:var(--bg); color:var(--text); -webkit-tap-highlight-color:transparent;
-  -webkit-text-size-adjust:100%;
-}
-/* iOS zoom fix */
-input,select,textarea,button{font-size:16px}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+input,select,textarea,button{font-size:16px} /* iOS zoom fix */
 
-.app{max-width:760px; margin:0 auto; padding:env(safe-area-inset-top) 16px calc(16px + env(safe-area-inset-bottom))}
-.header{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; background:var(--card); border-radius:16px; box-shadow:var(--shadow); border:var(--border); position:sticky; top:8px; z-index:5}
-.brand{display:flex; align-items:center; gap:12px}
-.logo{width:42px; height:42px; border-radius:12px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#061018; font-weight:800; box-shadow:var(--shadow)}
-.title h1{margin:0 0 2px 0; font-size:1.1rem} .title small{color:var(--muted)}
-.theme{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:.85rem}
-.switch{--w:46px; --h:28px; width:var(--w); height:var(--h); background:var(--bg-soft); border-radius:999px; position:relative; border:var(--border); cursor:pointer}
+.app{max-width:760px;margin:0 auto;padding:env(safe-area-inset-top) 16px 24px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);border:var(--border);position:sticky;top:8px;z-index:5}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#061018;font-weight:800;box-shadow:var(--shadow)}
+.title h1{margin:0 0 2px 0;font-size:1.1rem}.title small{color:var(--muted)}
+.right{display:flex;align-items:center;gap:8px}
+.switch{--w:46px;--h:28px;width:var(--w);height:var(--h);background:var(--bg-soft);border-radius:999px;position:relative;border:var(--border);cursor:pointer}
 .switch input{display:none}
-.switch i{position:absolute; top:3px; left:3px; width:22px; height:22px; background:#fff; border-radius:50%; transition:.25s; box-shadow:var(--shadow)}
+.switch i{position:absolute;top:3px;left:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:.25s;box-shadow:var(--shadow)}
 .switch input:checked + i{transform:translateX(18px)}
+.menu{appearance:none;border:var(--border);background:var(--bg-soft);color:var(--text);padding:10px 12px;border-radius:12px;cursor:pointer}
 
-.quick{margin:16px 0; padding:16px; background:var(--card); border-radius:18px; border:var(--border); box-shadow:var(--shadow)}
-.amount-row{display:flex; gap:10px}
-.amount{
-  flex:1 1 auto; font-size:18px; padding:16px 14px; border-radius:14px; border:var(--border);
-  background:var(--bg); color:var(--text); outline:none;
-}
-.amount:focus{box-shadow:var(--ring); border-color:transparent}
-.btn{
-  appearance:none; border:none; cursor:pointer; padding:14px 16px; border-radius:14px; font-weight:700;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2)); color:#061018; box-shadow:var(--shadow)
-}
-.btn.secondary{background:var(--bg-soft); color:var(--text); border:var(--border)}
-.btn.warn{background:var(--warn); color:#111}
-.btn.danger{background:var(--danger); color:#fff}
-.btn.ghost{background:transparent; border:var(--border); color:var(--text)}
+.quick{margin:16px 0;padding:16px;background:var(--card);border-radius:18px;border:var(--border);box-shadow:var(--shadow)}
+.amount-row{display:flex;gap:10px}
+.amount{flex:1 1 auto;font-size:18px;padding:16px 14px;border-radius:14px;border:var(--border);background:var(--bg);color:var(--text);outline:none}
+.amount:focus{box-shadow:var(--ring);border-color:transparent}
+.btn{appearance:none;border:none;cursor:pointer;padding:14px 16px;border-radius:14px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#061018;box-shadow:var(--shadow)}
+.btn.secondary{background:var(--bg-soft);color:var(--text);border:var(--border)}
+.btn.danger{background:var(--danger);color:#fff}
 
-.summaries{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px}
-.kpi{padding:12px; background:var(--bg-soft); border-radius:14px; border:var(--border)}
-.kpi b{display:block; font-size:.8rem; color:var(--muted); margin-bottom:4px}
-.kpi span{font-size:1.1rem; font-weight:800}
+.summaries{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.kpi{padding:12px;background:var(--bg-soft);border-radius:14px;border:var(--border)}
+.kpi b{display:block;font-size:.8rem;color:var(--muted);margin-bottom:4px}
+.kpi span{font-size:1.1rem;font-weight:800}
 
-.filters{display:flex; gap:8px; margin:16px 0 10px; flex-wrap:wrap}
-.tab{padding:8px 12px; border-radius:999px; background:var(--bg-soft); border:var(--border); color:var(--text); cursor:pointer}
+.filters{display:flex;gap:8px;margin:16px 0 10px;flex-wrap:wrap}
+.tab{padding:8px 12px;border-radius:999px;background:var(--bg-soft);border:var(--border);color:var(--text);cursor:pointer}
 .tab.active{box-shadow:var(--ring)}
-select{padding:10px 12px; border-radius:12px; background:var(--bg-soft); color:var(--text); border:var(--border)}
+select{padding:10px 12px;border-radius:12px;background:var(--bg-soft);color:var(--text);border:var(--border)}
 
-.list{display:grid; gap:10px; margin-bottom:96px}
-.card{padding:12px; background:var(--card); border-radius:16px; border:var(--border); box-shadow:var(--shadow); display:flex; justify-content:space-between; gap:10px}
-.meta{color:var(--muted); font-size:.85rem}
+.list{display:grid;gap:10px}
+.card{padding:12px;background:var(--card);border-radius:16px;border:var(--border);box-shadow:var(--shadow);display:flex;justify-content:space-between;gap:10px}
+.meta{color:var(--muted);font-size:.85rem}
 .cat{font-weight:700}
-.note{color:var(--muted); font-size:.92rem}
-.amount-out{font-size:1.1rem; font-weight:900; white-space:nowrap; display:flex; align-items:center}
-.row-actions{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
-.row-actions .btn{padding:8px 10px; font-size:.85rem; border-radius:10px}
-
-/* Alt araç çubuğu – iOS taşma ve kırpılma FIX */
-.toolbar{
-  position:fixed; left:50%; transform:translateX(-50%); bottom:12px;
-  width:min(760px,calc(100% - 24px));
-  display:flex; gap:8px; background:var(--card); border:var(--border);
-  box-shadow:var(--shadow); border-radius:16px; padding:10px; z-index:6; overflow:hidden;
-}
-.toolbar .btn, .toolbar label.btn{flex:1; min-width:0; text-align:center; white-space:nowrap}
+.note{color:var(--muted);font-size:.92rem}
+.amount-out{font-size:1.1rem;font-weight:900;white-space:nowrap;display:flex;align-items:center}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.row-actions .btn{padding:8px 10px;font-size:.85rem;border-radius:10px}
 
 /* Modal */
-.modal{position:fixed; inset:0; display:none; place-items:end; background:rgba(0,0,0,.55); z-index:9999}
+.modal{position:fixed;inset:0;display:none;place-items:end;background:rgba(0,0,0,.55);z-index:9999}
 .modal.show{display:grid}
-.sheet{width:100%; background:var(--card); border-radius:18px 18px 0 0; padding:16px; border:var(--border); box-shadow:0 -15px 25px rgba(0,0,0,.35); animation:su .25s ease}
-@keyframes su{from{transform:translateY(24px); opacity:.8} to{transform:translateY(0); opacity:1}}
-.cat-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px}
-.cat-btn{padding:12px; border-radius:12px; background:var(--bg-soft); border:var(--border); font-weight:700; cursor:pointer}
+.sheet{width:100%;background:var(--card);border-radius:18px 18px 0 0;padding:16px;border:var(--border);box-shadow:0 -15px 25px rgba(0,0,0,.35);animation:su .25s ease}
+@keyframes su{from{transform:translateY(24px);opacity:.8}to{transform:translateY(0);opacity:1}}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.cat-btn{padding:12px;border-radius:12px;background:var(--bg-soft);border:var(--border);font-weight:700;cursor:pointer}
 .cat-btn.active{box-shadow:var(--ring)}
-.cat-btn.editing{outline:2px dashed var(--accent)}
-textarea, input[type="text"]{width:100%; padding:12px; border-radius:12px; border:var(--border); background:var(--bg-soft); color:var(--text); resize:vertical}
-.hr{height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent); margin:12px 0}
+textarea,input[type="text"]{width:100%;padding:12px;border-radius:12px;border:var(--border);background:var(--bg-soft);color:var(--text);resize:vertical}
+.hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);margin:12px 0}
 
 /* Toast */
-.toast{position:fixed; top:12px; left:50%; transform:translateX(-50%); background:var(--bg-soft); border:var(--border); color:var(--text); padding:10px 14px; border-radius:999px; box-shadow:var(--shadow); z-index:10000; display:none}
-.toast.show{display:block; animation:fade .2s ease}
-@keyframes fade{from{opacity:0; transform:translate(-50%,-6px)} to{opacity:1; transform:translate(-50%,0)}}
-
-:focus-visible{outline:none; box-shadow:var(--ring)}
+.toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--bg-soft);border:var(--border);color:var(--text);padding:10px 14px;border-radius:999px;box-shadow:var(--shadow);z-index:10000;display:none}
+.toast.show{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translate(-50%,-6px)}to{opacity:1;transform:translate(-50%,0)}}
 .muted{color:var(--muted)}
-.chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
-.chip{border:var(--border); background:var(--bg-soft); padding:6px 10px; border-radius:999px; font-size:.85rem; cursor:pointer}
-
-/* file input gizle */
-input[type="file"]{display:none}
 </style>
 </head>
 <body>
@@ -118,19 +89,17 @@ input[type="file"]{display:none}
         <small class="muted">Arnavutluk Leki • hızlı kayıt</small>
       </div>
     </div>
-    <div class="theme">
-      <label class="switch" title="Karanlık/Aydınlık">
-        <input id="themeToggler" type="checkbox" aria-label="Tema anahtarı"><i></i>
-      </label>
-      <span id="themeLabel" class="muted">Karanlık</span>
+    <div class="right">
+      <label class="switch" title="Karanlık/Aydınlık"><input id="themeToggler" type="checkbox"><i></i></label>
+      <button id="moreBtn" class="menu" aria-haspopup="true" aria-expanded="false">⋮ Menü</button>
     </div>
   </header>
 
   <section class="quick">
-    <h2 style="margin:0 0 8px 0; color:var(--muted)">Hızlı Tutar Girişi</h2>
+    <h2 style="margin:0 0 8px 0;color:var(--muted)">Hızlı Tutar Girişi</h2>
     <div class="amount-row">
-      <input id="amount" class="amount" inputmode="numeric" pattern="[0-9\\s\\.,]*" autocomplete="off" placeholder="Tutar (L)" aria-label="Tutar (sadece sayı)">
-      <button id="goBtn" class="btn" aria-label="Devam">Devam</button>
+      <input id="amount" class="amount" inputmode="numeric" autocomplete="off" placeholder="Tutar (L)" aria-label="Tutar (sadece sayı)">
+      <button id="goBtn" class="btn">Devam</button>
     </div>
     <div class="summaries">
       <div class="kpi"><b>Toplam</b><span id="sumAll">L 0</span></div>
@@ -143,60 +112,63 @@ input[type="file"]{display:none}
     <button class="tab active" data-scope="all">Tümü</button>
     <button class="tab" data-scope="month">Bu Ay</button>
     <button class="tab" data-scope="today">Bugün</button>
-    <select id="catFilter" aria-label="Kategoriye göre">
-      <option value="">Kategori: Tümü</option>
-    </select>
+    <select id="catFilter"><option value="">Kategori: Tümü</option></select>
   </nav>
 
   <section class="list" id="list" aria-live="polite"></section>
-
-  <div class="toolbar">
-    <button id="btnExport" class="btn secondary">CSV İndir</button>
-    <label class="btn secondary">CSV Yükle
-      <input id="csvInput" type="file" accept=".csv">
-    </label>
-    <button id="btnExportAll" class="btn secondary">Tüm Veriyi Dışa Aktar</button>
-    <button id="btnClear" class="btn danger">Tüm Veriyi Temizle</button>
-  </div>
 </div>
 
 <!-- Kategori Modal -->
 <div class="modal" id="catModal" role="dialog" aria-modal="true">
   <div class="sheet">
-    <div style="display:flex; justify-content:space-between; align-items:center">
+    <div style="display:flex;justify-content:space-between;align-items:center">
       <h3 style="margin:0">Kategori Seç</h3>
-      <button class="btn ghost" id="closeModal">Kapat</button>
+      <button class="btn secondary" id="closeModal">Kapat</button>
     </div>
     <div class="cat-grid" id="catGrid"></div>
-    <div class="chips" id="smartChips"></div>
     <div class="hr"></div>
     <label for="note"><b>Manuel/Not (isteğe bağlı)</b></label>
     <textarea id="note" rows="2" placeholder="Örn. market, kafe, fırın…"></textarea>
     <div class="hr"></div>
-    <div style="display:flex; gap:10px">
+    <div style="display:flex;gap:10px">
       <button id="saveBtn" class="btn" style="flex:1">Kaydet</button>
       <button id="editCatsBtn" class="btn secondary" style="flex:1">Kategorileri Düzenle</button>
     </div>
-    <small class="muted">İpucu: Kategoriye <b>uzun bas</b> → adını değiştir.</small>
+  </div>
+</div>
+
+<!-- Menü Modal (CSV & işlemler) -->
+<div class="modal" id="menuModal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">İşlemler</h3>
+      <button class="btn secondary" id="closeMenu">Kapat</button>
+    </div>
+    <div style="display:grid;gap:10px;margin-top:8px">
+      <button id="btnExport" class="btn secondary">CSV İndir (filtreli)</button>
+      <label class="btn secondary">CSV Yükle<input id="csvInput" type="file" accept=".csv" style="display:none"></label>
+      <button id="btnExportAll" class="btn secondary">Tüm Veriyi Dışa Aktar</button>
+      <button id="btnClear" class="btn danger">Tüm Veriyi Temizle</button>
+    </div>
   </div>
 </div>
 
 <!-- Düzenle Modal -->
 <div class="modal" id="editModal" role="dialog" aria-modal="true">
   <div class="sheet">
-    <div style="display:flex; justify-content:space-between; align-items:center">
+    <div style="display:flex;justify-content:space-between;align-items:center">
       <h3 style="margin:0">Kaydı Düzenle</h3>
-      <button class="btn ghost" id="closeEdit">Kapat</button>
+      <button class="btn secondary" id="closeEdit">Kapat</button>
     </div>
     <div class="cat-grid" id="editCatGrid"></div>
     <div class="hr"></div>
     <label for="editAmount"><b>Tutar (L)</b></label>
-    <input id="editAmount" class="amount" inputmode="numeric" pattern="[0-9\\s\\.,]*">
+    <input id="editAmount" class="amount" inputmode="numeric">
     <div class="hr"></div>
     <label for="editNote"><b>Not</b></label>
     <textarea id="editNote" rows="2"></textarea>
     <div class="hr"></div>
-    <div style="display:flex; gap:10px">
+    <div style="display:flex;gap:10px">
       <button id="updateBtn" class="btn" style="flex:1">Güncelle</button>
       <button id="deleteBtn" class="btn danger" style="flex:1">Sil</button>
     </div>
@@ -206,272 +178,216 @@ input[type="file"]{display:none}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ---------- Safe storage ---------- */
-const storage=(()=>{let ok=true;try{const t='_andi_test'+Math.random();localStorage.setItem(t,t);localStorage.removeItem(t);}catch(e){ok=false;}const mem=new Map();return{getItem(k){try{return ok?localStorage.getItem(k):(mem.has(k)?mem.get(k):null);}catch(){return mem.has(k)?mem.get(k):null;}},setItem(k,v){try{ok?localStorage.setItem(k,v):mem.set(k,v);}catch(){mem.set(k,v);}},removeItem(k){try{ok?localStorage.removeItem(k):mem.delete(k);}catch(){mem.delete(k);}}};})();
+/* ---- global error -> ekranda göster ---- */
+window.addEventListener('error', e=>{ const t=document.getElementById('toast'); t.textContent='Hata: '+(e.message||'bilinmiyor'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); });
+
+/* ---- safe storage ---- */
+const storage=(()=>{let ok=true;try{const t='_t'+Math.random();localStorage.setItem(t,t);localStorage.removeItem(t);}catch(e){ok=false;}const mem=new Map();return{getItem:k=>ok?localStorage.getItem(k):(mem.get(k)||null),setItem:(k,v)=>{if(ok)try{localStorage.setItem(k,v);}catch(){mem.set(k,v);}else mem.set(k,v);}}})();
+
 const LS_KEY='andi_ev_harcamalari_v1', LS_CATS='andi_ev_harcamalari_categories_v1', LS_THEME='andi_theme_v1';
 const DEFAULT_CATEGORIES=['kira','su faturası','elektrik faturası','internet faturası','ev için yemek alışveriş','çamaşır ilacı','kıyafet','dışarıda yemek'];
-const SMART_NOTES=['market','pazaryeri','fırın','kasap','kafe','restoran','otobüs','taksi','eczane'];
 
-let records=loadRecords();
-let categories=loadCategories();
-let editingCats=false, pendingAmount=null, selectedCategory=null;
-let currentFilter={scope:'all', category:''}, editRecordId=null;
+let records = load(LS_KEY) || [];
+let categories = load(LS_CATS) || DEFAULT_CATEGORIES.slice();
+let editingCats=false, pendingAmount=null, selectedCategory=null, editRecordId=null;
+let filter={scope:'all', category:''};
 
-/* ---------- DOM ---------- */
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const amountEl=$('#amount'), goBtn=$('#goBtn'), listEl=$('#list');
 const sumAllEl=$('#sumAll'), sumMonthEl=$('#sumMonth'), sumTodayEl=$('#sumToday');
 const tabs=$$('.tab'), catFilterEl=$('#catFilter');
-const catModal=$('#catModal'), catGrid=$('#catGrid'), smartChips=$('#smartChips'), noteEl=$('#note');
-const saveBtn=$('#saveBtn'), closeModalBtn=$('#closeModal'), editCatsBtn=$('#editCatsBtn');
-const editModal=$('#editModal'), editCatGrid=$('#editCatGrid'), editAmountEl=$('#editAmount'), editNoteEl=$('#editNote');
-const updateBtn=$('#updateBtn'), deleteBtn=$('#deleteBtn'), closeEditBtn=$('#closeEdit');
+const themeToggler=$('#themeToggler'), toastEl=$('#toast');
+const catModal=$('#catModal'), catGrid=$('#catGrid'), noteEl=$('#note'), saveBtn=$('#saveBtn'), closeModalBtn=$('#closeModal'), editCatsBtn=$('#editCatsBtn');
+const menuModal=$('#menuModal'), moreBtn=$('#moreBtn'), closeMenu=$('#closeMenu');
 const btnExport=$('#btnExport'), btnExportAll=$('#btnExportAll'), btnClear=$('#btnClear'), csvInput=$('#csvInput');
-const themeToggler=$('#themeToggler'), themeLabel=$('#themeLabel'), toastEl=$('#toast');
+const editModal=$('#editModal'), closeEdit=$('#closeEdit'), editCatGrid=$('#editCatGrid'), editAmountEl=$('#editAmount'), editNoteEl=$('#editNote'), updateBtn=$('#updateBtn'), deleteBtn=$('#deleteBtn');
 
-/* ---------- INIT ---------- */
-applyTheme(loadTheme());
-renderCategoryFilter(); renderCatButtons(); renderSmartChips();
-renderList(); updateSummaries();
+applyTheme(load(LS_THEME)||'dark');
+renderCategoryFilter(); renderCatButtons(); renderList(); updateSummaries();
 
-/* ---------- Events ---------- */
-amountEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ openCategoryModal(); } });
-goBtn.addEventListener('click', openCategoryModal);
-tabs.forEach(t=> t.addEventListener('click', ()=>{ tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); currentFilter.scope=t.dataset.scope; renderList(); updateSummaries(); }));
-catFilterEl.addEventListener('change', ()=>{ currentFilter.category=catFilterEl.value; renderList(); updateSummaries(); });
+/* events */
+amountEl.addEventListener('keydown', e=>{ if(e.key==='Enter') openCategory(); });
+goBtn.addEventListener('click', openCategory);
+
+tabs.forEach(t=> t.addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  filter.scope=t.dataset.scope; renderList(); updateSummaries();
+}));
+catFilterEl.addEventListener('change', ()=>{ filter.category=catFilterEl.value; renderList(); updateSummaries(); });
+
+themeToggler.addEventListener('change', ()=>{ const m=themeToggler.checked?'light':'dark'; applyTheme(m); save(LS_THEME,m); });
+
+moreBtn.addEventListener('click', ()=> show(menuModal));
+closeMenu.addEventListener('click', ()=> hide(menuModal));
+btnExport.addEventListener('click', ()=>{ downloadCSV(getFiltered()); hide(menuModal); });
+btnExportAll.addEventListener('click', ()=>{ downloadCSV(records); hide(menuModal); });
+btnClear.addEventListener('click', ()=>{ if(!records.length) return toast('Zaten boş'); if(confirm('Tüm veriyi temizle?')){ records=[]; save(LS_KEY,records); renderList(); updateSummaries(); } hide(menuModal); });
+csvInput.addEventListener('change', importCSV);
 
 closeModalBtn.addEventListener('click', ()=> hide(catModal));
-saveBtn.addEventListener('click', handleSaveFromModal);
-editCatsBtn.addEventListener('click', toggleEditCats);
+editCatsBtn.addEventListener('click', ()=>{ editingCats=!editingCats; editCatsBtn.textContent=editingCats?'Düzenlemeyi Bitir':'Kategorileri Düzenle'; [...catGrid.children].forEach(b=> b.classList.toggle('editing', editingCats)); });
+saveBtn.addEventListener('click', saveFromModal);
 catModal.addEventListener('click', e=>{ if(e.target===catModal) hide(catModal); });
 
-closeEditBtn.addEventListener('click', ()=> hide(editModal));
-updateBtn.addEventListener('click', applyUpdate);
-deleteBtn.addEventListener('click', handleDeleteRecord);
+closeEdit.addEventListener('click', ()=> hide(editModal));
+updateBtn.addEventListener('click', updateRecord);
+deleteBtn.addEventListener('click', ()=>{ if(confirm('Silinsin mi?')){ records=records.filter(x=>x.id!==editRecordId); save(LS_KEY,records); hide(editModal); renderList(); updateSummaries(); }});
 editModal.addEventListener('click', e=>{ if(e.target===editModal) hide(editModal); });
 
-btnExport.addEventListener('click', ()=> downloadCSV(filteredRecords()));
-btnExportAll.addEventListener('click', ()=> downloadCSV(records));
-btnClear.addEventListener('click', clearAllWithConfirm);
-csvInput.addEventListener('change', handleCSVImport);
+/* helpers */
+function load(k){try{ return JSON.parse(storage.getItem(k)); }catch(_){ return null; }}
+function save(k,v){ try{ storage.setItem(k, JSON.stringify(v)); }catch(_){ /* fallback */ } }
+function uuid(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);}); }
+function now(){ const d=new Date(), y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), dd=('0'+d.getDate()).slice(-2), H=('0'+d.getHours()).slice(-2), M=('0'+d.getMinutes()).slice(-2); return {dateISO:${y}-${m}-${dd}, time:${H}:${M}}; }
+function toInt(s){ return parseInt(String(s||'').replace(/[^\d]/g,''),10)||0; }
+function fmt(n){ const s=Math.trunc(n).toString(); return 'L ' + s.replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+function toast(msg){ toastEl.textContent=msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'),1800); }
+function show(m){ m.classList.add('show'); }
+function hide(m){ m.classList.remove('show'); }
 
-themeToggler.addEventListener('change', ()=>{ const mode=themeToggler.checked?'light':'dark'; applyTheme(mode); saveTheme(mode); });
+/* theme */
+function applyTheme(mode){ if(mode==='light'){ document.documentElement.classList.add('light'); themeToggler.checked=true; } else { document.documentElement.classList.remove('light'); themeToggler.checked=false; } }
 
-/* ---------- Storage/Utils ---------- */
-function loadRecords(){ try{ return JSON.parse(storage.getItem(LS_KEY))||[] }catch(_){ return [] } }
-function saveRecords(){ try{ storage.setItem(LS_KEY, JSON.stringify(records)); }catch(_){ } }
-function loadCategories(){ try{ const d=JSON.parse(storage.getItem(LS_CATS)); if(Array.isArray(d)&&d.length) return d; }catch(_){ } storage.setItem(LS_CATS, JSON.stringify(DEFAULT_CATEGORIES)); return [...DEFAULT_CATEGORIES]; }
-function saveCategories(){ try{ storage.setItem(LS_CATS, JSON.stringify(categories)); }catch(_){} }
-function uuid(){ try{ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=(crypto.getRandomValues(new Uint8Array(1))[0]&15), v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }catch(_){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); } }
-function nowParts(){ const d=new Date(); const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); const HH=String(d.getHours()).padStart(2,'0'), MM=String(d.getMinutes()).padStart(2,'0'); return {dateISO:${yyyy}-${mm}-${dd}, timeHHMM:${HH}:${MM}}; }
-function sanitizeAmount(str){ return parseInt(String(str||'').replace(/[^\d]/g,''),10)||0; }
-function fmtALL(n){ const s=Math.trunc(n).toString(); return 'L ' + s.replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
-function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-/* ---------- Theme ---------- */
-function loadTheme(){ return storage.getItem(LS_THEME)||'dark'; }
-function saveTheme(m){ storage.setItem(LS_THEME,m); }
-function applyTheme(m){ if(m==='light'){ document.documentElement.classList.add('light'); themeToggler.checked=true; themeLabel.textContent='Aydınlık'; } else { document.documentElement.classList.remove('light'); themeToggler.checked=false; themeLabel.textContent='Karanlık'; } }
-
-/* ---------- Toast ---------- */
-let toastTimer; function toast(msg){ clearTimeout(toastTimer); toastEl.textContent=msg; toastEl.classList.add('show'); toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2000); }
-
-/* ---------- Render ---------- */
+/* categories */
 function renderCategoryFilter(){
-  catFilterEl.innerHTML='<option value="">Kategori: Tümü</option>' + categories.map(c=><option value="${escapeHtml(c)}">${escapeHtml(c)}</option>).join('');
+  catFilterEl.innerHTML='<option value="">Kategori: Tümü</option>' + categories.map(c=><option value="${c}">${c}</option>).join('');
 }
 function renderCatButtons(){
   catGrid.innerHTML='';
   categories.forEach((c,idx)=>{
     const b=document.createElement('button');
-    b.type='button'; b.className='cat-btn'; b.textContent=c; b.dataset.cat=c;
-    b.addEventListener('click', ()=>{
+    b.className='cat-btn'; b.textContent=c; b.dataset.cat=c;
+    b.onclick=()=>{
       if(editingCats){
-        const neo=prompt('Yeni ad ver:', c);
-        if(neo && neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); }
+        const neo=prompt('Yeni ad:', c);
+        if(neo && neo.trim()){ categories[idx]=neo.trim(); save(LS_CATS,categories); renderCategoryFilter(); renderCatButtons(); }
         return;
       }
-      selectCategory(c);
-    });
-    // uzun bas → yeniden adlandır
-    let t; b.addEventListener('touchstart',()=> t=setTimeout(()=>renameCat(idx,c),600));
-    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=> b.addEventListener(ev,()=> clearTimeout(t)));
-    b.addEventListener('mousedown',()=> t=setTimeout(()=>renameCat(idx,c),700));
+      document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      selectedCategory=c;
+    };
     catGrid.appendChild(b);
   });
-  highlightSelected();
-}
-function renameCat(idx,current){
-  const neo=prompt('Kategori adını değiştir:', current);
-  if(neo && neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); }
-}
-function toggleEditCats(){
-  editingCats=!editingCats;
-  editCatsBtn.textContent=editingCats?'Düzenlemeyi Bitir':'Kategorileri Düzenle';
-  [...catGrid.children].forEach(b=> b.classList.toggle('editing', editingCats));
-}
-function selectCategory(c){ selectedCategory=c; highlightSelected(); }
-function highlightSelected(){ [...catGrid.children].forEach(b=> b.classList.toggle('active', b.dataset.cat===selectedCategory)); }
-
-function renderSmartChips(){
-  const SMART=['market','pazaryeri','fırın','kasap','kafe','restoran','otobüs','taksi','eczane'];
-  smartChips.innerHTML=SMART.map(n=><button type="button" class="chip" data-note="${escapeHtml(n)}">${escapeHtml(n)}</button>).join('');
-  smartChips.querySelectorAll('.chip').forEach(ch=> ch.addEventListener('click', ()=>{
-    const add=ch.dataset.note; noteEl.value = noteEl.value ? (noteEl.value.trim() + ', ' + add) : add; noteEl.focus();
-  }));
 }
 
-function filteredRecords(){
-  const {scope,category}=currentFilter;
-  const today=nowParts().dateISO, ym=today.slice(0,7);
+/* add flow */
+function openCategory(){
+  const v = toInt(amountEl.value);
+  if(!v){ toast('Tutar girin'); amountEl.focus(); return; }
+  pendingAmount=v; selectedCategory=null; noteEl.value='';
+  renderCatButtons(); show(catModal);
+}
+function saveFromModal(){
+  const cat = selectedCategory || (noteEl.value.trim()? 'Manuel' : null);
+  if(!cat){ toast('Kategori seçin veya not yazın'); return; }
+  const t = now();
+  records.push({ id:uuid(), tarihISO:t.dateISO, saat:t.time, tutarALL: pendingAmount, kategori: cat, not: noteEl.value.trim() });
+  save(LS_KEY, records);
+  hide(catModal); amountEl.value=''; amountEl.focus();
+  renderList(); updateSummaries();
+}
+
+/* list */
+function getFiltered(){
+  const today=now().dateISO, ym=today.slice(0,7);
   return records.filter(r=>{
-    if(category && r.kategori!==category) return false;
-    if(scope==='today') return r.tarihISO===today;
-    if(scope==='month') return r.tarihISO.startsWith(ym);
+    if(filter.category && r.kategori!==filter.category) return false;
+    if(filter.scope==='today') return r.tarihISO===today;
+    if(filter.scope==='month') return r.tarihISO.startsWith(ym);
     return true;
   });
 }
-
 function renderList(){
-  const items=filteredRecords().sort((a,b)=> (b.tarihISO+b.saat).localeCompare(a.tarihISO+a.saat));
-  if(!items.length){
-    listEl.innerHTML = <div class="card"><div><div class="cat">Kayıt yok</div><div class="note">Tutar girip “Devam” deyin.</div></div></div>;
-    return;
-  }
+  const items=getFiltered().sort((a,b)=> (b.tarihISO+b.saat).localeCompare(a.tarihISO+a.saat));
+  if(!items.length){ listEl.innerHTML='<div class="card"><div><div class="cat">Kayıt yok</div><div class="note">Tutar girip “Devam” deyin.</div></div></div>'; return; }
   listEl.innerHTML = items.map(r=>`
     <article class="card">
       <div>
-        <div class="meta">${escapeHtml(r.tarihISO)} • ${escapeHtml(r.saat)}</div>
-        <div class="cat">${escapeHtml(r.kategori)}${r.not ? ' — <span class="note">'+escapeHtml(r.not)+'</span>' : ''}</div>
+        <div class="meta">${r.tarihISO} • ${r.saat}</div>
+        <div class="cat">${r.kategori}${r.not ? ' — <span class="note">'+r.not+'</span>' : ''}</div>
         <div class="row-actions">
           <button class="btn secondary" data-edit="${r.id}">Düzenle</button>
           <button class="btn danger" data-del="${r.id}">Sil</button>
         </div>
       </div>
-      <div class="amount-out">${fmtALL(r.tutarALL)}</div>
+      <div class="amount-out">${fmt(r.tutarALL)}</div>
     </article>
   `).join('');
-  listEl.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openEdit(b.dataset.edit)));
-  listEl.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteRecordWithConfirm(b.dataset.del)));
+  listEl.querySelectorAll('[data-edit]').forEach(b=> b.onclick=()=> openEdit(b.dataset.edit));
+  listEl.querySelectorAll('[data-del]').forEach(b=> b.onclick=()=>{ if(confirm('Silinsin mi?')){ records=records.filter(x=>x.id!==b.dataset.del); save(LS_KEY,records); renderList(); updateSummaries(); }});
 }
 
-/* ---------- Summaries ---------- */
-function updateSummaries(){
-  const sumAll=records.reduce((a,b)=>a+(b.tutarALL||0),0);
-  const today=nowParts().dateISO, ym=today.slice(0,7);
-  const sumMonth=records.filter(r=>r.tarihISO.startsWith(ym)).reduce((a,b)=>a+b.tutarALL,0);
-  const sumToday=records.filter(r=>r.tarihISO===today).reduce((a,b)=>a+b.tutarALL,0);
-  sumAllEl.textContent=fmtALL(sumAll);
-  sumMonthEl.textContent=fmtALL(sumMonth);
-  sumTodayEl.textContent=fmtALL(sumToday);
-}
-
-/* ---------- Add Flow ---------- */
-function openCategoryModal(){
-  const raw=sanitizeAmount(amountEl.value);
-  if(!raw){ toast('Tutar girin'); amountEl.focus(); return; }
-  pendingAmount=raw; selectedCategory=null; noteEl.value='';
-  renderCatButtons(); show(catModal);
-  setTimeout(()=> noteEl.focus(), 80);
-}
-function handleSaveFromModal(){
-  const cat = selectedCategory || (noteEl.value.trim() ? 'Manuel' : null);
-  if(!cat){ toast('Kategori seçin veya not girin'); return; }
-  const rec={ id:uuid(), ...nowParts(), tutarALL: pendingAmount||0, kategori: cat, not:(noteEl.value||'').trim() };
-  records.push(rec); saveRecords();
-  // Temizlik ve seri giriş için odak geri
-  pendingAmount=null; amountEl.value=''; hide(catModal);
-  renderList(); updateSummaries();
-  amountEl.focus(); amountEl.select();
-  setTimeout(()=> askDownloadCSV([rec]), 100);
-}
-
-/* ---------- Edit Flow ---------- */
+/* edit */
 function openEdit(id){
-  const rec=records.find(x=>x.id===id); if(!rec) return;
-  editRecordId=id; editAmountEl.value=rec.tutarALL; editNoteEl.value=rec.not||'';
-  renderEditCatButtons(rec.kategori); show(editModal);
+  const r=records.find(x=>x.id===id); if(!r) return;
+  editRecordId=id; editAmountEl.value=r.tutarALL; editNoteEl.value=r.not||'';
+  renderEditCatButtons(r.kategori); show(editModal);
 }
-function renderEditCatButtons(selected){
+function renderEditCatButtons(sel){
   editCatGrid.innerHTML='';
   categories.forEach(c=>{
-    const b=document.createElement('button');
-    b.type='button'; b.className='cat-btn' + (selected===c?' active':''); b.textContent=c; b.dataset.cat=c;
-    b.addEventListener('click', ()=>{
-      editCatGrid.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-    });
+    const b=document.createElement('button'); b.className='cat-btn'+(sel===c?' active':''); b.textContent=c; b.dataset.cat=c;
+    b.onclick=()=>{ editCatGrid.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); };
     editCatGrid.appendChild(b);
   });
 }
-function applyUpdate(){
-  const rec=records.find(x=>x.id===editRecordId); if(!rec) return;
-  const newAmt=sanitizeAmount(editAmountEl.value);
-  const active=editCatGrid.querySelector('.cat-btn.active');
-  rec.tutarALL=newAmt; rec.kategori=active?active.dataset.cat:rec.kategori; rec.not=(editNoteEl.value||'').trim();
-  saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt güncellendi');
-}
-function handleDeleteRecord(){ deleteRecordWithConfirm(editRecordId); }
-function deleteRecordWithConfirm(id){
-  if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
-  records=records.filter(x=>x.id!==id); saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt silindi');
+function updateRecord(){
+  const r=records.find(x=>x.id===editRecordId); if(!r) return;
+  r.tutarALL = toInt(editAmountEl.value);
+  const active=editCatGrid.querySelector('.cat-btn.active'); if(active) r.kategori=active.dataset.cat;
+  r.not = (editNoteEl.value||'').trim();
+  save(LS_KEY,records); hide(editModal); renderList(); updateSummaries();
 }
 
-/* ---------- CSV ---------- */
-function askDownloadCSV(recs){ if(confirm('CSV indirmek ister misiniz?')) downloadCSV(recs&&recs.length?recs:records); }
+/* csv */
 function csvEscape(s){ if(s==null) return ''; s=String(s); return (s.includes(',')||s.includes('"')||s.includes('\n'))?('"'+s.replace(/"/g,'""')+'"'):s; }
 function downloadCSV(rows){
-  const headers=['date','time','amount_all','category','note','id'];
-  const lines=[headers.join(',')];
-  rows.forEach(r=>{ lines.push([r.tarihISO,r.saat,String(r.tutarALL),csvEscape(r.kategori),csvEscape(r.not||''),r.id].join(',')); });
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download='andi-ev-harcamalari.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  toast('CSV indirildi');
+  const lines=[['date','time','amount_all','category','note','id'].join(',')];
+  rows.forEach(r=> lines.push([r.tarihISO,r.saat,String(r.tutarALL),csvEscape(r.kategori),csvEscape(r.not||''),r.id].join(',')));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'}), url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='andi-ev-harcamalari.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 }
-function handleCSVImport(e){
+function importCSV(e){
   const f=e.target.files&&e.target.files[0]; if(!f) return;
   const rd=new FileReader();
   rd.onload=ev=>{
     try{
       const text=ev.target.result.replace(/\r/g,'');
-      const lines=text.split('\n').filter(x=> x.trim().length);
-      const headers=splitCSVLine(lines[0]);
-      const need=['date','time','amount_all','category','note','id'];
-      const ok=need.every((h,i)=> headers[i]&&headers[i].trim()===h);
-      if(!ok) return alert('CSV başlıkları hatalı. Gerekli sıra: '+need.join(','));
-      const before=records.length, existing=new Set(records.map(r=>r.id));
+      const lines=text.split('\n').filter(Boolean);
+      const head=lines[0].split(','), need=['date','time','amount_all','category','note','id'];
+      if(!need.every((h,i)=> (head[i]||'').trim()===h)) return alert('CSV başlıkları sırayla: '+need.join(','));
+      const existing=new Set(records.map(r=>r.id)); let added=0;
       lines.slice(1).forEach(line=>{
-        const [date,time,amount,category,note,id]=splitCSVLine(line);
-        if(!id||existing.has(id)) return;
-        records.push({id:String(id), tarihISO:String(date), saat:String(time), tutarALL:sanitizeAmount(amount), kategori:String(category||'Manuel'), not:String(note||'')});
-        existing.add(id);
+        const cols=parseCSV(line); if(cols.length<6) return;
+        const [d,t,a,c,n,id]=cols;
+        if(!id || existing.has(id)) return;
+        records.push({id, tarihISO:d, saat:t, tutarALL:toInt(a), kategori:c||'Manuel', not:n||''});
+        existing.add(id); added++;
       });
-      saveRecords(); renderList(); updateSummaries(); toast((records.length-before)+' kayıt eklendi');
-    }catch(err){ alert('CSV okunurken hata oluştu.'); }
+      save(LS_KEY,records); renderList(); updateSummaries(); toast(added+' kayıt eklendi');
+    }catch(_){ alert('CSV okunamadı'); }
     finally{ e.target.value=''; }
   };
   rd.readAsText(f,'utf-8');
 }
-function splitCSVLine(line){
-  const out=[]; let cur=''; let inQ=false;
+function parseCSV(line){
+  const out=[]; let cur=''; let q=false;
   for(let i=0;i<line.length;i++){
     const ch=line[i];
-    if(inQ){ if(ch=='"'){ if(line[i+1]=='"'){ cur+='"'; i++; } else inQ=false; } else cur+=ch; }
-    else{ if(ch===','){ out.push(cur); cur=''; } else if(ch=='"'){ inQ=true; } else cur+=ch; }
+    if(q){ if(ch=='"'){ if(line[i+1]=='"'){ cur+='"'; i++; } else q=false; } else cur+=ch; }
+    else { if(ch===','){ out.push(cur); cur=''; } else if(ch=='"'){ q=true; } else cur+=ch; }
   }
   out.push(cur); return out;
 }
 
-/* ---------- Helpers ---------- */
-function show(m){ m.classList.add('show'); }
-function hide(m){ m.classList.remove('show'); }
-
-/* ---------- Clear all ---------- */
-function clearAllWithConfirm(){
-  if(!records.length) return toast('Zaten boş');
-  if(!confirm('Önce “Tüm Veriyi Dışa Aktar” yapmanızı öneririz.\nTüm veriyi temizlemek istediğinize emin misiniz?')) return;
-  records=[]; saveRecords(); renderList(); updateSummaries(); toast('Tüm veriler temizlendi');
+/* summaries */
+function updateSummaries(){
+  const sum=records.reduce((a,b)=>a+b.tutarALL,0);
+  const today=now().dateISO, ym=today.slice(0,7);
+  const month=records.filter(r=>r.tarihISO.startsWith(ym)).reduce((a,b)=>a+b.tutarALL,0);
+  const day=records.filter(r=>r.tarihISO===today).reduce((a,b)=>a+b.tutarALL,0);
+  sumAllEl.textContent=fmt(sum); sumMonthEl.textContent=fmt(month); sumTodayEl.textContent=fmt(day);
 }
 </script>
 </body>
