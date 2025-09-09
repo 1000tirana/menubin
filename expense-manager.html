@@ -2,17 +2,17 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Andi Ev Harcamaları</title>
 <style>
-/* ——— görünüm (kısaltılmış) ——— */
 :root{--line:#ececf1;--primary:#ff5a5f;--blue:#1e88e5;--red:#e53935}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
 .app{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
-.header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px 0}
+.header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:10px 16px 0}
 .h1{font-weight:700}
-.tabs{display:flex;gap:8px;padding:8px 0 12px}
-.tab{padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#f6f7f9}
+.tabs{display:flex;gap:8px;padding:8px 0 12px;overflow:auto}
+.tab{padding:9px 13px;border:1px solid var(--line);border-radius:12px;background:#f6f7f9;font-weight:700}
 .tab.active{background:#111;color:#fff;border-color:#111}
 .kpis{display:flex;gap:8px;padding:0 0 10px}
 .kpi{flex:1;border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;font-weight:700}
@@ -27,12 +27,12 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
 .navbar{position:fixed;left:0;right:0;bottom:0;border-top:1px solid var(--line);background:#fff}
 .nav{max-width:560px;margin:0 auto;display:flex;justify-content:space-around;padding:8px}
 .navbtn{background:none;border:none;font-weight:700}
-.fab{position:fixed;right:18px;bottom:78px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;border:none;font-size:28px;z-index:999}
-.sheet{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:flex-end}
+.fab{position:fixed;right:18px;bottom:78px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;border:none;font-size:28px;z-index:999;cursor:pointer}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:flex-end;z-index:50}
 .sheet.show{display:flex}
 .panel{background:#fff;border-radius:18px 18px 0 0;max-width:560px;margin:0 auto;width:100%;padding:14px}
 .input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px}
-.btn{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:700}
+.btn{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:700;cursor:pointer}
 .btn.primary{background:#111;color:#fff;border-color:#111}
 .small{font-size:12px;color:#666}
 .hidden{display:none}
@@ -63,25 +63,17 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
 
     <!-- SUMMARY -->
     <div id="view-summary" class="hidden">
-      <div class="card" style="padding:12px">
+      <div class="card" style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn" id="exportBtn">CSV Dışa Aktar</button>
         <label class="btn">CSV Yükle <input id="importInput" type="file" accept=".csv" class="hidden"></label>
         <button class="btn" id="wipeBtn">Tüm Veriyi Sil</button>
-        <div class="small" style="margin-top:8px">Depolama modu: <b id="storeModeText">Tarayıcı (localStorage)</b></div>
       </div>
     </div>
 
     <!-- SETTINGS -->
     <div id="view-settings" class="hidden">
       <div class="card" style="padding:12px; display:grid; gap:10px">
-        <label>Depolama
-          <select id="storageMode" class="input">
-            <option value="local">Tarayıcı (localStorage) – önerilen</option>
-            <option value="server">Sunucu (PHP – localhost)</option>
-          </select>
-        </label>
-        <div class="small">Sunucu modunda bu dosyanın yanında <code>api.php</code> olmalı.</div>
-        <button class="btn" id="syncNow">Sunucu ile eşitle (yükle & kaydet)</button>
+        <div class="small">Veriler tarayıcında (localStorage) saklanır. CSV ile yedekleyip geri yükleyebilirsin.</div>
       </div>
     </div>
   </div>
@@ -94,7 +86,7 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
     </div>
   </div>
 
-  <button class="fab" id="addBtn">+</button>
+  <button class="fab" id="addBtn" aria-label="+">+</button>
 
   <!-- Add Sheet -->
   <div class="sheet" id="sheet">
@@ -127,156 +119,125 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
 </div>
 
 <script>
-/* Helpers */
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const fmt=n=>"L "+(n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g," ");
-const today=()=>new Date().toISOString().slice(0,10);
-const uid=()=>Math.random().toString(36).slice(2,10);
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const fmt=n=>"L "+(n||0).toString().replace(/\B(?=(\\d{3})+(?!\\d))/g," ");
+  const today=()=>new Date().toISOString().slice(0,10);
+  const uid=()=>Math.random().toString(36).slice(2,10);
+  const LS='andi-expense-v3';
+  let items=[];
 
-/* State & storage backends */
-const LS_KEY='andi-expense-v2';
-let settings={mode:'local'}; // 'local' | 'server'
-let items=[];                // {id,date,type,amount,category,account,note}
+  function load(){ try{ const raw=localStorage.getItem(LS); if(raw) items=JSON.parse(raw)||[]; }catch(e){} }
+  function save(){ localStorage.setItem(LS, JSON.stringify(items)); }
 
-function loadLocal(){
-  const raw=localStorage.getItem(LS_KEY);
-  if(raw){ const o=JSON.parse(raw); items=o.items||[]; settings=o.settings||settings; }
-}
-function saveLocal(){ localStorage.setItem(LS_KEY, JSON.stringify({items,settings})); }
+  function switchTab(t){
+    ['daily','summary','settings'].forEach(v=>{
+      document.getElementById('view-'+v).classList.toggle('hidden', v!==t);
+      $$('#tabs .tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===t));
+    });
+  }
 
-async function loadServer(){
-  const r=await fetch('api.php?action=load'); const j=await r.json();
-  items=j.items||[]; return true;
-}
-async function saveServer(){
-  await fetch('api.php?action=save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})});
-  return true;
-}
+  function render(){
+    // KPIs
+    let inc=0,exp=0; items.forEach(i=> i.type==='income'? inc+=i.amount : exp+=i.amount);
+    $('#kpiIncome').textContent=fmt(inc);
+    $('#kpiExpense').textContent=fmt(exp);
+    $('#kpiTotal').textContent=fmt(inc-exp);
+    // list
+    const box=$('#dailyList'); box.innerHTML='';
+    if(items.length===0){ box.innerHTML='<div class="row"><div>Henüz kayıt yok</div></div>'; return; }
+    const sorted=[...items].sort((a,b)=> new Date(b.date)-new Date(a.date));
+    sorted.forEach(i=>{
+      box.insertAdjacentHTML('beforeend', `
+        <div class="row">
+          <div class="dot">${new Date(i.date).getDate()}</div>
+          <div>
+            <div style="font-weight:700">${i.category}</div>
+            <div class="small">${i.account} • ${new Date(i.date).toLocaleDateString('tr-TR',{weekday:'short'})}${i.note?' • '+i.note:''}</div>
+          </div>
+          <div class="amount ${i.type==='income'?'income':'expense'}">${(i.type==='income'?'+':'-')+fmt(i.amount)}</div>
+        </div>`);
+    });
+  }
 
-/* UI binding */
-function switchTab(t){
-  ['daily','summary','settings'].forEach(v=>{
-    document.getElementById('view-'+v).classList.toggle('hidden', v!==t);
-    $$('#tabs .tab').forEach(b=> b.classList.toggle('active', b.dataset.tab===t));
-  });
-}
-$('#tabs').addEventListener('click',e=>{ if(e.target.classList.contains('tab')) switchTab(e.target.dataset.tab); });
-$$('.navbtn').forEach(b=> b.onclick=()=> switchTab(b.dataset.tab));
+  function exportCSV(){
+    const rows=[['id','date','type','amount','category','account','note']];
+    items.forEach(i=> rows.push([i.id,i.date,i.type,i.amount,i.category,i.account,(i.note||'').replace(/\\n/g,' ')]));
+    const csv=rows.map(r=>r.map(v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"').join(',')).join('\\n');
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download='andi-ev-harcamalari.csv'; a.click();
+  }
 
-/* List & KPIs */
-function render(){
-  // KPIs
-  let inc=0,exp=0;
-  items.forEach(i=> i.type==='income'? inc+=i.amount : exp+=i.amount);
-  $('#kpiIncome').textContent=fmt(inc);
-  $('#kpiExpense').textContent=fmt(exp);
-  $('#kpiTotal').textContent=fmt(inc-exp);
-
-  // list
-  const box=$('#dailyList'); box.innerHTML='';
-  if(items.length===0){ box.innerHTML='<div class="row"><div>Henüz kayıt yok</div></div>'; return; }
-  const sorted=[...items].sort((a,b)=> new Date(b.date)-new Date(a.date));
-  sorted.forEach(i=>{
-    box.insertAdjacentHTML('beforeend', `
-      <div class="row">
-        <div class="dot">${new Date(i.date).getDate()}</div>
-        <div>
-          <div style="font-weight:700">${i.category}</div>
-          <div class="small">${i.account} • ${new Date(i.date).toLocaleDateString('tr-TR',{weekday:'short'})}${i.note? ' • '+i.note:''}</div>
-        </div>
-        <div class="amount ${i.type==='income'?'income':'expense'}">${(i.type==='income'?'+':'-')+fmt(i.amount)}</div>
-      </div>`);
-  });
-}
-
-/* Add sheet */
-function openSheet(){
-  $('#date').value=today(); $('#type').value='expense'; $('#amount').value=''; $('#note').value='';
-  $('#category').value='Ev için yemek alışveriş'; $('#account').value='Nakit';
-  $('#sheet').classList.add('show');
-}
-$('#addBtn').onclick=()=>openSheet();
-$('#closeSheet').onclick=()=>$('#sheet').classList.remove('show');
-$('#save').onclick=async ()=>{
-  const amount=parseInt(($('#amount').value||'').replace(/\D/g,''),10)||0;
-  if(!amount){ alert('Tutar gir (tam sayı).'); return; }
-  const it={ id:uid(), date:$('#date').value||today(), type:$('#type').value,
-             amount, category:$('#category').value, account:$('#account').value||'Nakit',
-             note:($('#note').value||'').trim() };
-  items.push(it);
-
-  // persist
-  if(settings.mode==='server'){ await saveServer(); } else { saveLocal(); }
-
-  render(); $('#sheet').classList.remove('show');
-  if(confirm('CSV indirilsin mi?')) exportCSV();
-};
-
-/* CSV */
-function exportCSV(){
-  const rows=[['id','date','type','amount','category','account','note']];
-  items.forEach(i=> rows.push([i.id,i.date,i.type,i.amount,i.category,i.account,(i.note||'').replace(/\n/g,' ')]));
-  const csv=rows.map(r=>r.map(v=>"${String(v??'').replace(/"/g,'""')}").join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='andi-ev-harcamalari.csv'; a.click();
-}
-$('#exportBtn').onclick=exportCSV;
-
-$('#importInput').onchange=e=>{
-  const f=e.target.files[0]; if(!f) return;
-  const reader=new FileReader();
-  reader.onload=async ev=>{
-    const lines=ev.target.result.split(/\r?\n/).filter(Boolean);
+  function importCSVText(txt){
+    const lines=txt.split(/\\r?\\n/).filter(Boolean);
+    if(!lines.length) return;
     const head=lines.shift();
-    const cols=head.split(',').map(s=>s.replace(/^"|"$/g,''));
-    const idx=Object.fromEntries(cols.map((c,i)=>[c,i]));
-    const arr=[];
+    const cols=head.split(',').map(s=>s.replace(/^"|"$/g,'')); const idx={}; cols.forEach((c,i)=>idx[c]=i);
     lines.forEach(line=>{
       const parts=[]; let cur='',q=false;
       for(const ch of line){ if(ch=='"'){ q=!q; continue; } if(ch==',' && !q){ parts.push(cur); cur=''; } else { cur+=ch; } }
       parts.push(cur);
       const g=k=>(parts[idx[k]]||'').replace(/^"|"$/g,'');
-      arr.push({ id:g('id')||uid(), date:g('date')||today(), type:g('type')||'expense',
-                 amount:parseInt((g('amount')||'').replace(/\D/g,''),10)||0,
-                 category:g('category')||'Diğer', account:g('account')||'Nakit', note:g('note')||'' });
+      items.push({
+        id: g('id')||uid(),
+        date: g('date')||today(),
+        type: (g('type')==='income'?'income':'expense'),
+        amount: parseInt((g('amount')||'').replace(/\\D/g,''),10)||0,
+        category: g('category')||'Diğer',
+        account: g('account')||'Nakit',
+        note: g('note')||''
+      });
     });
-    items=items.concat(arr);
-    if(settings.mode==='server'){ await saveServer(); } else { saveLocal(); }
-    render(); alert('İçe aktarıldı.');
-  };
-  reader.readAsText(f,'utf-8'); e.target.value='';
-};
+    save(); render();
+  }
 
-$('#wipeBtn').onclick=async ()=>{
-  if(!confirm('Tüm veriler silinsin mi?')) return;
-  items=[];
-  if(settings.mode==='server'){ await saveServer(); } else { saveLocal(); }
-  render();
-};
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // boot
+    load(); render(); switchTab('daily');
 
-/* Settings */
-$('#storageMode').onchange=async (e)=>{
-  settings.mode=e.target.value;
-  $('#storeModeText').textContent = settings.mode==='server' ? 'Sunucu (PHP)' : 'Tarayıcı (localStorage)';
-  if(settings.mode==='server'){ await loadServer(); }
-  else { loadLocal(); }
-  saveLocal(); // mod tercihini LS’de de tut
-  render();
-};
-$('#syncNow').onclick=async ()=>{
-  if(settings.mode!=='server'){ alert('Önce depolama modunu "Sunucu (PHP)" yap.'); return; }
-  await loadServer(); await saveServer(); render(); alert('Sunucu ile eşitlendi.');
-};
+    // tabs & navbar
+    $('#tabs').addEventListener('click', e=>{ if(e.target.classList.contains('tab')) switchTab(e.target.dataset.tab); });
+    $$('.navbtn').forEach(b=> b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
 
-/* Boot */
-(async function(){
-  loadLocal();  // tercih + varsa veriler
-  $('#storageMode').value=settings.mode;
-  $('#storeModeText').textContent = settings.mode==='server' ? 'Sunucu (PHP)' : 'Tarayıcı (localStorage)';
-  if(settings.mode==='server'){ try{ await loadServer(); }catch(e){ console.warn(e); } }
-  render();
-  switchTab('daily');
+    // add sheet
+    $('#addBtn').addEventListener('click', ()=>{
+      $('#date').value=today(); $('#type').value='expense'; $('#amount').value='';
+      $('#category').value='Ev için yemek alışveriş'; $('#account').value='Nakit'; $('#note').value='';
+      // data-data temizle (Safari uyumlu)
+      $('#photoPreview')?.removeAttribute && $('#photoPreview').removeAttribute('data-data');
+      $('#sheet').classList.add('show');
+    });
+    $('#closeSheet').addEventListener('click', ()=> $('#sheet').classList.remove('show'));
+    $('#save').addEventListener('click', ()=>{
+      const amount=parseInt(($('#amount').value||'').replace(/\\D/g,''),10)||0;
+      if(!amount){ alert('Tutar gir (tam sayı).'); return; }
+      items.push({
+        id: uid(),
+        date: $('#date').value||today(),
+        type: $('#type').value,
+        amount,
+        category: $('#category').value,
+        account: $('#account').value||'Nakit',
+        note: ($('#note').value||'').trim()
+      });
+      save(); render(); $('#sheet').classList.remove('show');
+      if(confirm('CSV indirilsin mi?')) exportCSV();
+    });
+
+    // csv
+    $('#exportBtn').addEventListener('click', exportCSV);
+    $('#importInput').addEventListener('change', e=>{
+      const f=e.target.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=ev=>{ importCSVText(ev.target.result); alert('İçe aktarıldı.'); };
+      r.readAsText(f,'utf-8'); e.target.value='';
+    });
+    $('#wipeBtn').addEventListener('click', ()=>{
+      if(!confirm('Tüm veriler silinsin mi?')) return;
+      items=[]; save(); render();
+    });
+  });
 })();
 </script>
 </body>
