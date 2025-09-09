@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="sq">
 <head>
@@ -18,63 +17,42 @@ body{margin:0;font-family:ui-sans-serif,-apple-system,Segoe UI,Roboto,Inter,Helv
   background: radial-gradient(1200px 600px at 10% -10%, #18233c 0%, transparent 60%), radial-gradient(800px 500px at 110% 10%, #1b2c2a 0%, transparent 50%), var(--bg);}
 a{color:inherit}button{font:inherit}
 .safe{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));}
-.safe-top{padding-top:max(14px,env(safe-area-inset-top));}
-.safe-bottom{padding-bottom:max(14px,env(safe-area-inset-bottom));}
-/* Extra bottom space so content never hides behind FAB or nav */
-main.safe{padding-bottom:calc(160px + env(safe-area-inset-bottom));}
-
+.safe-top{padding-top:max(14px,env(safe-area-inset-top));}.safe-bottom{padding-bottom:max(14px,env(safe-area-inset-bottom));}
 .appbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,rgba(5,8,15,.9),rgba(5,8,15,.55) 40%,rgba(5,8,15,0));backdrop-filter:blur(10px);}
 .appbar .row{display:flex;align-items:center;gap:10px}.h1{font-size:22px;font-weight:800;letter-spacing:.3px}
 .badge{font-size:12px;padding:4px 10px;border-radius:999px;background:#1f2433;color:#c7cee1;border:1px solid #2a3145}
 .camera-pill{background:#173022;color:#b7f1cf;border:1px solid #25553c}
 .appbar .bar{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
-
 .screen{display:none;min-height:calc(100dvh - 90px)}.screen.active{display:block}.section{padding:10px 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.card.pad{padding:12px}
-
 .video-wrap{position:relative;border-radius:12px;overflow:hidden;background:#0a0d14;aspect-ratio:3/4}
 video{width:100%;height:100%;object-fit:cover;display:block}
 .scan-frame{position:absolute;inset:10%;border:2px solid rgba(255,255,255,.55);border-radius:14px;pointer-events:none;transition:box-shadow .12s,border-color .12s}
 .glow-green{box-shadow:0 0 0 9999px rgba(0,128,0,.14) inset,0 0 22px rgba(0,255,144,.75) inset;border-color:rgba(0,255,144,.95)}
 .glow-red{box-shadow:0 0 0 9999px rgba(255,0,0,.14) inset,0 0 22px rgba(255,80,80,.9) inset;border-color:rgba(255,90,90,.95)}
-
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .btn{appearance:none;border:none;border-radius:14px;background:#232a3b;color:var(--text);padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer}
 .btn:disabled{opacity:.5;cursor:not-allowed}.btn.primary{background:var(--primary);color:#06130d;font-weight:900}
 .btn.warn{background:var(--warning);color:#1c1500}
 .select{appearance:none;border:1px solid #2b3349;border-radius:12px;background:#101625;color:#d7e0ff;padding:10px 12px;font-size:14px}
-
-/* Lists */
 .tabs{display:flex;gap:8px;flex-wrap:wrap}
 .tab{padding:8px 12px;border-radius:999px;border:1px solid #2a3145;background:#182032;color:#b9c2da;font-size:12px;font-weight:700;cursor:pointer}
 .tab.active{background:#1a2a22;border-color:#2c5c46;color:#c9f4dd}
-.list{list-style:none;margin:8px 0 0;padding:0 0 140px 0;} /* bottom padding so last row clears FAB */
+.list{list-style:none;margin:8px 0 0;padding:0}
 .item{display:flex;align-items:center;gap:10px;border-bottom:1px dashed #263049;padding:12px 6px}.item:last-child{border-bottom:none}
 .k{width:30px;height:30px;border-radius:10px;background:#1b2131;display:flex;align-items:center;justify-content:center;font-weight:800;color:#cbd6f0;flex:0 0 auto}
 .v{flex:1;font-weight:800;font-size:18px;letter-spacing:.5px}.meta{color:#9ca7c2;font-size:12px}
 .actions{display:flex;gap:6px}
 .iconbtn{width:38px;height:38px;border-radius:12px;background:#1a2030;border:1px solid #2b3349;display:flex;align-items:center;justify-content:center}
 .iconbtn svg{width:18px;height:18px;opacity:.9}.iconbtn.del{background:#281a1a;border-color:#3d2626}.iconbtn.copy{background:#17241d;border-color:#254e3a}.iconbtn.share{background:#1a1e2e}
-
-/* Bottom Nav (3 items) */
-.nav{position:sticky;bottom:0;left:0;right:0;z-index:60;border-top:1px solid var(--line);
-  background:linear-gradient(180deg,rgba(10,12,18,.2),rgba(10,12,18,.75) 40%,rgba(10,12,18,.95) 100%);backdrop-filter:blur(10px)}
-.nav .bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 0}
-.nav .btnnav{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:#c7cfe3;opacity:.9}
+.nav{position:sticky;bottom:0;left:0;right:0;z-index:60;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(10,12,18,.2),rgba(10,12,18,.75) 40%,rgba(10,12,18,.95) 100%);backdrop-filter:blur(10px)}
+.nav .bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0}.nav .btnnav{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:#c7cfe3;opacity:.9}
 .nav .btnnav.active{color:#caffea}.nav .btnnav svg{width:20px;height:20px}
-
-/* FAB */
-.fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(96px + env(safe-area-inset-bottom)); /* higher to clear nav */
-  width:64px;height:64px;border-radius:22px;background:var(--primary);color:#04100b;display:flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:900;box-shadow:0 15px 30px rgba(44,207,124,.35);z-index:65}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(76px + env(safe-area-inset-bottom));width:64px;height:64px;border-radius:22px;background:var(--primary);color:#04100b;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;box-shadow:0 15px 30px rgba(44,207,124,.35)}
 .fab:active{transform:translateY(1px) scale(.995)}
-
-/* Toast / Sheet */
-.toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);
-  background:#0f1626;color:#e8f1ff;border:1px solid #223156;border-radius:12px;padding:10px 14px;display:none;z-index:100}
+.toast{position:fixed;left:50%;bottom:calc(110px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0f1626;color:#e8f1ff;border:1px solid #223156;border-radius:12px;padding:10px 14px;display:none;z-index:100}
 .sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:90}
-.sheet{position:absolute;left:0;right:0;bottom:0;background:#0e141f;border-top-left-radius:18px;border-top-right-radius:18px;border:1px solid #223156;
-  box-shadow:var(--shadow);padding:12px 14px 20px;transform:translateY(100%);transition:transform .2s ease-out}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#0e141f;border-top-left-radius:18px;border-top-right-radius:18px;border:1px solid #223156;box-shadow:var(--shadow);padding:12px 14px 20px;transform:translateY(100%);transition:transform .2s ease-out}
 .sheet.show{transform:translateY(0)}.sheet .title{font-size:14px;letter-spacing:.3px;color:#b9c2d9;margin-bottom:10px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chip{padding:8px 12px;border-radius:999px;background:#172033;border:1px solid #243052;color:#cfd6ea;font-size:12px;font-weight:700;cursor:pointer}
 .chip.sel{background:#1a2a22;border-color:#2e5e48;color:#dff8ea}.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -95,7 +73,6 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 </div>
 
 <main class="safe">
-  <!-- Scan Screen -->
   <section id="screen-scan" class="screen active">
     <div class="section">
       <div class="card pad">
@@ -120,7 +97,6 @@ video{width:100%;height:100%;object-fit:cover;display:block}
     </div>
   </section>
 
-  <!-- List Screen -->
   <section id="screen-list" class="screen">
     <div class="section">
       <div class="card pad">
@@ -134,7 +110,6 @@ video{width:100%;height:100%;object-fit:cover;display:block}
     </div>
   </section>
 
-  <!-- Export Screen -->
   <section id="screen-export" class="screen">
     <div class="section">
       <div class="card pad">
@@ -157,9 +132,17 @@ video{width:100%;height:100%;object-fit:cover;display:block}
       </div>
     </div>
   </section>
+
+  <section id="screen-settings" class="screen">
+    <div class="section">
+      <div class="card pad">
+        <div class="h1" style="font-size:18px">Ayarlar</div>
+        <p class="meta">Kamera için HTTPS veya <b>http://localhost</b> kullan. iPhone için Safari → Ayarlar → Kamera izni açık olmalı.</p>
+      </div>
+    </div>
+  </section>
 </main>
 
-<!-- Bottom Nav (3 items) -->
 <nav class="nav safe safe-bottom">
   <div class="bar">
     <a data-nav="scan" class="btnnav active" href="javascript:void(0)">
@@ -174,13 +157,15 @@ video{width:100%;height:100%;object-fit:cover;display:block}
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2Zm7-18 5 5h-3v6h-4V7H7l5-5Z"/></svg>
       Dışa Aktar
     </a>
+    <a data-nav="settings" class="btnnav" href="javascript:void(0)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7 7 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.41l-.36 2.54c-.58.23-1.12.53-1.62.9l-2.4-.96a.5.5 0 0 0-.6.22L.7 7.93a.5.5 0 0 0 .12.64l2.03 1.58c-.05.31-.08.63-.08.96 0 .32.03.64.08.95L.82 13.64a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.31.62.22l2.39-.96c.5.38 1.05.69 1.63.94l.36 2.54c.05.24.25.41.49.41h3.8c.24 0 .45-.17.49-.41l.36-2.54c.58-.23 1.12-.53 1.62-.9l2.4.96c.23.09.49 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/></svg>
+      Ayarlar
+    </a>
   </div>
 </nav>
 
-<!-- FAB -->
 <button id="fab" class="fab" title="Hızlı ekle">+</button>
 
-<!-- Bottom Sheet -->
 <div id="sheet" class="sheet-back">
   <div class="sheet">
     <div class="title">Bu koda problem ekle (çoklu seçim)</div>
@@ -197,8 +182,6 @@ video{width:100%;height:100%;object-fit:cover;display:block}
 <canvas id="capture" class="hidden"></canvas>
 <div id="toast" class="toast"></div>
 
-<!-- jsQR fallback for devices without BarcodeDetector -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
 /* ===== Abbrevs ===== */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -207,9 +190,9 @@ function last4(s){const only=String(s).replace(/[^0-9A-Za-z]/g,'');return only.s
 function fmtTime(d){return new Date(d).toLocaleString();}
 
 /* ===== Elements ===== */
-const screens={ scan:$('#screen-scan'), list:$('#screen-list'), export:$('#screen-export') };
-function navTo(id){ Object.values(screens).forEach(x=>x.classList.remove('active')); $$('.btnnav').forEach(x=>x.classList.remove('active')); screens[id].classList.add('active'); document.querySelector(\.btnnav[data-nav="\${id}"]\).classList.add('active'); }
+const screens={ scan:$('#screen-scan'), list:$('#screen-list'), export:$('#screen-export'), settings:$('#screen-settings') };
 $$('.btnnav').forEach(b=>b.onclick=()=>navTo(b.dataset.nav));
+function navTo(id){ Object.values(screens).forEach(x=>x.classList.remove('active')); $$('.btnnav').forEach(x=>x.classList.remove('active')); screens[id].classList.add('active'); document.querySelector(`.btnnav[data-nav="${id}"]`).classList.add('active'); }
 
 const video=$('#video'),canvas=$('#capture'),ctx=canvas.getContext('2d',{willReadFrequently:true});
 const startBtn=$('#startBtn'),stopBtn=$('#stopBtn'),torchBtn=$('#torchBtn'),fixCamBtn=$('#fixCamBtn'),camStatus=$('#camStatus'),cameraSelect=$('#cameraSelect');
@@ -238,6 +221,7 @@ let BD=null; // BarcodeDetector instance
 function updateDetectorInfo(){ detectorInfo.textContent = "Tarayıcı: " + (USE_DETECTOR==="bd"?"BarcodeDetector":"jsQR"===USE_DETECTOR?"jsQR":"— (manuel)"); }
 
 async function setupDetector(){
+  // 1) BarcodeDetector (yerleşik ve hızlı)
   if('BarcodeDetector' in window){
     try{
       const fmts = (await window.BarcodeDetector.getSupportedFormats?.()) || [];
@@ -249,11 +233,13 @@ async function setupDetector(){
       }
     }catch{}
   }
+  // 2) jsQR (eğer globalde varsa)
   if(window.jsQR){
     USE_DETECTOR = "jsQR";
     updateDetectorInfo();
     return;
   }
+  // 3) yok → manuel mod
   USE_DETECTOR = "none";
   updateDetectorInfo();
 }
@@ -266,7 +252,7 @@ async function listCameras(selectedId){
     const vids=devices.filter(d=>d.kind==='videoinput');
     vids.forEach((d,i)=>{
       const opt=document.createElement('option');
-      opt.value=d.deviceId; opt.textContent=d.label || \Kamera \${i+1}\;
+      opt.value=d.deviceId; opt.textContent=d.label || `Kamera ${i+1}`;
       if(selectedId && d.deviceId===selectedId) opt.selected=true;
       cameraSelect.appendChild(opt);
     });
@@ -295,7 +281,7 @@ async function toggleTorch(){
   try{ torchOn=!torchOn; await track.applyConstraints({advanced:[{torch:torchOn}]}); toast(torchOn?'Drita: On':'Drita: Off'); }catch{ torchOn=false; toast('Gabim drita'); }
 }
 
-/* ===== Scan Loop ===== */
+/* ===== Scan Loop (async) ===== */
 async function scanLoop(){
   if(!scanning) return;
   const now=performance.now();
@@ -312,21 +298,22 @@ async function scanLoop(){
         }
       }else if(USE_DETECTOR==="jsQR" && window.jsQR){
         canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-        const ctx2=ctx; ctx2.drawImage(video,0,0,canvas.width,canvas.height);
-        const img=ctx2.getImageData(0,0,canvas.width,canvas.height);
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const img=ctx.getImageData(0,0,canvas.width,canvas.height);
         const qr=jsQR(img.data,canvas.width,canvas.height,{inversionAttempts:'dontInvert'});
         if(qr && qr.data){ handlePossibleHit(qr.data); }
       }
-    }catch(e){ /* ignore */ }
+    }catch(e){ /* swallow */ }
   }
   requestAnimationFrame(()=>scanLoop());
 }
+
 function handlePossibleHit(str){
   const now=performance.now();
-  if(now < scanCooldownUntil) return;
+  if(now < scanCooldownUntil) return; // debounce
   const v = last4(str||"");
   if(!v) return;
-  scanCooldownUntil = now + 900;
+  scanCooldownUntil = now + 900; // 0.9s
   onScan(v);
 }
 
@@ -401,9 +388,9 @@ function rowText(type,obj,i){
     const probs=(obj.problems||[]).join(', ');
     const who=obj.who?(' - '+obj.who):'';
     const note=obj.note?(' - '+obj.note):'';
-    return ${i+1}. ${obj.value} -  - ${probs}${who}${note};
+    return `${i+1}. ${obj.value} -  - ${probs}${who}${note}`;
   }else{
-    return ${i+1}. ${obj.value};
+    return `${i+1}. ${obj.value}`;
   }
 }
 function activeArray(){
@@ -418,7 +405,7 @@ function copyText(text){
 function legacyCopy(text){
   const ta=document.createElement('textarea');
   ta.value=text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select();
-  try{ document.execCommand('copy'); toast("Kopjuar!"); }catch{ alert("Gabim kopjim"); }
+  try{ document.execCommand('copy'); toast("Kopjuar!"); }catch{ alert("Kopjimi dështoi"); }
   document.body.removeChild(ta);
 }
 function shareText(text){ if(navigator.share){ navigator.share({text}).catch(()=>{});} else { window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank'); } }
@@ -478,6 +465,7 @@ document.addEventListener('click',(e)=>{
 
 /* ===== Add Flow ===== */
 function onScan(v){
+  // visual feedback
   scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth; scanFrame.classList.add('glow-green');
   setTimeout(()=>scanFrame.classList.remove('glow-green'),350);
   pendingValue=v; openSheet();
@@ -487,7 +475,8 @@ manualAddBtn.onclick=()=>{
   pendingValue=v; manualInput.value=''; openSheet();
 };
 fab.onclick=()=>{
-  const v=prompt("Kod yaz (son 4):"); if(!v) return; const x=last4(v); if(!x) return; pendingValue=x; openSheet();
+  const v=prompt("Kod yaz (son 4):"); if(!v) return;
+  const x=last4(v); if(!x) return; pendingValue=x; openSheet();
 };
 
 /* ===== Bottom Sheet ===== */
@@ -504,10 +493,10 @@ sheetSave.onclick=()=>{
   const chosen=[...chipsWrap.querySelectorAll('.chip.sel')].map(x=>x.textContent);
   const info=seen.get(pendingValue);
   if(info){
-    let msg=Ky kod është regjistruar më parë.\n\nKod: ${pendingValue}\nKur: ${fmtTime(info.time)};
-    if(info.where==='issue' && info.problems && info.problems.length) msg+=\nLloj: PROBLEM\nProblemet: ${info.problems.join(', ')};
-    else msg+=\nLloj: LISTË e thjeshtë;
-    msg+=\n\nTë fshihet regjistrimi i mëparshëm?;
+    let msg=`Ky kod është regjistruar më parë.\n\nKod: ${pendingValue}\nKur: ${fmtTime(info.time)}`;
+    if(info.where==='issue' && info.problems && info.problems.length) msg+=`\nLloj: PROBLEM\nProblemet: ${info.problems.join(', ')}`;
+    else msg+=`\nLloj: LISTË e thjeshtë`;
+    msg+=`\n\nTë fshihet regjistrimi i mëparshëm?`;
     const del=confirm(msg);
     if(del){ if(info.where==='list'){ items.splice(info.index,1);} else { issues.splice(info.index,1);} }
     else { toast("U ruajt i mëparshmi"); closeSheet(); return; }
@@ -549,6 +538,9 @@ fileIssues?.addEventListener('change',e=>{
   r.readAsText(f); e.target.value='';
 });
 
+/* ===== Nav ===== */
+$$('.btnnav').forEach(b=>b.onclick=()=>navTo(b.dataset.nav));
+
 /* ===== Camera buttons ===== */
 startBtn.onclick=()=>startCam(cameraSelect.value||null);
 stopBtn.onclick=stopCam;
@@ -560,6 +552,7 @@ async function init(){
   if(location.protocol!=='https:' && location.hostname!=='localhost'){ toast("Kujdes: Kamera kërkon HTTPS ose localhost"); }
   load();
   await listCameras();
+  // Try to create a detector early (so kullanıcı hangi modda olduğunu görsün)
   await setupDetector();
 }
 init();
