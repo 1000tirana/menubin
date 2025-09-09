@@ -5,6 +5,91 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
 <title>Andi – Shpenzimet e Shtëpisë</title>
 <style>
+  /* ——— Tema & renk paleti ——— */
+:root{
+  --bg:#f6f7fb; 
+  --card:#ffffff;
+  --ink:#14161a;
+  --muted:#8a90a0;
+  --line:#e7eaf0;
+  --accent:#ff5a5f;
+  --blue:#1e88e5;      /* gelir */
+  --red:#e53935;       /* gider */
+  --green:#2e7d32;     /* toplam + */
+  --amber:#f6b100;
+}
+
+/* Başlık daha app-vari */
+.header{
+  background: linear-gradient(180deg,#fff 0%,rgba(255,255,255,.96) 70%,rgba(255,255,255,.90) 100%);
+  backdrop-filter: saturate(140%) blur(4px);
+}
+
+/* KPI kartları – yumuşak gradient ve daha güçlü tipografi */
+.kpi{
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 18px rgba(20,22,26,.04);
+  background: linear-gradient(180deg,#ffffff 0%,#fafbff 100%);
+}
+.kpi .v{ font-weight:800 }
+
+/* Liste satırı – daha okunaklı ve “kart” etkisi */
+.list .row{
+  background:#fff;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+.list .row:hover{ transform: translateY(-1px); box-shadow: 0 8px 16px rgba(0,0,0,.04); }
+
+/* Dot rengi, satırın gelir/gider olmasına göre değişsin (CSS :has) */
+.list .row:has(.amount.income) .dot{ background:#e7f2ff; color:var(--blue) }
+.list .row:has(.amount.expense) .dot{ background:#ffe9ea; color:var(--red) }
+
+/* Tutar renkleri */
+.amount.income{ color:var(--blue) }
+.amount.expense{ color:var(--red) }
+
+/* Alt menü – ikonlu, büyük dokunma hedefi */
+.navbar{ backdrop-filter: saturate(140%) blur(6px) }
+.navbtn{
+  border-radius:12px;
+  padding:10px 14px;
+}
+.navbtn.active{ background:#111; color:#fff }
+.navbtn[data-tab="daily"]::before{ content:"📋"; margin-right:6px }
+.navbtn[data-tab="summary"]::before{ content:"📊"; margin-right:6px }
+.navbtn[data-tab="settings"]::before{ content:"⚙️"; margin-right:6px }
+
+/* FAB – daha canlı ve gölgeli */
+.fab{
+  box-shadow: 0 14px 28px rgba(255,90,95,.35), 0 2px 8px rgba(0,0,0,.1);
+  border: none;
+}
+
+/* Buton ikonları (CSV/del) */
+#exportBtn::before{ content:"⬇️"; margin-right:6px }
+#wipeBtn::before{ content:"🗑️"; margin-right:6px }
+
+/* Form kontrolleri – daha temiz ve app hissi */
+.input, select, textarea{
+  background:#fff;
+  border:1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(20,22,26,.02);
+}
+.input:focus, select:focus, textarea:focus{
+  outline:none;
+  border-color:#cfd6ff;
+  box-shadow:0 0 0 3px rgba(66,99,235,.15);
+}
+
+/* Sheet panel – daha güçlü üst kenar */
+.panel{ box-shadow: 0 -12px 28px rgba(0,0,0,.12) }
+
+/* —— (isteğe bağlı) Takvim & Pasta grafiği hazır stilleri —— */
+/* Eğer daha sonra #calendar veya #pie canvas eklersen bu renkleri kullanır */
+.calendar{ padding:10px; background:#fff; border:1px solid var(--line); border-radius:16px }
+.calendar .cell{ border-radius:12px; border:1px solid var(--line) }
+#pie{ display:block; margin:0 auto }
+.legend .badge{ border:1px solid rgba(0,0,0,.08) }
 :root{--bg:#f6f7fb; --card:#ffffff; --ink:#1b1d23; --muted:#8a90a0; --line:#e9ecf2; --accent:#ff5a5f; --blue:#1e88e5; --red:#e53935}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
