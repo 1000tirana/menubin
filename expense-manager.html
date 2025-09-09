@@ -1,426 +1,499 @@
-<!doctype html>
-<html lang="sq">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ANDI · Shpenzimet e Shtëpisë</title>
-<meta name="theme-color" content="#19c28e">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>Andi Ev Harcamaları</title>
 <style>
   :root{
-    --bg:#0f1219; --card:#171b25; --text:#e9eef7; --muted:#98a3b7; --stroke:#242a36;
-    --accent:#19c28e; --accent2:#3ddc97; --danger:#ff6b6b;
-    --radius:12px; --shadow:0 6px 18px rgba(0,0,0,.25);
+    --bg:#0f1222; --card:#171a2e; --ink:#eaf1ff; --ink-dim:#b8c1d9;
+    --accent:#6ee7ff; --accent2:#9b8cff; --good:#34d399; --bad:#fb7185; --muted:#22253b;
+    --chip:#1e2240; --chip-on:#2a2f59;
+    --radius:16px; --pad:14px; --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#0c0f15 0%,var(--bg) 100%);color:var(--text);
-       font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;}
-  .wrap{max-width:900px;margin:auto;padding:16px 14px 90px}
-  h1{font-size:20px;margin:6px 0 14px}
-
-  .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:14px}
-  .card h3{margin:0 0 10px;font-size:16px}
-  label{font-size:13px;color:var(--muted)}
-  input,select,textarea,button{
-    width:100%;background:#0f1422;border:1px solid var(--stroke);color:var(--text);
-    padding:10px 12px;border-radius:10px;font-size:15px;outline:none;
+  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+       background: radial-gradient(1200px 600px at 80% -10%, #1b1f3a 0%, #0f1222 50%, #0f1222 100%); color:var(--ink);}
+  header{position:sticky;top:0;background:rgba(15,18,34,.6);backdrop-filter: blur(8px);z-index:10}
+  .wrap{max-width:1000px;margin:auto;padding:18px}
+  .title{display:flex;align-items:center;gap:12px}
+  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6ee7ff,#9b8cff)}
+  h1{font-size:22px;margin:0}
+  .sub{color:var(--ink-dim);font-size:12px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  @media (max-width:860px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;border:1px solid #242949}
+  .card h2{margin:0 0 12px 0;font-size:16px}
+  .summary{display:flex;gap:14px;flex-wrap:wrap}
+  .pill{background:var(--muted);padding:10px 12px;border-radius:12px;display:flex;gap:8px;align-items:center}
+  .pill b{font-size:16px}
+  .amt{font-variant-numeric:tabular-nums}
+  .good{color:var(--good)} .bad{color:var(--bad)} .acc{color:var(--accent)}
+  .inputStack{display:grid;gap:10px;margin-top:8px}
+  label{font-size:12px;color:var(--ink-dim)}
+  input[type="number"], input[type="text"], select, button, .chips{
+    width:100%;border:none;border-radius:12px;background:#1a1f39;color:var(--ink);padding:14px;
+    outline: none; font-size:16px
   }
-  input::placeholder,textarea::placeholder{color:#6e7a90}
-  textarea{min-height:72px;resize:vertical}
-  .grid2{display:grid;gap:10px}
-  @media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
-  .btn{background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border:1px solid #1a6e58;color:#062a20;font-weight:700;cursor:pointer}
-  .btn-ghost{background:transparent;border:1px dashed var(--stroke);color:var(--text);cursor:pointer}
-  .btn-danger{background:linear-gradient(180deg,#ffb3b3 0%,var(--danger) 100%);border:1px solid #7b2c2c;color:#2a0b0b}
-  .muted{color:var(--muted)} .hide{display:none!important}
-
-  .list{display:grid;gap:10px}
-  .item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px;border:1px solid var(--stroke);border-radius:10px;background:#0f1422}
-  .top{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:#151c2b;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px}
-  .amt{font-weight:800}
-  .time{font-size:12px;color:#8895ad}
-  .actions{display:flex;gap:8px}
-  .totals{display:flex;gap:8px;flex-wrap:wrap}
-  .total-box{background:#0f1422;border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;font-size:13px}
-
-  /* Bottom Nav (3 buton) */
-  .nav{
-    position:fixed;left:0;right:0;bottom:0;background:#0f1422cc;backdrop-filter:blur(6px);
-    border-top:1px solid var(--stroke);display:grid;grid-template-columns:repeat(3,1fr);z-index:10
-  }
-  .nav a{padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
-    color:#c1cadb;text-decoration:none;font-size:12px}
-  .nav a .ico{font-size:18px}
-  .nav a.active{color:#0a2f24;background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%)}
-
-  .screen{display:none} .screen.active{display:block}
-
-  dialog{border:none;border-radius:12px;background:#121826;color:var(--text);box-shadow:var(--shadow);
-    width:min(92vw,560px);padding:0}
-  dialog::backdrop{background:rgba(0,0,0,.45)}
-  .modal-head{padding:12px 14px;border-bottom:1px solid var(--stroke);font-weight:700}
-  .modal-body{padding:14px}
-  .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 14px 14px}
-
-  .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-  @media(min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
-  .cat-btn{border:1px solid var(--stroke);background:#0f1422;border-radius:10px;padding:10px;cursor:pointer;text-align:center}
-  .cat-btn:hover{border-color:#2f7e69}
-  .note-area{margin-top:8px}
+  input::placeholder{color:#7282b9}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;background:transparent;padding:0}
+  .chip{background:var(--chip);padding:10px 12px;border-radius:999px;border:1px solid #2a315b;cursor:pointer;font-size:14px}
+  .chip.on{background:var(--chip-on);border-color:#3b4382;box-shadow:inset 0 0 0 1px #4b58b5}
+  .row{display:flex;gap:10px}
+  .row>div{flex:1}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .btn{background:linear-gradient(135deg,#6ee7ff,#9b8cff);color:#0b0d1a;font-weight:700}
+  .btn.secondary{background:#212648;color:var(--ink)}
+  .btn.warn{background:#3a1f2a;color:#ffd4d9;border:1px solid #5b2a3b}
+  .table{overflow:auto;border-radius:12px;border:1px solid #23284a}
+  table{width:100%;border-collapse:separate;border-spacing:0}
+  th,td{padding:12px 10px;border-bottom:1px solid #222647;font-size:14px}
+  th{position:sticky;top:0;background:#151935}
+  tr:hover td{background:#171c3d}
+  .mini{font-size:12px;color:var(--ink-dim)}
+  .right{text-align:right}
+  .tools{display:flex;gap:8px;flex-wrap:wrap}
+  .kpiGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media (max-width:600px){.kpiGrid{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:#151935;border:1px solid #23284a;border-radius:12px;padding:12px}
+  .kpi .v{font-weight:800;font-size:18px}
+  .search{display:flex;gap:8px;margin-top:6px}
+  .tag{padding:6px 10px;border-radius:999px;background:#22264a;border:1px solid #2d3160;font-size:12px}
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(9,11,22,.6);backdrop-filter: blur(6px);display:none;align-items:center;justify-content:center;z-index:99}
+  .modal.show{display:flex}
+  .modal .box{background:var(--card);border:1px solid #2a2f59;border-radius:16px;max-width:420px;width:92%;padding:18px}
+  .box h3{margin:0 0 8px 0}
+  .box p{margin:0 0 14px 0;color:var(--ink-dim)}
+  .box .rowBtn{display:flex;gap:10px}
+  .ghost{background:#1a1f39;color:var(--ink);border:1px solid #2a315b}
+  .soft{color:#9fb4ff}
+  .footer{opacity:.6;font-size:12px;margin-top:8px}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1 id="title">ANDI · Shpenzimet e Shtëpisë</h1>
-
-    <!-- === KRYEFAQJA (Hızlı giriş + özet) === -->
-    <section class="screen active" id="screen-home">
-      <div class="card">
-        <h3>Shtim shumë i shpejtë</h3>
-        <form id="quickForm" autocomplete="off">
-          <label for="quickAmount" class="muted">Shkruaj shumën</label>
-          <input id="quickAmount" type="number" inputmode="decimal" step="0.01" placeholder="p.sh. 1200" autocomplete="off">
-          <div class="grid2" style="margin-top:8px">
-            <button id="quickGo" class="btn" type="submit" disabled>Vazhdo</button>
-            <span class="muted" style="display:grid;align-items:center">Më pas: zgjedh kategori ose shënim</span>
-          </div>
-        </form>
-      </div>
-
-      <div class="card">
-        <h3>Përmbledhje e muajit</h3>
-        <div id="monthLine" class="muted">–</div>
-        <div class="totals" id="totalsHome" style="margin-top:8px"></div>
-      </div>
-    </section>
-
-    <!-- === SHPENZIME (liste/filtra/CSV) === -->
-    <section class="screen" id="screen-expenses">
-      <div class="card">
-        <h3>Regjistrat</h3>
-        <div class="grid2" style="margin-bottom:8px">
-          <input id="monthPick" type="month">
-          <input id="search" placeholder="Filtro sipas kategorie/shënimi…">
+  <header>
+    <div class="wrap">
+      <div class="title">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Andi Ev Harcamaları</h1>
+          <div class="sub">ALL (Arnavutluk Lek) ile kişisel harcama takip uygulaması</div>
         </div>
-        <div id="empty" class="muted">Ende nuk ka të dhëna.</div>
-        <div class="list" id="list"></div>
-        <div class="totals" id="totals"></div>
-
-        <div class="grid2" style="margin-top:10px">
-          <button class="btn" id="exportBtn">Shkarko CSV</button>
-          <label class="btn-ghost" style="display:grid;place-items:center;cursor:pointer">Ngarko CSV
-            <input id="importInput" type="file" accept=".csv,text/csv" style="display:none">
-          </label>
-        </div>
-        <button class="btn-ghost" id="clearAll" style="margin-top:8px">Pastro të gjitha</button>
       </div>
-    </section>
+    </div>
+  </header>
 
-    <!-- === RREGULLIME === -->
-    <section class="screen" id="screen-settings">
-      <div class="card">
-        <h3>Rregullime</h3>
-        <div class="grid2">
+  <main class="wrap">
+    <div class="grid">
+      <!-- SOL: Giriş & Özet -->
+      <section class="card">
+        <h2>Yeni Harcama</h2>
+        <div class="summary">
+          <div class="pill"><span>Toplam</span> <b class="amt acc" id="sumTotal">ALL 0</b></div>
+          <div class="pill"><span>Bugün</span> <b class="amt bad" id="sumToday">ALL 0</b></div>
+          <div class="pill"><span>Bu Ay</span> <b class="amt bad" id="sumMonth">ALL 0</b></div>
+          <div class="pill"><span>Kayıt</span> <b class="amt" id="countRows">0</b></div>
+        </div>
+
+        <div class="inputStack">
           <div>
-            <label for="setTitle">Titulli</label>
-            <input id="setTitle" placeholder="ANDI · Shpenzimet e Shtëpisë">
+            <label for="amount">Tutar (ALL)</label>
+            <input inputmode="decimal" type="number" id="amount" placeholder="Örn: 1500" />
           </div>
+
           <div>
-            <label for="accent">Ngjyra kryesore</label>
-            <input id="accent" type="color" value="#19c28e">
+            <label>Kategori seç</label>
+            <div class="chips" id="chipRow" aria-label="Kategoriler">
+              <!-- chips doldurulacak -->
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="note">Not (opsiyonel)</label>
+              <input type="text" id="note" placeholder="Örn: Market/mahalle bakkalı…" />
+            </div>
+            <div>
+              <label for="date">Tarih</label>
+              <input type="date" id="date"/>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="btnSave">Kaydet</button>
+            <button class="btn secondary" id="btnClearForm" title="Formu temizle">Temizle</button>
           </div>
         </div>
-        <div style="margin-top:8px">
-          <label for="categoriesBox">Kategori (një për rresht)</label>
-          <textarea id="categoriesBox">Qira
-Fatura e ujit
-Fatura e energjisë
-Internet
-Blerje ushqimore
-Detergjent rrobash
-Rroba
-Jashtë në restorant
-Shpenzime makine
-Shënim i lirë</textarea>
+
+        <div class="kpiGrid" id="catTotals"><!-- kategori özetleri --></div>
+
+        <div class="footer">Veriler cihazınızda <b>localStorage</b>’a kaydedilir. CSV indirip saklayabilir, sonra tekrar yükleyebilirsiniz.</div>
+      </section>
+
+      <!-- SAĞ: Liste & Araçlar -->
+      <section class="card">
+        <h2>Kayıtlar</h2>
+        <div class="tools">
+          <div class="search" style="flex:1">
+            <input id="searchBox" type="text" placeholder="Ara: kategori veya not…" />
+            <button class="btn secondary" id="btnResetSearch">Sıfırla</button>
+          </div>
+          <button class="btn secondary" id="btnExport">CSV İndir</button>
+          <label class="btn ghost" for="fileImport" style="cursor:pointer">CSV Yükle</label>
+          <input type="file" id="fileImport" accept=".csv" hidden />
+          <button class="btn warn" id="btnWipe">Tümünü Sil</button>
         </div>
-        <div class="grid2" style="margin-top:8px">
-          <button class="btn" id="apply">Zbato</button>
-          <button class="btn-ghost" id="downloadHTML">Shkarko HTML</button>
+
+        <div class="table" style="margin-top:10px">
+          <table id="tbl">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Kategori</th>
+                <th>Not</th>
+                <th class="right">Tutar (ALL)</th>
+                <th class="right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <!-- satırlar -->
+            </tbody>
+          </table>
         </div>
+        <div class="mini" style="margin-top:8px" id="status"></div>
+      </section>
+    </div>
+  </main>
+
+  <!-- CSV Sorusu Modal -->
+  <div class="modal" id="csvAsk">
+    <div class="box">
+      <h3>CSV indirilsin mi?</h3>
+      <p>Kaydı başarıyla ekledin. Yedeğini CSV olarak indirmek ister misin?</p>
+      <div class="rowBtn">
+        <button class="btn" id="goExport">Evet, indir</button>
+        <button class="btn ghost" id="noExport">Hayır</button>
       </div>
-    </section>
+    </div>
   </div>
-
-  <!-- Bottom Nav (3 sekme) -->
-  <nav class="nav" id="nav">
-    <a href="#home" data-target="screen-home" class="active"><span class="ico">🏠</span>Kryefaqja</a>
-    <a href="#exp" data-target="screen-expenses"><span class="ico">💸</span>Shpenzime</a>
-    <a href="#set" data-target="screen-settings"><span class="ico">⚙️</span>Rregullime</a>
-  </nav>
-
-  <!-- === Picker Dialog (kategori/şënim) === -->
-  <dialog id="pickerDlg">
-    <div class="modal-head">Zgjidh kategorinë</div>
-    <div class="modal-body">
-      <div class="cats" id="catsBox"></div>
-      <div class="note-area">
-        <label for="quickNote" class="muted">Shënim (opsionale)</label>
-        <textarea id="quickNote" placeholder="p.sh. ‘Market’, ‘Restorant …’"></textarea>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="pickerCancel">Anulo</button>
-      <button class="btn" id="pickerSave">Ruaj</button>
-    </div>
-  </dialog>
-
-  <!-- === Edit Dialog === -->
-  <dialog id="editDlg">
-    <div class="modal-head">Përditëso</div>
-    <form id="editForm">
-      <div class="modal-body">
-        <input type="hidden" id="editId">
-        <div class="grid2">
-          <div>
-            <label>Shuma (ALL)</label>
-            <input id="editAmount" inputmode="decimal" required>
-          </div>
-          <div>
-            <label>Kategoria</label>
-            <select id="editCategory" required></select>
-          </div>
-        </div>
-        <div style="margin-top:8px">
-          <label>Data & Ora</label>
-          <input id="editDate" type="datetime-local" required>
-        </div>
-        <div style="margin-top:8px">
-          <label>Shënim</label>
-          <textarea id="editNote"></textarea>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-ghost" type="button" id="editCancel">Anulo</button>
-        <button class="btn" type="submit">Ruaj</button>
-      </div>
-    </form>
-  </dialog>
 
 <script>
 (function(){
-  const LS_DATA='andi_quick_data_v4';
-  const LS_CFG='andi_quick_cfg_v1';
-  const $=s=>document.querySelector(s);
+  const LS_KEY = 'andi_expenses_v1';
+  const CURRENCY = 'ALL';
 
-  // --- STATE ---
-  let data = loadJSON(LS_DATA, []);
-  let cfg  = loadJSON(LS_CFG, {
-    title:'ANDI · Shpenzimet e Shtëpisë',
-    accent:'#19c28e',
-    categories:['Qira','Fatura e ujit','Fatura e energjisë','Internet','Blerje ushqimore','Detergjent rrobash','Rroba','Jashtë në restorant','Shpenzime makine','Shënim i lirë']
-  });
-  let lastDeleted=null;
+  const defaultCats = [
+    'Kira','Su faturası','Elektrik faturası','İnternet faturası',
+    'Ev için yemek alışveriş','Çamaşır ilacı','Kıyafet','Dışarıda yemek','Diğer'
+  ];
 
-  // --- THEME / TITULL ---
-  const title=$('#title'); title.textContent=cfg.title;
-  document.documentElement.style.setProperty('--accent', cfg.accent);
-
-  // --- NAV (3 sekme) ---
-  document.getElementById('nav').addEventListener('click', (e)=>{
-    const a=e.target.closest('a'); if(!a) return;
-    e.preventDefault();
-    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById(a.dataset.target).classList.add('active');
-    if(a.dataset.target==='screen-home') paintHome();
-    if(a.dataset.target==='screen-expenses') paintList();
-  });
-
-  // --- HIZLI GİRİŞ ---
-  const quickForm=$('#quickForm'), quickAmount=$('#quickAmount'), quickGo=$('#quickGo');
-  const pickerDlg=$('#pickerDlg'), catsBox=$('#catsBox'), quickNote=$('#quickNote');
-
-  function parseAmount(v){ return Number(String(v||'').replace(',','.')); }
-  function isValidAmount(v){ const n=parseAmount(v); return Number.isFinite(n) && n>0; }
-
-  quickForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const val=parseAmount(quickAmount.value);
-    if(!isValidAmount(val)){ shake(quickAmount); return; }
-    openPicker(val);
-  });
-  quickAmount.addEventListener('blur', ()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) openPicker(v); });
-  quickAmount.addEventListener('input', ()=>{ quickGo.disabled=!isValidAmount(quickAmount.value); });
-
-  function renderCats(){
-    catsBox.innerHTML='';
-    cfg.categories.forEach(c=>{
-      const b=document.createElement('button');
-      b.type='button'; b.className='cat-btn'; b.textContent=c;
-      b.onclick=()=>{ catsBox.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); };
-      catsBox.appendChild(b);
-    });
-  }
-  function openPicker(val){ renderCats(); quickNote.value=''; pickerDlg.dataset.amount=String(val); pickerDlg.showModal(); }
-  $('#pickerCancel').onclick=()=>pickerDlg.close();
-  $('#pickerSave').onclick=()=>{
-    const val=parseAmount(pickerDlg.dataset.amount||'0'); if(!isValidAmount(val)) return;
-    const sel=catsBox.querySelector('.sel'); let cat=sel?sel.textContent:''; let note=(quickNote.value||'').trim();
-    if(!cat && !note){ alert('Zgjidh kategori ose shkruaj shënim'); return; }
-    if(/shënim/i.test(cat)) cat='Shënim';
-    const rec={id:rid(),ts:new Date().toISOString(),amount:Number(val.toFixed(2)),currency:'ALL',category:cat||'Shënim',note};
-    data.push(rec); saveJSON(LS_DATA,data);
-    quickAmount.value=''; quickGo.disabled=true; pickerDlg.close();
-    paintHome(); paintList();
-    alert('U ruajt!');
+  const els = {
+    amount: q('#amount'),
+    note: q('#note'),
+    date: q('#date'),
+    chipRow: q('#chipRow'),
+    btnSave: q('#btnSave'),
+    btnClearForm: q('#btnClearForm'),
+    tbody: q('#tbody'),
+    sumTotal: q('#sumTotal'),
+    sumToday: q('#sumToday'),
+    sumMonth: q('#sumMonth'),
+    countRows: q('#countRows'),
+    searchBox: q('#searchBox'),
+    btnResetSearch: q('#btnResetSearch'),
+    btnExport: q('#btnExport'),
+    fileImport: q('#fileImport'),
+    btnWipe: q('#btnWipe'),
+    status: q('#status'),
+    catTotals: q('#catTotals'),
+    modal: q('#csvAsk'),
+    goExport: q('#goExport'),
+    noExport: q('#noExport'),
   };
 
-  // --- SHPENZIME (liste) ---
-  const monthPick=$('#monthPick'), search=$('#search'), list=$('#list'), empty=$('#empty'), totals=$('#totals');
-  const editDlg=$('#editDlg'), editId=$('#editId'), editAmount=$('#editAmount'), editCategory=$('#editCategory'), editDate=$('#editDate'), editNote=$('#editNote');
+  let data = load();
+  let activeCat = defaultCats[0];
 
-  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
+  // UI init
+  renderChips();
+  setToday(els.date);
+  render();
+  updateKPIs();
 
-  monthPick.addEventListener('change', paintList);
-  search.addEventListener('input', paintList);
-
-  list.addEventListener('click', (e)=>{
-    const btn=e.target.closest('[data-act]'); if(!btn) return;
-    const id=btn.dataset.id, act=btn.dataset.act;
-    const it=data.find(x=>x.id===id); if(!it) return;
-    if(act==='del'){ if(!confirm('Ta fshij këtë rresht?')) return;
-      lastDeleted={...it}; data=data.filter(x=>x.id!==id); saveJSON(LS_DATA,data); paintHome(); paintList();
-    } else if(act==='edit'){ openEdit(it); }
+  // Events
+  els.chipRow.addEventListener('click', (e)=>{
+    const b = e.target.closest('.chip'); if(!b) return;
+    activeCat = b.dataset.cat; syncChipUI();
   });
 
-  $('#editCancel').addEventListener('click', ()=> editDlg.close());
-  $('#editForm').addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const idx=data.findIndex(x=>x.id===editId.value); if(idx<0){ editDlg.close(); return; }
-    const val=parseAmount(editAmount.value); if(!isValidAmount(val)){ shake(editAmount); return; }
-    const dt=new Date(editDate.value); if(isNaN(dt.getTime())){ shake(editDate); return; }
-    data[idx]={...data[idx], amount:Number(val.toFixed(2)), category:editCategory.value, note:(editNote.value||'').trim(), ts:new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString()};
-    saveJSON(LS_DATA,data); paintHome(); paintList(); editDlg.close(); alert('U përditësua!');
+  els.btnSave.addEventListener('click', saveEntry);
+  els.btnClearForm.addEventListener('click', clearForm);
+
+  els.searchBox.addEventListener('input', render);
+  els.btnResetSearch.addEventListener('click', ()=>{ els.searchBox.value=''; render(); });
+
+  els.btnExport.addEventListener('click', exportCSV);
+  els.fileImport.addEventListener('change', importCSV);
+
+  els.btnWipe.addEventListener('click', ()=>{
+    if(confirm('Tüm kayıtlar silinsin mi? Bu işlem geri alınamaz.')){
+      data = []; persist(); render(); updateKPIs(); toast('Tüm kayıtlar silindi.');
+    }
   });
 
-  function openEdit(item){
-    editId.value=item.id;
-    editAmount.value=String(item.amount);
-    editCategory.innerHTML='';
-    cfg.categories.forEach(c=>{ const lab=/shënim/i.test(c)?'Shënim':c; editCategory.appendChild(new Option(lab,lab)); });
-    editCategory.value=/shënim/i.test(item.category)?'Shënim':item.category;
-    editNote.value=item.note||'';
-    const d=new Date(item.ts);
-    editDate.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
-    editDlg.showModal();
+  els.tbody.addEventListener('click', (e)=>{
+    const del = e.target.closest('[data-del]');
+    const edit = e.target.closest('[data-edit]');
+    if(del){
+      const id = del.dataset.del;
+      data = data.filter(r=>r.id!==id);
+      persist(); render(); updateKPIs();
+    } else if(edit){
+      const id = edit.dataset.edit;
+      const row = data.find(r=>r.id===id); if(!row) return;
+      // basit düzenleme: formu yükle
+      els.amount.value = row.amount;
+      els.note.value = row.note || '';
+      els.date.value = row.date.slice(0,10);
+      activeCat = row.category; syncChipUI();
+      // Sil ve kullanıcı yeniden kaydetsin (daha temiz akış)
+      data = data.filter(r=>r.id!==id);
+      persist(); render(); updateKPIs();
+      toast('Düzenleme modunda: değiştirip Kaydet’e bas.');
+      scrollTo({top:0,behavior:'smooth'});
+    }
+  });
+
+  // Modal
+  els.goExport.addEventListener('click', ()=>{ hideModal(); exportCSV(); });
+  els.noExport.addEventListener('click', hideModal);
+
+  // Helpers
+  function q(s,sc){ return (sc||document).querySelector(s); }
+  function fmt(n){
+    const fixed = Number(n).toLocaleString('tr-TR',{minimumFractionDigits:0, maximumFractionDigits:0});
+    return ALL ${fixed};
+  }
+  function setToday(inp){
+    const d = new Date();
+    inp.value = d.toISOString().slice(0,10);
   }
 
-  // --- HOME ÖZET ---
-  function paintHome(){
-    const [y,m]=(monthPick.value||new Date().toISOString().slice(0,7)).split('-').map(Number);
-    let market=0, rent=0;
-    for(const d of data){
-      const dt=new Date(d.ts);
-      if(dt.getFullYear()===y && (dt.getMonth()+1)===m){
-        if(/blerje\s+ushq/i.test(d.category)) market+=d.amount;
-        if(/qira/i.test(d.category)) rent+=d.amount;
+  function renderChips(){
+    els.chipRow.innerHTML = '';
+    defaultCats.forEach((c,i)=>{
+      const b = document.createElement('button');
+      b.type='button'; b.className = 'chip' + (i===0?' on':'');
+      b.textContent = c; b.dataset.cat = c;
+      els.chipRow.appendChild(b);
+    });
+  }
+  function syncChipUI(){
+    [...els.chipRow.children].forEach(ch=>{
+      ch.classList.toggle('on', ch.dataset.cat===activeCat);
+    });
+  }
+
+  function saveEntry(){
+    const amount = Number(els.amount.value);
+    if(!amount || amount<=0){ toast('Lütfen geçerli bir tutar gir.'); return; }
+    const note = (els.note.value||'').trim();
+    const date = els.date.value ? new Date(els.date.value) : new Date();
+    const rec = {
+      id: cryptoRandom(),
+      date: new Date(date.getTime() + date.getTimezoneOffset()*60000).toISOString(), // UTC'ye
+      amount: Math.round(amount),
+      category: activeCat,
+      note
+    };
+    data.push(rec);
+    persist();
+    clearForm(false);
+    render();
+    updateKPIs();
+    showModal(); // CSV sor
+  }
+
+  function clearForm(focus=true){
+    els.amount.value=''; els.note.value=''; setToday(els.date);
+    activeCat = defaultCats[0]; syncChipUI();
+    if(focus) els.amount.focus();
+  }
+
+  function render(){
+    const qy = (els.searchBox.value||'').toLowerCase();
+    const rows = (qy? data.filter(r=>{
+      return r.category.toLowerCase().includes(qy) || (r.note||'').toLowerCase().includes(qy);
+    }): data).sort((a,b)=> b.date.localeCompare(a.date));
+
+    els.tbody.innerHTML = rows.map(r=>{
+      const d = niceDate(r.date);
+      const note = esc(r.note||'');
+      return `<tr>
+        <td>${d}</td>
+        <td><span class="tag">${esc(r.category)}</span></td>
+        <td>${note||'<span class="mini" style="opacity:.6">—</span>'}</td>
+        <td class="right">${fmt(r.amount)}</td>
+        <td class="right">
+          <button class="chip" data-edit="${r.id}" title="Düzenle">✎</button>
+          <button class="chip" data-del="${r.id}" title="Sil">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    els.countRows.textContent = String(data.length);
+    els.status.textContent = rows.length===data.length ? '' : ${rows.length} / ${data.length} kayıt gösteriliyor;
+  }
+
+  function updateKPIs(){
+    const todayStr = new Date().toISOString().slice(0,10);
+    const monthStr = new Date().toISOString().slice(0,7);
+    const sum = data.reduce((a,b)=>a+b.amount,0);
+    const sumToday = data.filter(r=> r.date.slice(0,10)===todayStr).reduce((a,b)=>a+b.amount,0);
+    const sumMonth = data.filter(r=> r.date.slice(0,7)===monthStr).reduce((a,b)=>a+b.amount,0);
+    els.sumTotal.textContent = fmt(sum);
+    els.sumToday.textContent = fmt(sumToday);
+    els.sumMonth.textContent = fmt(sumMonth);
+
+    // kategori toplamları
+    const byCat = {};
+    data.forEach(r=> byCat[r.category]=(byCat[r.category]||0)+r.amount);
+    const cats = Object.entries(byCat).sort((a,b)=> b[1]-a[1]);
+    els.catTotals.innerHTML = cats.slice(0,8).map(([c,v])=>`
+      <div class="kpi">
+        <div class="t mini">${esc(c)}</div>
+        <div class="v amt">${fmt(v)}</div>
+      </div>
+    ).join('') || `<div class="mini" style="opacity:.8">Henüz veri yok.</div>;
+  }
+
+  function exportCSV(){
+    const rows = [
+      ['id','date','amount_all','category','note'],
+      ...data.map(r=>[r.id, r.date, r.amount, r.category, (r.note||'').replaceAll('"','""')])
+    ];
+    const csv = rows.map(r=> r.map(cell=>{
+      const s = String(cell ?? '');
+      return /[",\n]/.test(s) ? "${s.replaceAll('"','""')}" : s;
+    }).join(',')).join('\n');
+
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const ts = new Date().toISOString().replaceAll(':','').replaceAll('-','').slice(0,15);
+    a.href = url;
+    a.download = andi-ev-harcamalari-${ts}.csv;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 200);
+  }
+
+  async function importCSV(e){
+    const file = e.target.files?.[0]; if(!file) return;
+    const text = await file.text();
+    const rows = parseCSV(text);
+    // header tespiti
+    const header = rows[0].map(s=>s.toLowerCase());
+    const idx = {
+      id: header.indexOf('id'),
+      date: header.indexOf('date'),
+      amount: header.findIndex(x=> x==='amount' || x==='amount_all' || x==='tutar' ),
+      category: header.findIndex(x=> x==='category' || x==='kategori'),
+      note: header.findIndex(x=> x==='note' || x==='not')
+    };
+    const out = [];
+    for(let i=1;i<rows.length;i++){
+      const r = rows[i]; if(r.length===1 && !r[0]) continue;
+      const obj = {
+        id: r[idx.id] || cryptoRandom(),
+        date: normalizeDate(r[idx.date]),
+        amount: Math.round(Number(r[idx.amount]||0)),
+        category: r[idx.category] || 'Diğer',
+        note: r[idx.note] || ''
+      };
+      if(obj.date && obj.amount>0) out.push(obj);
+    }
+    // mevcutlara ekle (aynı id varsa güncelleme yerine atla)
+    const ids = new Set(data.map(x=>x.id));
+    out.forEach(o=>{ if(!ids.has(o.id)) data.push(o); });
+    persist(); render(); updateKPIs();
+    e.target.value = '';
+    toast(${out.length} kayıt eklendi.);
+  }
+
+  function showModal(){ els.modal.classList.add('show'); }
+  function hideModal(){ els.modal.classList.remove('show'); }
+
+  function persist(){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(_){ return []; }
+  }
+
+  function parseCSV(text){
+    // basit ama sağlam CSV ayrıştırıcı
+    const lines = text.replace(/\r/g,'').split('\n');
+    const rows = [];
+    for(const line of lines){
+      const out=[]; let s=''; let q=false;
+      for(let i=0;i<line.length;i++){
+        const c=line[i];
+        if(c==='"' ){
+          if(q && line[i+1]==='"'){ s+='"'; i++; }
+          else q=!q;
+        } else if(c===',' && !q){ out.push(s); s=''; }
+        else { s+=c; }
       }
+      out.push(s);
+      rows.push(out);
     }
-    const fmt=money();
-    $('#monthLine').textContent=Këtë muaj: “Blerje ushqimore” ${fmt(market)} · “Qira” ${fmt(rent)}.;
-    const byCat=groupByMonth(y,m);
-    const top=[...Object.entries(byCat)].sort((a,b)=>b[1]-a[1]).slice(0,3);
-    const box=$('#totalsHome'); box.innerHTML='';
-    top.forEach(([k,v])=>{ const el=document.createElement('div'); el.className='total-box'; el.textContent=${k}: ${fmt(v)}; box.appendChild(el); });
+    return rows.filter(r=> r.some(x=>x!=='')); // boş satırları at
   }
 
-  function paintList(){
-    const [y,m]=monthPick.value.split('-').map(Number);
-    const q=(search.value||'').toLowerCase().trim();
-    const rows=data.filter(d=>{
-      const dt=new Date(d.ts);
-      const inMonth=dt.getFullYear()===y && (dt.getMonth()+1)===m;
-      const inSearch=!q || (String(d.category).toLowerCase().includes(q) || String(d.note).toLowerCase().includes(q));
-      return inMonth && inSearch;
-    }).sort((a,b)=> new Date(b.ts)-new Date(a.ts));
-
-    empty.classList.toggle('hide', rows.length>0);
-    list.innerHTML=''; totals.innerHTML='';
-    const fmt=money(); const byCat={}; let sum=0;
-    for(const d of rows){
-      sum+=d.amount; byCat[d.category]=(byCat[d.category]||0)+d.amount;
-      const el=document.createElement('div'); el.className='item';
-      el.innerHTML=`
-        <div>
-          <div class="top">
-            <span class="chip">${esc(d.category)}</span>
-            ${d.note?<span class="chip">${esc(d.note)}</span>:''}
-          </div>
-          <div class="time">${new Date(d.ts).toLocaleString('sq-AL')}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-          <div class="amt">${fmt(d.amount)}</div>
-          <div class="actions">
-            <button class="btn-ghost" data-act="edit" data-id="${d.id}">Ndrysho</button>
-            <button class="btn-danger" data-act="del" data-id="${d.id}">Fshi</button>
-          </div>
-        </div>`;
-      list.appendChild(el);
-    }
-    const total=document.createElement('div'); total.className='total-box'; total.innerHTML=<b>Totali i muajit:</b> ${fmt(sum)}; totals.appendChild(total);
-    Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{ const b=document.createElement('div'); b.className='total-box'; b.textContent=${k}: ${fmt(v)}; totals.appendChild(b); });
+  function niceDate(iso){
+    const d = new Date(iso);
+    if(isNaN(d)) return iso;
+    const dd = d.toLocaleDateString('tr-TR',{year:'numeric',month:'2-digit',day:'2-digit'});
+    const tt = d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    return ${dd} ${tt};
   }
 
-  // --- SETTINGS ---
-  $('#setTitle').value=cfg.title; $('#accent').value=toHex(cfg.accent,'#19c28e'); $('#categoriesBox').value=cfg.categories.join('\n');
-  $('#apply').addEventListener('click', ()=>{
-    cfg.title = ($('#setTitle').value||cfg.title).trim();
-    cfg.accent = $('#accent').value || cfg.accent;
-    cfg.categories = ($('#categoriesBox').value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    if(!cfg.categories.some(c=>/shënim/i.test(c))) cfg.categories.push('Shënim i lirë');
-    saveJSON(LS_CFG,cfg);
-    document.documentElement.style.setProperty('--accent', cfg.accent);
-    title.textContent = cfg.title;
-    alert('Rregullimet u ruajtën.');
-  });
-  $('#downloadHTML').addEventListener('click', ()=>{
-    const html='<!doctype html>\n'+document.documentElement.outerHTML;
-    const blob=new Blob([html],{type:'text/html;charset=utf-8;'}); dl(blob,'andi-shpenzime-quick-lite.html');
-  });
-
-  // --- CSV ---
-  $('#exportBtn').addEventListener('click', exportCSV);
-  $('#importInput').addEventListener('change', async e=>{
-    const f=e.target.files?.[0]; if(!f) return;
-    const text=await f.text(); const rows=parseCSV(text); let added=0;
-    const ids=new Set(data.map(d=>d.id));
-    for(const r of rows){
-      const amt=Number(r.amount);
-      if(!r.id||ids.has(r.id)||!r.ts||!amt||!r.currency) continue;
-      data.push({ id:r.id, ts:r.ts, amount:amt, currency:r.currency, category:r.category||'Tjetër', note:r.note||'' });
-      ids.add(r.id); added++;
+  function normalizeDate(s){
+    if(!s) return null;
+    // ISO ise direkt
+    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s).toISOString();
+    // dd.mm.yyyy
+    if(/^\d{2}\.\d{2}\.\d{4}/.test(s)){
+      const [dd,mm,yy]=s.split(/[.\s]/); const d=new Date(${yy}-${mm}-${dd}T00:00:00Z);
+      return d.toISOString();
     }
-    saveJSON(LS_DATA,data); paintHome(); paintList(); alert(U shtuan ${added} rreshta.); e.target.value='';
+    // dd/mm/yyyy
+    if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
+      const [dd,mm,yy]=s.split(/[\/\s]/); const d=new Date(${yy}-${mm}-${dd}T00:00:00Z);
+      return d.toISOString();
+    }
+    // fallback
+    const d = new Date(s); return isNaN(d)? null : d.toISOString();
+  }
+
+  function cryptoRandom(){
+    if(window.crypto?.randomUUID) return crypto.randomUUID();
+    return 'id-'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+  }
+
+  function toast(msg){
+    els.status.textContent = msg;
+    setTimeout(()=>{ els.status.textContent=''; }, 3000);
+  }
+
+  // Klavye: sayı klavyesinde Enter yoksa butona yönlendir
+  els.amount.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); els.btnSave.click(); }
   });
-  $('#clearAll').addEventListener('click', ()=>{ if(!confirm('T’i fshij të gjitha?')) return; data=[]; saveJSON(LS_DATA,data); paintHome(); paintList(); });
 
-  // İlk boyamalar
-  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
-  paintHome(); paintList();
-
-  // --- UTILS ---
-  function money(){ const nf=new Intl.NumberFormat('sq-AL',{style:'currency',currency:'ALL',maximumFractionDigits:2}); return v=>nf.format(v); }
-  function rid(){ if(window.crypto?.getRandomValues){const a=new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join(''); } return 'id-'+Math.random().toString(36).slice(2); }
-  function loadJSON(k,fb){ try{const r=localStorage.getItem(k); return r?JSON.parse(r):fb}catch{ return fb } }
-  function saveJSON(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
-  function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function csvEsc(v){ const s=String(v??''); return /[",\n]/.test(s)?"${s.replace(/"/g,'""')}":s; }
-  function splitCSV(line){ const res=[]; let cur=''; let q=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(ch==='\"'){ if(q && line[i+1]==='\"'){cur+='\"'; i++;} else q=!q; } else if(ch===',' && !q){ res.push(cur); cur=''; } else cur+=ch; } res.push(cur); return res; }
-  function parseCSV(text){ const lines=text.replace(/\r/g,'').split('\n').filter(Boolean); if(!lines.length) return []; const header=splitCSV(lines[0]); const idx=n=>header.indexOf(n); const out=[]; for(let i=1;i<lines.length;i++){ const c=splitCSV(lines[i]); out.push({ id:c[idx('id')], ts:c[idx('ts')], amount:c[idx('amount')], currency:c[idx('currency')], category:c[idx('category')], note:c[idx('note')] }); } return out; }
-  function exportCSV(){ const rows=[['id','ts','amount','currency','category','note'].join(',')]; for(const d of data){ rows.push([d.id,d.ts,d.amount,d.currency,d.category||'',d.note||''].map(csvEsc).join(',')); } const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'}); dl(blob,ANDI_Shpnezime_${new Date().toISOString().slice(0,10)}.csv); }
-  function dl(blob, name){ const a=document.createElement('a'); a.download=name; a.href=URL.createObjectURL(blob); document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
-  function toHex(v,f){ if(!v) return f; if(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v)) return v; const m=/rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(v); if(m){const [r,g,b]=[+m[1],+m[2],+m[3]]; return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');} return f; }
 })();
 </script>
 </body>
