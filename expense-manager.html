@@ -3,101 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ANDI · Shpenzimet</title>
-<meta name="theme-color" content="#18c28e">
+<title>ANDI · Shpenzimet e Shtëpisë</title>
+<meta name="theme-color" content="#19c28e">
 <style>
   :root{
-    --bg:#0f131a; --card:#181e2b; --text:#eaf0f8; --muted:#9aa6bb; --stroke:#263041;
-    --accent:#18c28e; --accent2:#38d89d; --danger:#ff6b6b;
+    --bg:#0f1219; --card:#171b25; --text:#e9eef7; --muted:#98a3b7; --stroke:#242a36;
+    --accent:#19c28e; --accent2:#3ddc97; --danger:#ff6b6b;
     --radius:12px; --shadow:0 6px 18px rgba(0,0,0,.25);
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;background:linear-gradient(180deg,#0c0f15 0%,var(--bg) 100%);color:var(--text);
-    font-family:ui-sans-serif,-apple-system,Roboto,"Segoe UI","Helvetica Neue","Noto Sans",sans-serif;
-  }
-  .wrap{max-width:900px;margin:auto;padding:16px 14px 96px}
-  h1{font-size:20px;margin:8px 0 14px}
+  body{margin:0;background:linear-gradient(180deg,#0c0f15 0%,var(--bg) 100%);color:var(--text);
+       font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;}
+  .wrap{max-width:900px;margin:auto;padding:16px 14px 90px}
+  h1{font-size:20px;margin:6px 0 14px}
 
   .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:14px}
   .card h3{margin:0 0 10px;font-size:16px}
   label{font-size:13px;color:var(--muted)}
   input,select,textarea,button{
-    width:100%;background:#101726;border:1px solid var(--stroke);color:var(--text);
+    width:100%;background:#0f1422;border:1px solid var(--stroke);color:var(--text);
     padding:10px 12px;border-radius:10px;font-size:15px;outline:none;
   }
-  input::placeholder,textarea::placeholder{color:#70809a}
+  input::placeholder,textarea::placeholder{color:#6e7a90}
   textarea{min-height:72px;resize:vertical}
   .grid2{display:grid;gap:10px}
-  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+  @media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
   .btn{background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border:1px solid #1a6e58;color:#062a20;font-weight:700;cursor:pointer}
   .btn-ghost{background:transparent;border:1px dashed var(--stroke);color:var(--text);cursor:pointer}
   .btn-danger{background:linear-gradient(180deg,#ffb3b3 0%,var(--danger) 100%);border:1px solid #7b2c2c;color:#2a0b0b}
   .muted{color:var(--muted)} .hide{display:none!important}
 
-  /* Çipler */
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .chip{background:#151d2c;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
-  .chip:hover{border-color:#2f7e69}
-
-  /* Liste */
   .list{display:grid;gap:10px}
-  .item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px;border:1px solid var(--stroke);border-radius:10px;background:#101726}
+  .item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px;border:1px solid var(--stroke);border-radius:10px;background:#0f1422}
   .top{display:flex;gap:6px;flex-wrap:wrap}
-  .pill{background:#151d2c;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px}
+  .chip{background:#151c2b;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px}
   .amt{font-weight:800}
   .time{font-size:12px;color:#8895ad}
   .actions{display:flex;gap:8px}
   .totals{display:flex;gap:8px;flex-wrap:wrap}
-  .total-box{background:#101726;border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;font-size:13px}
+  .total-box{background:#0f1422;border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;font-size:13px}
 
-  /* Alt menü */
+  /* Bottom Nav (3 buton) */
   .nav{
-    position:fixed;left:0;right:0;bottom:0;background:#101726cc;backdrop-filter:blur(6px);
+    position:fixed;left:0;right:0;bottom:0;background:#0f1422cc;backdrop-filter:blur(6px);
     border-top:1px solid var(--stroke);display:grid;grid-template-columns:repeat(3,1fr);z-index:10
   }
-  .nav a{padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#c1cadb;text-decoration:none;font-size:12px}
+  .nav a{padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
+    color:#c1cadb;text-decoration:none;font-size:12px}
   .nav a .ico{font-size:18px}
   .nav a.active{color:#0a2f24;background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%)}
 
   .screen{display:none} .screen.active{display:block}
 
-  /* Dialog */
-  dialog{border:none;border-radius:12px;background:#121a28;color:var(--text);box-shadow:var(--shadow);width:min(92vw,560px);padding:0}
+  dialog{border:none;border-radius:12px;background:#121826;color:var(--text);box-shadow:var(--shadow);
+    width:min(92vw,560px);padding:0}
   dialog::backdrop{background:rgba(0,0,0,.45)}
   .modal-head{padding:12px 14px;border-bottom:1px solid var(--stroke);font-weight:700}
   .modal-body{padding:14px}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 14px 14px}
+
+  .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  @media(min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
+  .cat-btn{border:1px solid var(--stroke);background:#0f1422;border-radius:10px;padding:10px;cursor:pointer;text-align:center}
+  .cat-btn:hover{border-color:#2f7e69}
+  .note-area{margin-top:8px}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1 id="appTitle">ANDI · Shpenzimet</h1>
+    <h1 id="title">ANDI · Shpenzimet e Shtëpisë</h1>
 
-    <!-- === KRYEFAQJA === -->
+    <!-- === KRYEFAQJA (Hızlı giriş + özet) === -->
     <section class="screen active" id="screen-home">
       <div class="card">
         <h3>Shtim shumë i shpejtë</h3>
         <form id="quickForm" autocomplete="off">
-          <label for="quickAmount" class="muted">Shuma (Lekë)</label>
+          <label for="quickAmount" class="muted">Shkruaj shumën</label>
           <input id="quickAmount" type="number" inputmode="decimal" step="0.01" placeholder="p.sh. 1200" autocomplete="off">
           <div class="grid2" style="margin-top:8px">
             <button id="quickGo" class="btn" type="submit" disabled>Vazhdo</button>
-            <span class="muted" style="display:grid;align-items:center">Pastaj: zgjidh kategorinë ose shkruaj shënim</span>
+            <span class="muted" style="display:grid;align-items:center">Më pas: zgjedh kategori ose shënim</span>
           </div>
         </form>
-        <!-- Akıllı öneriler -->
-        <div id="suggestBox" class="chips hide"></div>
       </div>
 
       <div class="card">
         <h3>Përmbledhje e muajit</h3>
         <div id="monthLine" class="muted">–</div>
-        <div class="totals" id="homeTotals" style="margin-top:8px"></div>
+        <div class="totals" id="totalsHome" style="margin-top:8px"></div>
       </div>
     </section>
 
-    <!-- === SHPENZIME === -->
+    <!-- === SHPENZIME (liste/filtra/CSV) === -->
     <section class="screen" id="screen-expenses">
       <div class="card">
         <h3>Regjistrat</h3>
@@ -126,19 +123,12 @@
         <div class="grid2">
           <div>
             <label for="setTitle">Titulli</label>
-            <input id="setTitle" placeholder="ANDI · Shpenzimet">
+            <input id="setTitle" placeholder="ANDI · Shpenzimet e Shtëpisë">
           </div>
           <div>
             <label for="accent">Ngjyra kryesore</label>
-            <input id="accent" type="color" value="#18c28e">
+            <input id="accent" type="color" value="#19c28e">
           </div>
-        </div>
-        <div style="margin-top:8px">
-          <label for="themeMode">Tema</label>
-          <select id="themeMode">
-            <option value="dark" selected>E errët</option>
-            <option value="light">E çelët</option>
-          </select>
         </div>
         <div style="margin-top:8px">
           <label for="categoriesBox">Kategori (një për rresht)</label>
@@ -161,30 +151,30 @@ Shënim i lirë</textarea>
     </section>
   </div>
 
-  <!-- NAV -->
+  <!-- Bottom Nav (3 sekme) -->
   <nav class="nav" id="nav">
     <a href="#home" data-target="screen-home" class="active"><span class="ico">🏠</span>Kryefaqja</a>
     <a href="#exp" data-target="screen-expenses"><span class="ico">💸</span>Shpenzime</a>
     <a href="#set" data-target="screen-settings"><span class="ico">⚙️</span>Rregullime</a>
   </nav>
 
-  <!-- Kategori + shënim seçici -->
-  <dialog id="pickDlg">
+  <!-- === Picker Dialog (kategori/şënim) === -->
+  <dialog id="pickerDlg">
     <div class="modal-head">Zgjidh kategorinë</div>
     <div class="modal-body">
-      <div id="cats" class="chips"></div>
-      <div style="margin-top:10px">
-        <label for="pickNote" class="muted">Shënim (opsionale)</label>
-        <textarea id="pickNote" placeholder="p.sh. ‘Market’, ‘Restorant te …’"></textarea>
+      <div class="cats" id="catsBox"></div>
+      <div class="note-area">
+        <label for="quickNote" class="muted">Shënim (opsionale)</label>
+        <textarea id="quickNote" placeholder="p.sh. ‘Market’, ‘Restorant …’"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" id="pickCancel">Anulo</button>
-      <button class="btn" id="pickSave">Ruaj</button>
+      <button class="btn-ghost" id="pickerCancel">Anulo</button>
+      <button class="btn" id="pickerSave">Ruaj</button>
     </div>
   </dialog>
 
-  <!-- Editim -->
+  <!-- === Edit Dialog === -->
   <dialog id="editDlg">
     <div class="modal-head">Përditëso</div>
     <form id="editForm">
@@ -216,104 +206,82 @@ Shënim i lirë</textarea>
     </form>
   </dialog>
 
-  <!-- CSV sorusu -->
-  <dialog id="askExport">
-    <div class="modal-head">Ta shkarkoj CSV?</div>
-    <div class="modal-body">Regjistrimi u ruajt. Tani mund të shkarkosh CSV.</div>
-    <div class="modal-actions">
-      <button class="btn-ghost" id="noExport">Jo</button>
-      <button class="btn" id="yesExport">Po, shkarko</button>
-    </div>
-  </dialog>
-
 <script>
 (function(){
-  const LS_DATA='andi_new_data_v1';
-  const LS_CFG='andi_new_cfg_v1';
-  const LS_LAST='andi_new_last_cat';
+  const LS_DATA='andi_quick_data_v4';
+  const LS_CFG='andi_quick_cfg_v1';
   const $=s=>document.querySelector(s);
 
-  // --- State ---
+  // --- STATE ---
   let data = loadJSON(LS_DATA, []);
   let cfg  = loadJSON(LS_CFG, {
-    title:'ANDI · Shpenzimet',
-    accent:'#18c28e',
-    theme:'dark',
+    title:'ANDI · Shpenzimet e Shtëpisë',
+    accent:'#19c28e',
     categories:['Qira','Fatura e ujit','Fatura e energjisë','Internet','Blerje ushqimore','Detergjent rrobash','Rroba','Jashtë në restorant','Shpenzime makine','Shënim i lirë']
   });
-  let lastUsedCat = loadJSON(LS_LAST, null);
+  let lastDeleted=null;
 
-  // --- Elements ---
-  const appTitle=$('#appTitle'); const nav=$('#nav');
-  const quickForm=$('#quickForm'), quickAmount=$('#quickAmount'), quickGo=$('#quickGo');
-  const pickDlg=$('#pickDlg'), catsBox=$('#cats'), pickNote=$('#pickNote');
-  const askExport=$('#askExport'), yesExport=$('#yesExport'), noExport=$('#noExport');
-  const suggestBox=$('#suggestBox');
-
-  const monthPick=$('#monthPick'), search=$('#search'), list=$('#list'), totals=$('#totals'), empty=$('#empty');
-  const editDlg=$('#editDlg'), editId=$('#editId'), editAmount=$('#editAmount'), editCategory=$('#editCategory'), editDate=$('#editDate'), editNote=$('#editNote');
-
-  const setTitle=$('#setTitle'), accent=$('#accent'), themeMode=$('#themeMode'), catsTextarea=$('#categoriesBox');
-
-  // --- Init theme/title ---
-  appTitle.textContent = cfg.title;
+  // --- THEME / TITULL ---
+  const title=$('#title'); title.textContent=cfg.title;
   document.documentElement.style.setProperty('--accent', cfg.accent);
-  applyTheme(cfg.theme);
 
-  // --- NAV (sa të thjeshtë dhe stabil) ---
-  nav.addEventListener('click', (e)=>{
-    const a=e.target.closest('a'); if(!a) return; e.preventDefault();
-    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active')); a.classList.add('active');
+  // --- NAV (3 sekme) ---
+  document.getElementById('nav').addEventListener('click', (e)=>{
+    const a=e.target.closest('a'); if(!a) return;
+    e.preventDefault();
+    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(a.dataset.target).classList.add('active');
     if(a.dataset.target==='screen-home') paintHome();
     if(a.dataset.target==='screen-expenses') paintList();
   });
 
-  // --- Quick add ---
+  // --- HIZLI GİRİŞ ---
+  const quickForm=$('#quickForm'), quickAmount=$('#quickAmount'), quickGo=$('#quickGo');
+  const pickerDlg=$('#pickerDlg'), catsBox=$('#catsBox'), quickNote=$('#quickNote');
+
   function parseAmount(v){ return Number(String(v||'').replace(',','.')); }
   function isValidAmount(v){ const n=parseAmount(v); return Number.isFinite(n) && n>0; }
 
   quickForm.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const val=parseAmount(quickAmount.value); if(!isValidAmount(val)){ shake(quickAmount); return; }
+    const val=parseAmount(quickAmount.value);
+    if(!isValidAmount(val)){ shake(quickAmount); return; }
     openPicker(val);
   });
+  quickAmount.addEventListener('blur', ()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) openPicker(v); });
   quickAmount.addEventListener('input', ()=>{ quickGo.disabled=!isValidAmount(quickAmount.value); });
 
-  function openPicker(val){
+  function renderCats(){
     catsBox.innerHTML='';
     cfg.categories.forEach(c=>{
-      const chip=document.createElement('button'); chip.type='button'; chip.className='chip'; chip.innerHTML=<span>${iconFor(c)}</span><span>${c}</span>;
-      chip.onclick=()=>{ catsBox.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel')); chip.classList.add('sel'); };
-      catsBox.appendChild(chip);
+      const b=document.createElement('button');
+      b.type='button'; b.className='cat-btn'; b.textContent=c;
+      b.onclick=()=>{ catsBox.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); };
+      catsBox.appendChild(b);
     });
-    pickNote.value=''; pickDlg.dataset.amount=String(val); pickDlg.showModal();
   }
-  $('#pickCancel').onclick=()=>pickDlg.close();
-  $('#pickSave').onclick=()=>{
-    const val=parseAmount(pickDlg.dataset.amount||'0'); if(!isValidAmount(val)) return;
-    const sel=catsBox.querySelector('.chip.sel'); let cat= sel?sel.textContent.trim():''; let note=(pickNote.value||'').trim();
+  function openPicker(val){ renderCats(); quickNote.value=''; pickerDlg.dataset.amount=String(val); pickerDlg.showModal(); }
+  $('#pickerCancel').onclick=()=>pickerDlg.close();
+  $('#pickerSave').onclick=()=>{
+    const val=parseAmount(pickerDlg.dataset.amount||'0'); if(!isValidAmount(val)) return;
+    const sel=catsBox.querySelector('.sel'); let cat=sel?sel.textContent:''; let note=(quickNote.value||'').trim();
     if(!cat && !note){ alert('Zgjidh kategori ose shkruaj shënim'); return; }
     if(/shënim/i.test(cat)) cat='Shënim';
-    addRecord(val, cat||'Shënim', note);
-    pickDlg.close();
+    const rec={id:rid(),ts:new Date().toISOString(),amount:Number(val.toFixed(2)),currency:'ALL',category:cat||'Shënim',note};
+    data.push(rec); saveJSON(LS_DATA,data);
+    quickAmount.value=''; quickGo.disabled=true; pickerDlg.close();
+    paintHome(); paintList();
+    alert('U ruajt!');
   };
 
-  function addRecord(amount, category, note){
-    const rec={id:rid(), ts:new Date().toISOString(), amount:Number(amount.toFixed(2)), currency:'ALL', category, note:note||''};
-    data.push(rec); saveJSON(LS_DATA,data);
-    lastUsedCat=category; saveJSON(LS_LAST,lastUsedCat);
-    quickAmount.value=''; quickGo.disabled=true;
-    paintHome(); paintList();
-    askExport.showModal();
-  }
+  // --- SHPENZIME (liste) ---
+  const monthPick=$('#monthPick'), search=$('#search'), list=$('#list'), empty=$('#empty'), totals=$('#totals');
+  const editDlg=$('#editDlg'), editId=$('#editId'), editAmount=$('#editAmount'), editCategory=$('#editCategory'), editDate=$('#editDate'), editNote=$('#editNote');
 
-  yesExport.addEventListener('click', ()=>{ askExport.close(); exportCSV(); });
-  noExport.addEventListener('click', ()=> askExport.close());
+  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
 
-  // --- Expenses list ---
-  const today=new Date(); monthPick.value=today.toISOString().slice(0,7); // tek bir kez
   monthPick.addEventListener('change', paintList);
   search.addEventListener('input', paintList);
 
@@ -322,7 +290,7 @@ Shënim i lirë</textarea>
     const id=btn.dataset.id, act=btn.dataset.act;
     const it=data.find(x=>x.id===id); if(!it) return;
     if(act==='del'){ if(!confirm('Ta fshij këtë rresht?')) return;
-      data=data.filter(x=>x.id!==id); saveJSON(LS_DATA,data); paintHome(); paintList();
+      lastDeleted={...it}; data=data.filter(x=>x.id!==id); saveJSON(LS_DATA,data); paintHome(); paintList();
     } else if(act==='edit'){ openEdit(it); }
   });
 
@@ -332,66 +300,47 @@ Shënim i lirë</textarea>
     const idx=data.findIndex(x=>x.id===editId.value); if(idx<0){ editDlg.close(); return; }
     const val=parseAmount(editAmount.value); if(!isValidAmount(val)){ shake(editAmount); return; }
     const dt=new Date(editDate.value); if(isNaN(dt.getTime())){ shake(editDate); return; }
-    data[idx]={...data[idx], amount:Number(val.toFixed(2)), category:editCategory.value, note:(editNote.value||'').trim(),
-      ts:new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString()};
+    data[idx]={...data[idx], amount:Number(val.toFixed(2)), category:editCategory.value, note:(editNote.value||'').trim(), ts:new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString()};
     saveJSON(LS_DATA,data); paintHome(); paintList(); editDlg.close(); alert('U përditësua!');
   });
 
   function openEdit(item){
-    editId.value=item.id; editAmount.value=String(item.amount); editNote.value=item.note||'';
-    editCategory.innerHTML=''; cfg.categories.forEach(c=>editCategory.appendChild(new Option(/shënim/i.test(c)?'Shënim':c,/shënim/i.test(c)?'Shënim':c)));
+    editId.value=item.id;
+    editAmount.value=String(item.amount);
+    editCategory.innerHTML='';
+    cfg.categories.forEach(c=>{ const lab=/shënim/i.test(c)?'Shënim':c; editCategory.appendChild(new Option(lab,lab)); });
     editCategory.value=/shënim/i.test(item.category)?'Shënim':item.category;
-    const dt=new Date(item.ts); editDate.value=new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    editNote.value=item.note||'';
+    const d=new Date(item.ts);
+    editDate.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
     editDlg.showModal();
   }
 
-  // --- Home summary + suggestions ---
+  // --- HOME ÖZET ---
   function paintHome(){
     const [y,m]=(monthPick.value||new Date().toISOString().slice(0,7)).split('-').map(Number);
-    const fmt=money();
     let market=0, rent=0;
     for(const d of data){
-      const t=new Date(d.ts);
-      if(t.getFullYear()===y && (t.getMonth()+1)===m){
+      const dt=new Date(d.ts);
+      if(dt.getFullYear()===y && (dt.getMonth()+1)===m){
         if(/blerje\s+ushq/i.test(d.category)) market+=d.amount;
         if(/qira/i.test(d.category)) rent+=d.amount;
       }
     }
+    const fmt=money();
     $('#monthLine').textContent=Këtë muaj: “Blerje ushqimore” ${fmt(market)} · “Qira” ${fmt(rent)}.;
     const byCat=groupByMonth(y,m);
     const top=[...Object.entries(byCat)].sort((a,b)=>b[1]-a[1]).slice(0,3);
-    const homeTotals=$('#homeTotals'); homeTotals.innerHTML='';
-    if(Object.keys(byCat).length===0){
-      homeTotals.innerHTML='<span class="muted">S’ka të dhëna për muajin.</span>';
-    }else{
-      top.forEach(([k,v])=>{ const d=document.createElement('div'); d.className='total-box'; d.textContent=${k}: ${fmt(v)}; homeTotals.appendChild(d); });
-    }
-    paintSuggestions();
-  }
-
-  function paintSuggestions(){
-    const stats=countByCategoryThisMonth();
-    const popular=[...Object.entries(stats)].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k);
-    const candidates=[lastUsedCat, ...popular].filter(Boolean);
-    suggestBox.innerHTML='';
-    if(candidates.length===0){ suggestBox.classList.add('hide'); return; }
-    candidates.forEach(c=>{
-      const b=document.createElement('button'); b.className='chip'; b.type='button'; b.innerHTML=<span>${iconFor(c)}</span><span>${c}</span>;
-      b.onclick=()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) addRecord(v,c,''); else quickAmount.focus(); };
-      suggestBox.appendChild(b);
-    });
-    const free=document.createElement('button'); free.className='chip'; free.type='button'; free.innerHTML=<span>📝</span><span>Shënim i lirë</span>;
-    free.onclick=()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) openPicker(v); else quickAmount.focus(); };
-    suggestBox.appendChild(free);
-    suggestBox.classList.remove('hide');
+    const box=$('#totalsHome'); box.innerHTML='';
+    top.forEach(([k,v])=>{ const el=document.createElement('div'); el.className='total-box'; el.textContent=${k}: ${fmt(v)}; box.appendChild(el); });
   }
 
   function paintList(){
     const [y,m]=monthPick.value.split('-').map(Number);
     const q=(search.value||'').toLowerCase().trim();
     const rows=data.filter(d=>{
-      const t=new Date(d.ts);
-      const inMonth=t.getFullYear()===y && (t.getMonth()+1)===m;
+      const dt=new Date(d.ts);
+      const inMonth=dt.getFullYear()===y && (dt.getMonth()+1)===m;
       const inSearch=!q || (String(d.category).toLowerCase().includes(q) || String(d.note).toLowerCase().includes(q));
       return inMonth && inSearch;
     }).sort((a,b)=> new Date(b.ts)-new Date(a.ts));
@@ -405,8 +354,8 @@ Shënim i lirë</textarea>
       el.innerHTML=`
         <div>
           <div class="top">
-            <span class="pill">${iconFor(d.category)} ${esc(d.category)}</span>
-            ${d.note?<span class="pill">${esc(d.note)}</span>:''}
+            <span class="chip">${esc(d.category)}</span>
+            ${d.note?<span class="chip">${esc(d.note)}</span>:''}
           </div>
           <div class="time">${new Date(d.ts).toLocaleString('sq-AL')}</div>
         </div>
@@ -420,60 +369,25 @@ Shënim i lirë</textarea>
       list.appendChild(el);
     }
     const total=document.createElement('div'); total.className='total-box'; total.innerHTML=<b>Totali i muajit:</b> ${fmt(sum)}; totals.appendChild(total);
-    Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
-      const b=document.createElement('div'); b.className='total-box'; b.textContent=${k}: ${fmt(v)}; totals.appendChild(b);
-    });
+    Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{ const b=document.createElement('div'); b.className='total-box'; b.textContent=${k}: ${fmt(v)}; totals.appendChild(b); });
   }
 
-  function countByCategoryThisMonth(){
-    const [y,m]=(monthPick.value||new Date().toISOString().slice(0,7)).split('-').map(Number);
-    const out={}; for(const d of data){ const t=new Date(d.ts);
-      if(t.getFullYear()===y && (t.getMonth()+1)===m) out[d.category]=(out[d.category]||0)+d.amount; }
-    return out;
-  }
-  function groupByMonth(y,m){
-    const out={}; for(const d of data){ const t=new Date(d.ts);
-      if(t.getFullYear()===y && (t.getMonth()+1)===m) out[d.category]=(out[d.category]||0)+d.amount; }
-    return out;
-  }
-
-  // --- Settings ---
-  setTitle.value=cfg.title; accent.value=toHex(cfg.accent,'#18c28e'); themeMode.value=cfg.theme;
-  catsTextarea.value=cfg.categories.join('\n');
-
+  // --- SETTINGS ---
+  $('#setTitle').value=cfg.title; $('#accent').value=toHex(cfg.accent,'#19c28e'); $('#categoriesBox').value=cfg.categories.join('\n');
   $('#apply').addEventListener('click', ()=>{
-    cfg.title = (setTitle.value||cfg.title).trim();
-    cfg.accent = accent.value || cfg.accent;
-    cfg.theme  = themeMode.value || 'dark';
-    cfg.categories = (catsTextarea.value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    cfg.title = ($('#setTitle').value||cfg.title).trim();
+    cfg.accent = $('#accent').value || cfg.accent;
+    cfg.categories = ($('#categoriesBox').value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
     if(!cfg.categories.some(c=>/shënim/i.test(c))) cfg.categories.push('Shënim i lirë');
     saveJSON(LS_CFG,cfg);
-    appTitle.textContent=cfg.title;
     document.documentElement.style.setProperty('--accent', cfg.accent);
-    applyTheme(cfg.theme);
+    title.textContent = cfg.title;
     alert('Rregullimet u ruajtën.');
   });
-
   $('#downloadHTML').addEventListener('click', ()=>{
     const html='<!doctype html>\n'+document.documentElement.outerHTML;
-    const blob=new Blob([html],{type:'text/html;charset=utf-8;'}); dl(blob,'andi-shpenzime-new.html');
+    const blob=new Blob([html],{type:'text/html;charset=utf-8;'}); dl(blob,'andi-shpenzime-quick-lite.html');
   });
-
-  function applyTheme(mode){
-    if(mode==='light'){
-      document.documentElement.style.setProperty('--bg','#f4f7fb');
-      document.documentElement.style.setProperty('--card','#ffffff');
-      document.documentElement.style.setProperty('--text','#0e1726');
-      document.documentElement.style.setProperty('--muted','#5b677c');
-      document.documentElement.style.setProperty('--stroke','#e3e8f1');
-    }else{
-      document.documentElement.style.setProperty('--bg','#0f131a');
-      document.documentElement.style.setProperty('--card','#181e2b');
-      document.documentElement.style.setProperty('--text','#eaf0f8');
-      document.documentElement.style.setProperty('--muted','#9aa6bb');
-      document.documentElement.style.setProperty('--stroke','#263041');
-    }
-  }
 
   // --- CSV ---
   $('#exportBtn').addEventListener('click', exportCSV);
@@ -489,28 +403,13 @@ Shënim i lirë</textarea>
     }
     saveJSON(LS_DATA,data); paintHome(); paintList(); alert(U shtuan ${added} rreshta.); e.target.value='';
   });
-  $('#clearAll').addEventListener('click', ()=>{
-    if(!confirm('T’i fshij të gjitha?')) return; data=[]; saveJSON(LS_DATA,data); paintHome(); paintList();
-  });
+  $('#clearAll').addEventListener('click', ()=>{ if(!confirm('T’i fshij të gjitha?')) return; data=[]; saveJSON(LS_DATA,data); paintHome(); paintList(); });
 
-  // --- First paints (tek sefer) ---
+  // İlk boyamalar
+  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
   paintHome(); paintList();
 
-  // --- Utils ---
-  function iconFor(cat){
-    const s=(cat||'').toLowerCase();
-    if(s.includes('qira')) return '🏠';
-    if(s.includes('ujit')) return '🚰';
-    if(s.includes('energ')) return '⚡';
-    if(s.includes('internet')) return '🌐';
-    if(s.includes('blerje')||s.includes('ushq')) return '🛒';
-    if(s.includes('detergjent')) return '🧺';
-    if(s.includes('rroba')) return '👕';
-    if(s.includes('restorant')) return '🍽️';
-    if(s.includes('makine')||s.includes('makinë')) return '🚗';
-    if(s.includes('shënim')) return '📝';
-    return '💸';
-  }
+  // --- UTILS ---
   function money(){ const nf=new Intl.NumberFormat('sq-AL',{style:'currency',currency:'ALL',maximumFractionDigits:2}); return v=>nf.format(v); }
   function rid(){ if(window.crypto?.getRandomValues){const a=new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join(''); } return 'id-'+Math.random().toString(36).slice(2); }
   function loadJSON(k,fb){ try{const r=localStorage.getItem(k); return r?JSON.parse(r):fb}catch{ return fb } }
