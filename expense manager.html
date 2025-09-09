@@ -1,0 +1,455 @@
+<!-- ANDI · Shpenzimet – Elementor scoped full app -->
+<div id="andi" aria-live="polite">
+  <!-- Topbar -->
+  <div class="and-top">
+    <div>
+      <div class="and-title" id="and-title">ANDI · Shpenzimet</div>
+      <div class="and-muted" id="and-sub">–</div>
+    </div>
+    <div class="and-actions">
+      <button class="and-ghost" data-and="openFilter">Filtra</button>
+      <button class="and-ghost" data-and="exportCSV">CSV</button>
+    </div>
+  </div>
+
+  <!-- Segment (Daily/Calendar/Weekly/Monthly/Summary) -->
+  <div class="and-card">
+    <div class="and-seg" id="and-modes">
+      <button class="and-chip and-active" data-mode="daily">Ditore</button>
+      <button class="and-chip" data-mode="calendar">Kalendar</button>
+      <button class="and-chip" data-mode="weekly">Javore</button>
+      <button class="and-chip" data-mode="monthly">Mujore</button>
+      <button class="and-chip" data-mode="summary">Përmbledhje</button>
+    </div>
+
+    <!-- Boxes -->
+    <div id="and-box-daily" class="and-pad"></div>
+    <div id="and-box-calendar" class="and-pad" style="display:none"></div>
+    <div id="and-box-weekly" class="and-pad" style="display:none"></div>
+    <div id="and-box-monthly" class="and-pad" style="display:none"></div>
+    <div id="and-box-summary" class="and-pad" style="display:none"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="and-card">
+    <b>Statistika e muajit</b>
+    <div class="and-muted" id="and-stat-month" style="margin:4px 0 8px"></div>
+    <div id="and-stat-totals" class="and-totline"></div>
+  </div>
+
+  <!-- Settings -->
+  <div class="and-card">
+    <b>Rregullime</b>
+    <div class="and-grid2" style="margin-top:10px">
+      <div><label>Titulli</label><input id="and-set-title" placeholder="ANDI · Shpenzimet"></div>
+      <div><label>Ngjyra e theksit</label><input id="and-accent" type="color" value="#0ea5e9"></div>
+    </div>
+    <div style="margin-top:8px">
+      <label>Kategoritë (një për rresht)</label>
+      <textarea id="and-cats">Qira
+Fatura e ujit
+Fatura e energjisë
+Internet
+Blerje ushqimore
+Rroba
+Jashtë në restorant
+Shpenzime makine
+Të ardhura
+Shënim i lirë</textarea>
+    </div>
+    <div class="and-grid2" style="margin-top:8px">
+      <button class="and-btn" data-and="applySettings">Zbato</button>
+      <label class="and-ghost" style="display:grid;place-items:center;cursor:pointer">Ngarko CSV
+        <input id="and-csv-in" type="file" accept=".csv,text/csv" style="display:none">
+      </label>
+    </div>
+  </div>
+
+  <!-- Floating Add Button -->
+  <button id="and-fab" class="and-fab" aria-label="Shto">＋</button>
+
+  <!-- Add/Edit modal -->
+  <div id="and-ov" class="and-overlay" aria-hidden="true">
+    <div class="and-modal" role="dialog" aria-modal="true" aria-label="Regjistrim">
+      <div class="and-mh"><b>Regjistrim</b>
+        <div class="and-right">
+          <button class="and-ghost" data-and="delRow" id="and-del" style="display:none">Fshi</button>
+          <button class="and-ghost" data-and="closeModal">Mbyll</button>
+        </div>
+      </div>
+      <div class="and-mb">
+        <input type="hidden" id="and-id">
+        <div class="and-grid2">
+          <div><label>Shuma (ALL)</label>
+            <input id="and-amt" type="number" inputmode="decimal" step="0.01" placeholder="p.sh. 1500">
+          </div>
+          <div><label>Lloji</label>
+            <select id="and-type"><option value="expense">Shpenzim</option><option value="income">Të ardhura</option></select>
+          </div>
+        </div>
+        <div class="and-grid2" style="margin-top:8px">
+          <div><label>Llogaria</label>
+            <select id="and-acc"><option>Cash</option><option>Kartë</option></select>
+          </div>
+          <div><label>Kategoria</label><select id="and-cat"></select></div>
+        </div>
+        <div style="margin-top:8px"><label>Data & Ora</label><input id="and-date" type="datetime-local"></div>
+        <div style="margin-top:8px"><label>Shënim</label><textarea id="and-note" placeholder="opsionale…"></textarea></div>
+      </div>
+      <div class="and-mf">
+        <button class="and-btn" data-and="saveRow">Ruaj</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter sheet -->
+  <div id="and-filter" class="and-overlay and-bottom" aria-hidden="true">
+    <div class="and-modal and-sheet" role="dialog" aria-modal="true" aria-label="Filtra">
+      <div class="and-mh"><b>Filtra</b><button class="and-ghost" data-and="closeFilter">Mbyll</button></div>
+      <div class="and-mb">
+        <div class="and-muted">Llogaria</div>
+        <div id="and-accchips" class="and-chipline"></div>
+        <div style="height:8px"></div>
+        <div class="and-muted">Kategoria</div>
+        <div id="and-catchips" class="and-chipline"></div>
+      </div>
+      <div class="and-mf">
+        <button class="and-ghost" data-and="clearFilter">Pastro</button>
+        <button class="and-btn" data-and="applyFilter">Zbato</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Styles (scoped) -->
+<style>
+  #andi{font:16px -apple-system,BlinkMacSystemFont,Inter,Arial;color:#111}
+  #andi *{box-sizing:border-box}
+  #andi .and-muted{color:#6b7280}
+  #andi input,#andi select,#andi textarea{width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;background:#fff}
+  #andi textarea{min-height:72px;resize:vertical}
+  #andi .and-top{display:flex;justify-content:space-between;align-items:center}
+  #andi .and-actions{display:flex;gap:8px}
+  #andi .and-title{font-weight:800}
+  #andi .and-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px;margin-top:12px}
+  #andi .and-pad{padding:6px}
+  #andi .and-seg{display:flex;background:#f1f5f9;border:1px solid #e5e7eb;border-radius:12px;overflow:auto}
+  #andi .and-chip{flex:1;border:0;background:transparent;padding:10px 12px;font-weight:700;white-space:nowrap;cursor:pointer}
+  #andi .and-chip.and-active{background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+  #andi .and-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px;border-bottom:1px solid #e5e7eb;cursor:pointer}
+  #andi .and-row .m{font-size:12px;color:#6b7280}
+  #andi .and-amt{font-weight:800}
+  #andi .good{color:#10b981} #andi .bad{color:#ef4444}
+  #andi .and-totline{display:flex;gap:8px;flex-wrap:wrap}
+  #andi .and-tot{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px;font-size:13px}
+  #andi .and-btn{background:#ff3b30;color:#fff;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
+  #andi .and-ghost{background:#fff;border:1px dashed #e5e7eb;border-radius:10px;padding:10px 12px;cursor:pointer}
+  #andi .and-fab{position:fixed;right:16px;bottom:16px;background:#0ea5e9;color:#fff;width:56px;height:56px;border-radius:50%;
+    display:grid;place-items:center;font-size:28px;border:0;box-shadow:0 10px 26px rgba(14,165,233,.35);cursor:pointer;z-index:6}
+  #andi .and-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+  #andi .and-overlay.show{display:flex}
+  #andi .and-bottom{align-items:flex-end}
+  #andi .and-modal{background:#fff;border:1px solid #e5e7eb;border-radius:14px;width:min(92vw,560px);max-height:90vh;overflow:auto}
+  #andi .and-sheet{width:100%;max-width:900px;border-radius:12px 12px 0 0}
+  #andi .and-mh{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #e5e7eb}
+  #andi .and-mb{padding:12px}
+  #andi .and-mf{padding:0 12px 12px;display:flex;gap:8px;justify-content:flex-end}
+  #andi .and-chipline{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  #andi .and-chipline .chip{border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer}
+  #andi .and-chipline .chip.sel{background:#111;color:#fff;border-color:#111}
+  #andi .and-cal{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+  #andi .and-cal .hd{background:#fafafa;border-bottom:1px solid #e5e7eb;padding:8px;font-size:12px;text-align:center;color:#374151}
+  #andi .and-cell{min-height:78px;border-bottom:1px solid #e5e7eb;border-right:1px solid #e5e7eb;padding:6px 6px 8px;position:relative;background:#fff}
+  #andi .and-cell:nth-child(7n){border-right:none}
+  #andi .and-cell .d{font-size:11px;color:#374151;font-weight:600}
+  #andi .and-cell .dots{position:absolute;right:6px;bottom:6px;display:flex;gap:4px}
+  #andi .dot{width:6px;height:6px;border-radius:50%} #andi .dot.bad{background:#ef4444} #andi .dot.good{background:#10b981}
+  #andi .and-cell .amt{position:absolute;left:6px;bottom:4px;font-size:11px;color:#374151}
+  #andi canvas{max-width:100%;height:auto}
+</style>
+
+<!-- Script (scoped) -->
+<script>
+(function(){
+  var root=document.getElementById('andi');
+  function $(s){return root.querySelector(s)}
+  function $all(s){return Array.prototype.slice.call(root.querySelectorAll(s))}
+  var K_DATA='andi_full_data_v1', K_CFG='andi_full_cfg_v1';
+  var rows = load(K_DATA,[]);
+  var cfg  = load(K_CFG,{title:'ANDI · Shpenzimet',accent:'#0ea5e9',categories:[
+    'Qira','Fatura e ujit','Fatura e energjisë','Internet','Blerje ushqimore','Rroba','Jashtë në restorant','Shpenzime makine','Të ardhura','Shënim i lirë'
+  ]});
+  var filters={acc:new Set(), cat:new Set()};
+
+  // Init UI
+  $('#and-title').textContent=cfg.title;
+  $('#and-sub').textContent=new Date().toLocaleString('sq-AL',{month:'long',year:'numeric'});
+  $('#and-accent').value=cfg.accent; $('#and-fab').style.background=cfg.accent;
+  $('#and-set-title').value=cfg.title; $('#and-cats').value=cfg.categories.join('\\n');
+  // categories to select
+  function fillCatSelect(){
+    var sel=$('#and-cat'); sel.innerHTML=''; cfg.categories.forEach(function(c){ sel.appendChild(new Option(c,c)); });
+  }
+  fillCatSelect();
+
+  // Event delegation (clicks)
+  root.addEventListener('click', function(e){
+    var act=e.target.closest('[data-and]'); if(act){
+      var a=act.getAttribute('data-and');
+      if(a==='openFilter') openFilter();
+      if(a==='closeFilter') closeFilter();
+      if(a==='applyFilter') { closeFilter(); paintAll(); }
+      if(a==='clearFilter') { filters.acc.clear(); filters.cat.clear(); $all('#and-filter .chip').forEach(function(c){c.classList.remove('sel')}); }
+      if(a==='exportCSV') exportCSV();
+      if(a==='applySettings') applySettings();
+      if(a==='htmlDl') downloadHTML(); // (kullanmadık ama dursun)
+      if(a==='closeModal') closeModal();
+      if(a==='saveRow') saveRow();
+      if(a==='delRow') deleteRow();
+      return;
+    }
+    // mode switch
+    var chip=e.target.closest('.and-chip'); if(chip && chip.parentElement.id==='and-modes'){
+      $all('#and-modes .and-chip').forEach(function(x){x.classList.remove('and-active')}); chip.classList.add('and-active');
+      ['daily','calendar','weekly','monthly','summary'].forEach(function(m){
+        $('#and-box-'+m).style.display = (chip.getAttribute('data-mode')===m)?'block':'none';
+      });
+    }
+    // row edit
+    var rowEl=e.target.closest('.and-row'); if(rowEl && rowEl.dataset.id){ var item=rows.find(function(x){return x.id===rowEl.dataset.id}); openModal(item); }
+    // calendar cell -> day details
+    var cell=e.target.closest('.and-cell'); if(cell && cell.dataset.date){ openDay(cell.dataset.date); }
+  });
+
+  // FAB
+  $('#and-fab').addEventListener('click', function(){ openModal(null); });
+
+  // Accent color live
+  $('#and-accent').addEventListener('change', function(e){ cfg.accent=e.target.value; $('#and-fab').style.background=e.target.value; save(K_CFG,cfg); });
+
+  // CSV import
+  $('#and-csv-in').addEventListener('change', function(ev){
+    var f=ev.target.files && ev.target.files[0]; if(!f) return;
+    var r=new FileReader(); r.onload=function(){
+      var added=0, ids={}; rows.forEach(function(x){ids[x.id]=1});
+      parseCSV(String(r.result)).forEach(function(x){
+        if(!x.id||ids[x.id]) return;
+        rows.push({id:x.id,ts:x.ts,amount:+x.amount,type:x.type||'expense',account:x.account||'Cash',category:x.category||'Tjetër',note:x.note||''});
+        ids[x.id]=1; added++;
+      });
+      save(K_DATA,rows); paintAll(); alert('U shtuan '+added+' rreshta.'); ev.target.value='';
+    }; r.readAsText(f);
+  });
+
+  // Seed examples
+  if(rows.length===0){ seed(); save(K_DATA,rows); }
+
+  paintAll();
+
+  /* ---------- RENDERERS ---------- */
+  function paintAll(){ paintDaily(); paintCalendar(); paintWeekly(); paintMonthly(); paintSummary(); paintStats(); }
+
+  function paintDaily(){
+    var arr=filtered().sort(function(a,b){return new Date(b.ts)-new Date(a.ts)});
+    if(!arr.length){ $('#and-box-daily').innerHTML='<div class="and-muted">Ende nuk ka të dhëna.</div>'; return; }
+    var by={}; arr.forEach(function(r){ (by[r.ts.slice(0,10)]||(by[r.ts.slice(0,10)]=[])).push(r) });
+    var html='';
+    Object.keys(by).sort().reverse().forEach(function(d){
+      var list=by[d], inc=0,exp=0; list.forEach(function(x){ x.type==='income'?inc+=x.amount:exp+=x.amount });
+      html+='<div class="and-group">'+
+              '<div style="padding:10px 12px;border-bottom:1px solid #e5e7eb;background:#fafafa">'+
+              fmtDay(d)+' · <span class="good">+'+money(inc)+'</span> · <span class="bad">-'+money(exp)+'</span></div>'+
+              list.map(rowHTML).join('')+
+            '</div><div style="height:8px"></div>';
+    });
+    $('#and-box-daily').innerHTML=html;
+  }
+  function rowHTML(x){
+    var sign=x.type==='income'?'+':'-';
+    return '<div class="and-row" data-id="'+x.id+'"><div><b>'+esc(x.category)+'</b> · '+esc(x.account)+
+           '<div class="m">'+new Date(x.ts).toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'})+(x.note?(' · '+esc(x.note)):'')+'</div></div>'+
+           '<div class="and-amt '+(x.type==='income'?'good':'bad')+'">'+sign+money(x.amount)+'</div></div>';
+  }
+
+  function paintCalendar(){
+    var now=new Date(); var y=now.getFullYear(), m=now.getMonth();
+    var first=new Date(y,m,1); var start=new Date(first); start.setDate(first.getDate()-((first.getDay()+6)%7));
+    var days=[]; for(var i=0;i<42;i++){ var d=new Date(start); d.setDate(start.getDate()+i); days.push(d); }
+    var arr=filtered(), html='<div class="and-cal">';
+    ['Hën','Mar','Mër','Enj','Pre','Sht','Die'].forEach(function(w){ html+='<div class="hd">'+w+'</div>' });
+    days.forEach(function(d){
+      var key=d.toISOString().slice(0,10);
+      var list=arr.filter(function(r){return r.ts.slice(0,10)===key});
+      var inc=0,exp=0; list.forEach(function(x){ x.type==='income'?inc+=x.amount:exp+=x.amount });
+      html+='<div class="and-cell" data-date="'+key+'"><div class="d">'+d.getDate()+'</div>'+
+            (list.length?'<div class="amt">'+money(exp)+'</div>':'')+
+            '<div class="dots">'+(inc?'<span class="dot good"></span>':'')+(exp?'<span class="dot bad"></span>':'')+'</div></div>';
+    });
+    html+='</div>';
+    $('#and-box-calendar').innerHTML=html;
+  }
+
+  function paintWeekly(){
+    var arr=filtered(), wk={};
+    arr.forEach(function(r){ var d=new Date(r.ts); var k=d.getFullYear()+'-W'+isoWeek(d); (wk[k]||(wk[k]={inc:0,exp:0})); (r.type==='income'?wk[k].inc:wk[k].exp)+=r.amount; });
+    var keys=Object.keys(wk).sort().reverse();
+    $('#and-box-weekly').innerHTML = keys.length? keys.map(function(k){
+      return '<div class="and-row"><div><b>'+k+'</b></div><div class="and-amt">'+money(wk[k].inc-wk[k].exp)+'</div></div>'+
+             '<div class="and-row"><div class="m">Të ardhura</div><div class="and-amt good">+'+money(wk[k].inc)+'</div></div>'+
+             '<div class="and-row"><div class="m">Shpenzime</div><div class="and-amt bad">-'+money(wk[k].exp)+'</div></div>'+
+             '<hr style="border:none;border-top:1px solid #e5e7eb">';
+    }).join('') : '<div class="and-muted">S’ka të dhëna.</div>';
+  }
+
+  function paintMonthly(){
+    var arr=filtered(), m={}; arr.forEach(function(r){ var k=r.ts.slice(0,7); (m[k]||(m[k]={inc:0,exp:0})); (r.type==='income'?m[k].inc:m[k].exp)+=r.amount; });
+    var keys=Object.keys(m).sort().reverse();
+    $('#and-box-monthly').innerHTML = keys.length? keys.map(function(k){
+      return '<div class="and-row"><div><b>'+fmtMonth(k)+'</b></div><div class="and-amt">'+money(m[k].inc-m[k].exp)+'</div></div>'+
+             '<div class="and-row"><div class="m">Të ardhura</div><div class="and-amt good">+'+money(m[k].inc)+'</div></div>'+
+             '<div class="and-row"><div class="m">Shpenzime</div><div class="and-amt bad">-'+money(m[k].exp)+'</div></div>'+
+             '<hr style="border:none;border-top:1px solid #e5e7eb">';
+    }).join('') : '<div class="and-muted">S’ka të dhëna.</div>';
+  }
+
+  function paintSummary(){
+    var arr=filtered().filter(function(x){return x.type!=='income'}); if(!arr.length){ $('#and-box-summary').innerHTML='<div class="and-muted">S’ka shpenzime.</div>'; return; }
+    var by={}, tot=0; arr.forEach(function(r){ by[r.category]=(by[r.category]||0)+r.amount; tot+=r.amount; });
+    // pie
+    var w=320,h=320,r=140,cx=w/2,cy=h/2,colors=['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#84cc16','#f97316','#06b6d4'];
+    var can=document.createElement('canvas'); can.width=w; can.height=h; var ctx=can.getContext('2d');
+    var start=0,i=0; Object.keys(by).sort(function(a,b){return by[b]-by[a]}).forEach(function(cat){ var val=by[cat]; var ang=(val/tot)*Math.PI*2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+ang); ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill(); start+=ang; i++; });
+    var legend=document.createElement('div'); legend.className='and-totline';
+    i=0; Object.keys(by).sort(function(a,b){return by[b]-by[a]}).forEach(function(cat){ var chip=document.createElement('div'); chip.className='and-tot'; chip.innerHTML='<span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+colors[i%colors.length]+';margin-right:6px"></span>'+esc(cat)+' · <b>'+((by[cat]/tot*100).toFixed(1))+'%</b> · '+money(by[cat]); legend.appendChild(chip); i++; });
+    var box=$('#and-box-summary'); box.innerHTML=''; box.appendChild(can); box.appendChild(legend);
+  }
+
+  function paintStats(){
+    var key=new Date().toISOString().slice(0,7); var arr=filtered().filter(function(r){return r.ts.slice(0,7)===key});
+    var inc=0,exp=0; arr.forEach(function(x){ x.type==='income'?inc+=x.amount:exp+=x.amount; });
+    $('#and-stat-month').textContent=fmtMonth(key);
+    var box=$('#and-stat-totals'); box.innerHTML='';
+    box.appendChild(tot('Të ardhura','+'+money(inc),'var(--good)'));
+    box.appendChild(tot('Shpenzime','-'+money(exp),'var(--bad)'));
+    box.appendChild(tot('Bilanci',money(inc-exp),'var(--text)'));
+  }
+
+  /* ---------- MODAL / CRUD ---------- */
+  function openModal(item){
+    $('#and-id').value=item?item.id:'';
+    $('#and-amt').value=item?item.amount:'';
+    $('#and-type').value=item?item.type:'expense';
+    $('#and-acc').value=item?item.account:'Cash';
+    $('#and-cat').value=item?item.category:(cfg.categories[0]||'Tjetër');
+    $('#and-date').value=item?toLocal(item.ts).slice(0,16):new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+    $('#and-note').value=item?item.note:'';
+    $('#and-del').style.display=item?'':'none';
+    openOverlay('#and-ov');
+  }
+  function closeModal(){ closeOverlay('#and-ov'); }
+  function saveRow(){
+    var amt=Number(String($('#and-amt').value).replace(',','.')); if(!(amt>0)){ alert('Shuma?'); $('#and-amt').focus(); return; }
+    var obj={ id: $('#and-id').value||rid(), ts:new Date($('#and-date').value).toISOString(), amount:+amt.toFixed(2),
+      type:$('#and-type').value, account:$('#and-acc').value, category:$('#and-cat').value, note:($('#and-note').value||''), currency:'ALL' };
+    var i=rows.findIndex(function(x){return x.id===obj.id}); if(i>=0) rows[i]=obj; else rows.push(obj);
+    save(K_DATA,rows); closeModal(); paintAll();
+  }
+  function deleteRow(){
+    var id=$('#and-id').value; if(!id) return;
+    rows=rows.filter(function(x){return x.id!==id}); save(K_DATA,rows); closeModal(); paintAll();
+  }
+
+  /* ---------- FILTER ---------- */
+  function openFilter(){
+    var acc=$('#and-accchips'), cat=$('#and-catchips'); acc.innerHTML=''; cat.innerHTML='';
+    ;['Cash','Kartë'].forEach(function(a){
+      var b=document.createElement('button'); b.className='chip'+(filters.acc.has(a)?' sel':''); b.textContent=a; b.onclick=function(){toggle(filters.acc,a); b.classList.toggle('sel');};
+      acc.appendChild(b);
+    });
+    cfg.categories.forEach(function(c){
+      var b=document.createElement('button'); b.className='chip'+(filters.cat.has(c)?' sel':''); b.textContent=c; b.onclick=function(){toggle(filters.cat,c); b.classList.toggle('sel');};
+      cat.appendChild(b);
+    });
+    openOverlay('#and-filter');
+  }
+  function closeFilter(){ closeOverlay('#and-filter'); }
+  function toggle(set,val){ set.has(val)?set.delete(val):set.add(val); }
+  function filtered(){ return rows.filter(function(r){ var a=filters.acc.size?filters.acc.has(r.account):1; var c=filters.cat.size?filters.cat.has(r.category):1; return a&&c; }); }
+
+  /* ---------- SETTINGS ---------- */
+  function applySettings(){
+    cfg.title=$('#and-set-title').value||cfg.title;
+    cfg.accent=$('#and-accent').value||cfg.accent;
+    cfg.categories=($('#and-cats').value||'').split(/\\r?\\n/).map(function(s){return s.trim()}).filter(Boolean);
+    save(K_CFG,cfg);
+    $('#and-title').textContent=cfg.title; $('#and-fab').style.background=cfg.accent; fillCatSelect();
+    alert('Rregullimet u ruajtën.');
+  }
+
+  /* ---------- CSV ---------- */
+  function exportCSV(){
+    var lines=[['id','ts','amount','type','account','category','note'].join(',')];
+    rows.forEach(function(r){ lines.push([r.id,r.ts,r.amount,r.type,r.account,r.category||'',r.note||''].join(',')); });
+    var blob=new Blob([lines.join('\\n')],{type:'text/csv;charset=utf-8;'}), a=document.createElement('a');
+    a.download='ANDI_Shpnezime_'+new Date().toISOString().slice(0,10)+'.csv'; a.href=URL.createObjectURL(blob);
+    document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},0);
+  }
+  function parseCSV(t){ var L=t.replace(/\\r/g,'').split('\\n').filter(Boolean); if(!L.length) return [];
+    var h=L[0].split(','), I=function(n){return h.indexOf(n)}, out=[];
+    for(var i=1;i<L.length;i++){ var c=L[i].split(','); out.push({id:c[I('id')],ts:c[I('ts')],amount:c[I('amount')],type:c[I('type')],account:c[I('account')],category:c[I('category')],note:c[I('note')]}); }
+    return out;
+  }
+
+  /* ---------- Overlays ---------- */
+  function openOverlay(sel){ var el=$(sel); el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
+  function closeOverlay(sel){ var el=$(sel); el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
+
+  /* ---------- Utils ---------- */
+  function money(n){ return new Intl.NumberFormat('sq-AL',{style:'currency',currency:'ALL',maximumFractionDigits:2}).format(n||0) }
+  function fmtDay(k){ var d=new Date(k); return d.toLocaleDateString('sq-AL',{weekday:'short',day:'2-digit',month:'short'}) }
+  function fmtMonth(k){ var p=k.split('-'); return new Date(+p[0],+p[1]-1,1).toLocaleDateString('sq-AL',{month:'long',year:'numeric'}) }
+  function tot(l,v,c){ var d=document.createElement('div'); d.className='and-tot'; d.innerHTML='<b>'+l+':</b> <span style="color:'+c+'">'+v+'</span>'; return d; }
+  function toLocal(iso){ var d=new Date(iso); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString() }
+  function rid(){ return 'id-'+Math.random().toString(36).slice(2) }
+  function load(k,fb){ try{var s=localStorage.getItem(k); return s?JSON.parse(s):fb}catch(e){ return fb } }
+  function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} }
+  function sum(a,f){return a.reduce(function(x,y){return x+(f?f(y):y)},0)}
+  function isoWeek(d){ var dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); var day=(dt.getUTCDay()+6)%7;
+    dt.setUTCDate(dt.getUTCDate()-day+3); var first=new Date(Date.UTC(dt.getUTCFullYear(),0,4));
+    return 1+Math.round(((dt-first)/86400000-3+((first.getUTCDay()+6)%7))/7); }
+
+  /* ---------- Day detail ---------- */
+  function openDay(dateKey){
+    var list=filtered().filter(function(r){return r.ts.slice(0,10)===dateKey});
+    if(!list.length){ alert('S’ka të dhëna.'); return; }
+    // küçük popup yerine günlük listeyi modalda gösterip satıra dokununca düzenle:
+    var html='<div class="and-card"><b>'+fmtDay(dateKey)+'</b></div>'+ list.map(rowHTML).join('');
+    // modalı düzenleme moduna değil sadece bilgi için aç
+    openModal(null);
+    // modal gövdesini geçici gösterim
+    $('#and-note').value=''; $('#and-amt').value=''; $('#and-id').value='';
+    $('#and-amt').placeholder='Zgjidh një rresht nga poshtë';
+    var extra=document.createElement('div'); extra.innerHTML=html; extra.style.marginTop='8px';
+    $('#and-ov .and-mb').appendChild(extra);
+    // satıra tıklayınca gerçek düzenleme
+    Array.prototype.forEach.call(extra.querySelectorAll('.and-row'), function(r){
+      r.addEventListener('click', function(){
+        var item=rows.find(function(x){return x.id===r.dataset.id}); closeModal(); openModal(item);
+      });
+    });
+  }
+
+  /* ---------- Filters helper ---------- */
+  function filteredArrNotice(){ /* future */ }
+
+  /* ---------- Seed ---------- */
+  function seed(){
+    var now=new Date();
+    function mk(d,amt,cat,acc,type,n){return {id:rid(),ts:new Date(now.getFullYear(),now.getMonth(),d,12,0,0).toISOString(),amount:amt,type:type||'expense',account:acc||'Cash',category:cat,note:n||''}}
+    rows=[ mk(2,1200,'Qira'), mk(3,780,'Blerje ushqimore','Kartë'), mk(4,60,'Jashtë në restorant'),
+           mk(6,210,'Fatura e energjisë'), mk(8,45,'Fatura e ujit'), mk(10,350,'Të ardhura','Cash','income','Paga'),
+           mk(12,120,'Shpenzime makine') ];
+  }
+
+})();
+</script>
