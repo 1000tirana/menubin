@@ -2,484 +2,904 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Andi Ev Harcamaları</title>
 <style>
-  :root{
-    --bg:#0f1220; --card:#151a2e; --muted:#8b93b0; --text:#eaf0ff;
-    --accent:#6ee7b7; --accent2:#60a5fa; --danger:#ff6b6b; --chip:#1e2542;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
-    --radius:16px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; background:
-      radial-gradient(1200px 800px at 120% -10%, #1b2140 0%, rgba(27,33,64,0) 60%),
-      radial-gradient(900px 700px at -10% 120%, #1a2a3f 0%, rgba(0,0,0,0) 55%),
-      var(--bg);
-    color:var(--text); font:500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-    overflow-x:hidden;
-  }
-  .appbar{
-    position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(12px);
-    background:linear-gradient(180deg, rgba(21,26,46,.9), rgba(21,26,46,.6));
-    border-bottom:1px solid rgba(255,255,255,.06);
-    padding:12px 16px; display:flex; align-items:center; gap:12px;
-  }
-  .logo{
-    width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#60a5fa, #6ee7b7);
-    display:grid;place-items:center; box-shadow:var(--shadow); font-weight:900; color:#0a1024;
-  }
-  .title{font-size:18px;font-weight:800}
-  .subtitle{color:var(--muted); font-size:12px; margin-top:-2px}
+/* =========================
+   ANDI EV HARCAMALARI - STYLES
+   ========================= */
 
-  .container{padding:18px; max-width:960px; margin:0 auto}
-  .card{
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:var(--radius); box-shadow:var(--shadow);
-  }
+/* CSS Variables for Light/Dark themes */
+:root{
+  --bg: #0f1115;
+  --bg-soft: #151923;
+  --card: #171b26;
+  --text: #e8ecf1;
+  --muted: #b5c0cf;
+  --accent: #6ee7ff;
+  --accent-2:#7cffb7;
+  --danger:#ff6b6b;
+  --warn:#ffb86b;
+  --ok:#7df29a;
+  --shadow: 0 10px 25px rgba(0,0,0,.35);
+  --ring: 0 0 0 3px rgba(110,231,255,.25);
+  --border: 1px solid rgba(255,255,255,.06);
+}
 
-  /* INPUT BAR */
-  .input-bar{display:grid; grid-template-columns:1fr auto; gap:10px; padding:16px}
-  .amount{
-    width:100%; background:#0f1428; border:1px solid rgba(255,255,255,.08);
-    color:var(--text); border-radius:14px; padding:14px 16px; font-size:18px;
-    outline:none; transition:.2s border;
-  }
-  .amount:focus{border-color:rgba(96,165,250,.6)}
-  .btn{
-    background:linear-gradient(135deg, var(--accent2), var(--accent));
-    color:#0b1020; border:none; border-radius:14px; padding:14px 18px; font-size:16px;
-    font-weight:800; cursor:pointer; box-shadow:var(--shadow); transition:transform .06s;
-  }
-  .btn:active{transform:translateY(1px)}
-  .btn-secondary{
-    background:#1a2140; color:var(--text); border:1px solid rgba(255,255,255,.08);
-  }
-  .toolbar{display:flex; gap:10px; padding:12px 16px; flex-wrap:wrap}
+html.light{
+  --bg:#f6f8fb;
+  --bg-soft:#eef2f7;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#4b5563;
+  --accent:#0066ff;
+  --accent-2:#0fb76a;
+  --danger:#e11d48;
+  --warn:#d97706;
+  --ok:#16a34a;
+  --shadow: 0 10px 22px rgba(0,0,0,.08);
+  --ring: 0 0 0 3px rgba(0,102,255,.18);
+  --border: 1px solid rgba(2,6,23,.08);
+}
 
-  /* CHIPS */
-  .chips{display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px dashed rgba(255,255,255,.08)}
-  .chip{
-    padding:10px 12px; border-radius:999px; background:var(--chip); color:var(--text);
-    border:1px solid rgba(255,255,255,.05); cursor:pointer; font-size:14px; user-select:none;
-  }
-  .chip:hover{outline:2px solid rgba(96,165,250,.3)}
-  .chip:active{transform:translateY(1px)}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
 
-  /* STATS */
-  .stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:16px}
-  @media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr)} }
-  .stat{padding:14px;border-radius:14px;background:#0f1428;border:1px solid rgba(255,255,255,.08)}
-  .stat .k{font-size:12px;color:var(--muted)}
-  .stat .v{font-size:18px;font-weight:800;margin-top:4px}
+/* App shell */
+.app{
+  max-width: 760px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) 16px calc(16px + env(safe-area-inset-bottom));
+}
 
-  /* LIST */
-  .list{padding:4px 8px 12px}
-  .row{
-    display:grid; grid-template-columns:100px 1fr auto; gap:12px; align-items:center;
-    padding:12px; border-bottom:1px solid rgba(255,255,255,.06);
-  }
-  .row:last-child{border-bottom:none}
-  .date{color:var(--muted); font-size:12px}
-  .cat{font-weight:700}
-  .amt{font-weight:900}
-  .note{color:var(--muted); font-size:13px}
-  .row .del{
-    background:transparent; border:1px solid rgba(255,255,255,.1); color:#ffb0b0; padding:8px 10px;
-    border-radius:10px; cursor:pointer;
-  }
+/* Header */
+.header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:16px; background:var(--card); border-radius:16px;
+  box-shadow: var(--shadow); border: var(--border); position: sticky; top: 8px; z-index: 5;
+}
+.brand{
+  display:flex; align-items:center; gap:12px;
+}
+.logo{
+  width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#061018; font-weight:800; letter-spacing:.5px; box-shadow: var(--shadow);
+}
+.title{
+  line-height:1.05;
+}
+.title h1{
+  font-size:1.1rem; margin:0 0 2px 0; letter-spacing:.2px;
+}
+.title small{
+  color: var(--muted);
+}
 
-  /* MODAL (kategori + not) */
-  .modal-back{
-    position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; place-items:end; z-index:60;
-  }
-  .modal{width:100%; background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px;
-    box-shadow:var(--shadow); padding:16px; border:1px solid rgba(255,255,255,.08);
-    max-height:85svh; overflow:auto;
-  }
-  .modal h3{margin:4px 4px 10px}
-  .notein{
-    width:100%; background:#0f1428; border:1px solid rgba(255,255,255,.08);
-    color:var(--text); border-radius:12px; padding:12px 12px; font-size:15px; outline:none;
-  }
+/* Theme toggle */
+.theme{
+  display:flex; align-items:center; gap:8px; font-size:.85rem; color:var(--muted);
+}
+.switch{
+  --w:46px; --h:28px;
+  width:var(--w); height:var(--h); background:var(--bg-soft); border-radius:999px;
+  position:relative; border: var(--border); cursor:pointer; box-shadow: inset 0 0 0 2px rgba(0,0,0,.03);
+}
+.switch input{ display:none; }
+.switch i{
+  position:absolute; top:3px; left:3px; width:22px; height:22px; background:#fff;
+  border-radius:50%; transition:.25s; box-shadow: var(--shadow);
+}
+.switch input:checked + i{ transform: translateX(18px); }
 
-  .footer{
-    display:flex; gap:10px; padding:12px 16px; justify-content:space-between; align-items:center;
-    border-top:1px solid rgba(255,255,255,.06);
-  }
-  .muted{color:var(--muted); font-size:13px}
-  a.link{color:var(--accent2); text-decoration:none}
+/* Quick add card */
+.quick{
+  margin:16px 0; padding:16px; background:var(--card); border-radius:18px; border: var(--border); box-shadow: var(--shadow);
+}
+.quick h2{ margin:0 0 8px 0; font-size:1rem; color:var(--muted) }
+.amount-row{
+  display:flex; gap:10px;
+}
+.amount{
+  flex: 1 1 auto;
+  font-size:1.35rem; padding:16px 14px; border-radius:14px; border: var(--border);
+  background:var(--bg); color:var(--text); outline:none;
+}
+.amount:focus{ box-shadow: var(--ring); border-color: transparent; }
+.btn{
+  appearance:none; border:none; cursor:pointer; padding:14px 16px;
+  border-radius:14px; font-weight:700; letter-spacing:.2px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color:#061018; box-shadow: var(--shadow);
+}
+.btn:active{ transform: translateY(1px) }
+.btn.secondary{
+  background: var(--bg-soft); color: var(--text); border: var(--border);
+}
+.btn.warn{ background: var(--warn); color: #111 }
+.btn.danger{ background: var(--danger); color: #fff }
+.btn.ghost{
+  background: transparent; border: var(--border); color: var(--text)
+}
 
-  .empty{padding:24px; text-align:center; color:var(--muted)}
+/* Summaries */
+.summaries{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;
+  margin-top:12px;
+}
+.kpi{
+  padding:12px; background:var(--bg-soft); border-radius:14px; border: var(--border);
+}
+.kpi b{ display:block; font-size:.8rem; color:var(--muted); margin-bottom:4px }
+.kpi span{ font-size:1.1rem; font-weight:800 }
+
+/* Filters */
+.filters{
+  display:flex; gap:8px; margin:16px 0 10px 0; flex-wrap:wrap;
+}
+.tab{
+  padding:8px 12px; border-radius:999px; background:var(--bg-soft); border: var(--border);
+  color:var(--text); font-size:.9rem; cursor:pointer;
+}
+.tab.active{ outline: 3px solid transparent; box-shadow: var(--ring) }
+
+/* Category select (for filter) */
+select{
+  padding:10px 12px; border-radius:12px; background:var(--bg-soft); color:var(--text);
+  border: var(--border);
+}
+
+/* List */
+.list{
+  display:grid; gap:10px; margin-bottom:80px;
+}
+.card{
+  padding:12px; background:var(--card); border-radius:16px; border: var(--border); box-shadow: var(--shadow);
+  display:flex; align-items:stretch; justify-content:space-between; gap:10px;
+}
+.card-left{
+  display:flex; flex-direction:column; gap:4px;
+}
+.meta{ color: var(--muted); font-size:.85rem }
+.cat{ font-weight:700 }
+.note{ color: var(--muted); font-size:.92rem }
+.amount-out{ font-size:1.1rem; font-weight:900; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+.row-actions{
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;
+}
+.row-actions .btn{ padding:8px 10px; font-size:.85rem; border-radius:10px }
+
+/* Toolbar bottom */
+.toolbar{
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: 12px; width: min(760px, calc(100% - 24px));
+  display:flex; gap:8px; background:var(--card); border: var(--border);
+  box-shadow: var(--shadow); border-radius:16px; padding:10px; z-index:5;
+}
+.toolbar .btn{ flex:1 }
+
+/* Modal */
+.modal{
+  position: fixed; inset:0; display:none; place-items:end; background: rgba(0,0,0,.5);
+  z-index:10;
+}
+.modal.show{ display:grid; }
+.sheet{
+  width:100%; background:var(--card); border-radius:18px 18px 0 0; padding:16px; border: var(--border);
+  box-shadow: 0 -15px 25px rgba(0,0,0,.35);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp{ from{ transform: translateY(24px); opacity:.8 } to{ transform: translateY(0); opacity:1 } }
+.sheet h3{ margin:0 0 10px 0 }
+.cat-grid{
+  display:grid; grid-template-columns: repeat(2,1fr); gap:10px;
+}
+.cat-btn{
+  padding:12px; border-radius:12px; background:var(--bg-soft);
+  border: var(--border); text-align:center; font-weight:700; cursor:pointer;
+}
+.cat-btn.active{ box-shadow: var(--ring) }
+.cat-btn.editing{ outline: 2px dashed var(--accent) }
+textarea, input[type="text"]{
+  width:100%; padding:12px; border-radius:12px; border: var(--border);
+  background:var(--bg-soft); color:var(--text); resize: vertical;
+}
+.hr{ height:1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent); margin:12px 0 }
+
+/* Toasts / banners */
+.toast{
+  position: fixed; top: 12px; left:50%; transform: translateX(-50%);
+  background: var(--bg-soft); border: var(--border); color: var(--text); padding:10px 14px;
+  border-radius:999px; box-shadow: var(--shadow); z-index:20; display:none;
+}
+.toast.show{ display:block; animation: fade .2s ease }
+@keyframes fade{ from{opacity:0; transform: translate(-50%,-6px)} to{opacity:1; transform: translate(-50%,0)} }
+
+/* File input hide */
+input[type="file"]{ display:none }
+
+/* Accessibility focus for keyboard */
+:focus-visible{ outline: none; box-shadow: var(--ring) }
+
+/* Small tweaks */
+.muted{ color: var(--muted) }
+.right{ text-align:right }
+.flex{ display:flex; gap:8px; align-items:center }
+.gap{ gap:10px }
+.center{ text-align:center }
+.chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
+.chip{
+  border: var(--border); background: var(--bg-soft); padding:6px 10px; border-radius:999px; font-size:.85rem; cursor:pointer;
+}
 </style>
 </head>
 <body>
-  <header class="appbar">
-    <div class="logo">A</div>
-    <div>
-      <div class="title">Andi Ev Harcamaları</div>
-      <div class="subtitle">LEK (ALL) ile kayıt — hızlı kategori seçimi + CSV içe/dışa aktar</div>
+<div class="app" id="app" aria-live="polite">
+
+  <header class="header" role="banner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">L</div>
+      <div class="title">
+        <h1>Andi Ev Harcamaları</h1>
+        <small class="muted">Arnavutluk Leki • hızlı kayıt</small>
+      </div>
+    </div>
+    <div class="theme" aria-label="Tema değiştir">
+      <label class="switch" title="Karanlık/Aydınlık">
+        <input id="themeToggler" type="checkbox" aria-label="Tema anahtarı">
+        <i></i>
+      </label>
+      <span id="themeLabel" class="muted">Karanlık</span>
     </div>
   </header>
 
-  <main class="container">
-    <!-- INPUT & TOOLS -->
-    <section class="card" id="inputCard">
-      <div class="input-bar">
-        <input id="amount" class="amount" inputmode="decimal" placeholder="Tutarı gir (ALL)…" />
-        <button class="btn" id="nextBtn">Devam</button>
-      </div>
-
-      <div class="chips" id="chips" aria-disabled="true" title="Önce tutar girin">
-        <!-- hızlı kategoriler -->
-      </div>
-
-      <div class="toolbar">
-        <button class="btn-secondary" id="exportBtn">CSV İndir</button>
-        <label class="btn-secondary" style="padding:14px 18px; border-radius:14px; cursor:pointer">
-          CSV Yükle
-          <input type="file" id="importInput" accept=".csv,text/csv" hidden />
-        </label>
-        <button class="btn-secondary" id="clearBtn" title="Tüm kayıtları sil">Temizle</button>
-      </div>
-    </section>
-
-    <!-- STATS -->
-    <section class="card" style="margin-top:14px">
-      <div class="stats" id="stats"></div>
-    </section>
-
-    <!-- LIST -->
-    <section class="card" style="margin-top:14px">
-      <div class="list" id="list"></div>
-    </section>
-
-    <div class="footer">
-      <div class="muted">Veriler cihazında saklanır (localStorage). CSV ile yedekleyebilirsin.</div>
-      <a class="link" href="#" id="todayBtn">Bugün’e git</a>
+  <section class="quick" aria-labelledby="quick-title">
+    <h2 id="quick-title">Hızlı Tutar Girişi</h2>
+    <div class="amount-row">
+      <input id="amount" class="amount" inputmode="numeric" pattern="[0-9\s\.]*" autocomplete="off" placeholder="Tutar (L)" aria-label="Tutar (sadece sayı)" />
+      <button id="goBtn" class="btn" aria-label="Devam">Devam</button>
     </div>
-  </main>
 
-  <!-- MODAL: kategori & not -->
-  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <div class="modal">
-      <h3 id="mTitle">Kategori seç veya not yaz</h3>
-      <div class="chips" id="modalChips"></div>
-      <div style="padding:12px 16px">
-        <input id="noteInput" class="notein" placeholder="İstersen buraya not yaz (ör. market adı)…">
-      </div>
-      <div style="padding:0 16px 12px" class="muted">Tutar: <span id="modalAmount">0</span></div>
-      <div class="toolbar" style="padding:12px 16px 16px">
-        <button class="btn" id="saveBtn">Kaydı Oluştur</button>
-        <button class="btn-secondary" id="cancelBtn">Vazgeç</button>
-      </div>
+    <div class="summaries" aria-label="Özetler">
+      <div class="kpi"><b>Toplam</b><span id="sumAll">L 0</span></div>
+      <div class="kpi"><b>Bu Ay</b><span id="sumMonth">L 0</span></div>
+      <div class="kpi"><b>Bugün</b><span id="sumToday">L 0</span></div>
+    </div>
+  </section>
+
+  <nav class="filters" aria-label="Filtreler">
+    <button class="tab active" data-scope="all">Tümü</button>
+    <button class="tab" data-scope="month">Bu Ay</button>
+    <button class="tab" data-scope="today">Bugün</button>
+    <select id="catFilter" aria-label="Kategoriye göre filtre">
+      <option value="">Kategori: Tümü</option>
+    </select>
+  </nav>
+
+  <section class="list" id="list" aria-live="polite" aria-label="Kayıt listesi">
+    <!-- Cards injected here -->
+  </section>
+
+  <div class="toolbar" role="contentinfo">
+    <button id="btnExport" class="btn secondary" aria-label="CSV indir">CSV İndir</button>
+    <label class="btn secondary" for="csvInput" aria-label="CSV Yükle">CSV Yükle<input id="csvInput" type="file" accept=".csv" /></label>
+    <button id="btnExportAll" class="btn secondary" aria-label="Tüm veriyi dışa aktar">Tüm Veriyi Dışa Aktar</button>
+    <button id="btnClear" class="btn danger" aria-label="Tüm veriyi temizle">Tüm Veriyi Temizle</button>
+  </div>
+</div>
+
+<!-- Category & Note Modal -->
+<div class="modal" id="catModal" role="dialog" aria-modal="true" aria-labelledby="catTitle">
+  <div class="sheet">
+    <div class="flex" style="justify-content:space-between">
+      <h3 id="catTitle">Kategori Seç</h3>
+      <button class="btn ghost" id="closeModal" aria-label="Kapat">Kapat</button>
+    </div>
+
+    <div class="cat-grid" id="catGrid">
+      <!-- Category buttons injected -->
+    </div>
+
+    <div class="chips" id="smartChips" aria-label="Akıllı not önerileri">
+      <!-- chips injected -->
+    </div>
+
+    <div class="hr"></div>
+
+    <label for="note"><b>Manuel/Not (isteğe bağlı)</b></label>
+    <textarea id="note" rows="2" placeholder="Örn. market, kafe, fırın…"></textarea>
+
+    <div class="hr"></div>
+
+    <div class="flex gap" style="justify-content:space-between">
+      <button id="saveBtn" class="btn" aria-label="Kaydet">Kaydet</button>
+      <button id="editCatsBtn" class="btn secondary" aria-label="Kategori butonlarını düzenle">Kategorileri Düzenle</button>
+    </div>
+    <small class="muted">İpucu: Kategori butonuna <b>uzun bas</b> → adını değiştir.</small>
+  </div>
+</div>
+
+<!-- Edit Record Modal -->
+<div class="modal" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <div class="sheet">
+    <div class="flex" style="justify-content:space-between">
+      <h3 id="editTitle">Kaydı Düzenle</h3>
+      <button class="btn ghost" id="closeEdit" aria-label="Kapat">Kapat</button>
+    </div>
+
+    <div class="cat-grid" id="editCatGrid"></div>
+    <div class="hr"></div>
+    <label for="editAmount"><b>Tutar (L)</b></label>
+    <input id="editAmount" class="amount" inputmode="numeric" pattern="[0-9\s\.]*" />
+    <div class="hr"></div>
+    <label for="editNote"><b>Not</b></label>
+    <textarea id="editNote" rows="2"></textarea>
+
+    <div class="hr"></div>
+    <div class="flex" style="justify-content:space-between">
+      <button id="updateBtn" class="btn" aria-label="Güncelle">Güncelle</button>
+      <button id="deleteBtn" class="btn danger" aria-label="Sil">Sil</button>
     </div>
   </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-(function(){
-  const CATS = [
-    "Kira", "Su faturası", "Elektrik faturası", "İnternet faturası",
-    "Ev için alışveriş", "Çamaşır ilacı", "Kıyafet", "Dışarıda yemek"
-  ];
-  const LSKEY = "andi_expenses_v1";
+/* =========================
+   ANDI EV HARCAMALARI - SCRIPT
+   ========================= */
 
-  /** state */
-  let data = load();
-  let pending = { amount: 0, category: "", note: "" };
+// ---- Constants & Keys ----
+const LS_KEY = 'andi_ev_harcamalari_v1';
+const LS_CATS = 'andi_ev_harcamalari_categories_v1';
+const LS_THEME = 'andi_theme_v1';
 
-  /** elements */
-  const amountEl = document.getElementById('amount');
-  const nextBtn = document.getElementById('nextBtn');
-  const chipsEl = document.getElementById('chips');
-  const modalBack = document.getElementById('modalBack');
-  const modalChips = document.getElementById('modalChips');
-  const noteInput = document.getElementById('noteInput');
-  const modalAmount = document.getElementById('modalAmount');
-  const saveBtn = document.getElementById('saveBtn');
-  const cancelBtn = document.getElementById('cancelBtn');
-  const listEl = document.getElementById('list');
-  const statsEl = document.getElementById('stats');
-  const exportBtn = document.getElementById('exportBtn');
-  const importInput = document.getElementById('importInput');
-  const clearBtn = document.getElementById('clearBtn');
-  const todayBtn = document.getElementById('todayBtn');
+const DEFAULT_CATEGORIES = [
+  'kira',
+  'su faturası',
+  'elektrik faturası',
+  'internet faturası',
+  'ev için yemek alışveriş',
+  'çamaşır ilacı',
+  'kıyafet',
+  'dışarıda yemek'
+];
 
-  /** utils */
-  const fmt = new Intl.NumberFormat('sq-AL', { style:'currency', currency:'ALL', maximumFractionDigits:2 });
-  const fmtDate = ts => {
-    const d=new Date(ts);
-    return d.toLocaleDateString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric' }) + 
-           " " + d.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
-  };
-  function save(){ localStorage.setItem(LSKEY, JSON.stringify(data)); }
-  function load(){
-    try{
-      const raw = localStorage.getItem(LSKEY);
-      if(!raw) return [];
-      const arr = JSON.parse(raw);
-      return Array.isArray(arr) ? arr : [];
-    }catch(e){ return []; }
-  }
-  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+const SMART_NOTES = ['market','pazaryeri','fırın','kasap','kafe','restoran','otobüs','taksi','eczane'];
 
-  /** UI build */
-  function buildChips(target, onPick){
-    target.innerHTML = "";
-    CATS.forEach(c=>{
-      const b=document.createElement('button');
-      b.className='chip'; b.textContent=c;
-      b.addEventListener('click', ()=> onPick(c));
-      target.appendChild(b);
-    });
-    // manuel (not ile)
-    const manual=document.createElement('button');
-    manual.className='chip'; manual.textContent='(Manuel / sadece not)';
-    manual.title="Sadece not yazarak kaydet";
-    manual.addEventListener('click', ()=> onPick(""));
-    target.appendChild(manual);
-  }
+// ---- State ----
+let records = loadRecords();
+let categories = loadCategories();
+let editingCats = false;
+let pendingAmount = null; // amount entered before opening modal
+let selectedCategory = null;
+let selectedNote = '';
+let currentFilter = { scope: 'all', category: '' };
+let editRecordId = null;
 
-  function renderStats(){
-    const now=new Date();
-    const startOfDay=new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfWeek=(d=>{ const t=new Date(d); const wd=(t.getDay()+6)%7; t.setDate(t.getDate()-wd); t.setHours(0,0,0,0); return t.getTime(); })(now);
-    const startOfMonth=new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+// ---- DOM refs ----
+const amountEl = document.getElementById('amount');
+const goBtn = document.getElementById('goBtn');
+const listEl = document.getElementById('list');
+const sumAllEl = document.getElementById('sumAll');
+const sumMonthEl = document.getElementById('sumMonth');
+const sumTodayEl = document.getElementById('sumToday');
+const tabs = Array.from(document.querySelectorAll('.tab'));
+const catFilterEl = document.getElementById('catFilter');
 
-    const sum = (from=0)=> data.filter(x=>x.ts>=from).reduce((a,b)=>a+b.amount,0);
+const catModal = document.getElementById('catModal');
+const catGrid = document.getElementById('catGrid');
+const smartChips = document.getElementById('smartChips');
+const noteEl = document.getElementById('note');
+const saveBtn = document.getElementById('saveBtn');
+const closeModalBtn = document.getElementById('closeModal');
+const editCatsBtn = document.getElementById('editCatsBtn');
 
-    statsEl.innerHTML = [
-      ['Bugün', sum(startOfDay)],
-      ['Bu Hafta', sum(startOfWeek)],
-      ['Bu Ay', sum(startOfMonth)],
-      ['Toplam', sum(0)],
-    ].map(([k,v])=>(
-      `<div class="stat">
-        <div class="k">${k}</div>
-        <div class="v">${fmt.format(v || 0)}</div>
-      </div>`
-    )).join('');
-  }
+const editModal = document.getElementById('editModal');
+const editCatGrid = document.getElementById('editCatGrid');
+const editAmountEl = document.getElementById('editAmount');
+const editNoteEl = document.getElementById('editNote');
+const updateBtn = document.getElementById('updateBtn');
+const deleteBtn = document.getElementById('deleteBtn');
+const closeEditBtn = document.getElementById('closeEdit');
 
-  function renderList(){
-    if(!data.length){
-      listEl.innerHTML = <div class="empty">Henüz kayıt yok. Tutarı girerek başla.</div>;
-      renderStats();
-      return;
-    }
-    // newest first
-    const rows = data.slice().sort((a,b)=>b.ts-a.ts).map(x=>{
-      const note = x.note ? <div class="note">${escapeHtml(x.note)}</div> : '';
-      return `<div class="row" data-id="${x.id}">
-        <div>
-          <div class="date">${fmtDate(x.ts)}</div>
-          <div class="cat">${escapeHtml(x.category || '(Manuel)')}</div>
-        </div>
-        <div>${note}</div>
-        <div style="display:flex; align-items:center; gap:8px">
-          <div class="amt">${fmt.format(x.amount)}</div>
-          <button class="del" title="Sil">Sil</button>
-        </div>
-      </div>`;
-    }).join('');
-    listEl.innerHTML = rows;
+const btnExport = document.getElementById('btnExport');
+const btnExportAll = document.getElementById('btnExportAll');
+const btnClear = document.getElementById('btnClear');
+const csvInput = document.getElementById('csvInput');
 
-    // bind deletes
-    listEl.querySelectorAll('.row .del').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        const id = e.target.closest('.row').dataset.id;
-        data = data.filter(r=>r.id!==id);
-        save(); renderList(); renderStats();
-      });
-    });
+const themeToggler = document.getElementById('themeToggler');
+const themeLabel = document.getElementById('themeLabel');
 
-    renderStats();
-  }
+const toastEl = document.getElementById('toast');
 
-  function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+// ---- Init ----
+applyTheme(loadTheme());
+renderCategoryFilter();
+renderCatButtons();
+renderSmartChips();
+renderList();
+updateSummaries();
 
-  function openModal(){
-    modalAmount.textContent = fmt.format(pending.amount || 0);
-    noteInput.value = pending.note || "";
-    modalBack.style.display='grid';
-    setTimeout(()=> noteInput.focus(), 80);
-  }
-  function closeModal(){
-    modalBack.style.display='none';
-    pending.category = ""; // reset choice; note remains for convenience
-  }
+// ---- Event Listeners ----
 
-  function addRecord(){
-    const rec = {
-      id: uid(),
-      ts: Date.now(),
-      amount: pending.amount,
-      category: pending.category || '(Manuel)',
-      note: (noteInput.value||"").trim()
-    };
-    data.push(rec); save(); renderList();
+// Numeric input: allow digits, space, dot; format on blur
+amountEl.addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ openCategoryModal(); }
+});
+goBtn.addEventListener('click', openCategoryModal);
 
-    // sor: CSV indirilsin mi?
-    setTimeout(()=>{
-      if(confirm("CSV indirilsin mi?")){
-        exportCSV(true);
-      }
-    }, 50);
-  }
-
-  function exportCSV(download=true){
-    const header = ["id","timestamp","date","amount_ALL","category","note"];
-    const lines = data.map(x=>{
-      const cols = [
-        x.id,
-        x.ts,
-        new Date(x.ts).toISOString(),
-        String(x.amount).replace('.',','), // Avrupa ondalık tercihi
-        x.category || "",
-        (x.note||"").replace(/"/g,'""')
-      ];
-      // csv safe
-      return cols.map(c=>{
-        if(/[",;\n]/.test(c)) return "${c}";
-        return c;
-      }).join(",");
-    });
-    const csv = [header.join(","), ...lines].join("\n");
-    if(download){
-      const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const d = new Date();
-      const name = andi_ev_harcamalari_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.csv;
-      a.href = url; a.download = name; document.body.appendChild(a); a.click();
-      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
-    }
-    return csv;
-  }
-
-  function parseCSV(text){
-    // Basit ama “çift tırnak içi virgül” kurallı ayrıştırıcı
-    const rows=[]; let i=0, field="", row=[], inQ=false;
-    while(i<text.length){
-      const ch=text[i++];
-      if(inQ){
-        if(ch=='"'){
-          if(text[i]=='"'){ field+='"'; i++; } else { inQ=false; }
-        } else { field+=ch; }
-      } else {
-        if(ch=='"'){ inQ=true; }
-        else if(ch==','){ row.push(field); field=""; }
-        else if(ch=='\n' || ch=='\r'){
-          if(ch=='\r' && text[i]=='\n') i++;
-          row.push(field); field=""; if(row.some(c=>c!=='')) rows.push(row); row=[];
-        } else { field+=ch; }
-      }
-    }
-    if(field.length || row.length) { row.push(field); rows.push(row); }
-
-    // header’ı atla (uyuyorsa)
-    if(rows.length && rows[0][0]==='id') rows.shift();
-    return rows.map(r=>{
-      const [id, ts, , amount, category, note] = r;
-      const num = Number(String(amount).replace(',','.'));
-      return {
-        id: id || uid(),
-        ts: ts ? Number(ts) : Date.now(),
-        amount: isFinite(num) ? num : 0,
-        category: category || '(Manuel)',
-        note: note || ''
-      };
-    }).filter(x=>x.amount>0 && Number.isFinite(x.ts));
-  }
-
-  function importCSVFile(file){
-    const fr=new FileReader();
-    fr.onload = () => {
-      try{
-        const rows = parseCSV(String(fr.result));
-        // merge (aynı id varsa atla)
-        const existing = new Set(data.map(x=>x.id));
-        let added=0;
-        rows.forEach(r=>{
-          if(!existing.has(r.id)){ data.push(r); added++; }
-        });
-        if(added===0 && rows.length){
-          alert("CSV yüklendi fakat tüm kayıtlar zaten mevcut görünüyordu.");
-        } else {
-          alert(${added} kayıt eklendi.);
-        }
-        save(); renderList();
-      }catch(e){
-        alert("CSV okunamadı. Dosyayı kontrol edin.");
-      }
-    };
-    fr.readAsText(file, 'utf-8');
-  }
-
-  /** events */
-  buildChips(chipsEl, (cat)=>{
-    if(!amountEl.value){ amountEl.focus(); return; }
-    pending.amount = Number(amountEl.value.replace(',','.')) || 0;
-    pending.category = cat;
-    pending.note = "";
-    openModal();
-  });
-  buildChips(modalChips, (cat)=>{
-    pending.category = cat; // "" ise manuel
-  });
-
-  amountEl.addEventListener('input', ()=>{
-    const has = !!amountEl.value;
-    chipsEl.style.opacity = has ? 1 : .5;
-    chipsEl.style.pointerEvents = has ? 'auto' : 'none';
-  });
-
-  nextBtn.addEventListener('click', ()=>{
-    const val = Number(amountEl.value.replace(',','.')) || 0;
-    if(val<=0){ amountEl.focus(); amountEl.select?.(); return; }
-    pending.amount = val;
-    openModal();
-  });
-
-  // Mobilde Enter/done çalışsın
-  amountEl.addEventListener('keydown', (e)=>{
-    if(e.key==='Enter'){ e.preventDefault(); nextBtn.click(); }
-  });
-
-  saveBtn.addEventListener('click', ()=>{
-    if(!pending.amount || pending.amount<=0) return;
-    addRecord();
-    closeModal();
-    amountEl.value = ""; amountEl.focus();
-  });
-  cancelBtn.addEventListener('click', closeModal);
-  modalBack.addEventListener('click', (e)=>{ if(e.target===modalBack) closeModal(); });
-
-  exportBtn.addEventListener('click', ()=> exportCSV(true));
-  importInput.addEventListener('change', (e)=>{
-    const f=e.target.files?.[0]; if(f) importCSVFile(f);
-    e.target.value=""; // tekrar seçim için sıfırla
-  });
-
-  clearBtn.addEventListener('click', ()=>{
-    if(confirm("Tüm kayıtlar silinsin mi?")){ data=[]; save(); renderList(); renderStats(); }
-  });
-
-  todayBtn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    // en güncel kayda kaydır
-    const first = document.querySelector('.row');
-    if(first) first.scrollIntoView({behavior:'smooth', block:'start'});
-  });
-
-  /** init */
+// Tabs
+tabs.forEach(t=> t.addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  currentFilter.scope = t.dataset.scope;
   renderList();
-  amountEl.focus();
+  updateSummaries();
+}));
 
-})();
+// Category filter
+catFilterEl.addEventListener('change', ()=>{
+  currentFilter.category = catFilterEl.value;
+  renderList();
+  updateSummaries();
+});
+
+// Modal actions
+closeModalBtn.addEventListener('click', ()=> hide(catModal));
+saveBtn.addEventListener('click', handleSaveFromModal);
+editCatsBtn.addEventListener('click', toggleEditCats);
+
+// Edit Modal actions
+closeEditBtn.addEventListener('click', ()=> hide(editModal));
+updateBtn.addEventListener('click', applyUpdate);
+deleteBtn.addEventListener('click', handleDeleteRecord);
+
+// Toolbar
+btnExport.addEventListener('click', ()=> downloadCSV(filteredRecords()));
+btnExportAll.addEventListener('click', ()=> downloadCSV(records));
+btnClear.addEventListener('click', clearAllWithConfirm);
+
+// CSV import
+csvInput.addEventListener('change', handleCSVImport);
+
+// Theme
+themeToggler.addEventListener('change', ()=>{
+  const mode = themeToggler.checked ? 'light' : 'dark';
+  applyTheme(mode);
+  saveTheme(mode);
+});
+
+// ---- Functions: Storage & Utilities ----
+function loadRecords(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)) || [] }catch(_){ return [] }
+}
+function saveRecords(){
+  localStorage.setItem(LS_KEY, JSON.stringify(records));
+}
+function loadCategories(){
+  try{
+    const data = JSON.parse(localStorage.getItem(LS_CATS));
+    if(Array.isArray(data) && data.length) return data;
+  }catch(_){}
+  localStorage.setItem(LS_CATS, JSON.stringify(DEFAULT_CATEGORIES));
+  return [...DEFAULT_CATEGORIES];
+}
+function saveCategories(){
+  localStorage.setItem(LS_CATS, JSON.stringify(categories));
+}
+function uuid(){
+  // RFC4122-ish simple UUID v4
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
+    const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+function nowParts(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const HH = String(d.getHours()).padStart(2,'0');
+  const MM = String(d.getMinutes()).padStart(2,'0');
+  return { dateISO: ${yyyy}-${mm}-${dd}, timeHHMM: ${HH}:${MM} };
+}
+function sanitizeAmount(str){
+  if(!str) return 0;
+  return parseInt(String(str).replace(/[^\d]/g,''),10) || 0;
+}
+function fmtALL(n){
+  // thousands separated by space: L 12 345
+  const s = Math.trunc(n).toString();
+  return 'L ' + s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+// Theme
+function loadTheme(){
+  return localStorage.getItem(LS_THEME) || 'dark';
+}
+function saveTheme(mode){
+  localStorage.setItem(LS_THEME, mode);
+}
+function applyTheme(mode){
+  if(mode === 'light'){ document.documentElement.classList.add('light'); themeToggler.checked = true; themeLabel.textContent='Aydınlık'; }
+  else{ document.documentElement.classList.remove('light'); themeToggler.checked = false; themeLabel.textContent='Karanlık'; }
+}
+
+// Toast
+let toastTimer;
+function toast(msg){
+  clearTimeout(toastTimer);
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2000);
+}
+
+// ---- Functions: Rendering ----
+function renderCategoryFilter(){
+  // populate select with categories
+  catFilterEl.innerHTML = '<option value="">Kategori: Tümü</option>' + categories.map(c=><option value="${escapeHtml(c)}">${escapeHtml(c)}</option>).join('');
+}
+
+function renderCatButtons(){
+  catGrid.innerHTML = '';
+  categories.forEach((c, idx)=>{
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.className='cat-btn';
+    btn.textContent = c;
+    btn.setAttribute('data-cat', c);
+    btn.addEventListener('click', ()=>{
+      if(editingCats){
+        // rename on click while editing
+        const neo = prompt('Yeni ad ver:', c);
+        if(neo && neo.trim()){
+          categories[idx] = neo.trim();
+          saveCategories(); renderCatButtons(); renderCategoryFilter(); renderEditCatButtons();
+        }
+        return;
+      }
+      selectCategory(c, btn);
+    });
+    // long-press to rename
+    let pressTimer;
+    btn.addEventListener('touchstart', ()=> pressTimer=setTimeout(()=> renameCat(idx, c), 550) );
+    btn.addEventListener('touchend', ()=> clearTimeout(pressTimer));
+    btn.addEventListener('mousedown', ()=> pressTimer=setTimeout(()=> renameCat(idx, c), 650) );
+    btn.addEventListener('mouseup', ()=> clearTimeout(pressTimer));
+    catGrid.appendChild(btn);
+  });
+  highlightSelected();
+}
+
+function renameCat(idx, current){
+  const neo = prompt('Kategori adını değiştir:', current);
+  if(neo && neo.trim()){
+    categories[idx] = neo.trim();
+    saveCategories(); renderCatButtons(); renderCategoryFilter(); renderEditCatButtons();
+    toast('Kategori güncellendi');
+  }
+}
+
+function toggleEditCats(){
+  editingCats = !editingCats;
+  editCatsBtn.textContent = editingCats ? 'Düzenlemeyi Bitir' : 'Kategorileri Düzenle';
+  Array.from(catGrid.children).forEach(b=>{
+    b.classList.toggle('editing', editingCats);
+  });
+}
+
+function selectCategory(c, el){
+  selectedCategory = c;
+  highlightSelected();
+}
+
+function highlightSelected(){
+  Array.from(catGrid.children).forEach(b=>{
+    b.classList.toggle('active', b.getAttribute('data-cat') === selectedCategory);
+  });
+}
+
+function renderSmartChips(){
+  smartChips.innerHTML = SMART_NOTES.map(n=><button type="button" class="chip" data-note="${escapeHtml(n)}">${escapeHtml(n)}</button>).join('');
+  smartChips.querySelectorAll('.chip').forEach(ch=>{
+    ch.addEventListener('click', ()=>{
+      const add = ch.getAttribute('data-note');
+      noteEl.value = noteEl.value ? (noteEl.value.trim() + ', ' + add) : add;
+      noteEl.focus();
+    });
+  });
+}
+
+function renderList(){
+  const items = filteredRecords().sort((a,b)=> (b.tarihISO+a.saat > a.tarihISO+b.saat ? 1 : -1));
+  if(!items.length){
+    listEl.innerHTML = <div class="card"><div class="card-left"><div class="cat">Kayıt yok</div><div class="note muted">Yeni kayıt eklemek için tutarı girip “Devam” deyin.</div></div></div>;
+    return;
+  }
+  listEl.innerHTML = items.map(r=>{
+    return `
+    <article class="card" aria-label="Kayıt">
+      <div class="card-left">
+        <div class="meta">${escapeHtml(r.tarihISO)} • ${escapeHtml(r.saat)}</div>
+        <div class="cat">${escapeHtml(r.kategori)}${r.not ? ' — <span class="note">'+escapeHtml(r.not)+'</span>' : ''}</div>
+        <div class="row-actions">
+          <button class="btn secondary" data-edit="${r.id}" aria-label="Düzenle">Düzenle</button>
+          <button class="btn danger" data-del="${r.id}" aria-label="Sil">Sil</button>
+        </div>
+      </div>
+      <div class="amount-out" aria-label="Tutar">${fmtALL(r.tutarALL)}</div>
+    </article>`;
+  }).join('');
+
+  // Wire actions
+  listEl.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openEdit(b.getAttribute('data-edit'))));
+  listEl.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteRecordWithConfirm(b.getAttribute('data-del'))));
+}
+
+function filteredRecords(){
+  const {scope, category} = currentFilter;
+  const today = nowParts().dateISO;
+  const ym = today.slice(0,7);
+  return records.filter(r=>{
+    if(category && r.kategori !== category) return false;
+    if(scope==='today') return r.tarihISO === today;
+    if(scope==='month') return r.tarihISO.startsWith(ym);
+    return true;
+  });
+}
+
+function updateSummaries(){
+  const all = sumBy(records);
+  const today = nowParts().dateISO;
+  const ym = today.slice(0,7);
+  const monthSum = sumBy(records.filter(r=> r.tarihISO.startsWith(ym)));
+  const todaySum = sumBy(records.filter(r=> r.tarihISO === today));
+  sumAllEl.textContent = fmtALL(all);
+  sumMonthEl.textContent = fmtALL(monthSum);
+  sumTodayEl.textContent = fmtALL(todaySum);
+}
+function sumBy(arr){ return arr.reduce((a,b)=> a + (b.tutarALL||0), 0); }
+
+// ---- Add Flow ----
+function openCategoryModal(){
+  const raw = sanitizeAmount(amountEl.value);
+  if(!raw){ toast('Tutar girin'); amountEl.focus(); return; }
+  pendingAmount = raw;
+  selectedCategory = null;
+  selectedNote = '';
+  noteEl.value = '';
+  renderCatButtons();
+  show(catModal);
+  setTimeout(()=> noteEl.focus(), 80);
+}
+function handleSaveFromModal(){
+  const cat = selectedCategory || (noteEl.value.trim() ? 'Manuel' : null);
+  if(!cat){ toast('Kategori seçin veya not girin'); return; }
+  const rec = {
+    id: uuid(),
+    ...nowParts(),
+    tutarALL: pendingAmount || 0,
+    kategori: cat,
+    not: noteEl.value.trim()
+  };
+  records.push(rec);
+  saveRecords();
+  pendingAmount = null;
+  amountEl.value = '';
+  hide(catModal);
+  renderList();
+  updateSummaries();
+  // Ask CSV download
+  setTimeout(()=> askDownloadCSV([rec]), 150);
+}
+
+// ---- Edit Flow ----
+function openEdit(id){
+  const rec = records.find(x=> x.id === id);
+  if(!rec) return;
+  editRecordId = id;
+  editAmountEl.value = rec.tutarALL;
+  editNoteEl.value = rec.not || '';
+  renderEditCatButtons(rec.kategori);
+  show(editModal);
+}
+function renderEditCatButtons(selected){
+  editCatGrid.innerHTML = '';
+  categories.forEach(c=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className='cat-btn' + (selected===c ? ' active' : '');
+    b.textContent = c; b.setAttribute('data-cat', c);
+    b.addEventListener('click', ()=>{
+      editCatGrid.querySelectorAll('.cat-btn').forEach(x=> x.classList.remove('active'));
+      b.classList.add('active');
+    });
+    editCatGrid.appendChild(b);
+  });
+}
+function applyUpdate(){
+  const rec = records.find(x=> x.id === editRecordId);
+  if(!rec) return;
+  const newAmt = sanitizeAmount(editAmountEl.value);
+  const activeCatBtn = editCatGrid.querySelector('.cat-btn.active');
+  const newCat = activeCatBtn ? activeCatBtn.getAttribute('data-cat') : rec.kategori;
+  rec.tutarALL = newAmt;
+  rec.kategori = newCat || rec.kategori;
+  rec.not = (editNoteEl.value || '').trim();
+  saveRecords();
+  hide(editModal);
+  renderList();
+  updateSummaries();
+  toast('Kayıt güncellendi');
+}
+function handleDeleteRecord(){
+  deleteRecordWithConfirm(editRecordId);
+}
+function deleteRecordWithConfirm(id){
+  if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+  records = records.filter(x=> x.id !== id);
+  saveRecords();
+  hide(editModal);
+  renderList();
+  updateSummaries();
+  toast('Kayıt silindi');
+}
+
+// ---- CSV Export/Import ----
+function askDownloadCSV(recs){
+  if(confirm('CSV indirmek ister misiniz?')){
+    downloadCSV(recs && recs.length ? recs : records);
+  }
+}
+
+function downloadCSV(rows){
+  const headers = ['date','time','amount_all','category','note','id'];
+  const lines = [headers.join(',')];
+  rows.forEach(r=>{
+    const row = [
+      r.tarihISO,
+      r.saat,
+      String(r.tutarALL),
+      csvEscape(r.kategori),
+      csvEscape(r.not || ''),
+      r.id
+    ];
+    lines.push(row.join(','));
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'andi-ev-harcamalari.csv';
+  document.body.appendChild(a); a.click();
+  a.remove(); URL.revokeObjectURL(url);
+  toast('CSV indirildi');
+}
+function csvEscape(s){
+  if(s == null) return '';
+  s = String(s);
+  if(s.includes(',') || s.includes('"') || s.includes('\n')){
+    return '"' + s.replace(/"/g,'""') + '"';
+  }
+  return s;
+}
+
+function handleCSVImport(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const text = e.target.result;
+      const parsed = parseCSV(text);
+      const need = ['date','time','amount_all','category','note','id'];
+      // Validate headers
+      const headers = parsed.headers;
+      const ok = need.every((h,i)=> headers[i] && headers[i].trim() === h);
+      if(!ok){
+        alert('CSV başlıkları hatalı. Gerekli başlıklar şu sırada olmalı:\n' + need.join(','));
+        return;
+      }
+      const before = records.length;
+      const existingIds = new Set(records.map(r=> r.id));
+      parsed.rows.forEach(row=>{
+        const [date,time,amount,category,note,id] = row;
+        if(!id || existingIds.has(id)) return; // skip duplicates
+        const rec = {
+          id: String(id),
+          tarihISO: String(date),
+          saat: String(time),
+          tutarALL: sanitizeAmount(amount),
+          kategori: String(category || 'Manuel'),
+          not: String(note || '')
+        };
+        records.push(rec);
+        existingIds.add(id);
+      });
+      saveRecords(); renderList(); updateSummaries();
+      toast((records.length - before) + ' kayıt eklendi');
+    }catch(err){
+      console.error(err);
+      alert('CSV okunurken hata oluştu. Dosyayı kontrol edin.');
+    }finally{
+      // reset to allow same file re-select
+      csvInput.value = '';
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function parseCSV(text){
+  // very small CSV parser supporting quotes and commas
+  const lines = text.replace(/\r/g,'').split('\n').filter(x=> x.trim().length);
+  const headers = splitCSVLine(lines[0]);
+  const rows = lines.slice(1).map(splitCSVLine);
+  return { headers, rows };
+}
+function splitCSVLine(line){
+  const out = [];
+  let cur = '';
+  let inQ = false;
+  for(let i=0;i<line.length;i++){
+    const ch = line[i];
+    if(inQ){
+      if(ch === '"'){
+        if(line[i+1] === '"'){ cur += '"'; i++; }
+        else{ inQ = false; }
+      }else cur += ch;
+    }else{
+      if(ch === ','){ out.push(cur); cur=''; }
+      else if(ch === '"'){ inQ = true; }
+      else cur += ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+
+// ---- Helpers ----
+function show(mod){ mod.classList.add('show'); }
+function hide(mod){ mod.classList.remove('show'); }
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---- Clear All ----
+function clearAllWithConfirm(){
+  if(!records.length){ toast('Zaten boş'); return; }
+  if(!confirm('Önce “Tüm Veriyi Dışa Aktar” yapmanızı öneririz.\nTüm veriyi temizlemek istediğinize emin misiniz?')) return;
+  records = [];
+  saveRecords();
+  renderList();
+  updateSummaries();
+  toast('Tüm veriler temizlendi');
+}
+
+// ---- Modal category selection visual sync on open close tap outside ----
+catModal.addEventListener('click', (e)=>{ if(e.target === catModal) hide(catModal); });
+editModal.addEventListener('click', (e)=>{ if(e.target === editModal) hide(editModal); });
+
+// Close on ESC
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='Escape'){
+    if(catModal.classList.contains('show')) hide(catModal);
+    if(editModal.classList.contains('show')) hide(editModal);
+  }
+});
+
+// ---- Populate edit cat grid on category changes too ----
+function handleSaveCategoriesAndRefresh(){
+  saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons();
+}
+
+// ---- End of Script ----
 </script>
 </body>
 </html>
