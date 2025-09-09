@@ -2,497 +2,482 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Andi Ev Harcamaları</title>
 <style>
   :root{
-    --bg:#0f1222; --card:#171a2e; --ink:#eaf1ff; --ink-dim:#b8c1d9;
-    --accent:#6ee7ff; --accent2:#9b8cff; --good:#34d399; --bad:#fb7185; --muted:#22253b;
-    --chip:#1e2240; --chip-on:#2a2f59;
-    --radius:16px; --pad:14px; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --bg:#0f1220; --card:#151a2e; --muted:#8b93b0; --text:#eaf0ff;
+    --accent:#6ee7b7; --accent2:#60a5fa; --danger:#ff6b6b; --chip:#1e2542;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-       background: radial-gradient(1200px 600px at 80% -10%, #1b1f3a 0%, #0f1222 50%, #0f1222 100%); color:var(--ink);}
-  header{position:sticky;top:0;background:rgba(15,18,34,.6);backdrop-filter: blur(8px);z-index:10}
-  .wrap{max-width:1000px;margin:auto;padding:18px}
-  .title{display:flex;align-items:center;gap:12px}
-  .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#6ee7ff,#9b8cff)}
-  h1{font-size:22px;margin:0}
-  .sub{color:var(--ink-dim);font-size:12px}
-  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
-  @media (max-width:860px){.grid{grid-template-columns:1fr;}}
-  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;border:1px solid #242949}
-  .card h2{margin:0 0 12px 0;font-size:16px}
-  .summary{display:flex;gap:14px;flex-wrap:wrap}
-  .pill{background:var(--muted);padding:10px 12px;border-radius:12px;display:flex;gap:8px;align-items:center}
-  .pill b{font-size:16px}
-  .amt{font-variant-numeric:tabular-nums}
-  .good{color:var(--good)} .bad{color:var(--bad)} .acc{color:var(--accent)}
-  .inputStack{display:grid;gap:10px;margin-top:8px}
-  label{font-size:12px;color:var(--ink-dim)}
-  input[type="number"], input[type="text"], select, button, .chips{
-    width:100%;border:none;border-radius:12px;background:#1a1f39;color:var(--ink);padding:14px;
-    outline: none; font-size:16px
+  html,body{height:100%}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 800px at 120% -10%, #1b2140 0%, rgba(27,33,64,0) 60%),
+      radial-gradient(900px 700px at -10% 120%, #1a2a3f 0%, rgba(0,0,0,0) 55%),
+      var(--bg);
+    color:var(--text); font:500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    overflow-x:hidden;
   }
-  input::placeholder{color:#7282b9}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;background:transparent;padding:0}
-  .chip{background:var(--chip);padding:10px 12px;border-radius:999px;border:1px solid #2a315b;cursor:pointer;font-size:14px}
-  .chip.on{background:var(--chip-on);border-color:#3b4382;box-shadow:inset 0 0 0 1px #4b58b5}
-  .row{display:flex;gap:10px}
-  .row>div{flex:1}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
-  .btn{background:linear-gradient(135deg,#6ee7ff,#9b8cff);color:#0b0d1a;font-weight:700}
-  .btn.secondary{background:#212648;color:var(--ink)}
-  .btn.warn{background:#3a1f2a;color:#ffd4d9;border:1px solid #5b2a3b}
-  .table{overflow:auto;border-radius:12px;border:1px solid #23284a}
-  table{width:100%;border-collapse:separate;border-spacing:0}
-  th,td{padding:12px 10px;border-bottom:1px solid #222647;font-size:14px}
-  th{position:sticky;top:0;background:#151935}
-  tr:hover td{background:#171c3d}
-  .mini{font-size:12px;color:var(--ink-dim)}
-  .right{text-align:right}
-  .tools{display:flex;gap:8px;flex-wrap:wrap}
-  .kpiGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  @media (max-width:600px){.kpiGrid{grid-template-columns:repeat(2,1fr)}}
-  .kpi{background:#151935;border:1px solid #23284a;border-radius:12px;padding:12px}
-  .kpi .v{font-weight:800;font-size:18px}
-  .search{display:flex;gap:8px;margin-top:6px}
-  .tag{padding:6px 10px;border-radius:999px;background:#22264a;border:1px solid #2d3160;font-size:12px}
-  /* Modal */
-  .modal{position:fixed;inset:0;background:rgba(9,11,22,.6);backdrop-filter: blur(6px);display:none;align-items:center;justify-content:center;z-index:99}
-  .modal.show{display:flex}
-  .modal .box{background:var(--card);border:1px solid #2a2f59;border-radius:16px;max-width:420px;width:92%;padding:18px}
-  .box h3{margin:0 0 8px 0}
-  .box p{margin:0 0 14px 0;color:var(--ink-dim)}
-  .box .rowBtn{display:flex;gap:10px}
-  .ghost{background:#1a1f39;color:var(--ink);border:1px solid #2a315b}
-  .soft{color:#9fb4ff}
-  .footer{opacity:.6;font-size:12px;margin-top:8px}
+  .appbar{
+    position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(12px);
+    background:linear-gradient(180deg, rgba(21,26,46,.9), rgba(21,26,46,.6));
+    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:12px 16px; display:flex; align-items:center; gap:12px;
+  }
+  .logo{
+    width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#60a5fa, #6ee7b7);
+    display:grid;place-items:center; box-shadow:var(--shadow); font-weight:900; color:#0a1024;
+  }
+  .title{font-size:18px;font-weight:800}
+  .subtitle{color:var(--muted); font-size:12px; margin-top:-2px}
+
+  .container{padding:18px; max-width:960px; margin:0 auto}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+
+  /* INPUT BAR */
+  .input-bar{display:grid; grid-template-columns:1fr auto; gap:10px; padding:16px}
+  .amount{
+    width:100%; background:#0f1428; border:1px solid rgba(255,255,255,.08);
+    color:var(--text); border-radius:14px; padding:14px 16px; font-size:18px;
+    outline:none; transition:.2s border;
+  }
+  .amount:focus{border-color:rgba(96,165,250,.6)}
+  .btn{
+    background:linear-gradient(135deg, var(--accent2), var(--accent));
+    color:#0b1020; border:none; border-radius:14px; padding:14px 18px; font-size:16px;
+    font-weight:800; cursor:pointer; box-shadow:var(--shadow); transition:transform .06s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-secondary{
+    background:#1a2140; color:var(--text); border:1px solid rgba(255,255,255,.08);
+  }
+  .toolbar{display:flex; gap:10px; padding:12px 16px; flex-wrap:wrap}
+
+  /* CHIPS */
+  .chips{display:flex; gap:8px; flex-wrap:wrap; padding:12px 16px; border-top:1px dashed rgba(255,255,255,.08)}
+  .chip{
+    padding:10px 12px; border-radius:999px; background:var(--chip); color:var(--text);
+    border:1px solid rgba(255,255,255,.05); cursor:pointer; font-size:14px; user-select:none;
+  }
+  .chip:hover{outline:2px solid rgba(96,165,250,.3)}
+  .chip:active{transform:translateY(1px)}
+
+  /* STATS */
+  .stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:16px}
+  @media (max-width:900px){ .stats{grid-template-columns:repeat(2,1fr)} }
+  .stat{padding:14px;border-radius:14px;background:#0f1428;border:1px solid rgba(255,255,255,.08)}
+  .stat .k{font-size:12px;color:var(--muted)}
+  .stat .v{font-size:18px;font-weight:800;margin-top:4px}
+
+  /* LIST */
+  .list{padding:4px 8px 12px}
+  .row{
+    display:grid; grid-template-columns:100px 1fr auto; gap:12px; align-items:center;
+    padding:12px; border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .row:last-child{border-bottom:none}
+  .date{color:var(--muted); font-size:12px}
+  .cat{font-weight:700}
+  .amt{font-weight:900}
+  .note{color:var(--muted); font-size:13px}
+  .row .del{
+    background:transparent; border:1px solid rgba(255,255,255,.1); color:#ffb0b0; padding:8px 10px;
+    border-radius:10px; cursor:pointer;
+  }
+
+  /* MODAL (kategori + not) */
+  .modal-back{
+    position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; place-items:end; z-index:60;
+  }
+  .modal{width:100%; background:var(--card); border-top-left-radius:20px; border-top-right-radius:20px;
+    box-shadow:var(--shadow); padding:16px; border:1px solid rgba(255,255,255,.08);
+    max-height:85svh; overflow:auto;
+  }
+  .modal h3{margin:4px 4px 10px}
+  .notein{
+    width:100%; background:#0f1428; border:1px solid rgba(255,255,255,.08);
+    color:var(--text); border-radius:12px; padding:12px 12px; font-size:15px; outline:none;
+  }
+
+  .footer{
+    display:flex; gap:10px; padding:12px 16px; justify-content:space-between; align-items:center;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .muted{color:var(--muted); font-size:13px}
+  a.link{color:var(--accent2); text-decoration:none}
+
+  .empty{padding:24px; text-align:center; color:var(--muted)}
 </style>
 </head>
 <body>
-  <header>
-    <div class="wrap">
-      <div class="title">
-        <div class="logo" aria-hidden="true"></div>
-        <div>
-          <h1>Andi Ev Harcamaları</h1>
-          <div class="sub">ALL (Arnavutluk Lek) ile kişisel harcama takip uygulaması</div>
-        </div>
-      </div>
+  <header class="appbar">
+    <div class="logo">A</div>
+    <div>
+      <div class="title">Andi Ev Harcamaları</div>
+      <div class="subtitle">LEK (ALL) ile kayıt — hızlı kategori seçimi + CSV içe/dışa aktar</div>
     </div>
   </header>
 
-  <main class="wrap">
-    <div class="grid">
-      <!-- SOL: Giriş & Özet -->
-      <section class="card">
-        <h2>Yeni Harcama</h2>
-        <div class="summary">
-          <div class="pill"><span>Toplam</span> <b class="amt acc" id="sumTotal">ALL 0</b></div>
-          <div class="pill"><span>Bugün</span> <b class="amt bad" id="sumToday">ALL 0</b></div>
-          <div class="pill"><span>Bu Ay</span> <b class="amt bad" id="sumMonth">ALL 0</b></div>
-          <div class="pill"><span>Kayıt</span> <b class="amt" id="countRows">0</b></div>
-        </div>
+  <main class="container">
+    <!-- INPUT & TOOLS -->
+    <section class="card" id="inputCard">
+      <div class="input-bar">
+        <input id="amount" class="amount" inputmode="decimal" placeholder="Tutarı gir (ALL)…" />
+        <button class="btn" id="nextBtn">Devam</button>
+      </div>
 
-        <div class="inputStack">
-          <div>
-            <label for="amount">Tutar (ALL)</label>
-            <input inputmode="decimal" type="number" id="amount" placeholder="Örn: 1500" />
-          </div>
+      <div class="chips" id="chips" aria-disabled="true" title="Önce tutar girin">
+        <!-- hızlı kategoriler -->
+      </div>
 
-          <div>
-            <label>Kategori seç</label>
-            <div class="chips" id="chipRow" aria-label="Kategoriler">
-              <!-- chips doldurulacak -->
-            </div>
-          </div>
+      <div class="toolbar">
+        <button class="btn-secondary" id="exportBtn">CSV İndir</button>
+        <label class="btn-secondary" style="padding:14px 18px; border-radius:14px; cursor:pointer">
+          CSV Yükle
+          <input type="file" id="importInput" accept=".csv,text/csv" hidden />
+        </label>
+        <button class="btn-secondary" id="clearBtn" title="Tüm kayıtları sil">Temizle</button>
+      </div>
+    </section>
 
-          <div class="row">
-            <div>
-              <label for="note">Not (opsiyonel)</label>
-              <input type="text" id="note" placeholder="Örn: Market/mahalle bakkalı…" />
-            </div>
-            <div>
-              <label for="date">Tarih</label>
-              <input type="date" id="date"/>
-            </div>
-          </div>
+    <!-- STATS -->
+    <section class="card" style="margin-top:14px">
+      <div class="stats" id="stats"></div>
+    </section>
 
-          <div class="actions">
-            <button class="btn" id="btnSave">Kaydet</button>
-            <button class="btn secondary" id="btnClearForm" title="Formu temizle">Temizle</button>
-          </div>
-        </div>
+    <!-- LIST -->
+    <section class="card" style="margin-top:14px">
+      <div class="list" id="list"></div>
+    </section>
 
-        <div class="kpiGrid" id="catTotals"><!-- kategori özetleri --></div>
-
-        <div class="footer">Veriler cihazınızda <b>localStorage</b>’a kaydedilir. CSV indirip saklayabilir, sonra tekrar yükleyebilirsiniz.</div>
-      </section>
-
-      <!-- SAĞ: Liste & Araçlar -->
-      <section class="card">
-        <h2>Kayıtlar</h2>
-        <div class="tools">
-          <div class="search" style="flex:1">
-            <input id="searchBox" type="text" placeholder="Ara: kategori veya not…" />
-            <button class="btn secondary" id="btnResetSearch">Sıfırla</button>
-          </div>
-          <button class="btn secondary" id="btnExport">CSV İndir</button>
-          <label class="btn ghost" for="fileImport" style="cursor:pointer">CSV Yükle</label>
-          <input type="file" id="fileImport" accept=".csv" hidden />
-          <button class="btn warn" id="btnWipe">Tümünü Sil</button>
-        </div>
-
-        <div class="table" style="margin-top:10px">
-          <table id="tbl">
-            <thead>
-              <tr>
-                <th>Tarih</th>
-                <th>Kategori</th>
-                <th>Not</th>
-                <th class="right">Tutar (ALL)</th>
-                <th class="right">İşlem</th>
-              </tr>
-            </thead>
-            <tbody id="tbody">
-              <!-- satırlar -->
-            </tbody>
-          </table>
-        </div>
-        <div class="mini" style="margin-top:8px" id="status"></div>
-      </section>
+    <div class="footer">
+      <div class="muted">Veriler cihazında saklanır (localStorage). CSV ile yedekleyebilirsin.</div>
+      <a class="link" href="#" id="todayBtn">Bugün’e git</a>
     </div>
   </main>
 
-  <!-- CSV Sorusu Modal -->
-  <div class="modal" id="csvAsk">
-    <div class="box">
-      <h3>CSV indirilsin mi?</h3>
-      <p>Kaydı başarıyla ekledin. Yedeğini CSV olarak indirmek ister misin?</p>
-      <div class="rowBtn">
-        <button class="btn" id="goExport">Evet, indir</button>
-        <button class="btn ghost" id="noExport">Hayır</button>
+  <!-- MODAL: kategori & not -->
+  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal">
+      <h3 id="mTitle">Kategori seç veya not yaz</h3>
+      <div class="chips" id="modalChips"></div>
+      <div style="padding:12px 16px">
+        <input id="noteInput" class="notein" placeholder="İstersen buraya not yaz (ör. market adı)…">
+      </div>
+      <div style="padding:0 16px 12px" class="muted">Tutar: <span id="modalAmount">0</span></div>
+      <div class="toolbar" style="padding:12px 16px 16px">
+        <button class="btn" id="saveBtn">Kaydı Oluştur</button>
+        <button class="btn-secondary" id="cancelBtn">Vazgeç</button>
       </div>
     </div>
   </div>
 
 <script>
 (function(){
-  const LS_KEY = 'andi_expenses_v1';
-  const CURRENCY = 'ALL';
-
-  const defaultCats = [
-    'Kira','Su faturası','Elektrik faturası','İnternet faturası',
-    'Ev için yemek alışveriş','Çamaşır ilacı','Kıyafet','Dışarıda yemek','Diğer'
+  const CATS = [
+    "Kira", "Su faturası", "Elektrik faturası", "İnternet faturası",
+    "Ev için alışveriş", "Çamaşır ilacı", "Kıyafet", "Dışarıda yemek"
   ];
+  const LSKEY = "andi_expenses_v1";
 
-  const els = {
-    amount: q('#amount'),
-    note: q('#note'),
-    date: q('#date'),
-    chipRow: q('#chipRow'),
-    btnSave: q('#btnSave'),
-    btnClearForm: q('#btnClearForm'),
-    tbody: q('#tbody'),
-    sumTotal: q('#sumTotal'),
-    sumToday: q('#sumToday'),
-    sumMonth: q('#sumMonth'),
-    countRows: q('#countRows'),
-    searchBox: q('#searchBox'),
-    btnResetSearch: q('#btnResetSearch'),
-    btnExport: q('#btnExport'),
-    fileImport: q('#fileImport'),
-    btnWipe: q('#btnWipe'),
-    status: q('#status'),
-    catTotals: q('#catTotals'),
-    modal: q('#csvAsk'),
-    goExport: q('#goExport'),
-    noExport: q('#noExport'),
-  };
-
+  /** state */
   let data = load();
-  let activeCat = defaultCats[0];
+  let pending = { amount: 0, category: "", note: "" };
 
-  // UI init
-  renderChips();
-  setToday(els.date);
-  render();
-  updateKPIs();
+  /** elements */
+  const amountEl = document.getElementById('amount');
+  const nextBtn = document.getElementById('nextBtn');
+  const chipsEl = document.getElementById('chips');
+  const modalBack = document.getElementById('modalBack');
+  const modalChips = document.getElementById('modalChips');
+  const noteInput = document.getElementById('noteInput');
+  const modalAmount = document.getElementById('modalAmount');
+  const saveBtn = document.getElementById('saveBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const listEl = document.getElementById('list');
+  const statsEl = document.getElementById('stats');
+  const exportBtn = document.getElementById('exportBtn');
+  const importInput = document.getElementById('importInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const todayBtn = document.getElementById('todayBtn');
 
-  // Events
-  els.chipRow.addEventListener('click', (e)=>{
-    const b = e.target.closest('.chip'); if(!b) return;
-    activeCat = b.dataset.cat; syncChipUI();
-  });
-
-  els.btnSave.addEventListener('click', saveEntry);
-  els.btnClearForm.addEventListener('click', clearForm);
-
-  els.searchBox.addEventListener('input', render);
-  els.btnResetSearch.addEventListener('click', ()=>{ els.searchBox.value=''; render(); });
-
-  els.btnExport.addEventListener('click', exportCSV);
-  els.fileImport.addEventListener('change', importCSV);
-
-  els.btnWipe.addEventListener('click', ()=>{
-    if(confirm('Tüm kayıtlar silinsin mi? Bu işlem geri alınamaz.')){
-      data = []; persist(); render(); updateKPIs(); toast('Tüm kayıtlar silindi.');
-    }
-  });
-
-  els.tbody.addEventListener('click', (e)=>{
-    const del = e.target.closest('[data-del]');
-    const edit = e.target.closest('[data-edit]');
-    if(del){
-      const id = del.dataset.del;
-      data = data.filter(r=>r.id!==id);
-      persist(); render(); updateKPIs();
-    } else if(edit){
-      const id = edit.dataset.edit;
-      const row = data.find(r=>r.id===id); if(!row) return;
-      // basit düzenleme: formu yükle
-      els.amount.value = row.amount;
-      els.note.value = row.note || '';
-      els.date.value = row.date.slice(0,10);
-      activeCat = row.category; syncChipUI();
-      // Sil ve kullanıcı yeniden kaydetsin (daha temiz akış)
-      data = data.filter(r=>r.id!==id);
-      persist(); render(); updateKPIs();
-      toast('Düzenleme modunda: değiştirip Kaydet’e bas.');
-      scrollTo({top:0,behavior:'smooth'});
-    }
-  });
-
-  // Modal
-  els.goExport.addEventListener('click', ()=>{ hideModal(); exportCSV(); });
-  els.noExport.addEventListener('click', hideModal);
-
-  // Helpers
-  function q(s,sc){ return (sc||document).querySelector(s); }
-  function fmt(n){
-    const fixed = Number(n).toLocaleString('tr-TR',{minimumFractionDigits:0, maximumFractionDigits:0});
-    return ALL ${fixed};
-  }
-  function setToday(inp){
-    const d = new Date();
-    inp.value = d.toISOString().slice(0,10);
-  }
-
-  function renderChips(){
-    els.chipRow.innerHTML = '';
-    defaultCats.forEach((c,i)=>{
-      const b = document.createElement('button');
-      b.type='button'; b.className = 'chip' + (i===0?' on':'');
-      b.textContent = c; b.dataset.cat = c;
-      els.chipRow.appendChild(b);
-    });
-  }
-  function syncChipUI(){
-    [...els.chipRow.children].forEach(ch=>{
-      ch.classList.toggle('on', ch.dataset.cat===activeCat);
-    });
-  }
-
-  function saveEntry(){
-    const amount = Number(els.amount.value);
-    if(!amount || amount<=0){ toast('Lütfen geçerli bir tutar gir.'); return; }
-    const note = (els.note.value||'').trim();
-    const date = els.date.value ? new Date(els.date.value) : new Date();
-    const rec = {
-      id: cryptoRandom(),
-      date: new Date(date.getTime() + date.getTimezoneOffset()*60000).toISOString(), // UTC'ye
-      amount: Math.round(amount),
-      category: activeCat,
-      note
-    };
-    data.push(rec);
-    persist();
-    clearForm(false);
-    render();
-    updateKPIs();
-    showModal(); // CSV sor
-  }
-
-  function clearForm(focus=true){
-    els.amount.value=''; els.note.value=''; setToday(els.date);
-    activeCat = defaultCats[0]; syncChipUI();
-    if(focus) els.amount.focus();
-  }
-
-  function render(){
-    const qy = (els.searchBox.value||'').toLowerCase();
-    const rows = (qy? data.filter(r=>{
-      return r.category.toLowerCase().includes(qy) || (r.note||'').toLowerCase().includes(qy);
-    }): data).sort((a,b)=> b.date.localeCompare(a.date));
-
-    els.tbody.innerHTML = rows.map(r=>{
-      const d = niceDate(r.date);
-      const note = esc(r.note||'');
-      return `<tr>
-        <td>${d}</td>
-        <td><span class="tag">${esc(r.category)}</span></td>
-        <td>${note||'<span class="mini" style="opacity:.6">—</span>'}</td>
-        <td class="right">${fmt(r.amount)}</td>
-        <td class="right">
-          <button class="chip" data-edit="${r.id}" title="Düzenle">✎</button>
-          <button class="chip" data-del="${r.id}" title="Sil">🗑</button>
-        </td>
-      </tr>`;
-    }).join('');
-
-    els.countRows.textContent = String(data.length);
-    els.status.textContent = rows.length===data.length ? '' : ${rows.length} / ${data.length} kayıt gösteriliyor;
-  }
-
-  function updateKPIs(){
-    const todayStr = new Date().toISOString().slice(0,10);
-    const monthStr = new Date().toISOString().slice(0,7);
-    const sum = data.reduce((a,b)=>a+b.amount,0);
-    const sumToday = data.filter(r=> r.date.slice(0,10)===todayStr).reduce((a,b)=>a+b.amount,0);
-    const sumMonth = data.filter(r=> r.date.slice(0,7)===monthStr).reduce((a,b)=>a+b.amount,0);
-    els.sumTotal.textContent = fmt(sum);
-    els.sumToday.textContent = fmt(sumToday);
-    els.sumMonth.textContent = fmt(sumMonth);
-
-    // kategori toplamları
-    const byCat = {};
-    data.forEach(r=> byCat[r.category]=(byCat[r.category]||0)+r.amount);
-    const cats = Object.entries(byCat).sort((a,b)=> b[1]-a[1]);
-    els.catTotals.innerHTML = cats.slice(0,8).map(([c,v])=>`
-      <div class="kpi">
-        <div class="t mini">${esc(c)}</div>
-        <div class="v amt">${fmt(v)}</div>
-      </div>
-    ).join('') || `<div class="mini" style="opacity:.8">Henüz veri yok.</div>;
-  }
-
-  function exportCSV(){
-    const rows = [
-      ['id','date','amount_all','category','note'],
-      ...data.map(r=>[r.id, r.date, r.amount, r.category, (r.note||'').replaceAll('"','""')])
-    ];
-    const csv = rows.map(r=> r.map(cell=>{
-      const s = String(cell ?? '');
-      return /[",\n]/.test(s) ? "${s.replaceAll('"','""')}" : s;
-    }).join(',')).join('\n');
-
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const ts = new Date().toISOString().replaceAll(':','').replaceAll('-','').slice(0,15);
-    a.href = url;
-    a.download = andi-ev-harcamalari-${ts}.csv;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 200);
-  }
-
-  async function importCSV(e){
-    const file = e.target.files?.[0]; if(!file) return;
-    const text = await file.text();
-    const rows = parseCSV(text);
-    // header tespiti
-    const header = rows[0].map(s=>s.toLowerCase());
-    const idx = {
-      id: header.indexOf('id'),
-      date: header.indexOf('date'),
-      amount: header.findIndex(x=> x==='amount' || x==='amount_all' || x==='tutar' ),
-      category: header.findIndex(x=> x==='category' || x==='kategori'),
-      note: header.findIndex(x=> x==='note' || x==='not')
-    };
-    const out = [];
-    for(let i=1;i<rows.length;i++){
-      const r = rows[i]; if(r.length===1 && !r[0]) continue;
-      const obj = {
-        id: r[idx.id] || cryptoRandom(),
-        date: normalizeDate(r[idx.date]),
-        amount: Math.round(Number(r[idx.amount]||0)),
-        category: r[idx.category] || 'Diğer',
-        note: r[idx.note] || ''
-      };
-      if(obj.date && obj.amount>0) out.push(obj);
-    }
-    // mevcutlara ekle (aynı id varsa güncelleme yerine atla)
-    const ids = new Set(data.map(x=>x.id));
-    out.forEach(o=>{ if(!ids.has(o.id)) data.push(o); });
-    persist(); render(); updateKPIs();
-    e.target.value = '';
-    toast(${out.length} kayıt eklendi.);
-  }
-
-  function showModal(){ els.modal.classList.add('show'); }
-  function hideModal(){ els.modal.classList.remove('show'); }
-
-  function persist(){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+  /** utils */
+  const fmt = new Intl.NumberFormat('sq-AL', { style:'currency', currency:'ALL', maximumFractionDigits:2 });
+  const fmtDate = ts => {
+    const d=new Date(ts);
+    return d.toLocaleDateString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric' }) + 
+           " " + d.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+  };
+  function save(){ localStorage.setItem(LSKEY, JSON.stringify(data)); }
   function load(){
     try{
-      const raw = localStorage.getItem(LS_KEY);
-      return raw ? JSON.parse(raw) : [];
-    }catch(_){ return []; }
+      const raw = localStorage.getItem(LSKEY);
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+  /** UI build */
+  function buildChips(target, onPick){
+    target.innerHTML = "";
+    CATS.forEach(c=>{
+      const b=document.createElement('button');
+      b.className='chip'; b.textContent=c;
+      b.addEventListener('click', ()=> onPick(c));
+      target.appendChild(b);
+    });
+    // manuel (not ile)
+    const manual=document.createElement('button');
+    manual.className='chip'; manual.textContent='(Manuel / sadece not)';
+    manual.title="Sadece not yazarak kaydet";
+    manual.addEventListener('click', ()=> onPick(""));
+    target.appendChild(manual);
+  }
+
+  function renderStats(){
+    const now=new Date();
+    const startOfDay=new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfWeek=(d=>{ const t=new Date(d); const wd=(t.getDay()+6)%7; t.setDate(t.getDate()-wd); t.setHours(0,0,0,0); return t.getTime(); })(now);
+    const startOfMonth=new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    const sum = (from=0)=> data.filter(x=>x.ts>=from).reduce((a,b)=>a+b.amount,0);
+
+    statsEl.innerHTML = [
+      ['Bugün', sum(startOfDay)],
+      ['Bu Hafta', sum(startOfWeek)],
+      ['Bu Ay', sum(startOfMonth)],
+      ['Toplam', sum(0)],
+    ].map(([k,v])=>(
+      `<div class="stat">
+        <div class="k">${k}</div>
+        <div class="v">${fmt.format(v || 0)}</div>
+      </div>`
+    )).join('');
+  }
+
+  function renderList(){
+    if(!data.length){
+      listEl.innerHTML = <div class="empty">Henüz kayıt yok. Tutarı girerek başla.</div>;
+      renderStats();
+      return;
+    }
+    // newest first
+    const rows = data.slice().sort((a,b)=>b.ts-a.ts).map(x=>{
+      const note = x.note ? <div class="note">${escapeHtml(x.note)}</div> : '';
+      return `<div class="row" data-id="${x.id}">
+        <div>
+          <div class="date">${fmtDate(x.ts)}</div>
+          <div class="cat">${escapeHtml(x.category || '(Manuel)')}</div>
+        </div>
+        <div>${note}</div>
+        <div style="display:flex; align-items:center; gap:8px">
+          <div class="amt">${fmt.format(x.amount)}</div>
+          <button class="del" title="Sil">Sil</button>
+        </div>
+      </div>`;
+    }).join('');
+    listEl.innerHTML = rows;
+
+    // bind deletes
+    listEl.querySelectorAll('.row .del').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        const id = e.target.closest('.row').dataset.id;
+        data = data.filter(r=>r.id!==id);
+        save(); renderList(); renderStats();
+      });
+    });
+
+    renderStats();
+  }
+
+  function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  function openModal(){
+    modalAmount.textContent = fmt.format(pending.amount || 0);
+    noteInput.value = pending.note || "";
+    modalBack.style.display='grid';
+    setTimeout(()=> noteInput.focus(), 80);
+  }
+  function closeModal(){
+    modalBack.style.display='none';
+    pending.category = ""; // reset choice; note remains for convenience
+  }
+
+  function addRecord(){
+    const rec = {
+      id: uid(),
+      ts: Date.now(),
+      amount: pending.amount,
+      category: pending.category || '(Manuel)',
+      note: (noteInput.value||"").trim()
+    };
+    data.push(rec); save(); renderList();
+
+    // sor: CSV indirilsin mi?
+    setTimeout(()=>{
+      if(confirm("CSV indirilsin mi?")){
+        exportCSV(true);
+      }
+    }, 50);
+  }
+
+  function exportCSV(download=true){
+    const header = ["id","timestamp","date","amount_ALL","category","note"];
+    const lines = data.map(x=>{
+      const cols = [
+        x.id,
+        x.ts,
+        new Date(x.ts).toISOString(),
+        String(x.amount).replace('.',','), // Avrupa ondalık tercihi
+        x.category || "",
+        (x.note||"").replace(/"/g,'""')
+      ];
+      // csv safe
+      return cols.map(c=>{
+        if(/[",;\n]/.test(c)) return "${c}";
+        return c;
+      }).join(",");
+    });
+    const csv = [header.join(","), ...lines].join("\n");
+    if(download){
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      const name = andi_ev_harcamalari_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.csv;
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+    }
+    return csv;
   }
 
   function parseCSV(text){
-    // basit ama sağlam CSV ayrıştırıcı
-    const lines = text.replace(/\r/g,'').split('\n');
-    const rows = [];
-    for(const line of lines){
-      const out=[]; let s=''; let q=false;
-      for(let i=0;i<line.length;i++){
-        const c=line[i];
-        if(c==='"' ){
-          if(q && line[i+1]==='"'){ s+='"'; i++; }
-          else q=!q;
-        } else if(c===',' && !q){ out.push(s); s=''; }
-        else { s+=c; }
+    // Basit ama “çift tırnak içi virgül” kurallı ayrıştırıcı
+    const rows=[]; let i=0, field="", row=[], inQ=false;
+    while(i<text.length){
+      const ch=text[i++];
+      if(inQ){
+        if(ch=='"'){
+          if(text[i]=='"'){ field+='"'; i++; } else { inQ=false; }
+        } else { field+=ch; }
+      } else {
+        if(ch=='"'){ inQ=true; }
+        else if(ch==','){ row.push(field); field=""; }
+        else if(ch=='\n' || ch=='\r'){
+          if(ch=='\r' && text[i]=='\n') i++;
+          row.push(field); field=""; if(row.some(c=>c!=='')) rows.push(row); row=[];
+        } else { field+=ch; }
       }
-      out.push(s);
-      rows.push(out);
     }
-    return rows.filter(r=> r.some(x=>x!=='')); // boş satırları at
+    if(field.length || row.length) { row.push(field); rows.push(row); }
+
+    // header’ı atla (uyuyorsa)
+    if(rows.length && rows[0][0]==='id') rows.shift();
+    return rows.map(r=>{
+      const [id, ts, , amount, category, note] = r;
+      const num = Number(String(amount).replace(',','.'));
+      return {
+        id: id || uid(),
+        ts: ts ? Number(ts) : Date.now(),
+        amount: isFinite(num) ? num : 0,
+        category: category || '(Manuel)',
+        note: note || ''
+      };
+    }).filter(x=>x.amount>0 && Number.isFinite(x.ts));
   }
 
-  function niceDate(iso){
-    const d = new Date(iso);
-    if(isNaN(d)) return iso;
-    const dd = d.toLocaleDateString('tr-TR',{year:'numeric',month:'2-digit',day:'2-digit'});
-    const tt = d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
-    return ${dd} ${tt};
+  function importCSVFile(file){
+    const fr=new FileReader();
+    fr.onload = () => {
+      try{
+        const rows = parseCSV(String(fr.result));
+        // merge (aynı id varsa atla)
+        const existing = new Set(data.map(x=>x.id));
+        let added=0;
+        rows.forEach(r=>{
+          if(!existing.has(r.id)){ data.push(r); added++; }
+        });
+        if(added===0 && rows.length){
+          alert("CSV yüklendi fakat tüm kayıtlar zaten mevcut görünüyordu.");
+        } else {
+          alert(${added} kayıt eklendi.);
+        }
+        save(); renderList();
+      }catch(e){
+        alert("CSV okunamadı. Dosyayı kontrol edin.");
+      }
+    };
+    fr.readAsText(file, 'utf-8');
   }
 
-  function normalizeDate(s){
-    if(!s) return null;
-    // ISO ise direkt
-    if(/^\d{4}-\d{2}-\d{2}/.test(s)) return new Date(s).toISOString();
-    // dd.mm.yyyy
-    if(/^\d{2}\.\d{2}\.\d{4}/.test(s)){
-      const [dd,mm,yy]=s.split(/[.\s]/); const d=new Date(${yy}-${mm}-${dd}T00:00:00Z);
-      return d.toISOString();
-    }
-    // dd/mm/yyyy
-    if(/^\d{2}\/\d{2}\/\d{4}/.test(s)){
-      const [dd,mm,yy]=s.split(/[\/\s]/); const d=new Date(${yy}-${mm}-${dd}T00:00:00Z);
-      return d.toISOString();
-    }
-    // fallback
-    const d = new Date(s); return isNaN(d)? null : d.toISOString();
-  }
-
-  function cryptoRandom(){
-    if(window.crypto?.randomUUID) return crypto.randomUUID();
-    return 'id-'+Math.random().toString(36).slice(2)+Date.now().toString(36);
-  }
-
-  function toast(msg){
-    els.status.textContent = msg;
-    setTimeout(()=>{ els.status.textContent=''; }, 3000);
-  }
-
-  // Klavye: sayı klavyesinde Enter yoksa butona yönlendir
-  els.amount.addEventListener('keydown', (e)=>{
-    if(e.key==='Enter'){ e.preventDefault(); els.btnSave.click(); }
+  /** events */
+  buildChips(chipsEl, (cat)=>{
+    if(!amountEl.value){ amountEl.focus(); return; }
+    pending.amount = Number(amountEl.value.replace(',','.')) || 0;
+    pending.category = cat;
+    pending.note = "";
+    openModal();
   });
+  buildChips(modalChips, (cat)=>{
+    pending.category = cat; // "" ise manuel
+  });
+
+  amountEl.addEventListener('input', ()=>{
+    const has = !!amountEl.value;
+    chipsEl.style.opacity = has ? 1 : .5;
+    chipsEl.style.pointerEvents = has ? 'auto' : 'none';
+  });
+
+  nextBtn.addEventListener('click', ()=>{
+    const val = Number(amountEl.value.replace(',','.')) || 0;
+    if(val<=0){ amountEl.focus(); amountEl.select?.(); return; }
+    pending.amount = val;
+    openModal();
+  });
+
+  // Mobilde Enter/done çalışsın
+  amountEl.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); nextBtn.click(); }
+  });
+
+  saveBtn.addEventListener('click', ()=>{
+    if(!pending.amount || pending.amount<=0) return;
+    addRecord();
+    closeModal();
+    amountEl.value = ""; amountEl.focus();
+  });
+  cancelBtn.addEventListener('click', closeModal);
+  modalBack.addEventListener('click', (e)=>{ if(e.target===modalBack) closeModal(); });
+
+  exportBtn.addEventListener('click', ()=> exportCSV(true));
+  importInput.addEventListener('change', (e)=>{
+    const f=e.target.files?.[0]; if(f) importCSVFile(f);
+    e.target.value=""; // tekrar seçim için sıfırla
+  });
+
+  clearBtn.addEventListener('click', ()=>{
+    if(confirm("Tüm kayıtlar silinsin mi?")){ data=[]; save(); renderList(); renderStats(); }
+  });
+
+  todayBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    // en güncel kayda kaydır
+    const first = document.querySelector('.row');
+    if(first) first.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  /** init */
+  renderList();
+  amountEl.focus();
 
 })();
 </script>
