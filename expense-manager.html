@@ -7,7 +7,7 @@
 <style>
 :root{
   --bg:#fff; --paper:#fafafa; --ink:#1c1d22; --muted:#8b9098;
-  --primary:#ff5a5f; /* accent */
+  --primary:#ff5a5f;
   --blue:#1e88e5; --red:#e53935; --green:#2e7d32; --amber:#f57c00;
   --surface:#ffffff; --card:#ffffff; --line:#ececf1;
   --shadow: 0 8px 24px rgba(0,0,0,.08);
@@ -15,135 +15,85 @@
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{
-  margin:0; background:var(--bg); color:var(--ink); font-family: ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-}
-.app{
-  max-width:560px; margin:0 auto; min-height:100%;
-  display:flex; flex-direction:column;
-}
-.header{
-  position:sticky; top:0; z-index:5; background:linear-gradient(180deg,#fff 0%,#fff 65%,rgba(255,255,255,.92) 100%);
-  padding:10px 16px 0 16px; border-bottom:1px solid var(--line);
-}
-.header .title{
-  display:flex; align-items:center; justify-content:space-between;
-}
-.h1{font-size:18px; font-weight:700; letter-spacing:.2px}
-.monthRow{
-  display:flex; align-items:center; justify-content:center; gap:12px; padding:8px 0 10px;
-}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+.app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+.header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#fff 0%,#fff 65%,rgba(255,255,255,.92) 100%);padding:10px 16px 0 16px;border-bottom:1px solid var(--line)}
+.header .title{display:flex;align-items:center;justify-content:space-between}
+.h1{font-size:18px;font-weight:700;letter-spacing:.2px}
+.monthRow{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 0 10px}
 .monthBtn{border:none;background:#f2f3f5;color:#222;padding:8px 10px;border-radius:10px;font-weight:600}
 .monthLabel{font-weight:700}
-.tabs{
-  display:flex; gap:8px; overflow:auto; padding:8px 0 12px; scrollbar-width:none;
-}
-.tab{flex:0 0 auto; padding:10px 14px; background:#f2f3f5; color:#333; border-radius:14px; font-weight:700; opacity:.85; border:1px solid transparent}
-.tab.active{background:#111;color:#fff; border-color:#111}
-.kpis{
-  display:flex; justify-content:space-between; padding:10px 6px 12px; gap:10px; font-weight:700;
-}
-.kpi{flex:1; text-align:center; background:#f7f7f9; border:1px solid var(--line); border-radius:12px; padding:10px}
-.kpi .v{display:block; font-size:15px; margin-top:4px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:8px 0 12px;scrollbar-width:none}
+.tab{flex:0 0 auto;padding:10px 14px;background:#f2f3f5;color:#333;border-radius:14px;font-weight:700;opacity:.85;border:1px solid transparent}
+.tab.active{background:#111;color:#fff;border-color:#111}
+.kpis{display:flex;justify-content:space-between;padding:10px 6px 12px;gap:10px;font-weight:700}
+.kpi{flex:1;text-align:center;background:#f7f7f9;border:1px solid var(--line);border-radius:12px;padding:10px}
+.kpi .v{display:block;font-size:15px;margin-top:4px}
 .blue{color:var(--blue)} .red{color:var(--red)} .green{color:var(--green)}
-.content{flex:1; overflow:auto; padding:10px 12px 90px}
-
-.card{background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow)}
+.content{flex:1;overflow:auto;padding:10px 12px 90px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
 .section{margin-bottom:14px}
-
-/* Transactions list */
+/* List */
 .list{overflow:hidden}
-.row{
-  display:grid; grid-template-columns:58px 1fr auto; gap:10px; align-items:center;
-  padding:12px; border-bottom:1px solid var(--line); background:#fff;
-}
+.row{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--line);background:#fff}
 .row:last-child{border-bottom:none}
-.dot{
-  width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:800; background:#f3f5f7; color:#222;
-}
-.row .title{font-weight:700; font-size:14px}
-.row .note{font-size:12px; color:var(--muted); margin-top:2px}
-.amount{font-weight:800; font-size:14px}
+.dot{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:#f3f5f7;color:#222}
+.row .title{font-weight:700;font-size:14px}
+.row .note{font-size:12px;color:var(--muted);margin-top:2px}
+.amount{font-weight:800;font-size:14px}
 .amount.income{color:var(--blue)} .amount.expense{color:var(--red)} .amount.transfer{color:var(--amber)}
-
 /* Calendar */
 .calendar{padding:8px}
-.grid{
-  display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
-}
-.cell{
-  background:#fff; border:1px solid var(--line); border-radius:12px; padding:8px; min-height:72px;
-  display:flex; flex-direction:column; justify-content:flex-start; gap:6px;
-}
-.cell .d{font-size:12px; color:#555; font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cell{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;min-height:72px;display:flex;flex-direction:column;gap:6px}
+.cell .d{font-size:12px;color:#555;font-weight:700}
 .cell .sum{font-size:12px}
-.cell.today{border-color:#111; box-shadow:0 0 0 1px #111 inset}
-
+.cell.today{border-color:#111;box-shadow:0 0 0 1px #111 inset}
 /* Stats – pie */
 .canvaswrap{padding:12px}
-.legend{display:flex; flex-direction:column; gap:8px; padding:10px 12px 14px}
-.legItem{display:flex; align-items:center; justify-content:space-between; gap:12px}
-.legLeft{display:flex; align-items:center; gap:10px}
-.badge{width:12px; height:12px; border-radius:3px}
-
+.legend{display:flex;flex-direction:column;gap:8px;padding:10px 12px 14px}
+.legItem{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.legLeft{display:flex;align-items:center;gap:10px}
+.badge{width:12px;height:12px;border-radius:3px}
 /* Bottom bar & FAB */
-.navbar{
-  position:fixed; bottom:0; left:0; right:0; z-index:10; background:#fff; border-top:1px solid var(--line);
-}
-.nav{
-  max-width:560px; margin:0 auto; display:flex; justify-content:space-around; padding:8px 8px 8px;
-}
-.navbtn{border:none;background:none;font-weight:700; color:#666; padding:10px 6px}
+.navbar{position:fixed;bottom:0;left:0;right:0;z-index:10;background:#fff;border-top:1px solid var(--line)}
+.nav{max-width:560px;margin:0 auto;display:flex;justify-content:space-around;padding:8px 8px 8px}
+.navbtn{border:none;background:none;font-weight:700;color:#666;padding:10px 6px}
 .navbtn.active{color:#111}
-.fab{
-  position:fixed; right:18px; bottom:78px; width:56px; height:56px; border-radius:16px; background:var(--primary); color:#fff; font-size:28px; border:none; box-shadow:0 10px 24px rgba(255,90,95,.35);
-}
-
+.fab{position:fixed;right:18px;bottom:78px;width:56px;height:56px;border-radius:16px;background:var(--primary);color:#fff;font-size:28px;border:none;box-shadow:0 10px 24px rgba(255,90,95,.35);z-index:999}
 /* Dialog / sheet */
-.sheet{
-  position:fixed; inset:0; background:rgba(0,0,0,.25); display:none; align-items:flex-end; z-index:20;
-}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.25);display:none;align-items:flex-end;z-index:20}
 .sheet.show{display:flex}
-.panel{
-  background:#fff; border-radius:18px 18px 0 0; width:100%; max-width:560px; margin:0 auto; padding:14px 14px 18px; box-shadow:0 -10px 30px rgba(0,0,0,.25);
-}
-.panel h3{margin:6px 0 12px; font-size:16px}
-.f{display:flex; flex-direction:column; gap:10px}
-.input, select, textarea{
-  width:100%; padding:12px 12px; border:1px solid var(--line); border-radius:12px; font-size:16px; background:#fff;
-}
-.row2{display:flex; gap:10px}
-.btn{padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:#fff; font-weight:700}
-.btn.primary{background:#111; color:#fff; border-color:#111}
-.btn.red{background:#e53935; color:#fff; border-color:#e53935}
-.btn.green{background:#2e7d32; color:#fff; border-color:#2e7d32}
-.actions{display:flex; gap:10px; margin-top:6px}
-
-/* Tiny helpers */
+.panel{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:560px;margin:0 auto;padding:14px 14px 18px;box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+.panel h3{margin:6px 0 12px;font-size:16px}
+.f{display:flex;flex-direction:column;gap:10px}
+.input,select,textarea{width:100%;padding:12px 12px;border:1px solid var(--line);border-radius:12px;font-size:16px;background:#fff}
+.row2{display:flex;gap:10px}
+.btn{padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:700}
+.btn.primary{background:#111;color:#fff;border-color:#111}
+.btn.red{background:#e53935;color:#fff;border-color:#e53935}
+.btn.green{background:#2e7d32;color:#fff;border-color:#2e7d32}
+.actions{display:flex;gap:10px;margin-top:6px}
 .hidden{display:none}
-.center{display:flex; align-items:center; justify-content:center}
-hr.sep{border:none; border-top:1px solid var(--line); margin:12px 0}
+.center{display:flex;align-items:center;justify-content:center}
+hr.sep{border:none;border-top:1px solid var(--line);margin:12px 0}
 .small{font-size:12px;color:var(--muted)}
-a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dashed #111}
+a.link{color:#111;font-weight:700;text-decoration:none;border-bottom:1px dashed #111}
 </style>
 </head>
 <body>
 <div class="app">
-
   <!-- HEADER -->
   <div class="header">
     <div class="title">
       <div class="h1">Transaction</div>
       <div class="small">ALL (L)</div>
     </div>
-
     <div class="monthRow">
       <button class="monthBtn" id="prevMonth">&lt;</button>
       <div class="monthLabel" id="monthLabel"></div>
       <button class="monthBtn" id="nextMonth">&gt;</button>
     </div>
-
     <div class="tabs" id="tabs">
       <button class="tab active" data-tab="daily">Daily</button>
       <button class="tab" data-tab="calendar">Calendar</button>
@@ -151,7 +101,6 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
       <button class="tab" data-tab="monthly">Monthly</button>
       <button class="tab" data-tab="summary">Summary</button>
     </div>
-
     <div class="kpis">
       <div class="kpi"><span>Gelir</span><span class="v blue" id="kpiIncome">L 0</span></div>
       <div class="kpi"><span>Gider</span><span class="v red" id="kpiExpense">L 0</span></div>
@@ -161,37 +110,23 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
 
   <!-- CONTENT -->
   <div class="content">
-    <!-- DAILY -->
     <div id="view-daily" class="section">
       <div class="card list" id="dailyList"></div>
     </div>
-
-    <!-- CALENDAR -->
     <div id="view-calendar" class="section hidden">
-      <div class="card calendar">
-        <div class="grid" id="calGrid"></div>
-      </div>
+      <div class="card calendar"><div class="grid" id="calGrid"></div></div>
     </div>
-
-    <!-- WEEKLY -->
     <div id="view-weekly" class="section hidden">
       <div class="card list" id="weeklyList"></div>
     </div>
-
-    <!-- MONTHLY -->
     <div id="view-monthly" class="section hidden">
       <div class="card list" id="monthlyList"></div>
     </div>
-
-    <!-- SUMMARY -->
     <div id="view-summary" class="section hidden">
       <div class="card">
-        <div class="canvaswrap center">
-          <canvas id="pie" width="320" height="220"></canvas>
-        </div>
+        <div class="canvaswrap center"><canvas id="pie" width="320" height="220"></canvas></div>
         <div class="legend" id="legend"></div>
       </div>
-
       <div class="section">
         <div class="card" style="padding:12px">
           <div class="row2" style="margin-bottom:8px">
@@ -201,15 +136,11 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
           <div class="small" id="filterInfo">Tüm hesaplar</div>
         </div>
       </div>
-
       <div class="section">
         <div class="card" style="padding:12px">
           <div class="row2">
             <button class="btn" id="exportBtn">CSV Dışa Aktar</button>
-            <label class="btn">
-              CSV Yükle
-              <input id="importInput" type="file" accept=".csv" class="hidden">
-            </label>
+            <label class="btn">CSV Yükle<input id="importInput" type="file" accept=".csv" class="hidden"></label>
             <button class="btn" id="wipeBtn">Tüm Veriyi Sil</button>
           </div>
           <div class="small" style="margin-top:8px">CSV; Excel’de açılır. İçerik: id,date,type,amount,category,note,account,photo</div>
@@ -231,7 +162,7 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
   <!-- FAB -->
   <button class="fab" id="addBtn">+</button>
 
-  <!-- ADD / EDIT SHEET -->
+  <!-- ADD SHEET -->
   <div class="sheet" id="sheet">
     <div class="panel">
       <h3 id="sheetTitle">Yeni Kayıt</h3>
@@ -248,9 +179,7 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
             <option>Birikim</option>
           </select>
         </div>
-
         <input id="amount" class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Tutar (L) — tam sayı" />
-
         <div class="row2">
           <select id="category">
             <option value="Kira">Kira</option>
@@ -265,17 +194,13 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
           </select>
           <input id="date" type="date" class="input" />
         </div>
-
         <textarea id="note" rows="2" class="input" placeholder="Not (isteğe bağlı)"></textarea>
-
         <div class="row2">
-          <label class="btn" style="flex:1;text-align:center">
-            Foto Ekle
+          <label class="btn" style="flex:1;text-align:center">Foto Ekle
             <input id="photo" type="file" accept="image/*" capture="environment" class="hidden">
           </label>
           <div id="photoPreview" class="center" style="flex:1;border:1px dashed var(--line);border-radius:12px;min-height:48px"></div>
         </div>
-
         <div class="actions">
           <button class="btn" id="closeSheet">Kapat</button>
           <button class="btn primary" id="save">Kaydet</button>
@@ -299,99 +224,61 @@ a.link{color:#111; font-weight:700; text-decoration:none; border-bottom:1px dash
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
 /* ===== Utilities ===== */
 const $ = (q,ctx=document)=>ctx.querySelector(q);
 const $$ = (q,ctx=document)=>Array.from(ctx.querySelectorAll(q));
-
 const fmtALL = n => "L " + (n||0).toString().replace(/\B(?=(\d{3})+(?!\d))/g," ");
-
 const todayISO = ()=> new Date().toISOString().slice(0,10);
 const firstDay = (y,m)=> new Date(y,m,1);
 const daysInMonth = (y,m)=> new Date(y,m+1,0).getDate();
-
-function uid(){ return Math.random().toString(36).slice(2,10); }
-
+const uid = ()=> Math.random().toString(36).slice(2,10);
 function download(filename, text){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8;'}));
-  a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
+  a.download = filename; document.body.appendChild(a); a.click(); a.remove();
 }
 
 /* ===== State ===== */
 const STORE_KEY = 'andi-expense-v1';
-let state = {
-  month: new Date(),  // current viewed month
-  filterAccounts: null,  // null = all
-  items: []           // {id,date,type,amount,category,note,account,photo}
-};
+let state = { month:new Date(), filterAccounts:null, items:[] };
+function load(){ try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ state={...state,...JSON.parse(raw)}; } }catch(e){} if(!state.items) state.items=[]; }
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-function load(){
-  try{
-    const raw = localStorage.getItem(STORE_KEY);
-    if(raw){ state = {...state, ...JSON.parse(raw)}; }
-  }catch(e){}
-  if(!state.items) state.items = [];
-}
-function save(){
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-}
-
-/* ===== Rendering ===== */
+/* ===== Rendering helpers ===== */
 function setMonthLabel(){
-  const d = state.month;
-  const label = d.toLocaleDateString('tr-TR',{month:'long', year:'numeric'});
-  $('#monthLabel').textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  const d=state.month; const label=d.toLocaleDateString('tr-TR',{month:'long',year:'numeric'});
+  $('#monthLabel').textContent = label.charAt(0).toUpperCase()+label.slice(1);
 }
-function monthRange(){
-  const y = state.month.getFullYear();
-  const m = state.month.getMonth();
-  const start = new Date(y,m,1);
-  const end = new Date(y,m+1,0,23,59,59,999);
-  return [start,end];
-}
-function inRange(d, start,end){ return d>=start && d<=end; }
-
-function filteredItems(rangeOnly=false){
-  const [start,end] = monthRange();
-  const accs = state.filterAccounts;
+function monthRange(){ const y=state.month.getFullYear(), m=state.month.getMonth(); return [new Date(y,m,1), new Date(y,m+1,0,23,59,59,999)]; }
+function inRange(d,s,e){ return d>=s && d<=e; }
+function filteredItems(rangeOnly=true){
+  const [s,e]=monthRange(); const accs=state.filterAccounts;
   return state.items.filter(it=>{
     const d=new Date(it.date);
-    if(rangeOnly && !inRange(d,start,end)) return false;
+    if(rangeOnly && !inRange(d,s,e)) return false;
     if(accs && !accs.includes(it.account)) return false;
     return true;
   });
 }
-
 function calcKPIs(){
-  const list = filteredItems(true);
-  let inc=0, exp=0;
-  list.forEach(i=>{
-    if(i.type==='income') inc+=i.amount;
-    else if(i.type==='expense') exp+=i.amount;
-  });
-  $('#kpiIncome').textContent = fmtALL(inc);
-  $('#kpiExpense').textContent = fmtALL(exp);
-  $('#kpiTotal').textContent = fmtALL(inc-exp);
+  const list=filteredItems(true); let inc=0,exp=0;
+  list.forEach(i=>{ if(i.type==='income') inc+=i.amount; else if(i.type==='expense') exp+=i.amount; });
+  $('#kpiIncome').textContent=fmtALL(inc); $('#kpiExpense').textContent=fmtALL(exp); $('#kpiTotal').textContent=fmtALL(inc-exp);
 }
-
 function renderDaily(){
-  const list = $('#dailyList');
-  list.innerHTML = '';
-  const [start,end]=monthRange();
-  const items = filteredItems(true).sort((a,b)=> new Date(b.date)-new Date(a.date) );
-  if(items.length===0){ list.innerHTML = <div class="center" style="padding:24px;color:var(--muted)">Bu ay kayıt yok</div>; return; }
+  const list=$('#dailyList'); list.innerHTML='';
+  const items=filteredItems(true).sort((a,b)=> new Date(b.date)-new Date(a.date));
+  if(items.length===0){ list.innerHTML=<div class="center" style="padding:24px;color:var(--muted)">Bu ay kayıt yok</div>; return; }
   items.forEach(i=>{
-    const day = new Date(i.date).getDate();
-    const amt = (i.type==='income'?'+':'-') + fmtALL(i.amount);
-    const cls = i.type==='income'?'income':(i.type==='expense'?'expense':'transfer');
-    const note = i.note?<div class="note">${i.note}</div>:'';
-    const photoIcon = i.photo? '📷' : '';
-    const html = `
+    const day=new Date(i.date).getDate();
+    const amt=(i.type==='income'?'+':'-')+fmtALL(i.amount);
+    const cls=i.type==='income'?'income':(i.type==='expense'?'expense':'transfer');
+    const note=i.note?<div class="note">${i.note}</div>:'';
+    const photoIcon=i.photo?'📷':'';
+    list.insertAdjacentHTML('beforeend', `
       <div class="row">
         <div class="dot">${day}</div>
         <div>
@@ -400,287 +287,152 @@ function renderDaily(){
           ${note}
         </div>
         <div class="amount ${cls}">${amt}</div>
-      </div>`;
-    list.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-function renderCalendar(){
-  const grid = $('#calGrid');
-  grid.innerHTML = '';
-  const y = state.month.getFullYear();
-  const m = state.month.getMonth();
-  const first = firstDay(y,m);
-  const startWeekday = (first.getDay()+6)%7; // Mon=0
-  const total = daysInMonth(y,m);
-
-  const sums = {}; // day -> {inc,exp}
-  filteredItems(true).forEach(i=>{
-    const d = new Date(i.date).getDate();
-    if(!sums[d]) sums[d]={inc:0,exp:0};
-    if(i.type==='income') sums[d].inc+=i.amount;
-    if(i.type==='expense') sums[d].exp+=i.amount;
-  });
-
-  for(let i=0;i<startWeekday;i++){
-    grid.insertAdjacentHTML('beforeend', <div></div>);
-  }
-  for(let d=1; d<=total; d++){
-    const se = sums[d]||{inc:0,exp:0};
-    const isToday = (new Date().toDateString()===new Date(y,m,d).toDateString());
-    grid.insertAdjacentHTML('beforeend', `
-      <div class="cell ${isToday?'today':''}">
-        <div class="d">${d}</div>
-        <div class="sum blue">${se.inc? '＋'+fmtALL(se.inc):''}</div>
-        <div class="sum red">${se.exp? '－'+fmtALL(se.exp):''}</div>
       </div>`);
+  });
+}
+function renderCalendar(){
+  const grid=$('#calGrid'); grid.innerHTML='';
+  const y=state.month.getFullYear(), m=state.month.getMonth();
+  const first=firstDay(y,m); const startWeekday=(first.getDay()+6)%7; const total=daysInMonth(y,m);
+  const sums={}; filteredItems(true).forEach(i=>{const d=new Date(i.date).getDate(); if(!sums[d]) sums[d]={inc:0,exp:0}; if(i.type==='income') sums[d].inc+=i.amount; if(i.type==='expense') sums[d].exp+=i.amount;});
+  for(let i=0;i<startWeekday;i++) grid.insertAdjacentHTML('beforeend', <div></div>);
+  for(let d=1; d<=total; d++){
+    const se=sums[d]||{inc:0,exp:0}; const isToday=(new Date().toDateString()===new Date(y,m,d).toDateString());
+    grid.insertAdjacentHTML('beforeend', <div class="cell ${isToday?'today':''}"><div class="d">${d}</div><div class="sum blue">${se.inc? '＋'+fmtALL(se.inc):''}</div><div class="sum red">${se.exp? '－'+fmtALL(se.exp):''}</div></div>);
   }
 }
-
-function aggregate(by){ // 'week' | 'month'
-  const map = new Map();
+function aggregate(by){
+  const map=new Map();
   filteredItems(true).forEach(i=>{
-    const d=new Date(i.date);
-    let key;
-    if(by==='week'){
-      const first = new Date(d); first.setDate(d.getDate()-((d.getDay()+6)%7)); // monday
-      key = first.toISOString().slice(0,10);
-    }else{
-      key = d.toISOString().slice(0,7);
-    }
-    const o = map.get(key)||{inc:0,exp:0};
-    if(i.type==='income') o.inc+=i.amount;
-    else if(i.type==='expense') o.exp+=i.amount;
-    map.set(key,o);
+    const d=new Date(i.date); let key;
+    if(by==='week'){ const first=new Date(d); first.setDate(d.getDate()-((d.getDay()+6)%7)); key=first.toISOString().slice(0,10); }
+    else key=d.toISOString().slice(0,7);
+    const o=map.get(key)||{inc:0,exp:0}; if(i.type==='income') o.inc+=i.amount; else if(i.type==='expense') o.exp+=i.amount; map.set(key,o);
   });
   return Array.from(map.entries()).sort((a,b)=> a[0]<b[0]?-1:1);
 }
 function renderAggList(containerId, by){
-  const el = $(containerId);
-  el.innerHTML='';
-  const rows = aggregate(by);
-  if(rows.length===0){ el.innerHTML = <div class="center" style="padding:24px;color:var(--muted)">Kayıt yok</div>; return; }
+  const el=$(containerId); el.innerHTML='';
+  const rows=aggregate(by);
+  if(rows.length===0){ el.innerHTML=<div class="center" style="padding:24px;color:var(--muted)">Kayıt yok</div>; return; }
   rows.forEach(([key,vals])=>{
-    const title = by==='week'
-      ? new Date(key).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'}) + " haftası"
-      : key;
-    const total = vals.inc - vals.exp;
-    el.insertAdjacentHTML('beforeend', `
-      <div class="row">
-        <div class="dot">${by==='week'?'W':'M'}</div>
-        <div>
-          <div class="title">${title}</div>
-          <div class="note blue">Gelir: ${fmtALL(vals.inc)}</div>
-          <div class="note red">Gider: ${fmtALL(vals.exp)}</div>
-        </div>
-        <div class="amount ${total>=0?'income':'expense'}">${fmtALL(total)}</div>
-      </div>
-    `);
+    const title= by==='week' ? new Date(key).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit'})+" haftası" : key;
+    const total=vals.inc-vals.exp;
+    el.insertAdjacentHTML('beforeend', <div class="row"><div class="dot">${by==='week'?'W':'M'}</div><div><div class="title">${title}</div><div class="note blue">Gelir: ${fmtALL(vals.inc)}</div><div class="note red">Gider: ${fmtALL(vals.exp)}</div></div><div class="amount ${total>=0?'income':'expense'}">${fmtALL(total)}</div></div>);
   });
 }
-
 function renderPie(){
-  const ctx = $('#pie').getContext('2d');
-  const W = ctx.canvas.width, H = ctx.canvas.height;
-  ctx.clearRect(0,0,W,H);
-  const data = {};
-  filteredItems(true).forEach(i=>{
-    if(i.type!=='expense') return;
-    data[i.category]=(data[i.category]||0)+i.amount;
-  });
-  const labels = Object.keys(data);
-  const vals = labels.map(k=>data[k]);
-  const sum = vals.reduce((a,b)=>a+b,0);
-  const colors = labels.map((_,i)=>hsl(${(i*57)%360} 80% 55%));
-  // draw pie
-  let a0 = -Math.PI/2;
-  vals.forEach((v,idx)=>{
-    const a1 = a0 + (v/sum)*Math.PI*2;
-    ctx.beginPath(); ctx.moveTo(W/2,H/2);
-    ctx.arc(W/2,H/2, Math.min(W,H)/2-14, a0, a1);
-    ctx.closePath(); ctx.fillStyle = colors[idx]; ctx.fill(); a0=a1;
-  });
-  // legend
-  const leg = $('#legend'); leg.innerHTML='';
-  labels.forEach((lab,i)=>{
-    const pct = sum? (data[lab]*100/sum).toFixed(1):0;
-    leg.insertAdjacentHTML('beforeend', `
-      <div class="legItem">
-        <div class="legLeft"><span class="badge" style="background:${colors[i]}"></span><strong>${lab}</strong></div>
-        <div>${pct}% – ${fmtALL(data[lab])}</div>
-      </div>`);
-  });
-  if(labels.length===0){
-    leg.innerHTML = <div class="center" style="color:var(--muted);padding:12px">Gider verisi yok</div>;
-  }
+  const ctx=$('#pie').getContext('2d'); const W=ctx.canvas.width,H=ctx.canvas.height; ctx.clearRect(0,0,W,H);
+  const data={}; filteredItems(true).forEach(i=>{ if(i.type!=='expense') return; data[i.category]=(data[i.category]||0)+i.amount; });
+  const labels=Object.keys(data); const vals=labels.map(k=>data[k]); const sum=vals.reduce((a,b)=>a+b,0);
+  const colors=labels.map((_,i)=>hsl(${(i*57)%360} 80% 55%));
+  let a0=-Math.PI/2; vals.forEach((v,idx)=>{ const a1=a0+(v/sum)*Math.PI*2; ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.arc(W/2,H/2,Math.min(W,H)/2-14,a0,a1); ctx.closePath(); ctx.fillStyle=colors[idx]; ctx.fill(); a0=a1; });
+  const leg=$('#legend'); leg.innerHTML=''; labels.forEach((lab,i)=>{ const pct=sum? (data[lab]*100/sum).toFixed(1):0; leg.insertAdjacentHTML('beforeend', <div class="legItem"><div class="legLeft"><span class="badge" style="background:${colors[i]}"></span><strong>${lab}</strong></div><div>${pct}% – ${fmtALL(data[lab])}</div></div>); });
+  if(labels.length===0) leg.innerHTML=<div class="center" style="color:var(--muted);padding:12px">Gider verisi yok</div>;
 }
+function renderAll(){ setMonthLabel(); calcKPIs(); renderDaily(); renderCalendar(); renderAggList('#weeklyList','week'); renderAggList('#monthlyList','month'); renderPie(); }
 
-function renderAll(){
-  setMonthLabel();
-  calcKPIs();
-  renderDaily();
-  renderCalendar();
-  renderAggList('#weeklyList','week');
-  renderAggList('#monthlyList','month');
-  renderPie();
-}
-
-/* ===== Tabs & Month ===== */
+/* ===== Tabs, Navbar, Month ===== */
 function switchTab(tab){
   $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
-  ['daily','calendar','weekly','monthly','summary'].forEach(v=>{
-    $('#view-'+v).classList.toggle('hidden', v!==tab);
-  });
-  // bottom nav highlight (only first two make sense visually)
-  $$('.navbtn').forEach(n=>n.classList.toggle('active', n.dataset.tab===tab || (tab==='daily' && n.dataset.tab==='daily') || (tab==='summary' && n.dataset.tab==='summary')));
+  ['daily','calendar','weekly','monthly','summary'].forEach(v=> $('#view-'+v).classList.toggle('hidden', v!==tab));
+  $$('.navbtn').forEach(n=> n.classList.toggle('active', n.dataset.tab===tab || (tab==='daily' && n.dataset.tab==='daily') || (tab==='summary' && n.dataset.tab==='summary')));
 }
-$('#tabs').addEventListener('click', e=>{
-  if(e.target.classList.contains('tab')) switchTab(e.target.dataset.tab);
-});
-$('#prevMonth').onclick = ()=>{ state.month.setMonth(state.month.getMonth()-1); renderAll(); };
-$('#nextMonth').onclick = ()=>{ state.month.setMonth(state.month.getMonth()+1); renderAll(); };
+function bindNav(){
+  // üst sekmeler
+  $('#tabs').addEventListener('click', e=>{ if(e.target.classList.contains('tab')) switchTab(e.target.dataset.tab); });
+  // alt bar
+  $$('.navbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tab=btn.dataset.tab;
+      if(tab==='accounts' || tab==='settings'){ switchTab('summary'); return; }
+      switchTab(tab);
+    });
+  });
+  // ay gezinme
+  $('#prevMonth').onclick=()=>{ state.month.setMonth(state.month.getMonth()-1); renderAll(); };
+  $('#nextMonth').onclick=()=>{ state.month.setMonth(state.month.getMonth()+1); renderAll(); };
+}
 
-/* ===== Add/Edit ===== */
-const sheet = $('#sheet');
-$('#addBtn').onclick = ()=>{ openSheet(); };
-
+/* ===== Add Sheet & Photo ===== */
 function openSheet(){
   $('#sheetTitle').textContent='Yeni Kayıt';
-  $('#type').value='expense';
-  $('#account').value='Nakit';
-  $('#amount').value='';
-  $('#category').value='Yemek';
-  $('#date').value = todayISO();
-  $('#note').value='';
-  $('#photo').value='';
-  $('#photoPreview').innerHTML='';
-  sheet.classList.add('show');
+  $('#type').value='expense'; $('#account').value='Nakit'; $('#amount').value='';
+  $('#category').value='Yemek'; $('#date').value=todayISO(); $('#note').value='';
+  $('#photo').value=''; $('#photoPreview').innerHTML=''; delete $('#photoPreview').dataset?.data;
+  $('#sheet').classList.add('show');
 }
-$('#closeSheet').onclick = ()=> sheet.classList.remove('show');
+function bindSheet(){
+  $('#addBtn').addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); openSheet(); });
+  $('#closeSheet').onclick=()=> $('#sheet').classList.remove('show');
 
-$('#photo').addEventListener('change', async (e)=>{
-  const file = e.target.files[0]; if(!file) return;
-  const img = new Image();
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    img.onload = ()=>{
-      // downscale to keep localStorage small
-      const maxW = 480, maxH=360;
-      const r = Math.min(maxW/img.width, maxH/img.height, 1);
-      const c = document.createElement('canvas'); c.width=img.width*r; c.height=img.height*r;
-      const cx=c.getContext('2d'); cx.drawImage(img,0,0,c.width,c.height);
-      const data=c.toDataURL('image/jpeg',.7);
-      $('#photoPreview').innerHTML = <img src="${data}" style="max-width:100%;border-radius:10px">;
-      $('#photoPreview').dataset.data = data;
-    };
-    img.src = ev.target.result;
+  $('#photo').addEventListener('change', (e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    const img=new Image(); const reader=new FileReader();
+    reader.onload=ev=>{ img.onload=()=>{ const maxW=480,maxH=360; const r=Math.min(maxW/img.width,maxH/img.height,1);
+      const c=document.createElement('canvas'); c.width=img.width*r; c.height=img.height*r; const cx=c.getContext('2d'); cx.drawImage(img,0,0,c.width,c.height);
+      const data=c.toDataURL('image/jpeg',.7); $('#photoPreview').innerHTML=<img src="${data}" style="max-width:100%;border-radius:10px">; $('#photoPreview').dataset.data=data; };
+      img.src=ev.target.result; }; reader.readAsDataURL(file);
+  });
+
+  $('#save').onclick=()=>{
+    const type=$('#type').value, account=$('#account').value;
+    const amount=parseInt(($('#amount').value||'').replace(/\D/g,''),10)||0;
+    const category=$('#category').value, date=$('#date').value||todayISO(), note=$('#note').value.trim();
+    const photo=$('#photoPreview').dataset.data||'';
+    if(!amount){ alert('Tutar giriniz (tam sayı).'); return; }
+    state.items.push({id:uid(),date,type,amount,category,note,account,photo}); save(); renderAll(); $('#sheet').classList.remove('show');
+    if(confirm('CSV indirilsin mi?')) exportCSV();
   };
-  reader.readAsDataURL(file);
-});
-
-$('#save').onclick = ()=>{
-  const type = $('#type').value;
-  const account = $('#account').value;
-  const amount = parseInt(($('#amount').value||'').replace(/\D/g,''),10)||0; // integer
-  const category = $('#category').value;
-  const date = $('#date').value || todayISO();
-  const note = $('#note').value.trim();
-  const photo = $('#photoPreview').dataset.data || '';
-  if(!amount){ alert('Tutar giriniz (tam sayı).'); return; }
-  const it = {id:uid(), date, type, amount, category, note, account, photo};
-  state.items.push(it); save(); renderAll();
-  sheet.classList.remove('show');
-
-  // Kayıttan sonra sor
-  if(confirm('CSV indirilsin mi?')){
-    exportCSV();
-  }
-};
+}
 
 /* ===== Filters ===== */
-const filterSheet = $('#filterSheet');
-$('#filterBtn').onclick = ()=>{ 
-  // preset
-  const accs = state.filterAccounts || ['Nakit','Kart','Birikim'];
-  $$('.accChk').forEach(c=>c.checked = accs.includes(c.value));
-  filterSheet.classList.add('show');
-};
-$('#fCancel').onclick = ()=> filterSheet.classList.remove('show');
-$('#fApply').onclick = ()=>{
-  const accs = $$('.accChk').filter(c=>c.checked).map(c=>c.value);
-  state.filterAccounts = (accs.length===3 || accs.length===0)? null : accs;
-  $('#filterInfo').textContent = state.filterAccounts? ('Filtre: '+state.filterAccounts.join(', ')) : 'Tüm hesaplar';
-  filterSheet.classList.remove('show');
-  renderAll();
-};
-$('#clearFilterBtn').onclick = ()=>{ state.filterAccounts=null; $('#filterInfo').textContent='Tüm hesaplar'; renderAll(); };
-
-/* ===== CSV Import / Export / Wipe ===== */
-function exportCSV(){
-  const rows = [['id','date','type','amount','category','note','account','photo']];
-  state.items.forEach(i=>{
-    rows.push([i.id,i.date,i.type,i.amount,i.category,(i.note||'').replaceAll('\n',' '),i.account,i.photo?'[embedded]':'']);
-  });
-  const csv = rows.map(r=>r.map(v=>{
-    const s = (v==null?'':String(v));
-    return "${s.replace(/"/g,'""')}";
-  }).join(',')).join('\n');
-  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-  download(andi-ev-harcamalari-${stamp}.csv, csv);
+function bindFilter(){
+  const filterSheet=$('#filterSheet');
+  $('#filterBtn').onclick=()=>{ const accs=state.filterAccounts||['Nakit','Kart','Birikim']; $$('.accChk').forEach(c=>c.checked=accs.includes(c.value)); filterSheet.classList.add('show'); };
+  $('#fCancel').onclick=()=> filterSheet.classList.remove('show');
+  $('#fApply').onclick=()=>{ const accs=$$('.accChk').filter(c=>c.checked).map(c=>c.value);
+    state.filterAccounts=(accs.length===3||accs.length===0)?null:accs; $('#filterInfo').textContent=state.filterAccounts?('Filtre: '+state.filterAccounts.join(', ')):'Tüm hesaplar';
+    filterSheet.classList.remove('show'); renderAll(); };
+  $('#clearFilterBtn').onclick=()=>{ state.filterAccounts=null; $('#filterInfo').textContent='Tüm hesaplar'; renderAll(); };
 }
-$('#exportBtn').onclick = exportCSV;
 
-$('#importInput').addEventListener('change', (e)=>{
-  const f = e.target.files[0]; if(!f) return;
-  const reader = new FileReader();
-  reader.onload = ev=>{
-    const lines = ev.target.result.split(/\r?\n/).filter(Boolean);
-    const head = lines.shift();
-    const cols = head.split(',').map(s=>s.replace(/^"|"$/g,''));
-    const idx = Object.fromEntries(cols.map((c,i)=>[c,i]));
-    const items=[];
-    lines.forEach(line=>{
-      const parts=[]; let cur=''; let inside=false;
-      for(let ch of line){
-        if(ch=='"'){ inside=!inside; continue; }
-        if(ch==',' && !inside){ parts.push(cur); cur=''; continue; }
-        cur+=ch;
-      }
-      parts.push(cur);
-      function g(k){ return (parts[idx[k]]||'').trim(); }
-      const it = {
-        id: g('id') || uid(),
-        date: g('date') || todayISO(),
-        type: g('type')||'expense',
-        amount: parseInt(g('amount').replace(/\D/g,''))||0,
-        category: g('category')||'Diğer',
-        note: g('note')||'',
-        account: g('account')||'Nakit',
-        photo: '' // güvenlik ve boyut için CSV’den foto almıyoruz
-      };
-      items.push(it);
-    });
-    if(!confirm(Toplam ${items.length} kayıt içe aktarılsın mı? Mevcut verilerin ÜZERİNE eklenir.)) return;
-    state.items = state.items.concat(items); save(); renderAll();
-    alert('İçe aktarma tamamlandı.');
-  };
-  reader.readAsText(f,'utf-8');
-  e.target.value='';
+/* ===== CSV Import/Export/Wipe ===== */
+function exportCSV(){
+  const rows=[['id','date','type','amount','category','note','account','photo']];
+  state.items.forEach(i=> rows.push([i.id,i.date,i.type,i.amount,i.category,(i.note||'').replaceAll('\n',' '),i.account,i.photo?'[embedded]':'']));
+  const csv=rows.map(r=>r.map(v=>"${String(v??'').replace(/"/g,'""')}").join(',')).join('\n');
+  const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-'); download(andi-ev-harcamalari-${stamp}.csv, csv);
+}
+function bindCsv(){
+  $('#exportBtn').onclick=exportCSV;
+  $('#importInput').addEventListener('change', (e)=>{
+    const f=e.target.files[0]; if(!f) return; const reader=new FileReader();
+    reader.onload=ev=>{
+      const lines=ev.target.result.split(/\r?\n/).filter(Boolean);
+      const head=lines.shift(); const cols=head.split(',').map(s=>s.replace(/^"|"$/g,'')); const idx=Object.fromEntries(cols.map((c,i)=>[c,i]));
+      const items=[];
+      lines.forEach(line=>{
+        const parts=[]; let cur='',inside=false;
+        for(let ch of line){ if(ch=='"'){ inside=!inside; continue; } if(ch==',' && !inside){ parts.push(cur); cur=''; continue; } cur+=ch; } parts.push(cur);
+        const g=k=>(parts[idx[k]]||'').trim();
+        items.push({ id:g('id')||uid(), date:g('date')||todayISO(), type:g('type')||'expense', amount:parseInt(g('amount').replace(/\D/g,''))||0, category:g('category')||'Diğer', note:g('note')||'', account:g('account')||'Nakit', photo:'' });
+      });
+      if(!confirm(Toplam ${items.length} kayıt içe aktarılsın mı? Mevcut verilerin ÜZERİNE eklenir.)) return;
+      state.items=state.items.concat(items); save(); renderAll(); alert('İçe aktarma tamamlandı.');
+    };
+    reader.readAsText(f,'utf-8'); e.target.value='';
+  });
+  $('#wipeBtn').onclick=()=>{ if(confirm('Tüm verileri silmek istediğine emin misin?')){ state.items=[]; save(); renderAll(); } };
+}
+
+/* ===== Boot (DOMContentLoaded) ===== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  load();
+  $('#date') && ($('#date').value=todayISO());
+  setMonthLabel(); renderAll(); switchTab('daily');
+  bindNav(); bindSheet(); bindFilter(); bindCsv();
 });
-
-$('#wipeBtn').onclick = ()=>{
-  if(confirm('Tüm verileri silmek istediğine emin misin?')){
-    state.items=[]; save(); renderAll();
-  }
-};
-
-/* ===== Boot ===== */
-load();
-$('#date').value = todayISO();
-setMonthLabel(); renderAll();
-// default tab
-switchTab('daily');
-
 </script>
 </body>
 </html>
