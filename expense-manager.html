@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Andi Ev Harcamaları</title>
 <style>
-/* ====== THEME ====== */
 :root{
   --bg:#0f1115; --bg-soft:#151923; --card:#171b26; --text:#e8ecf1; --muted:#b5c0cf;
   --accent:#6ee7ff; --accent-2:#7cffb7; --danger:#ff6b6b; --warn:#ffb86b; --ok:#7df29a;
@@ -167,38 +166,13 @@ textarea, input[type="text"]{width:100%; padding:12px; border-radius:12px; borde
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ============ SAFE STORAGE LAYER (localStorage fallback) ============ */
-const storage = (()=> {
-  let ok = true;
-  try {
-    const t = '_andi_test_' + Math.random();
-    window.localStorage.setItem(t, t);
-    window.localStorage.removeItem(t);
-  } catch(e) { ok = false; }
-  const mem = new Map();
-  return {
-    getItem(k){ try{ return ok ? window.localStorage.getItem(k) : (mem.has(k)?mem.get(k):null);}catch(_){ return mem.has(k)?mem.get(k):null; } },
-    setItem(k,v){ try{ ok ? window.localStorage.setItem(k,v) : mem.set(k,v); }catch(_){ mem.set(k,v); } },
-    removeItem(k){ try{ ok ? window.localStorage.removeItem(k) : mem.delete(k); }catch(_){ mem.delete(k); } }
-  };
-})();
-
-/* ============ KEYS & DEFAULTS ============ */
-const LS_KEY='andi_ev_harcamalari_v1';
-const LS_CATS='andi_ev_harcamalari_categories_v1';
-const LS_THEME='andi_theme_v1';
+const storage=(()=>{let ok=true;try{const t='__andi_test__'+Math.random();localStorage.setItem(t,t);localStorage.removeItem(t);}catch(e){ok=false;}const mem=new Map();return{getItem(k){try{return ok?localStorage.getItem(k):(mem.has(k)?mem.get(k):null);}catch(_){return mem.has(k)?mem.get(k):null;}},setItem(k,v){try{ok?localStorage.setItem(k,v):mem.set(k,v);}catch(_){mem.set(k,v);}},removeItem(k){try{ok?localStorage.removeItem(k):mem.delete(k);}catch(_){mem.delete(k);}}};})();
+const LS_KEY='andi_ev_harcamalari_v1', LS_CATS='andi_ev_harcamalari_categories_v1', LS_THEME='andi_theme_v1';
 const DEFAULT_CATEGORIES=['kira','su faturası','elektrik faturası','internet faturası','ev için yemek alışveriş','çamaşır ilacı','kıyafet','dışarıda yemek'];
 const SMART_NOTES=['market','pazaryeri','fırın','kasap','kafe','restoran','otobüs','taksi','eczane'];
-
-/* ============ STATE ============ */
-let records = loadRecords();
-let categories = loadCategories();
-let editingCats=false, pendingAmount=null, selectedCategory=null, selectedNote='';
-let currentFilter={scope:'all', category:''}, editRecordId=null;
-
-/* ============ DOM ============ */
-const $=s=>document.querySelector(s);
-const $$=s=>Array.from(document.querySelectorAll(s));
+let records=loadRecords(); let categories=loadCategories(); let editingCats=false, pendingAmount=null, selectedCategory=null;
+let currentFilter={scope:'all',category:''}, editRecordId=null;
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
 const amountEl=$('#amount'), goBtn=$('#goBtn'), listEl=$('#list');
 const sumAllEl=$('#sumAll'), sumMonthEl=$('#sumMonth'), sumTodayEl=$('#sumToday');
 const tabs=$$('.tab'), catFilterEl=$('#catFilter');
@@ -208,298 +182,72 @@ const editModal=$('#editModal'), editCatGrid=$('#editCatGrid'), editAmountEl=$('
 const updateBtn=$('#updateBtn'), deleteBtn=$('#deleteBtn'), closeEditBtn=$('#closeEdit');
 const btnExport=$('#btnExport'), btnExportAll=$('#btnExportAll'), btnClear=$('#btnClear'), csvInput=$('#csvInput');
 const themeToggler=$('#themeToggler'), themeLabel=$('#themeLabel'), toastEl=$('#toast');
-
-/* ============ INIT ============ */
-applyTheme(loadTheme());
-renderCategoryFilter(); renderCatButtons(); renderSmartChips();
-renderList(); updateSummaries();
-
-/* ============ EVENTS ============ */
-// Enter ve buton
-amountEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ openCategoryModal(); } });
-goBtn.addEventListener('click', openCategoryModal);
-// Kullanıcı yazıp durursa otomatik modal (1sn)
-let typingTimer=null;
-amountEl.addEventListener('input', ()=>{
-  clearTimeout(typingTimer);
-  typingTimer=setTimeout(()=>{ if(sanitizeAmount(amountEl.value)>0) openCategoryModal(); }, 1000);
-});
-
-// Filtre sekmeleri
-tabs.forEach(t=> t.addEventListener('click', ()=>{
-  tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active');
-  currentFilter.scope=t.dataset.scope; renderList(); updateSummaries();
-}));
+applyTheme(loadTheme()); renderCategoryFilter(); renderCatButtons(); renderSmartChips(); renderList(); updateSummaries();
+amountEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ openCategoryModal(); } }); goBtn.addEventListener('click', openCategoryModal);
+let typingTimer=null; amountEl.addEventListener('input', ()=>{ clearTimeout(typingTimer); typingTimer=setTimeout(()=>{ if(sanitizeAmount(amountEl.value)>0) openCategoryModal(); }, 1000); });
+tabs.forEach(t=> t.addEventListener('click', ()=>{ tabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); currentFilter.scope=t.dataset.scope; renderList(); updateSummaries(); }));
 catFilterEl.addEventListener('change', ()=>{ currentFilter.category=catFilterEl.value; renderList(); updateSummaries(); });
-
-// Modal
-closeModalBtn.addEventListener('click', ()=> hide(catModal));
-saveBtn.addEventListener('click', handleSaveFromModal);
-editCatsBtn.addEventListener('click', toggleEditCats);
+closeModalBtn.addEventListener('click', ()=> hide(catModal)); saveBtn.addEventListener('click', handleSaveFromModal); editCatsBtn.addEventListener('click', toggleEditCats);
 catModal.addEventListener('click', e=>{ if(e.target===catModal) hide(catModal); });
-
-// Edit modal
-closeEditBtn.addEventListener('click', ()=> hide(editModal));
-updateBtn.addEventListener('click', applyUpdate);
-deleteBtn.addEventListener('click', handleDeleteRecord);
-editModal.addEventListener('click', e=>{ if(e.target===editModal) hide(editModal); });
-
-// Araç çubuğu
-btnExport.addEventListener('click', ()=> downloadCSV(filteredRecords()));
-btnExportAll.addEventListener('click', ()=> downloadCSV(records));
-btnClear.addEventListener('click', clearAllWithConfirm);
-csvInput.addEventListener('change', handleCSVImport);
-
-// Tema
-themeToggler.addEventListener('change', ()=>{
-  const mode=themeToggler.checked?'light':'dark'; applyTheme(mode); saveTheme(mode);
-});
-
-/* ============ STORAGE & UTILS ============ */
+closeEditBtn.addEventListener('click', ()=> hide(editModal)); updateBtn.addEventListener('click', applyUpdate); deleteBtn.addEventListener('click', handleDeleteRecord); editModal.addEventListener('click', e=>{ if(e.target===editModal) hide(editModal); });
+btnExport.addEventListener('click', ()=> downloadCSV(filteredRecords())); btnExportAll.addEventListener('click', ()=> downloadCSV(records)); btnClear.addEventListener('click', clearAllWithConfirm); csvInput.addEventListener('change', handleCSVImport);
+themeToggler.addEventListener('change', ()=>{ const mode=themeToggler.checked?'light':'dark'; applyTheme(mode); saveTheme(mode); });
 function loadRecords(){ try{ return JSON.parse(storage.getItem(LS_KEY))||[] }catch(_){ return [] } }
-function saveRecords(){ try{ storage.setItem(LS_KEY, JSON.stringify(records)); }catch(_){ /* RAM fallback zaten devrede */ } }
-function loadCategories(){
-  try{
-    const d = JSON.parse(storage.getItem(LS_CATS));
-    if(Array.isArray(d)&&d.length) return d;
-  }catch(_){}
-  storage.setItem(LS_CATS, JSON.stringify(DEFAULT_CATEGORIES));
-  return [...DEFAULT_CATEGORIES];
-}
+function saveRecords(){ try{ storage.setItem(LS_KEY, JSON.stringify(records)); }catch(_){ } }
+function loadCategories(){ try{ const d=JSON.parse(storage.getItem(LS_CATS)); if(Array.isArray(d)&&d.length) return d; }catch(_){ } storage.setItem(LS_CATS, JSON.stringify(DEFAULT_CATEGORIES)); return [...DEFAULT_CATEGORIES]; }
 function saveCategories(){ try{ storage.setItem(LS_CATS, JSON.stringify(categories)); }catch(_){} }
-
-function uuid(){
-  try{
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
-      const r=(crypto.getRandomValues(new Uint8Array(1))[0]&15), v=c==='x'?r:(r&0x3|0x8); return v.toString(16);
-    });
-  }catch(_){
-    // crypto yoksa basit fallback
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
-      const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16);
-    });
-  }
-}
-function nowParts(){
-  const d=new Date();
-  const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
-  const HH=String(d.getHours()).padStart(2,'0'), MM=String(d.getMinutes()).padStart(2,'0');
-  return {dateISO:${yyyy}-${mm}-${dd}, timeHHMM:${HH}:${MM}};
-}
+function uuid(){ try{ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=(crypto.getRandomValues(new Uint8Array(1))[0]&15), v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }catch(_){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=Math.random()*16|0, v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); } }
+function nowParts(){ const d=new Date(), yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); const HH=String(d.getHours()).padStart(2,'0'), MM=String(d.getMinutes()).padStart(2,'0'); return {dateISO:`${yyyy}-${mm}-${dd}`, timeHHMM:`${HH}:${MM}`}; }
 function sanitizeAmount(str){ return parseInt(String(str||'').replace(/[^\d]/g,''),10)||0; }
 function fmtALL(n){ const s=Math.trunc(n).toString(); return 'L ' + s.replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
 function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-/* ============ THEME ============ */
-function loadTheme(){ return storage.getItem(LS_THEME)||'dark'; }
-function saveTheme(m){ storage.setItem(LS_THEME,m); }
+function loadTheme(){ return storage.getItem(LS_THEME)||'dark'; } function saveTheme(m){ storage.setItem(LS_THEME,m); }
 function applyTheme(m){ if(m==='light'){ document.documentElement.classList.add('light'); themeToggler.checked=true; themeLabel.textContent='Aydınlık'; } else { document.documentElement.classList.remove('light'); themeToggler.checked=false; themeLabel.textContent='Karanlık'; } }
-
-/* ============ TOAST ============ */
-let toastTimer;
-function toast(msg){ clearTimeout(toastTimer); toastEl.textContent=msg; toastEl.classList.add('show'); toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2000); }
-
-/* ============ RENDER ============ */
-function renderCategoryFilter(){
-  catFilterEl.innerHTML='<option value="">Kategori: Tümü</option>' + categories.map(c=><option value="${escapeHtml(c)}">${escapeHtml(c)}</option>).join('');
-}
-function renderCatButtons(){
-  catGrid.innerHTML='';
-  categories.forEach((c,idx)=>{
-    const b=document.createElement('button');
-    b.type='button'; b.className='cat-btn'; b.textContent=c; b.dataset.cat=c;
-    b.addEventListener('click', ()=>{
-      if(editingCats){
-        const neo=prompt('Yeni ad ver:', c);
-        if(neo && neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); }
-        return;
-      }
-      selectCategory(c);
-    });
-    // uzun bas → yeniden adlandır
-    let t; b.addEventListener('touchstart',()=> t=setTimeout(()=>renameCat(idx,c),600));
-    ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=> b.addEventListener(ev,()=> clearTimeout(t)));
-    b.addEventListener('mousedown',()=> t=setTimeout(()=>renameCat(idx,c),700));
-    catGrid.appendChild(b);
-  });
-  highlightSelected();
-}
-function renameCat(idx,current){
-  const neo=prompt('Kategori adını değiştir:', current);
-  if(neo && neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); }
-}
-function toggleEditCats(){
-  editingCats=!editingCats;
-  editCatsBtn.textContent=editingCats?'Düzenlemeyi Bitir':'Kategorileri Düzenle';
-  [...catGrid.children].forEach(b=> b.classList.toggle('editing', editingCats));
-}
+let toastTimer; function toast(msg){ clearTimeout(toastTimer); toastEl.textContent=msg; toastEl.classList.add('show'); toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2000); }
+function renderCategoryFilter(){ catFilterEl.innerHTML='<option value=\"\">Kategori: Tümü</option>'+categories.map(c=>`<option value=\"${escapeHtml(c)}\">${escapeHtml(c)}</option>`).join(''); }
+function renderCatButtons(){ catGrid.innerHTML=''; categories.forEach((c,idx)=>{ const b=document.createElement('button'); b.type='button'; b.className='cat-btn'; b.textContent=c; b.dataset.cat=c;
+  b.addEventListener('click', ()=>{ if(editingCats){ const neo=prompt('Yeni ad ver:', c); if(neo&&neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); } return; } selectCategory(c); });
+  let t; b.addEventListener('touchstart',()=> t=setTimeout(()=>renameCat(idx,c),600));
+  ['touchend','touchcancel','mouseup','mouseleave'].forEach(ev=> b.addEventListener(ev,()=> clearTimeout(t)));
+  b.addEventListener('mousedown',()=> t=setTimeout(()=>renameCat(idx,c),700));
+  catGrid.appendChild(b);
+  }); highlightSelected(); }
+function renameCat(idx,current){ const neo=prompt('Kategori adını değiştir:', current); if(neo&&neo.trim()){ categories[idx]=neo.trim(); saveCategories(); renderCategoryFilter(); renderCatButtons(); renderEditCatButtons(); toast('Kategori güncellendi'); } }
+function toggleEditCats(){ editingCats=!editingCats; editCatsBtn.textContent=editingCats?'Düzenlemeyi Bitir':'Kategorileri Düzenle'; [...catGrid.children].forEach(b=> b.classList.toggle('editing', editingCats)); }
 function selectCategory(c){ selectedCategory=c; highlightSelected(); }
 function highlightSelected(){ [...catGrid.children].forEach(b=> b.classList.toggle('active', b.dataset.cat===selectedCategory)); }
-
-function renderSmartChips(){
-  smartChips.innerHTML=SMART_NOTES.map(n=><button type="button" class="chip" data-note="${escapeHtml(n)}">${escapeHtml(n)}</button>).join('');
-  smartChips.querySelectorAll('.chip').forEach(ch=> ch.addEventListener('click', ()=>{
-    const add=ch.dataset.note; noteEl.value = noteEl.value ? (noteEl.value.trim() + ', ' + add) : add; noteEl.focus();
-  }));
-}
-
-function filteredRecords(){
-  const {scope,category}=currentFilter;
-  const today=nowParts().dateISO, ym=today.slice(0,7);
-  return records.filter(r=>{
-    if(category && r.kategori!==category) return false;
-    if(scope==='today') return r.tarihISO===today;
-    if(scope==='month') return r.tarihISO.startsWith(ym);
-    return true;
-  });
-}
-
-function renderList(){
-  const items=filteredRecords().sort((a,b)=> (b.tarihISO+b.saat).localeCompare(a.tarihISO+a.saat));
-  if(!items.length){
-    listEl.innerHTML=<div class="card"><div><div class="cat">Kayıt yok</div><div class="note">Tutar girip “Devam” deyin.</div></div></div>;
-    return;
-  }
-  listEl.innerHTML = items.map(r=>`
-    <article class="card">
+function renderSmartChips(){ smartChips.innerHTML=SMART_NOTES.map(n=>`<button type=\"button\" class=\"chip\" data-note=\"${escapeHtml(n)}\">${escapeHtml(n)}</button>`).join(''); smartChips.querySelectorAll('.chip').forEach(ch=> ch.addEventListener('click', ()=>{ const add=ch.dataset.note; noteEl.value = noteEl.value ? (noteEl.value.trim() + ', ' + add) : add; noteEl.focus(); })); }
+function filteredRecords(){ const {scope,category}=currentFilter; const today=nowParts().dateISO, ym=today.slice(0,7); return records.filter(r=>{ if(category && r.kategori!==category) return false; if(scope==='today') return r.tarihISO===today; if(scope==='month') return r.tarihISO.startsWith(ym); return true; }); }
+function renderList(){ const items=filteredRecords().sort((a,b)=> (b.tarihISO+b.saat).localeCompare(a.tarihISO+a.saat)); if(!items.length){ listEl.innerHTML=`<div class=\"card\"><div><div class=\"cat\">Kayıt yok</div><div class=\"note\">Tutar girip “Devam” deyin.</div></div></div>`; return; } listEl.innerHTML = items.map(r=>`
+    <article class=\"card\">
       <div>
-        <div class="meta">${escapeHtml(r.tarihISO)} • ${escapeHtml(r.saat)}</div>
-        <div class="cat">${escapeHtml(r.kategori)}${r.not ? ' — <span class="note">'+escapeHtml(r.not)+'</span>' : ''}</div>
-        <div class="row-actions">
-          <button class="btn secondary" data-edit="${r.id}">Düzenle</button>
-          <button class="btn danger" data-del="${r.id}">Sil</button>
+        <div class=\"meta\">${escapeHtml(r.tarihISO)} • ${escapeHtml(r.saat)}</div>
+        <div class=\"cat\">${escapeHtml(r.kategori)}${r.not ? ' — <span class=\"note\">'+escapeHtml(r.not)+'</span>' : ''}</div>
+        <div class=\"row-actions\">
+          <button class=\"btn secondary\" data-edit=\"${r.id}\">Düzenle</button>
+          <button class=\"btn danger\" data-del=\"${r.id}\">Sil</button>
         </div>
       </div>
-      <div class="amount-out">${fmtALL(r.tutarALL)}</div>
+      <div class=\"amount-out\">${fmtALL(r.tutarALL)}</div>
     </article>
-  `).join('');
-  listEl.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openEdit(b.dataset.edit)));
-  listEl.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteRecordWithConfirm(b.dataset.del)));
-}
-
-function updateSummaries(){
-  const sumAll=records.reduce((a,b)=>a+(b.tutarALL||0),0);
-  const today=nowParts().dateISO, ym=today.slice(0,7);
-  const sumMonth=records.filter(r=>r.tarihISO.startsWith(ym)).reduce((a,b)=>a+b.tutarALL,0);
-  const sumToday=records.filter(r=>r.tarihISO===today).reduce((a,b)=>a+b.tutarALL,0);
-  sumAllEl.textContent=fmtALL(sumAll);
-  sumMonthEl.textContent=fmtALL(sumMonth);
-  sumTodayEl.textContent=fmtALL(sumToday);
-}
-
-/* ============ ADD FLOW ============ */
-function openCategoryModal(){
-  const raw=sanitizeAmount(amountEl.value);
-  if(!raw){ toast('Tutar girin'); amountEl.focus(); return; }
-  pendingAmount=raw; selectedCategory=null; noteEl.value=''; renderCatButtons(); show(catModal);
-  setTimeout(()=> noteEl.focus(), 80);
-}
-function handleSaveFromModal(){
-  const cat = selectedCategory || (noteEl.value.trim() ? 'Manuel' : null);
-  if(!cat){ toast('Kategori seçin veya not girin'); return; }
-  const rec={ id:uuid(), ...nowParts(), tutarALL: pendingAmount||0, kategori: cat, not:(noteEl.value||'').trim() };
-  records.push(rec); saveRecords();
-  pendingAmount=null; amountEl.value=''; hide(catModal);
-  renderList(); updateSummaries();
-  setTimeout(()=> askDownloadCSV([rec]), 120);
-}
-
-/* ============ EDIT FLOW ============ */
-function openEdit(id){
-  const rec=records.find(x=>x.id===id); if(!rec) return;
-  editRecordId=id; editAmountEl.value=rec.tutarALL; editNoteEl.value=rec.not||'';
-  renderEditCatButtons(rec.kategori); show(editModal);
-}
-function renderEditCatButtons(selected){
-  editCatGrid.innerHTML='';
-  categories.forEach(c=>{
-    const b=document.createElement('button');
-    b.type='button'; b.className='cat-btn' + (selected===c?' active':''); b.textContent=c; b.dataset.cat=c;
-    b.addEventListener('click', ()=>{
-      editCatGrid.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-    });
-    editCatGrid.appendChild(b);
-  });
-}
-function applyUpdate(){
-  const rec=records.find(x=>x.id===editRecordId); if(!rec) return;
-  const newAmt=sanitizeAmount(editAmountEl.value);
-  const active=editCatGrid.querySelector('.cat-btn.active');
-  rec.tutarALL=newAmt; rec.kategori=active?active.dataset.cat:rec.kategori; rec.not=(editNoteEl.value||'').trim();
-  saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt güncellendi');
-}
+  `).join(''); listEl.querySelectorAll('[data-edit]').forEach(b=> b.addEventListener('click', ()=> openEdit(b.dataset.edit))); listEl.querySelectorAll('[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteRecordWithConfirm(b.dataset.del))); }
+function updateSummaries(){ const sumAll=records.reduce((a,b)=>a+(b.tutarALL||0),0); const today=nowParts().dateISO, ym=today.slice(0,7); const sumMonth=records.filter(r=>r.tarihISO.startsWith(ym)).reduce((a,b)=>a+b.tutarALL,0); const sumToday=records.filter(r=>r.tarihISO===today).reduce((a,b)=>a+b.tutarALL,0); sumAllEl.textContent=fmtALL(sumAll); sumMonthEl.textContent=fmtALL(sumMonth); sumTodayEl.textContent=fmtALL(sumToday); }
+function openCategoryModal(){ const raw=sanitizeAmount(amountEl.value); if(!raw){ toast('Tutar girin'); amountEl.focus(); return; } pendingAmount=raw; selectedCategory=null; noteEl.value=''; renderCatButtons(); show(catModal); setTimeout(()=> noteEl.focus(), 80); }
+function handleSaveFromModal(){ const cat = selectedCategory || (noteEl.value.trim() ? 'Manuel' : null); if(!cat){ toast('Kategori seçin veya not girin'); return; } const rec={ id:uuid(), ...nowParts(), tutarALL: pendingAmount||0, kategori: cat, not:(noteEl.value||'').trim() }; records.push(rec); saveRecords(); pendingAmount=null; amountEl.value=''; hide(catModal); renderList(); updateSummaries(); setTimeout(()=> askDownloadCSV([rec]), 120); }
+function openEdit(id){ const rec=records.find(x=>x.id===id); if(!rec) return; editRecordId=id; editAmountEl.value=rec.tutarALL; editNoteEl.value=rec.not||''; renderEditCatButtons(rec.kategori); show(editModal); }
+function renderEditCatButtons(selected){ editCatGrid.innerHTML=''; categories.forEach(c=>{ const b=document.createElement('button'); b.type='button'; b.className='cat-btn' + (selected===c?' active':''); b.textContent=c; b.dataset.cat=c; b.addEventListener('click', ()=>{ editCatGrid.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }); editCatGrid.appendChild(b); }); }
+function applyUpdate(){ const rec=records.find(x=>x.id===editRecordId); if(!rec) return; const newAmt=sanitizeAmount(editAmountEl.value); const active=editCatGrid.querySelector('.cat-btn.active'); rec.tutarALL=newAmt; rec.kategori=active?active.dataset.cat:rec.kategori; rec.not=(editNoteEl.value||'').trim(); saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt güncellendi'); }
 function handleDeleteRecord(){ deleteRecordWithConfirm(editRecordId); }
-function deleteRecordWithConfirm(id){
-  if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
-  records=records.filter(x=>x.id!==id); saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt silindi');
-}
-
-/* ============ CSV EXPORT/IMPORT ============ */
+function deleteRecordWithConfirm(id){ if(!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return; records=records.filter(x=>x.id!==id); saveRecords(); hide(editModal); renderList(); updateSummaries(); toast('Kayıt silindi'); }
 function askDownloadCSV(recs){ if(confirm('CSV indirmek ister misiniz?')) downloadCSV(recs&&recs.length?recs:records); }
-function csvEscape(s){ if(s==null) return ''; s=String(s); return (s.includes(',')||s.includes('"')||s.includes('\n'))?('"'+s.replace(/"/g,'""')+'"'):s; }
-function downloadCSV(rows){
-  const headers=['date','time','amount_all','category','note','id'];
-  const lines=[headers.join(',')];
-  rows.forEach(r=>{
-    lines.push([r.tarihISO,r.saat,String(r.tutarALL),csvEscape(r.kategori),csvEscape(r.not||''),r.id].join(','));
-  });
-  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob); const a=document.createElement('a');
-  a.href=url; a.download='andi-ev-harcamalari.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  toast('CSV indirildi');
-}
+function csvEscape(s){ if(s==null) return ''; s=String(s); return (s.includes(',')||s.includes('\"')||s.includes('\\n'))?('\"'+s.replace(/\"/g,'\"\"')+'\"'):s; }
+function downloadCSV(rows){ const headers=['date','time','amount_all','category','note','id']; const lines=[headers.join(',')]; rows.forEach(r=>{ lines.push([r.tarihISO,r.saat,String(r.tutarALL),csvEscape(r.kategori),csvEscape(r.not||''),r.id].join(',')); }); const blob=new Blob([lines.join('\\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='andi-ev-harcamalari.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); toast('CSV indirildi'); }
 csvInput.addEventListener('change', handleCSVImport);
-function handleCSVImport(e){
-  const f=e.target.files&&e.target.files[0]; if(!f) return;
-  const rd=new FileReader();
-  rd.onload=ev=>{
-    try{
-      const text=ev.target.result.replace(/\r/g,'');
-      const lines=text.split('\n').filter(x=>x.trim().length);
-      const headers=splitCSVLine(lines[0]);
-      const need=['date','time','amount_all','category','note','id'];
-      const ok=need.every((h,i)=>headers[i]&&headers[i].trim()===h);
-      if(!ok) return alert('CSV başlıkları hatalı. Gerekli sıra: '+need.join(','));
-      const before=records.length, existing=new Set(records.map(r=>r.id));
-      lines.slice(1).forEach(line=>{
-        const [date,time,amount,category,note,id]=splitCSVLine(line);
-        if(!id||existing.has(id)) return;
-        records.push({id:String(id), tarihISO:String(date), saat:String(time), tutarALL:sanitizeAmount(amount), kategori:String(category||'Manuel'), not:String(note||'')});
-        existing.add(id);
-      });
-      saveRecords(); renderList(); updateSummaries(); toast((records.length-before)+' kayıt eklendi');
-    }catch(err){ alert('CSV okunurken hata oluştu.'); }
-    finally{ csvInput.value=''; }
-  };
-  rd.readAsText(f,'utf-8');
-}
-function splitCSVLine(line){
-  const out=[]; let cur=''; let inQ=false;
-  for(let i=0;i<line.length;i++){
-    const ch=line[i];
-    if(inQ){
-      if(ch=='"'){ if(line[i+1]=='"'){ cur+='"'; i++; } else inQ=false; }
-      else cur+=ch;
-    }else{
-      if(ch===','){ out.push(cur); cur=''; }
-      else if(ch=='"'){ inQ=true; }
-      else cur+=ch;
-    }
-  }
-  out.push(cur); return out;
-}
-
-/* ============ HELPERS ============ */
-function show(m){ m.classList.add('show'); }
-function hide(m){ m.classList.remove('show'); }
-
-/* ============ CLEAR ALL ============ */
-function clearAllWithConfirm(){
-  if(!records.length) return toast('Zaten boş');
-  if(!confirm('Önce “Tüm Veriyi Dışa Aktar” yapmanızı öneririz.\nTüm veriyi temizlemek istediğinize emin misiniz?')) return;
-  records=[]; saveRecords(); renderList(); updateSummaries(); toast('Tüm veriler temizlendi');
-}
+function handleCSVImport(e){ const f=e.target.files&&e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=ev=>{ try{ const text=ev.target.result.replace(/\\r/g,''); const lines=text.split('\\n').filter(x=> x.trim().length); const headers=splitCSVLine(lines[0]); const need=['date','time','amount_all','category','note','id']; const ok=need.every((h,i)=> headers[i]&&headers[i].trim()===h); if(!ok) return alert('CSV başlıkları hatalı. Gerekli sıra: '+need.join(',')); const before=records.length, existing=new Set(records.map(r=>r.id)); lines.slice(1).forEach(line=>{ const [date,time,amount,category,note,id]=splitCSVLine(line); if(!id||existing.has(id)) return; records.push({id:String(id), tarihISO:String(date), saat:String(time), tutarALL:sanitizeAmount(amount), kategori:String(category||'Manuel'), not:String(note||'')}); existing.add(id); }); saveRecords(); renderList(); updateSummaries(); toast((records.length-before)+' kayıt eklendi'); }catch(err){ alert('CSV okunurken hata oluştu.'); } finally{ csvInput.value=''; } }; rd.readAsText(f,'utf-8'); }
+function splitCSVLine(line){ const out=[]; let cur=''; let inQ=false; for(let i=0;i<line.length;i++){ const ch=line[i]; if(inQ){ if(ch=='\"'){ if(line[i+1]=='\"'){ cur+='\"'; i++; } else inQ=false; } else cur+=ch; } else { if(ch===','){ out.push(cur); cur=''; } else if(ch=='\"'){ inQ=true; } else cur+=ch; } } out.push(cur); return out; }
+function show(m){ m.classList.add('show'); } function hide(m){ m.classList.remove('show'); }
+function clearAllWithConfirm(){ if(!records.length) return toast('Zaten boş'); if(!confirm('Önce “Tüm Veriyi Dışa Aktar” yapmanızı öneririz.\\nTüm veriyi temizlemek istediğinize emin misiniz?')) return; records=[]; saveRecords(); renderList(); updateSummaries(); toast('Tüm veriler temizlendi'); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ if(catModal.classList.contains('show')) hide(catModal); if(editModal.classList.contains('show')) hide(editModal);} });
 </script>
 </body>
 </html>
