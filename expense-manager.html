@@ -2,394 +2,624 @@
 <html lang="sq">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Andi – Shpenzimet e Shtëpisë</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ANDI · Shpenzimet e Shtëpisë</title>
+<meta name="theme-color" content="#0f8a6f">
 <style>
-:root{--bg:#f7f7fb;--card:#fff;--ink:#111;--muted:#8b8f98;--brand:#ff4d4f;--blue:#2e7cf6;--shadow:0 10px 24px rgba(16,18,20,.08);--r:16px}
-*{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-.appbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #ececf2;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
-.appbar .t{font-weight:800}
-.monthnav{display:flex;gap:8px;align-items:center;background:#f2f4f8;padding:6px 10px;border-radius:12px}
-.monthnav button{border:0;background:#fff;border-radius:10px;padding:6px 9px;box-shadow:var(--shadow);cursor:pointer}
-main{padding:12px 12px 90px}
-.tabs{display:flex;gap:8px;overflow:auto;padding:8px 2px 12px}
-.tab{flex:0 0 auto;padding:8px 12px;border-radius:12px;background:#eef1f8;border:1px solid transparent;font-weight:700;cursor:pointer;white-space:nowrap}
-.tab.active{background:#fff;border-color:#e7eaf2;box-shadow:var(--shadow)}
-.hidden{display:none}
-.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
-.row{display:flex;justify-content:space-between;align-items:center}
-.muted{color:var(--muted);font-size:12px}
-.money{font-weight:800} .expense{color:#e11d48} .income{color:#16a34a}
-.list .item{display:flex;justify-content:space-between;align-items:center;padding:12px 8px;border-bottom:1px dashed #eee}
-.icon{width:36px;height:36px;border-radius:10px;background:#f2f5ff;display:grid;place-items:center;margin-right:8px}
-.left{display:flex;align-items:center}
-.pill{background:#f2f4f8;border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
-.link{color:var(--blue);text-decoration:underline;cursor:pointer}
-.fab{position:fixed;right:16px;bottom:84px;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--brand);color:#fff;box-shadow:0 16px 30px rgba(255,77,79,.4);font-size:28px;cursor:pointer;z-index:25}
-.bbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #ececf2;padding:8px 6px env(safe-area-inset-bottom);display:flex;justify-content:space-around;z-index:15}
-.bbar button{border:0;background:transparent;color:#8a90a1;font-weight:700}
-.bbar .active{color:var(--blue)}
-/* modal */
-.back{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;z-index:30}
-.modal{background:#fff;width:100%;max-height:88vh;overflow:auto;border-top-left-radius:18px;border-top-right-radius:18px;padding:14px 14px 18px}
-.modal h3{margin:6px 0 10px}
-.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-input,select,textarea{width:100%;padding:12px;border:1px solid #e6e8ef;border-radius:12px;background:#fbfbfe;font:inherit}
-textarea{min-height:70px}
-.btn{border:0;background:#111;color:#fff;padding:12px;border-radius:12px;font-weight:800;cursor:pointer}
-.ghost{background:#eef1f6;color:#223}
-.danger{background:#fee2e2;color:#b91c1c}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.cell{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:8px;min-height:72px;display:flex;flex-direction:column;gap:4px}
-.cell .d{font-weight:800;font-size:12px;color:#8791a7}
+  :root{
+    --bg:#0e1014; --card:#151923; --muted:#9aa3b2; --text:#e9eef7;
+    --accent:#19c28e; --accent-2:#3ddc97; --danger:#ff6464; --warn:#ffc83d;
+    --chip:#1d2230; --stroke:#242a38; --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,#0b0d11 0%, #101420 100%);
+    font-family: ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    color:var(--text);
+  }
+  .wrap{max-width:920px;margin-inline:auto;padding:clamp(14px,2.5vw,24px)}
+  header.app{
+    position:sticky;top:0;z-index:5;border-bottom:1px solid var(--stroke);
+    background:linear-gradient(180deg,#0f8a6f 0%, #0a6a56 100%);
+    border-radius:0 0 18px 18px;box-shadow:var(--shadow);padding:18px 16px 14px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:38px;height:38px;border-radius:12px;background:radial-gradient(120% 120% at 20% 10%,#fff 0%,#bdf6e7 35%,#0f8a6f 36%,#095a49 100%);box-shadow:inset 0 0 0 2px rgba(255,255,255,.12),0 8px 18px rgba(0,0,0,.2)}
+  .title{display:flex;flex-direction:column;line-height:1.1}
+  .title b{font-size:18px;letter-spacing:.2px}
+  .title small{opacity:.9;color:#e9fff7}
+  .bar{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:8px 12px;border-radius:999px;font-size:13px}
+
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-top:18px}
+  .card h3{margin:0 0 12px;font-size:16px;letter-spacing:.2px}
+
+  .row{display:grid;gap:10px}
+  @media(min-width:640px){.row{grid-template-columns:1.2fr 1fr}}
+  .grid2{display:grid;gap:10px}
+  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+  .grid3{display:grid;gap:10px}
+  @media(min-width:800px){.grid3{grid-template-columns:1.1fr 1fr 1fr}}
+
+  label{font-size:13px;color:var(--muted)}
+  input,select,textarea,button{
+    width:100%;border-radius:12px;border:1px solid var(--stroke);background:#101521;color:var(--text);
+    padding:12px 14px;font-size:16px;outline:none;transition:.2s border,.2s transform,.2s box-shadow;
+  }
+  input::placeholder,textarea::placeholder{color:#5b6473}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#5f6b7e 50%),linear-gradient(135deg,#5f6b7e 50%,transparent 50%);
+    background-position:calc(100% - 18px) calc(1em + 2px),calc(100% - 13px) calc(1em + 2px);background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+  textarea{min-height:80px;resize:vertical}
+
+  .btn{border:1px solid #1d6b56;background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);color:#032a20;font-weight:700;letter-spacing:.2px;cursor:pointer;box-shadow:0 8px 20px rgba(25,194,142,.35)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn-ghost{background:transparent;border:1px dashed var(--stroke);color:var(--text)}
+  .btn-danger{background:linear-gradient(180deg,#ff9a9a 0%,var(--danger) 100%);color:#3a0d0d;border:1px solid #802b2b}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  .toolbar .grow{flex:1}
+
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tab{padding:8px 12px;border-radius:999px;border:1px solid var(--stroke);background:#0f1320;cursor:pointer;font-size:13px}
+  .tab.active{background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);color:#032a20;border-color:#1d6b56}
+
+  .list{display:grid;gap:10px;margin-top:10px}
+  .item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px;border:1px solid var(--stroke);border-radius:12px;background:#101521}
+  .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{background:var(--chip);padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);font-size:12px;color:#cfe8df}
+  .amt{font-weight:800}
+  .time{color:#7f8aa0;font-size:12px}
+  .actions{display:flex;gap:8px}
+  .act{border:1px solid var(--stroke);background:#0f1320;border-radius:10px;padding:8px 10px;font-size:13px;cursor:pointer}
+  .act:hover{transform:translateY(-1px)}
+
+  .totals{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .total-box{background:#0f1320;border:1px solid var(--stroke);border-radius:12px;padding:10px 12px;font-size:14px}
+
+  dialog{border:none;border-radius:16px;background:#121826;color:var(--text);box-shadow:var(--shadow);width:min(92vw,520px);padding:0}
+  dialog::backdrop{background:rgba(0,0,0,.5)}
+  .modal-head{padding:16px 18px;border-bottom:1px solid var(--stroke);display:flex;align-items:center;gap:10px}
+  .modal-body{padding:18px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 18px 18px}
+
+  .fab{
+    position:fixed;right:16px;bottom:18px;z-index:10;width:58px;height:58px;border-radius:50%;
+    display:grid;place-items:center;background:linear-gradient(180deg,var(--accent) 0%,var(--accent-2) 100%);
+    border:1px solid #1d6b56;color:#032a20;font-weight:900;font-size:28px;box-shadow:0 14px 24px rgba(25,194,142,.35);cursor:pointer;
+  }
+  .toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+    background:#0f1320;border:1px solid var(--stroke);color:var(--text);
+    padding:10px 14px;border-radius:12px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:center
+  }
+  .toast button{white-space:nowrap}
+  .help{color:#cfe8df;font-size:13px}
+  .muted{color:var(--muted)}
+  .hide{display:none!important}
+  canvas{background:#0f1320;border:1px solid var(--stroke);border-radius:12px;padding:10px}
 </style>
 </head>
 <body>
-<header class="appbar">
-  <div class="t">Andi – Shpenzimet</div>
-  <div class="monthnav">
-    <button id="prevM">‹</button>
-    <div id="monthLbl" style="font-weight:800">—</div>
-    <button id="nextM">›</button>
-  </div>
-</header>
-
-<main>
-  <div class="tabs">
-    <div class="tab active" data-v="list">Ditore</div>
-    <div class="tab" data-v="cal">Kalendar</div>
-    <div class="tab" data-v="week">Javore</div>
-    <div class="tab" data-v="month">Mujore</div>
-    <div class="tab" data-v="sum">Përmbledhje</div>
-  </div>
-
-  <!-- LIST -->
-  <section id="v-list">
-    <div class="card row">
-      <div><div class="muted">Të ardhura</div><div id="sumIn" class="money income">L 0</div></div>
-      <div><div class="muted">Shpenzime</div><div id="sumOut" class="money expense">L 0</div></div>
-      <div><div class="muted">Totali</div><div id="sumTot" class="money">L 0</div></div>
+  <header class="app">
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div class="title">
+        <b>ANDI · Shpenzimet e Shtëpisë</b>
+        <small>Monedha: Lekë (ALL)</small>
+      </div>
     </div>
-    <div class="card">
-      <div class="row" style="margin-bottom:6px">
-        <div class="pill" id="todayPill">Sot</div>
+    <div class="bar">
+      <span class="pill">localStorage</span>
+      <span class="pill">CSV shkarko / ngarko</span>
+      <span class="pill">Përditëso & Fshi · Grafikë</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- SHTIM I SHPEJTË -->
+    <section class="card">
+      <h3>Shtim i Shpejtë</h3>
+      <form id="entry" autocomplete="off">
+        <div class="row">
+          <div>
+            <label for="amount">Shuma (Lekë)</label>
+            <input id="amount" inputmode="decimal" placeholder="p.sh. 1200" required>
+          </div>
+          <div>
+            <label for="category">Kategoria</label>
+            <select id="category" required>
+              <option value="" disabled selected>Zgjidh kategorinë</option>
+              <option>Qira</option>
+              <option>Fatura e ujit</option>
+              <option>Fatura e energjisë</option>
+              <option>Internet</option>
+              <option>Blerje ushqimore</option>
+              <option>Detergjent rrobash</option>
+              <option>Rroba</option>
+              <option>Jashtë në restorant</option>
+              <option>Shpenzime makine</option>
+              <option value="__custom">Shënim i lirë</option>
+            </select>
+          </div>
+        </div>
+        <div id="noteRow" class="hide">
+          <label for="note">Shënim (opsionale)</label>
+          <textarea id="note" placeholder="p.sh. ‘Market te Bajrami’, ‘Restorant…’"></textarea>
+        </div>
+        <div class="grid2">
+          <button type="submit" class="btn">Shto regjistrim</button>
+          <button type="button" id="clearBtn" class="btn-ghost">Pastro të gjitha</button>
+        </div>
+        <div class="help">Pas çdo shtimi do të pyes: “Ta shkarkoj CSV?”</div>
+      </form>
+    </section>
+
+    <!-- PËRMBLEDHJE + MJETE -->
+    <section class="card">
+      <h3>Përmbledhje</h3>
+      <div class="toolbar">
+        <div class="grow">
+          <label for="monthPick">Muaji</label>
+          <input type="month" id="monthPick">
+        </div>
+        <div class="grow">
+          <label for="search">Kërko</label>
+          <input id="search" placeholder="Filtro sipas kategorie/shënimi…">
+        </div>
         <div>
-          <span class="link" id="btnExp">Shkarko CSV</span>
-          &nbsp;•&nbsp;
-          <label class="link" style="cursor:pointer">Ngarko CSV
-            <input type="file" id="csvFile" accept=".csv" style="display:none">
+          <label>&nbsp;</label>
+          <button id="exportBtn" class="btn">Shkarko CSV</button>
+        </div>
+        <div>
+          <label class="btn-ghost" style="display:inline-grid;place-items:center;cursor:pointer;margin-top:20px">
+            Ngarko CSV
+            <input id="importInput" type="file" accept=".csv,text/csv" style="display:none">
           </label>
         </div>
       </div>
-      <div id="list" class="list"></div>
-    </div>
-  </section>
 
-  <!-- CALENDAR -->
-  <section id="v-cal" class="hidden">
-    <div class="card">
-      <div class="row"><strong>Kalendar Mujor</strong></div>
-      <div id="cal" class="cal"></div>
-    </div>
-  </section>
+      <div id="monthSummary" class="help" style="margin-top:10px"></div>
 
-  <!-- WEEK -->
-  <section id="v-week" class="hidden">
-    <div class="card"><canvas id="chWeek" height="220"></canvas></div>
-  </section>
+      <div class="tabs" id="chartTabs">
+        <button class="tab active" data-range="week">Javor</button>
+        <button class="tab" data-range="month">Mujor</button>
+        <button class="tab" data-range="year">Vjetor</button>
+      </div>
+      <div style="margin-top:10px">
+        <canvas id="mainChart" height="220"></canvas>
+      </div>
 
-  <!-- MONTH -->
-  <section id="v-month" class="hidden">
-    <div class="card"><canvas id="chMonth" height="240"></canvas></div>
-    <div class="card"><canvas id="chYear" height="240"></canvas></div>
-  </section>
+      <div class="totals" id="totals"></div>
+    </section>
 
-  <!-- SUMMARY -->
-  <section id="v-sum" class="hidden">
-    <div class="card"><canvas id="chPie" height="260"></canvas></div>
-    <div class="card">
-      <div style="font-weight:800;margin-bottom:8px">Këtë muaj</div>
-      <div id="monthSummary"></div>
-    </div>
-  </section>
-</main>
-
-<div class="fab" id="fab">＋</div>
-
-<!-- ADD MODAL -->
-<div class="back" id="addBack">
-  <div class="modal">
-    <h3>Shto shpenzim</h3>
-    <div><div style="font-weight:800;margin-bottom:6px">1) Shkruaj shumën (ALL)</div>
-      <input id="amt" type="number" inputmode="decimal" step="0.01" placeholder="p.sh. 1200">
-    </div>
-    <div style="margin-top:10px">
-      <div style="font-weight:800;margin-bottom:6px">2) Zgjidh kategorinë</div>
-      <div id="catBtns"></div>
-    </div>
-    <div style="margin-top:10px">
-      <div class="muted">Shënim (opsionale)</div>
-      <textarea id="note" placeholder="p.sh. marketi i lagjes…"></textarea>
-    </div>
-    <div class="row" style="gap:8px;margin-top:12px">
-      <button class="btn ghost" id="addCancel" style="flex:1">Anulo</button>
-      <button class="btn" id="addSave" style="flex:1">Ruaj</button>
-    </div>
+    <!-- LISTA -->
+    <section class="card">
+      <h3>Regjistrat</h3>
+      <div id="empty" class="muted">Ende nuk ka të dhëna.</div>
+      <div class="list" id="list"></div>
+    </section>
   </div>
-</div>
 
-<!-- EDIT MODAL -->
-<div class="back" id="editBack">
-  <div class="modal">
-    <h3>Edito transaksion</h3>
-    <div class="grid2">
-      <div><div class="muted">Data</div><input id="eDate" type="date"></div>
-      <div><div class="muted">Shuma (ALL)</div><input id="eAmt" type="number" inputmode="decimal" step="0.01"></div>
+  <!-- FAB -->
+  <button class="fab" title="Regjistrim i ri" aria-label="Regjistrim i ri" id="fab">＋</button>
+
+  <!-- Pyetje: CSV? -->
+  <dialog id="askExport">
+    <div class="modal-head"><strong>T’a shkarkoj CSV?</strong></div>
+    <div class="modal-body">
+      Regjistrimi u ruajt. Tani mund të shkarkoj CSV-në.
     </div>
-    <div style="margin-top:10px"><div class="muted">Kategoria</div><select id="eCat"></select></div>
-    <div style="margin-top:10px"><div class="muted">Shënim</div><textarea id="eNote"></textarea></div>
-    <div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn danger" id="eDel">Fshij</button>
-      <div style="flex:1"></div>
-      <button class="btn ghost" id="eCancel">Anulo</button>
-      <button class="btn" id="eSave">Ruaj</button>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="noExport">Jo</button>
+      <button class="btn" id="yesExport">Po, shkarko</button>
     </div>
-  </div>
-</div>
+  </dialog>
 
-<div class="bbar">
-  <button class="active" data-g="list">📄 Lista</button>
-  <button data-g="week">📊 Stat</button>
-  <button data-g="cal">🗓️ Kal</button>
-  <button data-g="month">📈 Grafikë</button>
-  <button data-g="sum">⭐ Përmbl.</button>
-</div>
-
-<script>
-/* ====== Të përbashkëta ====== */
-const LS_KEY='andi_tx_v2';
-const CATS=[
-  {id:'qira', t:'Qira', e:'🏠'},
-  {id:'uje', t:'Ujë', e:'🚰'},
-  {id:'energjia', t:'Energjia elektrike', e:'⚡'},
-  {id:'internet', t:'Internet', e:'🌐'},
-  {id:'ushqime', t:'Ushqime për shtëpi', e:'🛒'},
-  {id:'detergjente', t:'Detergjentë/Larës', e:'🧴'},
-  {id:'veshje', t:'Veshje', e:'👕'},
-  {id:'jashte', t:'Jashtë për të ngrënë', e:'🍽️'},
-  {id:'makina', t:'Makina', e:'🚗'},
-  {id:'tjeter', t:'Tjetër', e:'📝'}
-];
-let TX = load();   // [{id,date,amount(<0 expense),cat,note}]
-let curMonth = new Date();
-
-/* ====== Util ====== */
-function uuid(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16)})}
-function save(){localStorage.setItem(LS_KEY, JSON.stringify(TX))}
-function load(){try{return JSON.parse(localStorage.getItem(LS_KEY))||[]}catch(e){return []}}
-function ymd(d){return new Date(d).toISOString().slice(0,10)}
-function dFrom(s){return new Date(s+'T12:00:00')}
-function sMonth(d){return new Date(d.getFullYear(),d.getMonth(),1)}
-function eMonth(d){return new Date(d.getFullYear(),d.getMonth()+1,0)}
-const ALL='L'; const fmt=n=>${ALL} ${Number(n||0).toLocaleString('sq-AL',{maximumFractionDigits:2})}
-function weekNum(dt){const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));const dn=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()+4-dn);const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));return Math.ceil((((d-ys)/86400000)+1)/7)}
-function catTitle(id){return CATS.find(c=>c.id===id)?.t||id}
-function catEmoji(id){return CATS.find(c=>c.id===id)?.e||'💸'}
-function esc(s){return (s||'').replace(/[&<>\"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-
-/* ====== Header ay / tablar ====== */
-const monthLbl=document.getElementById('monthLbl');
-function refreshMonth(){monthLbl.textContent=new Intl.DateTimeFormat('sq-AL',{month:'long',year:'numeric'}).format(curMonth)}
-document.getElementById('prevM').onclick=()=>{curMonth.setMonth(curMonth.getMonth()-1);refreshMonth();renderAll()}
-document.getElementById('nextM').onclick=()=>{curMonth.setMonth(curMonth.getMonth()+1);refreshMonth();renderAll()}
-refreshMonth();
-
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showView(t.dataset.v));
-document.querySelectorAll('.bbar button').forEach(b=>b.onclick=()=>showView(b.dataset.g));
-function showView(id){
-  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.v===id));
-  document.querySelectorAll('.bbar button').forEach(x=>x.classList.toggle('active',x.dataset.g===id));
-  ['list','cal','week','month','sum'].forEach(v=>document.getElementById('v-'+v).classList.toggle('hidden',v!==id));
-  if(id==='cal') drawCal();
-  if(['week','month','sum'].includes(id)) drawCharts();
-}
-
-/* ====== Liste ====== */
-function renderList(){
-  const list=document.getElementById('list'); list.innerHTML='';
-  const ms=sMonth(curMonth), me=eMonth(curMonth);
-  const fmtDate=new Intl.DateTimeFormat('sq-AL',{day:'2-digit',month:'2-digit',year:'numeric',weekday:'short'});
-  const inM = TX.filter(t=>{const d=dFrom(t.date);return d>=ms && d<=me}).sort((a,b)=>b.date.localeCompare(a.date));
-
-  let inSum=0,outSum=0;
-  inM.forEach(t=>{
-    if(t.amount>=0) inSum+=t.amount; else outSum += Math.abs(t.amount);
-    const row=document.createElement('div'); row.className='item';
-    row.innerHTML=`
-      <div class="left">
-        <div class="icon">${catEmoji(t.cat)}</div>
-        <div>
-          <div style="font-weight:700">${catTitle(t.cat)} ${t.note?• <span class="muted">${esc(t.note)}</span>:''}</div>
-          <div class="muted">${fmtDate.format(dFrom(t.date))}</div>
+  <!-- Modal: Përditëso -->
+  <dialog id="editModal">
+    <div class="modal-head"><strong>Përditëso regjistrimin</strong></div>
+    <form id="editForm">
+      <div class="modal-body">
+        <input type="hidden" id="editId">
+        <div class="grid3">
+          <div>
+            <label for="editAmount">Shuma (ALL)</label>
+            <input id="editAmount" inputmode="decimal" required>
+          </div>
+          <div>
+            <label for="editCategory">Kategoria</label>
+            <select id="editCategory" required>
+              <option>Qira</option>
+              <option>Fatura e ujit</option>
+              <option>Fatura e energjisë</option>
+              <option>Internet</option>
+              <option>Blerje ushqimore</option>
+              <option>Detergjent rrobash</option>
+              <option>Rroba</option>
+              <option>Jashtë në restorant</option>
+              <option>Shpenzime makine</option>
+              <option>Shënim</option>
+            </select>
+          </div>
+          <div>
+            <label for="editDate">Data & Ora</label>
+            <input id="editDate" type="datetime-local" required>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <label for="editNote">Shënim</label>
+          <textarea id="editNote" placeholder="Opsionale"></textarea>
         </div>
       </div>
-      <div class="money expense">-${fmt(Math.abs(t.amount))}</div>`;
-    row.onclick=()=>openEdit(t.id);
-    list.appendChild(row);
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" id="cancelEdit">Anulo</button>
+        <button class="btn" type="submit">Ruaj</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toast (Rikthe) -->
+  <div id="toast" class="toast hide">
+    <span>U fshi.</span>
+    <button id="undoBtn" class="btn-ghost">Rikthe</button>
+  </div>
+
+<!-- Chart.js (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  const LS_KEY = 'andi_expenses_v3';
+  const OLD_KEYS = ['andi_expenses_v2','andi_expenses_v1'];
+  const $ = s => document.querySelector(s);
+  const list = $('#list'), totals = $('#totals'), empty = $('#empty');
+  const amount = $('#amount'), category = $('#category'), note = $('#note'), noteRow = $('#noteRow');
+  const monthPick = $('#monthPick'), search = $('#search');
+  const askExport = $('#askExport'), yesExport = $('#yesExport'), noExport = $('#noExport');
+  const editModal = $('#editModal'), editForm = $('#editForm');
+  const editId = $('#editId'), editAmount = $('#editAmount'), editCategory = $('#editCategory'), editDate = $('#editDate'), editNote = $('#editNote');
+  const toast = $('#toast'), undoBtn = $('#undoBtn');
+  const monthSummary = $('#monthSummary');
+
+  const fmt = new Intl.NumberFormat('sq-AL',{style:'currency',currency:'ALL',maximumFractionDigits:2});
+
+  // Gjendja
+  let data = load();
+  let lastDeleted = null;
+  // Muaji i tanishëm
+  const now = new Date(); monthPick.value = now.toISOString().slice(0,7);
+
+  // Grafikë
+  let chartRange = 'week';
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  let chart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: [], datasets: [{ label: 'Shpenzime (ALL)', data: [] }] },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+      scales: { x: { grid: { display:false } }, y: { beginAtZero:true } }
+    }
   });
-  document.getElementById('sumIn').textContent=fmt(inSum);
-  document.getElementById('sumOut').textContent=fmt(outSum);
-  document.getElementById('sumTot').textContent=fmt(inSum-outSum);
-  document.getElementById('todayPill').textContent='Sot: '+new Intl.DateTimeFormat('sq-AL',{day:'2-digit',month:'2-digit'}).format(new Date());
-}
 
-/* ====== Kayıt ekleme ====== */
-const addBack=document.getElementById('addBack');
-document.getElementById('fab').onclick=()=>openAdd();
-document.getElementById('addCancel').onclick=()=>addBack.style.display='none';
-addBack.addEventListener('click',e=>{if(e.target===addBack) addBack.style.display='none'});
-
-let pickCat=null;
-function openAdd(){
-  pickCat=null;
-  addBack.style.display='flex';
-  document.getElementById('amt').value='';
-  document.getElementById('note').value='';
-  const box=document.getElementById('catBtns'); box.innerHTML='';
-  CATS.forEach(c=>{
-    const b=document.createElement('button');
-    b.className='btn ghost'; b.style.margin='6px 6px 0 0';
-    b.textContent=${c.e} ${c.t};
-    b.onclick=()=>{pickCat=c.id; [...box.children].forEach(x=>x.style.outline=''); b.style.outline='3px solid #2e7cf6'};
-    box.appendChild(b);
+  // Tabs e grafikës
+  document.getElementById('chartTabs').addEventListener('click', (e)=>{
+    const t = e.target.closest('.tab'); if(!t) return;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    chartRange = t.dataset.range;
+    paintChart();
   });
-}
-document.getElementById('addSave').onclick=()=>{
-  const a=parseFloat(document.getElementById('amt').value);
-  if(!a || a<=0) return alert('Shkruaj një shumë > 0');
-  if(!pickCat) return alert('Zgjidh kategorinë');
-  const n=document.getElementById('note').value.trim();
-  TX.unshift({id:uuid(),date:ymd(new Date()),amount:-Math.abs(a),cat:pickCat,note:n});
-  save(); addBack.style.display='none'; renderAll();
-  setTimeout(()=>{ if(confirm('CSV të shkarkohet tani?')) exportCSV(); }, 80);
-};
 
-/* ====== Düzenle/Sil ====== */
-const editBack=document.getElementById('editBack');
-const eDate=document.getElementById('eDate'), eAmt=document.getElementById('eAmt'),
-      eCat=document.getElementById('eCat'), eNote=document.getElementById('eNote');
-let editing=null;
+  // Render i parë
+  paintAll();
 
-function openEdit(id){
-  const t=TX.find(x=>x.id===id); if(!t) return;
-  editing=id; eDate.value=t.date; eAmt.value=Math.abs(t.amount);
-  eCat.innerHTML=CATS.map(c=><option value="${c.id}">${c.t}</option>).join('');
-  eCat.value=t.cat; eNote.value=t.note||'';
-  editBack.style.display='flex';
-}
-document.getElementById('eCancel').onclick=()=>editBack.style.display='none';
-editBack.addEventListener('click',e=>{if(e.target===editBack) editBack.style.display='none'});
-document.getElementById('eDel').onclick=()=>{
-  if(confirm('Fshije këtë transaksion?')){
-    TX=TX.filter(x=>x.id!==editing); save(); editBack.style.display='none'; renderAll();
+  // UI
+  $('#fab').addEventListener('click', ()=>{ window.scrollTo({top:0,behavior:'smooth'}); amount.focus(); });
+
+  category.addEventListener('change', ()=>{
+    noteRow.classList.toggle('hide', category.value !== '__custom');
+    if (category.value === '__custom') note.focus();
+  });
+
+  $('#entry').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const raw = (amount.value||'').replace(',','.');
+    const val = Number(raw);
+    if(!val || val<=0){ shake(amount); return; }
+    let cat = category.value; if(!cat){ shake(category); return; }
+    let n = '';
+    if(cat==='__custom'){ n=(note.value||'').trim(); if(!n){ shake(note); return; } cat='Shënim'; }
+    else { n=(note.value||'').trim(); }
+
+    const entry = { id: rid(), ts: new Date().toISOString(), amount: Number(val.toFixed(2)), currency:'ALL', category: cat, note: n };
+    data.push(entry); save();
+
+    amount.value=''; category.value=''; note.value=''; noteRow.classList.add('hide');
+    paintAll(); askExport.showModal();
+  });
+
+  yesExport.addEventListener('click', ()=>{ askExport.close(); exportCSV(); });
+  noExport.addEventListener('click', ()=> askExport.close());
+
+  $('#clearBtn').addEventListener('click', ()=>{
+    if(!confirm('T’i fshij të gjitha regjistrimet?')) return;
+    data=[]; save(); paintAll();
+  });
+
+  $('#exportBtn').addEventListener('click', exportCSV);
+
+  $('#importInput').addEventListener('change', async e=>{
+    const f = e.target.files?.[0]; if(!f) return;
+    const text = await f.text();
+    const rows = parseCSV(text);
+    let added=0; const ids=new Set(data.map(d=>d.id));
+    for(const r of rows){
+      const amt = Number(r.amount);
+      if(!r.id || ids.has(r.id) || !r.ts || !amt || !r.currency) continue;
+      data.push({ id:r.id, ts:r.ts, amount:amt, currency:r.currency, category:r.category||'Tjetër', note:r.note||'' });
+      ids.add(r.id); added++;
+    }
+    save(); paintAll(); alert(Importi i CSV përfundoi: u shtuan ${added} rreshta.); e.target.value='';
+  });
+
+  monthPick.addEventListener('change', paintAll);
+  search.addEventListener('input', paintListAndTotals);
+
+  // Veprimet në listë (edit / delete)
+  list.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const act = btn.dataset.act;
+    const item = data.find(x=>x.id===id);
+    if(!item) return;
+
+    if(act==='edit'){ openEdit(item); }
+    else if(act==='del'){
+      if(!confirm('Ta fshij këtë regjistrim?')) return;
+      lastDeleted = {...item};
+      data = data.filter(x=>x.id!==id);
+      save(); paintAll(); showToast();
+    }
+  });
+
+  // Modal: Edit
+  $('#cancelEdit').addEventListener('click', ()=> editModal.close());
+  editForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const id = editId.value;
+    const idx = data.findIndex(x=>x.id===id);
+    if(idx<0){ editModal.close(); return; }
+
+    const val = Number((editAmount.value||'').replace(',','.'));
+    if(!val || val<=0){ shake(editAmount); return; }
+
+    const dt = new Date(editDate.value);
+    if(isNaN(dt.getTime())){ shake(editDate); return; }
+
+    data[idx] = {
+      ...data[idx],
+      amount: Number(val.toFixed(2)),
+      category: editCategory.value,
+      note: (editNote.value||'').trim(),
+      ts: new Date(dt.getTime() - dt.getTimezoneOffset()*60000).toISOString()
+    };
+    save(); paintAll(); editModal.close();
+    askExport.showModal();
+  });
+
+  // Toast (undo)
+  undoBtn.addEventListener('click', ()=>{
+    if(lastDeleted){
+      data.push(lastDeleted);
+      save(); paintAll();
+      hideToast();
+      lastDeleted=null;
+    }
+  });
+
+  // --- RENDER helpers ---
+  function paintAll(){
+    paintListAndTotals();
+    paintMonthSummary();
+    paintChart();
   }
-};
-document.getElementById('eSave').onclick=()=>{
-  const t=TX.find(x=>x.id===editing); if(!t) return;
-  t.date=eDate.value; t.amount=-Math.abs(parseFloat(eAmt.value||0)); t.cat=eCat.value; t.note=eNote.value.trim();
-  save(); editBack.style.display='none'; renderAll();
-};
 
-/* ====== Kalendar ====== */
-function drawCal(){
-  const wrap=document.getElementById('cal'); wrap.innerHTML='';
-  const s=sMonth(curMonth), e=eMonth(curMonth);
-  const first=new Date(s); const start=new Date(first); start.setDate(1-((first.getDay()+6)%7)); // monday
-  for(let i=0;i<42;i++){
-    const d=new Date(start); d.setDate(start.getDate()+i);
-    const cell=document.createElement('div'); cell.className='cell'; if(d.getMonth()!==curMonth.getMonth()) cell.style.opacity=.5;
-    const day=ymd(d); const group=TX.filter(t=>t.date===day);
-    const sum=group.reduce((a,b)=>a+b.amount,0);
-    cell.innerHTML=`<div class="d">${d.getDate()}</div>
-      <div class="muted">${group.length} hyrje</div>
-      <div class="money ${sum<0?'expense':'income'}">${sum===0?'—':fmt(sum)}</div>`;
-    wrap.appendChild(cell);
-  }
-}
+  function paintListAndTotals(){
+    const month = monthPick.value;
+    const [y,m] = month.split('-').map(Number);
+    const q = (search.value||'').toLowerCase().trim();
 
-/* ====== CSV ====== */
-function exportCSV(){
-  const head=['id','date','amount','category','note'];
-  const rows=TX.map(r=>[r.id,r.date,r.amount,r.cat,(r.note||'').replaceAll('"','""')]);
-  const csv=[head,...rows].map(r=>r.map(x=>"${x}").join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=andi-${ymd(new Date())}.csv; a.click();
-}
-document.getElementById('btnExp').onclick=exportCSV;
+    const filtered = data.filter(d=>{
+      const dt = new Date(d.ts);
+      const inMonth = dt.getFullYear()===y && (dt.getMonth()+1)===m;
+      const inSearch = !q || (String(d.category).toLowerCase().includes(q) || String(d.note).toLowerCase().includes(q));
+      return inMonth && inSearch;
+    }).sort((a,b)=> new Date(b.ts) - new Date(a.ts));
 
-document.getElementById('csvFile').addEventListener('change', async (e)=>{
-  const f=e.target.files[0]; if(!f) return;
-  const text=await f.text(); const lines=text.trim().split(/\r?\n/); if(lines.length<2) return alert('CSV bosh.');
-  const cols=lines[0].split(',').map(x=>x.replaceAll('"','')); const idx=(n)=>cols.indexOf(n);
-  const idI=idx('id'), dI=idx('date'), aI=idx('amount'), cI=idx('category'), nI=idx('note'); const map=new Map(TX.map(x=>[x.id,x]));
-  for(let i=1;i<lines.length;i++){
-    const arr=parseCSV(lines[i]); if(arr.length<5) continue;
-    const row={id:val(arr[idI]),date:val(arr[dI]),amount:parseFloat(val(arr[aI])||0),cat:val(arr[cI]),note:val(arr[nI])};
-    map.set(row.id,row);
-  }
-  TX=[...map.values()].sort((a,b)=>b.date.localeCompare(a.date)); save(); renderAll(); alert('Import i suksesshëm.');
-  e.target.value='';
-});
-function parseCSV(line){const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch=='"'){if(q&&line[i+1]=='"'){cur+='"';i++;}else q=!q;}else if(ch==','&&!q){out.push(cur);cur='';}else cur+=ch;} out.push(cur);return out}
-function val(s){return (s||'').replaceAll(/^"|"$/g,'').replaceAll('""','"' )}
+    empty.classList.toggle('hide', filtered.length>0);
+    list.innerHTML=''; totals.innerHTML='';
 
-/* ====== Grafikë & Përmbledhje ====== */
-let chWeek,chMonth,chYear,chPie;
-function destroy(c){if(c) c.destroy()}
-function drawCharts(){
-  const ms=sMonth(curMonth), me=eMonth(curMonth);
-  const cur = TX.filter(t=>{const d=dFrom(t.date);return d>=ms && d<=me});
+    const byCat={}; let sum=0;
+    for(const d of filtered){
+      sum += d.amount; byCat[d.category]=(byCat[d.category]||0)+d.amount;
+      const dt = new Date(d.ts);
+      const el = document.createElement('div'); el.className='item';
+      el.innerHTML = `
+        <div>
+          <div class="top">
+            <span class="chip">${esc(d.category)}</span>
+            ${d.note?<span class="chip">${esc(d.note)}</span>:''}
+          </div>
+          <div class="time">${dt.toLocaleString('sq-AL')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div class="amt">${fmt.format(d.amount)}</div>
+          <div class="actions">
+            <button class="act" data-act="edit" data-id="${d.id}">Përditëso</button>
+            <button class="act" data-act="del" data-id="${d.id}">Fshi</button>
+          </div>
+        </div>`;
+      list.appendChild(el);
+    }
 
-  // pie kategori (vetëm shpenzime)
-  const byCat={}; cur.forEach(t=>{const v=Math.abs(Math.min(0,t.amount)); if(v<=0) return; byCat[t.cat]=(byCat[t.cat]||0)+v});
-  const pLabels=Object.keys(byCat).map(k=>catTitle(k)), pVals=Object.values(byCat);
+    const totalBox = document.createElement('div');
+    totalBox.className='total-box';
+    totalBox.innerHTML=<b>Totali i muajit:</b> ${fmt.format(sum)};
+    totals.appendChild(totalBox);
 
-  // javore
-  const w={}; cur.forEach(t=>{const wn=weekNum(dFrom(t.date)); w[wn]=(w[wn]||0)+Math.abs(Math.min(0,t.amount))});
-  const wL=Object.keys(w).map(n=>'Java '+n), wV=Object.values(w);
-
-  // 12 muaj
-  const now=new Date(); const mL=[], mV=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    const ms2=sMonth(d), me2=eMonth(d);
-    const sum=TX.filter(t=>{const td=dFrom(t.date);return td>=ms2&&td<=me2})
-                 .reduce((a,b)=>a+Math.abs(Math.min(0,b.amount)),0);
-    mL.push(new Intl.DateTimeFormat('sq-AL',{month:'short'}).format(d)); mV.push(sum);
+    for(const [cat,val] of Object.entries(byCat).sort((a,b)=>b[1]-a[1])){
+      const chip = document.createElement('div'); chip.className='total-box';
+      chip.textContent = ${cat}: ${fmt.format(val)}; totals.appendChild(chip);
+    }
   }
 
-  // vjet
-  const y={}; TX.forEach(t=>{const Y=dFrom(t.date).getFullYear(); y[Y]=(y[Y]||0)+Math.abs(Math.min(0,t.amount))});
-  const yL=Object.keys(y), yV=Object.values(y);
+  // Përmbledhje specifike e muajit (market/qira)
+  function paintMonthSummary(){
+    const month = monthPick.value; const [y,m] = month.split('-').map(Number);
+    let market = 0, qira = 0;
+    for(const d of data){
+      const dt = new Date(d.ts);
+      if(dt.getFullYear()===y && (dt.getMonth()+1)===m){
+        if(d.category==='Blerje ushqimore') market += d.amount;
+        if(d.category==='Qira') qira += d.amount;
+      }
+    }
+    monthSummary.textContent = Këtë muaj: “Blerje ushqimore” ${fmt.format(market)} · “Qira” ${fmt.format(qira)}.;
+  }
 
-  destroy(chPie); destroy(chWeek); destroy(chMonth); destroy(chYear);
-  chPie = new Chart(document.getElementById('chPie'),{type:'pie',data:{labels:pLabels,datasets:[{data:pVals}]},options:{plugins:{legend:{position:'bottom'}}}});
-  chWeek= new Chart(document.getElementById('chWeek'),{type:'bar',data:{labels:wL,datasets:[{label:'Shpenzime (ALL)',data:wV}]} ,options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-  chMonth= new Chart(document.getElementById('chMonth'),{type:'bar',data:{labels:mL,datasets:[{label:'Shpenzime mujore',data:mV}]},options:{scales:{y:{beginAtZero:true}}}});
-  chYear= new Chart(document.getElementById('chYear'),{type:'line',data:{labels:yL,datasets:[{label:'Shpenzime vjetore',data:yV,tension:.25}]},options:{scales:{y:{beginAtZero:true}}}});
+  // Grafikë (javor/mujor/vjetor)
+  function paintChart(){
+    const range = chartRange;
+    const {labels, values} = buildSeries(range);
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = values;
+    chart.update();
+  }
 
-  // përmbledhje mujore
-  const sumDiv=document.getElementById('monthSummary');
-  const lines=Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=><div class="row" style="padding:6px 0"><div>${catTitle(k)}</div><div class="money expense">-${fmt(v)}</div></div>).join('');
-  const total=pVals.reduce((a,b)=>a+b,0);
-  sumDiv.innerHTML=(lines||'<div class="muted">S’ka të dhëna për këtë muaj.</div>')+<div class="row" style="border-top:1px dashed #eee;padding-top:8px;margin-top:6px"><strong>Totali</strong><strong class="money expense">-${fmt(total)}</strong></div>;
-}
+  function buildSeries(range){
+    const now = new Date();
+    const labels = [];
+    const buckets = [];
 
-/* ====== İlk çizim ====== */
-function renderAll(){ renderList(); if(!document.getElementById('v-cal').classList.contains('hidden')) drawCal(); if(!document.getElementById('v-sum').classList.contains('hidden')||!document.getElementById('v-week').classList.contains('hidden')||!document.getElementById('v-month').classList.contains('hidden')) drawCharts();}
-renderAll();
+    if(range==='week'){
+      // e hënë … e diel (7 ditë, java aktuale sipas lokalit)
+      const start = startOfWeek(now);
+      for(let i=0;i<7;i++){
+        const d = new Date(start); d.setDate(start.getDate()+i);
+        labels.push(d.toLocaleDateString('sq-AL',{weekday:'short'}));
+        buckets.push({from: startOfDay(d), to: endOfDay(d), sum:0});
+      }
+    } else if(range==='month'){
+      // ditët e muajit aktual
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth()+1, 0);
+      const days = end.getDate();
+      for(let i=1;i<=days;i++){
+        const d = new Date(now.getFullYear(), now.getMonth(), i);
+        labels.push(String(i));
+        buckets.push({from: startOfDay(d), to: endOfDay(d), sum:0});
+      }
+    } else {
+      // muajt e vitit aktual
+      for(let i=0;i<12;i++){
+        const d = new Date(now.getFullYear(), i, 1);
+        labels.push(d.toLocaleDateString('sq-AL',{month:'short'}));
+        const from = new Date(now.getFullYear(), i, 1);
+        const to = new Date(now.getFullYear(), i+1, 0, 23,59,59,999);
+        buckets.push({from, to, sum:0});
+      }
+    }
+
+    // mbush me të dhënat
+    for(const rec of data){
+      const t = new Date(rec.ts);
+      for(const b of buckets){
+        if(t>=b.from && t<=b.to){ b.sum += rec.amount; break; }
+      }
+    }
+
+    return { labels, values: buckets.map(b=>Number(b.sum.toFixed(2))) };
+  }
+
+  // Edit modal
+  function openEdit(item){
+    editId.value = item.id;
+    editAmount.value = String(item.amount);
+    editCategory.value = item.category;
+    editNote.value = item.note || '';
+    const d = new Date(item.ts);
+    const local = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    editDate.value = local;
+    editModal.showModal();
+  }
+
+  // Toast
+  let toastTimer=null;
+  function showToast(){ toast.classList.remove('hide'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,6000); }
+  function hideToast(){ toast.classList.add('hide'); clearTimeout(toastTimer); }
+
+  // Persistencë
+  function load(){
+    try{
+      const cur = localStorage.getItem(LS_KEY);
+      if(cur) return JSON.parse(cur) || [];
+      for(const k of OLD_KEYS){
+        const old = localStorage.getItem(k);
+        if(old){ localStorage.setItem(LS_KEY, old); return JSON.parse(old)||[]; }
+      }
+      return [];
+    }catch{ return []; }
+  }
+  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(data)); }catch{} }
+
+  // CSV
+  function exportCSV(){
+    const header = ['id','ts','amount','currency','category','note'];
+    const rows = [header.join(',')];
+    for(const d of data){ rows.push([d.id,d.ts,d.amount,d.currency,d.category||'',d.note||''].map(csvEsc).join(',')); }
+    const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a'); a.download = ANDI_Shpnezime_${new Date().toISOString().slice(0,10)}.csv;
+    a.href = URL.createObjectURL(blob); document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },0);
+  }
+
+  function parseCSV(text){
+    const lines=text.replace(/\r/g,'').split('\n').filter(Boolean); if(!lines.length) return [];
+    const header=splitCSV(lines[0]); const idx=n=>header.indexOf(n); const out=[];
+    for(let i=1;i<lines.length;i++){ const c=splitCSV(lines[i]);
+      out.push({ id:c[idx('id')], ts:c[idx('ts')], amount:c[idx('amount')], currency:c[idx('currency')], category:c[idx('category')], note:c[idx('note')] });
+    } return out;
+  }
+  function splitCSV(line){
+    const res=[]; let cur=''; let q=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='\"'){ if(q && line[i+1]==='\"'){cur+='\"'; i++;} else q=!q; }
+      else if(ch===',' && !q){ res.push(cur); cur=''; }
+      else cur+=ch;
+    }
+    res.push(cur); return res;
+  }
+  function csvEsc(v){ const s=String(v??''); return /[",\n]/.test(s)?"${s.replace(/"/g,'""')}":s; }
+
+  // Utils kohe
+  function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0,0,0,0); }
+  function endOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23,59,59,999); }
+  function startOfWeek(d){
+    // Java fillon të hënën (ISO)
+    const day = (d.getDay()+6)%7; // 0=hënë
+    const r = new Date(d); r.setDate(d.getDate()-day); r.setHours(0,0,0,0); return r;
+  }
+
+  // Utils të tjera
+  function rid(){ if(window.crypto?.getRandomValues){ const a=new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join(''); } return 'id-'+Math.random().toString(36).slice(2); }
+  function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+  function shake(el){ el.style.transition='transform .08s'; el.style.transform='translateX(3px)'; setTimeout(()=>el.style.transform='translateX(-3px)',80); setTimeout(()=>el.style.transform='',160); el.focus(); }
+})();
 </script>
 </body>
 </html>
