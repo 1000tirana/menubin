@@ -3,108 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ANDI · Shpenzimet e Shtëpisë 1</title>
-<meta name="theme-color" content="#19c28e">
+<title>ANDI · Shpenzimet</title>
+<meta name="theme-color" content="#ffffff">
 <style>
   :root{
-    --bg:#0f1219; --card:#171b25; --text:#e9eef7; --muted:#98a3b7; --stroke:#242a36;
-    --accent:#19c28e; --accent2:#3ddc97; --danger:#ff6b6b;
-    --radius:12px; --shadow:0 6px 18px rgba(0,0,0,.25);
+    /* iOS açık tema */
+    --bg:#f7f8fb; --card:#ffffff; --text:#0e1726; --muted:#6b778c; --stroke:#e6ebf3;
+    --accent:#18c28e; --accent2:#38d89d; --danger:#e34b4b; --link:#1a73e8;
+    --radius:16px; --shadow:0 10px 24px rgba(13,38,76,.08);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#0c0f15 0%,var(--bg) 100%);color:var(--text);
-       font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;}
-  .wrap{max-width:900px;margin:auto;padding:16px 14px 90px}
-  h1{font-size:20px;margin:6px 0 14px}
-
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Inter,system-ui,sans-serif}
+  .wrap{max-width:920px;margin:auto;padding:16px 14px 112px}
+  h1{font-size:20px;margin:8px 0 14px}
+  /* Kart */
   .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-top:14px}
   .card h3{margin:0 0 10px;font-size:16px}
   label{font-size:13px;color:var(--muted)}
   input,select,textarea,button{
-    width:100%;background:#0f1422;border:1px solid var(--stroke);color:var(--text);
-    padding:10px 12px;border-radius:10px;font-size:15px;outline:none;
+    width:100%;background:#fff;border:1px solid var(--stroke);color:var(--text);
+    padding:12px 12px;border-radius:12px;font-size:15px;outline:none;
   }
-  input::placeholder,textarea::placeholder{color:#6e7a90}
+  input::placeholder,textarea::placeholder{color:#9aa7bd}
   textarea{min-height:72px;resize:vertical}
   .grid2{display:grid;gap:10px}
-  @media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
-  .btn{background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border:1px solid #1a6e58;color:#062a20;font-weight:700;cursor:pointer}
-  .btn-ghost{background:transparent;border:1px dashed var(--stroke);color:var(--text);cursor:pointer}
-  .btn-danger{background:linear-gradient(180deg,#ffb3b3 0%,var(--danger) 100%);border:1px solid #7b2c2c;color:#2a0b0b}
-  .muted{color:var(--muted)} .hide{display:none!important}
+  @media(min-width:640px){.grid2{grid-template-columns:1fr 1fr}}
+  .btn{background:var(--accent);border:1px solid #0e9e76;color:#fff;font-weight:700;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn-ghost{background:#fff;border:1px dashed var(--stroke);color:var(--text);cursor:pointer}
+  .btn-danger{background:var(--danger);border:1px solid #b13131;color:#fff}
+  .muted{color:var(--muted)}
+  .hide{display:none!important}
 
-  .list{display:grid;gap:10px}
-  .item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px;border:1px solid var(--stroke);border-radius:10px;background:#0f1422}
-  .top{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{background:#151c2b;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px}
-  .amt{font-weight:800}
-  .time{font-size:12px;color:#8895ad}
-  .actions{display:flex;gap:8px}
-  .totals{display:flex;gap:8px;flex-wrap:wrap}
-  .total-box{background:#0f1422;border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;font-size:13px}
-
-  /* Bottom Nav (3 buton) */
-  .nav{
-    position:fixed;left:0;right:0;bottom:0;background:#0f1422cc;backdrop-filter:blur(6px);
-    border-top:1px solid var(--stroke);display:grid;grid-template-columns:repeat(3,1fr);z-index:10
+  /* iOS sekme (Shpenzime üstü) */
+  .seg{
+    display:flex;gap:8px;overflow:auto;padding:6px;border:1px solid var(--stroke);
+    border-radius:999px;background:#f3f6fb
   }
-  .nav a{padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
-    color:#c1cadb;text-decoration:none;font-size:12px}
-  .nav a .ico{font-size:18px}
-  .nav a.active{color:#0a2f24;background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%)}
+  .seg button{
+    flex:0 0 auto;border:none;background:#fff;border:1px solid var(--stroke);color:#3a4a62;
+    padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:600
+  }
+  .seg button.active{background:#111; color:#fff; border-color:#111}
 
+  /* Chip/pill */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{background:#f3f6fb;border:1px solid var(--stroke);border-radius:999px;padding:6px 10px;font-size:12px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .chip:hover{border-color:#c9d4e7}
+
+  /* Liste (iOS) */
+  .list{display:grid;gap:10px}
+  .item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;padding:12px;border:1px solid var(--stroke);border-radius:14px;background:var(--card);box-shadow:var(--shadow)}
+  .dateBadge{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;border-right:1px dashed var(--stroke);padding-right:8px}
+  .day{font-weight:800;font-size:20px}
+  .dow{font-size:11px;color:var(--muted)}
+  .cat{font-weight:700}
+  .note{font-size:12px;color:var(--muted)}
+  .time{font-size:12px;color:#8a94a8;margin-top:2px}
+  .amt{font-weight:800;color:var(--danger)}
+  .actions{display:flex;gap:8px; margin-top:6px}
+  .totals{display:flex;gap:8px;flex-wrap:wrap}
+  .total-box{background:#f3f6fb;border:1px solid var(--stroke);border-radius:10px;padding:8px 10px;font-size:13px}
+
+  /* Alt menü */
+  .nav{position:fixed;left:0;right:0;bottom:0;background:#fffcc;backdrop-filter:saturate(150%) blur(10px);
+       border-top:1px solid var(--stroke);display:grid;grid-template-columns:repeat(3,1fr);z-index:10;background:#ffffffee}
+  .nav a{padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#6a768c;text-decoration:none;font-size:12px}
+  .nav a .ico{font-size:18px}
+  .nav a.active{color:#e24444}
   .screen{display:none} .screen.active{display:block}
 
-  dialog{border:none;border-radius:12px;background:#121826;color:var(--text);box-shadow:var(--shadow);
-    width:min(92vw,560px);padding:0}
+  /* Dialog */
+  dialog{border:none;border-radius:16px;background:#fff;color:var(--text);box-shadow:0 20px 60px rgba(0,0,0,.25);width:min(92vw,560px);padding:0}
   dialog::backdrop{background:rgba(0,0,0,.45)}
   .modal-head{padding:12px 14px;border-bottom:1px solid var(--stroke);font-weight:700}
   .modal-body{padding:14px}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding:0 14px 14px}
 
-  .cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-  @media(min-width:640px){.cats{grid-template-columns:repeat(3,1fr)}}
-  .cat-btn{border:1px solid var(--stroke);background:#0f1422;border-radius:10px;padding:10px;cursor:pointer;text-align:center}
-  .cat-btn:hover{border-color:#2f7e69}
-  .note-area{margin-top:8px}
+  /* Calendar grid (hafif) */
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+  .cal .cell{background:#fff;border:1px solid var(--stroke);border-radius:12px;padding:8px;text-align:right;min-height:72px;position:relative}
+  .cal .cell .d{position:absolute;left:8px;top:6px;font-weight:700;color:#5a657a}
+  .cal .cell .s{font-size:12px;color:#e24444}
+  canvas{max-width:100%}
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1 id="title">ANDI · Shpenzimet e Shtëpisë</h1>
+    <h1 id="appTitle">ANDI · Shpenzimet</h1>
 
-    <!-- === KRYEFAQJA (Hızlı giriş + özet) === -->
+    <!-- === KRYEFAQJA === -->
     <section class="screen active" id="screen-home">
       <div class="card">
         <h3>Shtim shumë i shpejtë</h3>
         <form id="quickForm" autocomplete="off">
-          <label for="quickAmount" class="muted">Shkruaj shumën</label>
+          <label for="quickAmount" class="muted">Shuma (Lekë)</label>
           <input id="quickAmount" type="number" inputmode="decimal" step="0.01" placeholder="p.sh. 1200" autocomplete="off">
           <div class="grid2" style="margin-top:8px">
             <button id="quickGo" class="btn" type="submit" disabled>Vazhdo</button>
-            <span class="muted" style="display:grid;align-items:center">Më pas: zgjedh kategori ose shënim</span>
+            <span class="muted" style="display:grid;align-items:center">Pastaj: zgjidh kategorinë ose shkruaj shënim</span>
           </div>
         </form>
+        <div id="suggestBox" class="chips hide"></div>
       </div>
 
       <div class="card">
         <h3>Përmbledhje e muajit</h3>
         <div id="monthLine" class="muted">–</div>
-        <div class="totals" id="totalsHome" style="margin-top:8px"></div>
+        <div class="totals" id="homeTotals" style="margin-top:8px"></div>
       </div>
     </section>
 
-    <!-- === SHPENZIME (liste/filtra/CSV) === -->
+    <!-- === SHPENZIME === -->
     <section class="screen" id="screen-expenses">
       <div class="card">
-        <h3>Regjistrat</h3>
+        <h3>Transaksione</h3>
+        <div class="seg" id="expTabs" style="margin-bottom:8px">
+          <button data-view="daily"   class="active">Ditore</button>
+          <button data-view="calendar">Kalendar</button>
+          <button data-view="weekly">Javore</button>
+          <button data-view="monthly">Mujore</button>
+          <button data-view="summary">Përmbledhje</button>
+        </div>
         <div class="grid2" style="margin-bottom:8px">
           <input id="monthPick" type="month">
           <input id="search" placeholder="Filtro sipas kategorie/shënimi…">
         </div>
-        <div id="empty" class="muted">Ende nuk ka të dhëna.</div>
-        <div class="list" id="list"></div>
-        <div class="totals" id="totals"></div>
+
+        <!-- DAILY/LIST -->
+        <div id="view-daily">
+          <div id="empty" class="muted">Ende nuk ka të dhëna.</div>
+          <div class="list" id="list"></div>
+          <div class="totals" id="totals"></div>
+        </div>
+
+        <!-- CALENDAR -->
+        <div id="view-calendar" class="hide">
+          <div id="calBox" class="cal"></div>
+        </div>
+
+        <!-- WEEKLY -->
+        <div id="view-weekly" class="hide">
+          <div class="list" id="weekList"></div>
+        </div>
+
+        <!-- MONTHLY (totals by category) -->
+        <div id="view-monthly" class="hide">
+          <div class="totals" id="mTotals"></div>
+        </div>
+
+        <!-- SUMMARY (donut) -->
+        <div id="view-summary" class="hide">
+          <canvas id="sumPie" width="600" height="360"></canvas>
+          <div class="totals" id="sumLegend" style="margin-top:8px"></div>
+        </div>
 
         <div class="grid2" style="margin-top:10px">
           <button class="btn" id="exportBtn">Shkarko CSV</button>
@@ -123,11 +176,11 @@
         <div class="grid2">
           <div>
             <label for="setTitle">Titulli</label>
-            <input id="setTitle" placeholder="ANDI · Shpenzimet e Shtëpisë">
+            <input id="setTitle" placeholder="ANDI · Shpenzimet">
           </div>
           <div>
             <label for="accent">Ngjyra kryesore</label>
-            <input id="accent" type="color" value="#19c28e">
+            <input id="accent" type="color" value="#18c28e">
           </div>
         </div>
         <div style="margin-top:8px">
@@ -151,30 +204,30 @@ Shënim i lirë</textarea>
     </section>
   </div>
 
-  <!-- Bottom Nav (3 sekme) -->
+  <!-- NAV -->
   <nav class="nav" id="nav">
     <a href="#home" data-target="screen-home" class="active"><span class="ico">🏠</span>Kryefaqja</a>
-    <a href="#exp" data-target="screen-expenses"><span class="ico">💸</span>Shpenzime</a>
+    <a href="#exp" data-target="screen-expenses"><span class="ico">📋</span>Shpenzime</a>
     <a href="#set" data-target="screen-settings"><span class="ico">⚙️</span>Rregullime</a>
   </nav>
 
-  <!-- === Picker Dialog (kategori/şënim) === -->
-  <dialog id="pickerDlg">
+  <!-- Kategori seçici -->
+  <dialog id="pickDlg">
     <div class="modal-head">Zgjidh kategorinë</div>
     <div class="modal-body">
-      <div class="cats" id="catsBox"></div>
-      <div class="note-area">
-        <label for="quickNote" class="muted">Shënim (opsionale)</label>
-        <textarea id="quickNote" placeholder="p.sh. ‘Market’, ‘Restorant …’"></textarea>
+      <div id="cats" class="chips"></div>
+      <div style="margin-top:10px">
+        <label for="pickNote" class="muted">Shënim (opsionale)</label>
+        <textarea id="pickNote" placeholder="p.sh. ‘Market’, ‘Restorant te …’"></textarea>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn-ghost" id="pickerCancel">Anulo</button>
-      <button class="btn" id="pickerSave">Ruaj</button>
+      <button class="btn-ghost" id="pickCancel">Anulo</button>
+      <button class="btn" id="pickSave">Ruaj</button>
     </div>
   </dialog>
 
-  <!-- === Edit Dialog === -->
+  <!-- Editim -->
   <dialog id="editDlg">
     <div class="modal-head">Përditëso</div>
     <form id="editForm">
@@ -206,93 +259,124 @@ Shënim i lirë</textarea>
     </form>
   </dialog>
 
+  <!-- CSV sorusu -->
+  <dialog id="askExport">
+    <div class="modal-head">Ta shkarkoj CSV?</div>
+    <div class="modal-body">Regjistrimi u ruajt. Tani mund të shkarkosh CSV.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="noExport">Jo</button>
+      <button class="btn" id="yesExport">Po, shkarko</button>
+    </div>
+  </dialog>
+
 <script>
 (function(){
-  const LS_DATA='andi_quick_data_v4';
-  const LS_CFG='andi_quick_cfg_v1';
+  const LS_DATA='andi_ioslook_data_v1';
+  const LS_CFG='andi_ioslook_cfg_v1';
+  const LS_LAST='andi_ioslook_last_cat';
   const $=s=>document.querySelector(s);
 
-  // --- STATE ---
+  // --- State ---
   let data = loadJSON(LS_DATA, []);
   let cfg  = loadJSON(LS_CFG, {
-    title:'ANDI · Shpenzimet e Shtëpisë',
-    accent:'#19c28e',
+    title:'ANDI · Shpenzimet',
+    accent:'#18c28e',
     categories:['Qira','Fatura e ujit','Fatura e energjisë','Internet','Blerje ushqimore','Detergjent rrobash','Rroba','Jashtë në restorant','Shpenzime makine','Shënim i lirë']
   });
-  let lastDeleted=null;
+  let lastUsedCat = loadJSON(LS_LAST, null);
+  let expView='daily'; // daily | calendar | weekly | monthly | summary
 
-  // --- THEME / TITULL ---
-  const title=$('#title'); title.textContent=cfg.title;
-  document.documentElement.style.setProperty('--accent', cfg.accent);
+  // Elements
+  const appTitle=$('#appTitle'); const nav=$('#nav');
+  const quickForm=$('#quickForm'), quickAmount=$('#quickAmount'), quickGo=$('#quickGo');
+  const pickDlg=$('#pickDlg'), catsBox=$('#cats'), pickNote=$('#pickNote');
+  const askExport=$('#askExport'), yesExport=$('#yesExport'), noExport=$('#noExport');
+  const suggestBox=$('#suggestBox');
+  const monthPick=$('#monthPick'), search=$('#search');
+  const list=$('#list'), totals=$('#totals'), empty=$('#empty');
+  const weekList=$('#weekList'), mTotals=$('#mTotals'), calBox=$('#calBox');
+  const sumPie=$('#sumPie'), sumLegend=$('#sumLegend');
+  const editDlg=$('#editDlg'), editId=$('#editId'), editAmount=$('#editAmount'), editCategory=$('#editCategory'), editDate=$('#editDate'), editNote=$('#editNote');
 
-  // --- NAV (3 sekme) ---
-  document.getElementById('nav').addEventListener('click', (e)=>{
-    const a=e.target.closest('a'); if(!a) return;
-    e.preventDefault();
-    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
+  const expTabs=$('#expTabs');
+  expTabs.addEventListener('click',(e)=>{
+    const b=e.target.closest('button'); if(!b) return;
+    expView=b.dataset.view; expTabs.querySelectorAll('button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    ['daily','calendar','weekly','monthly','summary'].forEach(v=>$('#view-'+v).classList.toggle('hide', v!==expView));
+    paintView();
+  });
+
+  // init UI
+  appTitle.textContent=cfg.title; document.documentElement.style.setProperty('--accent', cfg.accent);
+  const today=new Date(); monthPick.value=today.toISOString().slice(0,7);
+
+  // NAV
+  nav.addEventListener('click', (e)=>{
+    const a=e.target.closest('a'); if(!a) return; e.preventDefault();
+    document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active')); a.classList.add('active');
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(a.dataset.target).classList.add('active');
     if(a.dataset.target==='screen-home') paintHome();
-    if(a.dataset.target==='screen-expenses') paintList();
+    if(a.dataset.target==='screen-expenses') paintView();
   });
 
-  // --- HIZLI GİRİŞ ---
-  const quickForm=$('#quickForm'), quickAmount=$('#quickAmount'), quickGo=$('#quickGo');
-  const pickerDlg=$('#pickerDlg'), catsBox=$('#catsBox'), quickNote=$('#quickNote');
-
+  // QUICK ADD
   function parseAmount(v){ return Number(String(v||'').replace(',','.')); }
   function isValidAmount(v){ const n=parseAmount(v); return Number.isFinite(n) && n>0; }
-
   quickForm.addEventListener('submit', (e)=>{
     e.preventDefault();
-    const val=parseAmount(quickAmount.value);
-    if(!isValidAmount(val)){ shake(quickAmount); return; }
+    const val=parseAmount(quickAmount.value); if(!isValidAmount(val)){ shake(quickAmount); return; }
     openPicker(val);
   });
-  quickAmount.addEventListener('blur', ()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) openPicker(v); });
   quickAmount.addEventListener('input', ()=>{ quickGo.disabled=!isValidAmount(quickAmount.value); });
 
-  function renderCats(){
+  function openPicker(val){
     catsBox.innerHTML='';
     cfg.categories.forEach(c=>{
-      const b=document.createElement('button');
-      b.type='button'; b.className='cat-btn'; b.textContent=c;
-      b.onclick=()=>{ catsBox.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); };
-      catsBox.appendChild(b);
+      const chip=document.createElement('button'); chip.type='button'; chip.className='chip';
+      chip.innerHTML=<span>${iconFor(c)}</span><span>${c}</span>;
+      chip.onclick=()=>{ catsBox.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel')); chip.classList.add('sel'); };
+      catsBox.appendChild(chip);
     });
+    pickNote.value=''; pickDlg.dataset.amount=String(val); pickDlg.showModal();
   }
-  function openPicker(val){ renderCats(); quickNote.value=''; pickerDlg.dataset.amount=String(val); pickerDlg.showModal(); }
-  $('#pickerCancel').onclick=()=>pickerDlg.close();
-  $('#pickerSave').onclick=()=>{
-    const val=parseAmount(pickerDlg.dataset.amount||'0'); if(!isValidAmount(val)) return;
-    const sel=catsBox.querySelector('.sel'); let cat=sel?sel.textContent:''; let note=(quickNote.value||'').trim();
+  $('#pickCancel').onclick=()=>pickDlg.close();
+  $('#pickSave').onclick=()=>{
+    const val=parseAmount(pickDlg.dataset.amount||'0'); if(!isValidAmount(val)) return;
+    const sel=catsBox.querySelector('.chip.sel'); let cat= sel?sel.textContent.trim():''; let note=(pickNote.value||'').trim();
     if(!cat && !note){ alert('Zgjidh kategori ose shkruaj shënim'); return; }
     if(/shënim/i.test(cat)) cat='Shënim';
-    const rec={id:rid(),ts:new Date().toISOString(),amount:Number(val.toFixed(2)),currency:'ALL',category:cat||'Shënim',note};
-    data.push(rec); saveJSON(LS_DATA,data);
-    quickAmount.value=''; quickGo.disabled=true; pickerDlg.close();
-    paintHome(); paintList();
-    alert('U ruajt!');
+    addRecord(val, cat||'Shënim', note);
+    pickDlg.close();
   };
 
-  // --- SHPENZIME (liste) ---
-  const monthPick=$('#monthPick'), search=$('#search'), list=$('#list'), empty=$('#empty'), totals=$('#totals');
-  const editDlg=$('#editDlg'), editId=$('#editId'), editAmount=$('#editAmount'), editCategory=$('#editCategory'), editDate=$('#editDate'), editNote=$('#editNote');
+  function addRecord(amount, category, note){
+    const rec={id:rid(), ts:new Date().toISOString(), amount:Number(amount.toFixed(2)), currency:'ALL', category, note:note||''};
+    data.push(rec); saveJSON(LS_DATA,data);
+    lastUsedCat=category; saveJSON(LS_LAST,lastUsedCat);
+    quickAmount.value=''; quickGo.disabled=true;
+    paintHome(); paintView();
+    askExport.showModal();
+  }
 
-  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
+  yesExport.addEventListener('click', ()=>{ askExport.close(); exportCSV(); });
+  noExport.addEventListener('click', ()=> askExport.close());
 
-  monthPick.addEventListener('change', paintList);
-  search.addEventListener('input', paintList);
+  // LISTENERS
+  monthPick.addEventListener('change', paintView);
+  search.addEventListener('input', paintView);
 
-  list.addEventListener('click', (e)=>{
+  // EDIT
+  list.addEventListener('click', onRowAction);
+  weekList.addEventListener('click', onRowAction);
+  function onRowAction(e){
     const btn=e.target.closest('[data-act]'); if(!btn) return;
     const id=btn.dataset.id, act=btn.dataset.act;
     const it=data.find(x=>x.id===id); if(!it) return;
     if(act==='del'){ if(!confirm('Ta fshij këtë rresht?')) return;
-      lastDeleted={...it}; data=data.filter(x=>x.id!==id); saveJSON(LS_DATA,data); paintHome(); paintList();
+      data=data.filter(x=>x.id!==id); saveJSON(LS_DATA,data); paintHome(); paintView();
     } else if(act==='edit'){ openEdit(it); }
-  });
+  }
 
   $('#editCancel').addEventListener('click', ()=> editDlg.close());
   $('#editForm').addEventListener('submit', (e)=>{
@@ -300,47 +384,67 @@ Shënim i lirë</textarea>
     const idx=data.findIndex(x=>x.id===editId.value); if(idx<0){ editDlg.close(); return; }
     const val=parseAmount(editAmount.value); if(!isValidAmount(val)){ shake(editAmount); return; }
     const dt=new Date(editDate.value); if(isNaN(dt.getTime())){ shake(editDate); return; }
-    data[idx]={...data[idx], amount:Number(val.toFixed(2)), category:editCategory.value, note:(editNote.value||'').trim(), ts:new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString()};
-    saveJSON(LS_DATA,data); paintHome(); paintList(); editDlg.close(); alert('U përditësua!');
+    data[idx]={...data[idx], amount:Number(val.toFixed(2)), category:editCategory.value, note:(editNote.value||'').trim(),
+      ts:new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString()};
+    saveJSON(LS_DATA,data); paintHome(); paintView(); editDlg.close(); alert('U përditësua!');
   });
 
   function openEdit(item){
-    editId.value=item.id;
-    editAmount.value=String(item.amount);
-    editCategory.innerHTML='';
-    cfg.categories.forEach(c=>{ const lab=/shënim/i.test(c)?'Shënim':c; editCategory.appendChild(new Option(lab,lab)); });
+    editId.value=item.id; editAmount.value=String(item.amount); editNote.value=item.note||'';
+    editCategory.innerHTML=''; cfg.categories.forEach(c=>editCategory.appendChild(new Option(/shënim/i.test(c)?'Shënim':c,/shënim/i.test(c)?'Shënim':c)));
     editCategory.value=/shënim/i.test(item.category)?'Shënim':item.category;
-    editNote.value=item.note||'';
-    const d=new Date(item.ts);
-    editDate.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+    const dt=new Date(item.ts); editDate.value=new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().slice(0,16);
     editDlg.showModal();
   }
 
-  // --- HOME ÖZET ---
+  // HOME
   function paintHome(){
     const [y,m]=(monthPick.value||new Date().toISOString().slice(0,7)).split('-').map(Number);
-    let market=0, rent=0;
-    for(const d of data){
-      const dt=new Date(d.ts);
-      if(dt.getFullYear()===y && (dt.getMonth()+1)===m){
-        if(/blerje\s+ushq/i.test(d.category)) market+=d.amount;
-        if(/qira/i.test(d.category)) rent+=d.amount;
-      }
+    const fmt=money(); let market=0, rent=0;
+    for(const d of data){ const t=new Date(d.ts);
+      if(t.getFullYear()===y && (t.getMonth()+1)===m){ if(/blerje\s+ushq/i.test(d.category)) market+=d.amount; if(/qira/i.test(d.category)) rent+=d.amount; }
     }
-    const fmt=money();
     $('#monthLine').textContent=Këtë muaj: “Blerje ushqimore” ${fmt(market)} · “Qira” ${fmt(rent)}.;
     const byCat=groupByMonth(y,m);
     const top=[...Object.entries(byCat)].sort((a,b)=>b[1]-a[1]).slice(0,3);
-    const box=$('#totalsHome'); box.innerHTML='';
-    top.forEach(([k,v])=>{ const el=document.createElement('div'); el.className='total-box'; el.textContent=${k}: ${fmt(v)}; box.appendChild(el); });
+    const homeTotals=$('#homeTotals'); homeTotals.innerHTML='';
+    Object.entries(byCat).length===0
+      ? homeTotals.innerHTML='<span class="muted">S’ka të dhëna për muajin.</span>'
+      : top.forEach(([k,v])=>{ const d=document.createElement('div'); d.className='total-box'; d.textContent=${k}: ${fmt(v)}; homeTotals.appendChild(d); });
+    paintSuggestions();
+  }
+  function paintSuggestions(){
+    const stats=countByCategoryThisMonth();
+    const popular=[...Object.entries(stats)].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k);
+    const candidates=[lastUsedCat, ...popular].filter(Boolean);
+    suggestBox.innerHTML='';
+    if(candidates.length===0){ suggestBox.classList.add('hide'); return; }
+    candidates.forEach(c=>{
+      const b=document.createElement('button'); b.className='chip'; b.type='button'; b.innerHTML=<span>${iconFor(c)}</span><span>${c}</span>;
+      b.onclick=()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) addRecord(v,c,''); else quickAmount.focus(); };
+      suggestBox.appendChild(b);
+    });
+    const free=document.createElement('button'); free.className='chip'; free.type='button'; free.innerHTML=<span>📝</span><span>Shënim i lirë</span>;
+    free.onclick=()=>{ const v=parseAmount(quickAmount.value); if(isValidAmount(v)) openPicker(v); else quickAmount.focus(); };
+    suggestBox.appendChild(free);
+    suggestBox.classList.remove('hide');
+  }
+
+  // VIEWS
+  function paintView(){
+    if(expView==='daily') paintList();
+    else if(expView==='weekly') paintWeekly();
+    else if(expView==='monthly') paintMonthly();
+    else if(expView==='calendar') paintCalendar();
+    else if(expView==='summary') paintSummary();
   }
 
   function paintList(){
     const [y,m]=monthPick.value.split('-').map(Number);
     const q=(search.value||'').toLowerCase().trim();
     const rows=data.filter(d=>{
-      const dt=new Date(d.ts);
-      const inMonth=dt.getFullYear()===y && (dt.getMonth()+1)===m;
+      const t=new Date(d.ts);
+      const inMonth=t.getFullYear()===y && (t.getMonth()+1)===m;
       const inSearch=!q || (String(d.category).toLowerCase().includes(q) || String(d.note).toLowerCase().includes(q));
       return inMonth && inSearch;
     }).sort((a,b)=> new Date(b.ts)-new Date(a.ts));
@@ -350,66 +454,95 @@ Shënim i lirë</textarea>
     const fmt=money(); const byCat={}; let sum=0;
     for(const d of rows){
       sum+=d.amount; byCat[d.category]=(byCat[d.category]||0)+d.amount;
+      const t=new Date(d.ts); const day=t.getDate(); const dow=t.toLocaleDateString('sq-AL',{weekday:'short'});
       const el=document.createElement('div'); el.className='item';
       el.innerHTML=`
+        <div class="dateBadge"><div class="day">${String(day).padStart(2,'0')}</div><div class="dow">${dow}</div></div>
         <div>
-          <div class="top">
-            <span class="chip">${esc(d.category)}</span>
-            ${d.note?<span class="chip">${esc(d.note)}</span>:''}
-          </div>
-          <div class="time">${new Date(d.ts).toLocaleString('sq-AL')}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-          <div class="amt">${fmt(d.amount)}</div>
+          <div class="cat">${iconFor(d.category)} ${esc(d.category)}</div>
+          ${d.note?<div class="note">${esc(d.note)}</div>:''}
+          <div class="time">${t.toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'})}</div>
           <div class="actions">
             <button class="btn-ghost" data-act="edit" data-id="${d.id}">Ndrysho</button>
             <button class="btn-danger" data-act="del" data-id="${d.id}">Fshi</button>
           </div>
-        </div>`;
+        </div>
+        <div class="amt">${fmt(d.amount)}</div>`;
       list.appendChild(el);
     }
     const total=document.createElement('div'); total.className='total-box'; total.innerHTML=<b>Totali i muajit:</b> ${fmt(sum)}; totals.appendChild(total);
     Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{ const b=document.createElement('div'); b.className='total-box'; b.textContent=${k}: ${fmt(v)}; totals.appendChild(b); });
   }
 
-  // --- SETTINGS ---
-  $('#setTitle').value=cfg.title; $('#accent').value=toHex(cfg.accent,'#19c28e'); $('#categoriesBox').value=cfg.categories.join('\n');
-  $('#apply').addEventListener('click', ()=>{
-    cfg.title = ($('#setTitle').value||cfg.title).trim();
-    cfg.accent = $('#accent').value || cfg.accent;
-    cfg.categories = ($('#categoriesBox').value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-    if(!cfg.categories.some(c=>/shënim/i.test(c))) cfg.categories.push('Shënim i lirë');
-    saveJSON(LS_CFG,cfg);
-    document.documentElement.style.setProperty('--accent', cfg.accent);
-    title.textContent = cfg.title;
-    alert('Rregullimet u ruajtën.');
-  });
-  $('#downloadHTML').addEventListener('click', ()=>{
-    const html='<!doctype html>\n'+document.documentElement.outerHTML;
-    const blob=new Blob([html],{type:'text/html;charset=utf-8;'}); dl(blob,'andi-shpenzime-quick-lite.html');
-  });
+  function paintWeekly(){
+    const [y,m]=monthPick.value.split('-').map(Number);
+    const rows=data.filter(d=>{const t=new Date(d.ts); return t.getFullYear()===y && (t.getMonth()+1)===m;});
+    const map={}; rows.forEach(r=>{ const w=weekOf(r.ts); map[w]=(map[w]||0)+r.amount; });
+    weekList.innerHTML='';
+    const fmt=money();
+    Object.entries(map).sort((a,b)=>a[0]-b[0]).forEach(([w,total])=>{
+      const el=document.createElement('div'); el.className='item';
+      el.innerHTML=`<div class="dateBadge"><div class="day">W${w}</div><div class="dow">javë</div></div>
+        <div><div class="cat">Totali i javës</div></div>
+        <div class="amt">${fmt(total)}</div>`;
+      weekList.appendChild(el);
+    });
+    if(!Object.keys(map).length) weekList.innerHTML='<div class="muted">S’ka të dhëna për këtë muaj.</div>';
+  }
 
-  // --- CSV ---
-  $('#exportBtn').addEventListener('click', exportCSV);
-  $('#importInput').addEventListener('change', async e=>{
-    const f=e.target.files?.[0]; if(!f) return;
-    const text=await f.text(); const rows=parseCSV(text); let added=0;
-    const ids=new Set(data.map(d=>d.id));
-    for(const r of rows){
-      const amt=Number(r.amount);
-      if(!r.id||ids.has(r.id)||!r.ts||!amt||!r.currency) continue;
-      data.push({ id:r.id, ts:r.ts, amount:amt, currency:r.currency, category:r.category||'Tjetër', note:r.note||'' });
-      ids.add(r.id); added++;
+  function paintMonthly(){
+    const [y,m]=monthPick.value.split('-').map(Number);
+    const byCat=groupByMonth(y,m); const fmt=money();
+    mTotals.innerHTML='';
+    if(!Object.keys(byCat).length){ mTotals.innerHTML='<span class="muted">S’ka të dhëna.</span>'; return; }
+    Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+      const el=document.createElement('div'); el.className='total-box'; el.textContent=${k}: ${fmt(v)}; mTotals.appendChild(el);
+    });
+  }
+
+  function paintCalendar(){
+    const [y,m]=monthPick.value.split('-').map(Number);
+    const first=new Date(y,m-1,1), last=new Date(y,m,0), days=last.getDate();
+    const sums=perDay(y,m);
+    calBox.innerHTML='';
+    // header row not needed; keep minimal
+    for(let d=1; d<=days; d++){
+      const el=document.createElement('div'); el.className='cell';
+      el.innerHTML=<div class="d">${d}</div><div class="s">${sums[d]?money()(sums[d]):''}</div>;
+      calBox.appendChild(el);
     }
-    saveJSON(LS_DATA,data); paintHome(); paintList(); alert(U shtuan ${added} rreshta.); e.target.value='';
-  });
-  $('#clearAll').addEventListener('click', ()=>{ if(!confirm('T’i fshij të gjitha?')) return; data=[]; saveJSON(LS_DATA,data); paintHome(); paintList(); });
+  }
 
-  // İlk boyamalar
-  const now=new Date(); monthPick.value=now.toISOString().slice(0,7);
-  paintHome(); paintList();
+  function paintSummary(){
+    const [y,m]=monthPick.value.split('-').map(Number);
+    const byCat=groupByMonth(y,m); const total=Object.values(byCat).reduce((a,b)=>a+b,0);
+    // donut
+    const ctx=sumPie.getContext('2d'); const W=sumPie.width, H=sumPie.height; ctx.clearRect(0,0,W,H);
+    const colors=['#ff6b6b','#f8c343','#6ecb63','#3da5d9','#9b59b6','#fd9644','#20bf6b','#3867d6','#d1a3ff','#ff8f87'];
+    let start=-Math.PI/2, i=0;
+    Object.entries(byCat).forEach(([k,v])=>{
+      const ang=(v/total)*Math.PI*2; ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.arc(W/2,H/2,140,start,start+ang); ctx.closePath(); ctx.fillStyle=colors[i%colors.length]; ctx.fill(); start+=ang; i++;
+    });
+    // hole
+    ctx.globalCompositeOperation='destination-out'; ctx.beginPath(); ctx.arc(W/2,H/2,85,0,Math.PI*2); ctx.fill(); ctx.globalCompositeOperation='source-over';
+    // legend
+    sumLegend.innerHTML='';
+    i=0; const fmt=money();
+    Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+      const box=document.createElement('div'); box.className='total-box';
+      box.style.borderColor=colors[i%colors.length]; box.style.background='#fff';
+      box.innerHTML=<b style="color:${colors[i%colors.length]}">●</b> ${k}: ${fmt(v)} (${((v/total)*100).toFixed(1)}%);
+      sumLegend.appendChild(box); i++;
+    });
+    if(total===0){ ctx.clearRect(0,0,W,H); sumLegend.innerHTML='<span class="muted">S’ka të dhëna.</span>'; }
+  }
 
-  // --- UTILS ---
+  // helpers
+  function groupByMonth(y,m){ const out={}; for(const d of data){ const t=new Date(d.ts); if(t.getFullYear()===y && (t.getMonth()+1)===m) out[d.category]=(out[d.category]||0)+d.amount; } return out; }
+  function perDay(y,m){ const out={}; for(const d of data){ const t=new Date(d.ts); if(t.getFullYear()===y && (t.getMonth()+1)===m){ const dd=t.getDate(); out[dd]=(out[dd]||0)+d.amount; }} return out; }
+  function countByCategoryThisMonth(){ const [y,m]=(monthPick.value||new Date().toISOString().slice(0,7)).split('-').map(Number); return groupByMonth(y,m); }
+  function weekOf(ts){ const d=new Date(ts); const first=new Date(d.getFullYear(), d.getMonth(), 1); const day=(d.getDate()+first.getDay()-1); return Math.floor(day/7)+1; }
+  function iconFor(cat){ const s=(cat||'').toLowerCase(); if(s.includes('qira'))return'🏠'; if(s.includes('ujit'))return'🚰'; if(s.includes('energ'))return'⚡'; if(s.includes('internet'))return'🌐'; if(s.includes('blerje')||s.includes('ushq'))return'🛒'; if(s.includes('detergjent'))return'🧺'; if(s.includes('rroba'))return'👕'; if(s.includes('restorant'))return'🍽️'; if(s.includes('makin'))return'🚗'; if(s.includes('shënim'))return'📝'; return '💸'; }
   function money(){ const nf=new Intl.NumberFormat('sq-AL',{style:'currency',currency:'ALL',maximumFractionDigits:2}); return v=>nf.format(v); }
   function rid(){ if(window.crypto?.getRandomValues){const a=new Uint8Array(16); crypto.getRandomValues(a); return Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join(''); } return 'id-'+Math.random().toString(36).slice(2); }
   function loadJSON(k,fb){ try{const r=localStorage.getItem(k); return r?JSON.parse(r):fb}catch{ return fb } }
@@ -420,7 +553,7 @@ Shënim i lirë</textarea>
   function parseCSV(text){ const lines=text.replace(/\r/g,'').split('\n').filter(Boolean); if(!lines.length) return []; const header=splitCSV(lines[0]); const idx=n=>header.indexOf(n); const out=[]; for(let i=1;i<lines.length;i++){ const c=splitCSV(lines[i]); out.push({ id:c[idx('id')], ts:c[idx('ts')], amount:c[idx('amount')], currency:c[idx('currency')], category:c[idx('category')], note:c[idx('note')] }); } return out; }
   function exportCSV(){ const rows=[['id','ts','amount','currency','category','note'].join(',')]; for(const d of data){ rows.push([d.id,d.ts,d.amount,d.currency,d.category||'',d.note||''].map(csvEsc).join(',')); } const blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'}); dl(blob,ANDI_Shpnezime_${new Date().toISOString().slice(0,10)}.csv); }
   function dl(blob, name){ const a=document.createElement('a'); a.download=name; a.href=URL.createObjectURL(blob); document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); }
-  function toHex(v,f){ if(!v) return f; if(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v)) return v; const m=/rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(v); if(m){const [r,g,b]=[+m[1],+m[2],+m[3]]; return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');} return f; }
+  function shake(el){ el.style.transition='transform .08s'; el.style.transform='translateX(3px)'; setTimeout(()=>el.style.transform='translateX(-3px)',80); setTimeout(()=>el.style.transform='',160); el.focus(); }
 })();
 </script>
 </body>
