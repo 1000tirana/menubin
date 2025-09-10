@@ -2,50 +2,31 @@
 <html lang="sq">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Andi • Shpenzimet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Andi • Shpenzimet (Final)</title>
 <meta name="theme-color" content="#0b0f1a">
 <style>
-/* ---------- THEME ---------- */
 :root{
-  --bg:#0b0f1a;
-  --ink:#e9eef7;
-  --muted:#9fb0c8;
-  --glass:rgba(255,255,255,.06);
-  --border:rgba(255,255,255,.12);
-  --card:#0f1626;
-  --accent:#6cf7d7;   /* mint */
-  --accent2:#7aa6ff;  /* blue */
-  --good:#7dff9a;
-  --bad:#ff7a8a;
+  --bg:#0b0f1a; --ink:#e9eef7; --muted:#9fb0c8; --glass:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.12); --card:#0f1626; --accent:#6cf7d7; --accent2:#7aa6ff;
+  --good:#7dff9a; --bad:#ff7a8a;
 }
 :root.light{
-  --bg:#f5f7fc;
-  --ink:#0d1320;
-  --muted:#5b6b83;
-  --glass:rgba(0,0,0,.04);
-  --border:rgba(0,0,0,.08);
-  --card:#ffffff;
-  --accent:#005cf7;
-  --accent2:#00d4a6;
-  --good:#1e8e3e;
-  --bad:#c62828;
+  --bg:#f5f7fc; --ink:#0d1320; --muted:#5b6b83; --glass:rgba(0,0,0,.04);
+  --border:rgba(0,0,0,.08); --card:#ffffff; --accent:#005cf7; --accent2:#00d4a6;
+  --good:#1e8e3e; --bad:#c62828;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color: transparent}
+*{box-sizing:border-box;-webkit-tap-highlight-color: transparent; touch-action: manipulation;}
 html,body{height:100%}
 body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg) 60%) no-repeat fixed;color:var(--ink);
-  font-family: ui-rounded, system-ui, -apple-system, "SF Pro", Segoe UI, Roboto, Helvetica, Arial, sans-serif;}
+  font-family: ui-rounded, system-ui, -apple-system, "SF Pro", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-size:16px; line-height:1.35;}
+input,select,button,textarea{font-size:16px !important}
+.app{max-width:900px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;position:relative;z-index:0}
 
-/* ---------- APP LAYOUT ---------- */
-.app{max-width:720px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;}
-
-/* HERO HEADER */
-.hero{
-  position:sticky;top:0;z-index:10;
-  background:linear-gradient(140deg,#0a0f2d 0%, #14225a 35%, #0b2a43 100%);
-  border-bottom:1px solid var(--border);
-  box-shadow: 0 20px 60px rgba(0,0,0,.35);
-}
+/* HERO */
+.hero{position:sticky;top:0;z-index:20;background:linear-gradient(140deg,#0a0f2d 0%, #14225a 35%, #0b2a43 100%);
+  border-bottom:1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,.35)}
 .hero-inner{padding:20px 16px 14px}
 .title{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .title h1{margin:0;font-size:18px;letter-spacing:.4px}
@@ -56,9 +37,7 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
 .switch input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s}
 .switch input:checked::after{left:23px}
 
-.balance{
-  margin-top:14px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px
-}
+.balance{margin-top:14px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px}
 .balance .big{font-weight:900;font-size:32px;letter-spacing:.5px}
 .tag{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--glass);border:1px solid var(--border);backdrop-filter: blur(8px);}
 .kpis{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -66,31 +45,32 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
 .kpi b{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
 .kpi .v{font-weight:900}
 
-/* SEGMENTED TABS */
-.tabs{padding:10px 12px 0;position:sticky;top:92px;background:linear-gradient(180deg,rgba(10,16,45,.98), rgba(10,16,45,.75), transparent)}
-.segment{
-  display:flex;gap:6px;background:var(--glass);border:1px solid var(--border);
-  padding:6px;border-radius:999px;backdrop-filter: blur(10px);width:max-content;
-}
+/* TABS */
+.tabs{padding:10px 12px 0;position:sticky;top:92px;background:linear-gradient(180deg,rgba(10,16,45,.98), rgba(10,16,45,.75), transparent);z-index:19}
+.segment{display:flex;gap:6px;background:var(--glass);border:1px solid var(--border);padding:6px;border-radius:999px;backdrop-filter: blur(10px);width:max-content}
 .seg{border:none;background:transparent;color:var(--muted);padding:8px 14px;border-radius:999px;font-weight:800}
 .seg.active{background:linear-gradient(180deg,var(--accent), var(--accent2));color:#08111f}
 
 /* CONTENT */
-.content{padding:12px;display:grid;gap:14px}
+.content{padding:12px;display:grid;gap:14px;position:relative;z-index:1}
+@media (orientation: landscape) { .content{grid-template-columns: 1.2fr .8fr} #view-sum{order:2} }
 
-/* QUICK ADD */
-.quick{display:grid;gap:10px;background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:10px;backdrop-filter:blur(10px)}
-.row{display:flex;gap:10px}
-.input, select{flex:1;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:16px}
+/* QUICK ADD + FORMULAS */
+.quick{display:grid;gap:10px;background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:10px;backdrop-filter:blur(10px);position:relative;z-index:2}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.input, select{flex:1;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--ink);font-size:16px;min-width:120px}
 .btn{padding:14px 16px;border-radius:14px;border:1px solid var(--border);background:linear-gradient(180deg,var(--accent2),var(--accent));color:#08111f;font-weight:900;cursor:pointer}
 .btn.ghost{background:var(--glass);color:var(--ink)}
+.inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inline .x{opacity:.7}
+.preview{font-weight:900;padding:8px 12px;border-radius:999px;border:1px dashed var(--border);background:var(--card)}
 
-/* HORIZONTAL CHIPS */
+/* CHIPS */
 .hchips{display:flex;gap:10px;overflow:auto;padding-bottom:2px;scroll-snap-type:x mandatory}
 .chip{scroll-snap-align:start;white-space:nowrap;border:1px solid var(--border);background:var(--card);padding:10px 12px;border-radius:999px;cursor:pointer;font-weight:800;color:var(--muted)}
 .chip.sel{outline:2px solid var(--accent);color:var(--ink)}
 
-/* LIST CARDS */
+/* LIST */
 .list{display:grid;gap:10px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px}
 .group{color:var(--muted);font-weight:800;margin-top:2px}
@@ -100,8 +80,6 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
 .note{font-size:12px;color:var(--muted);margin-top:2px}
 .amt{font-weight:900}
 .income{color:var(--good)} .expense{color:var(--bad)}
-.rowitem:hover{background:rgba(255,255,255,.02)}
-
 .actions{display:flex;gap:8px;margin-top:10px}
 .icon{border:1px solid var(--border);background:var(--glass);padding:8px 10px;border-radius:10px;cursor:pointer}
 
@@ -113,15 +91,16 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
 .badge{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:var(--card)}
 .sw{width:12px;height:12px;border-radius:2px;background:#ccc}
 
-.toolbar{display:flex;gap:8px;flex-wrap:wrap}
-.small{font-size:12px;color:var(--muted)}
+/* TOAST */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#0d111a;color:#fff;padding:10px 14px;border-radius:12px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .2s;z-index:999;border:1px solid var(--border)}
+.toast.show{opacity:1}
 
-/* SHEET (edit) */
+/* SHEET */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:99}
 .sheet.show{display:flex}
-.panel{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 0 0;max-width:720px;margin:0 auto;width:100%;padding:14px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:18px 18px 0 0;max-width:900px;margin:0 auto;width:100%;padding:14px}
 .grid{display:grid;gap:10px}
-.row2{display:flex;gap:10px}
+.row2{display:flex;gap:10px;flex-wrap:wrap}
 
 /* A11Y */
 .seg:focus-visible, .btn:focus-visible, .chip:focus-visible, .icon:focus-visible, .input:focus-visible, select:focus-visible{outline:3px solid #6cf7d7;outline-offset:2px}
@@ -149,7 +128,7 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
         <div class="tag">
           <span>Periudha</span>
           <select id="period" style="background:transparent;border:none;color:var(--ink);font-weight:800">
-            <option value="all">Gjithë koha</option>
+            <option value="all" selected>Gjithë koha</option>
             <option value="month">Ky muaj</option>
             <option value="week">Kjo javë</option>
             <option value="today">Sot</option>
@@ -175,18 +154,25 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
   <!-- CONTENT -->
   <div class="content">
 
-    <!-- QUICK ADD -->
-    <div class="quick" id="quickAdd">
+    <!-- QUICK ADD (form + formulas) -->
+    <form class="quick" id="quickAdd" autocomplete="off">
+      <div class="row inline">
+        <input id="qQty" class="input" type="tel" inputmode="numeric" placeholder="Sasia (ops.)">
+        <span class="x">×</span>
+        <input id="qUnit" class="input" type="tel" inputmode="numeric" placeholder="Çmimi/Unit (ops.)">
+        <span class="x">=</span>
+        <span class="preview" id="qPreview">L 0</span>
+      </div>
       <div class="row">
-        <input id="qAmount" class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Shuma (ALL)">
+        <input id="qAmount" class="input" type="tel" inputmode="numeric" placeholder="Shuma (ALL) — direkt">
         <select id="qType" class="input" style="max-width:160px">
           <option value="expense">Shpenzim</option>
           <option value="income">Të ardhura</option>
         </select>
-        <button class="btn" id="qSave">Shto</button>
+        <button class="btn" id="qSave" type="submit">Shto</button>
       </div>
       <div class="hchips" id="qCats"></div>
-    </div>
+    </form>
 
     <!-- LIST VIEW -->
     <div id="view-home" class="list"></div>
@@ -200,10 +186,10 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
           </svg>
         </div>
         <div class="card">
-          <div class="toolbar" style="margin-bottom:10px">
-            <button class="btn ghost" id="export">⬇️ Eksporto CSV</button>
+          <div class="toolbar" style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn ghost" id="export" type="button">⬇️ Eksporto CSV</button>
             <label class="btn ghost">📤 Ngarko CSV <input id="import" type="file" accept=".csv" style="display:none"></label>
-            <button class="btn ghost" id="wipe">🗑️ Fshi të gjitha</button>
+            <button class="btn ghost" id="wipe" type="button">🗑️ Fshi të gjitha</button>
           </div>
           <div id="legend" class="legend"></div>
           <div class="small" style="margin-top:12px">Shënim: Ruajtje lokale (localStorage). Për kopje rezervë përdor CSV.</div>
@@ -219,7 +205,7 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
     <div id="view-set" class="hidden">
       <div class="card">
         <p><b>Monedha:</b> ALL (L). Shuma si numër i plotë.</p>
-        <p class="small">Versioni: Pro UI. Të gjitha funksionet pa biblioteka të jashtme.</p>
+        <p class="small">Final — portrait & landscape uyumlu; formüller: Sasia × Çmimi = Shuma.</p>
       </div>
     </div>
 
@@ -237,30 +223,34 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
           </select>
           <input id="fDate" type="date" class="input">
         </div>
-        <input id="fAmount" class="input" inputmode="numeric" pattern="[0-9]*" placeholder="Shuma (L)">
+        <div class="row2">
+          <input id="fQty" class="input" type="tel" inputmode="numeric" placeholder="Sasia (ops.)">
+          <input id="fUnit" class="input" type="tel" inputmode="numeric" placeholder="Çmimi/Unit (ops.)">
+        </div>
+        <input id="fAmount" class="input" type="tel" inputmode="numeric" placeholder="Shuma (L) (autocalc ose manual)">
         <select id="fCat" class="input"></select>
         <input id="fAcc" class="input" value="Cash" placeholder="Llogaria (Cash/Kartë/Kursim)">
         <input id="fNote" class="input" placeholder="Shënim (opsionale)">
         <div class="row2">
-          <button class="btn ghost" id="close">Mbyll</button>
-          <button class="btn" id="save">Ruaj</button>
+          <button class="btn ghost" id="close" type="button">Mbyll</button>
+          <button class="btn" id="save" type="button">Ruaj</button>
         </div>
-        <button class="btn ghost" id="del" style="border-color:var(--bad);color:var(--bad)">Fshi</button>
+        <button class="btn ghost" id="del" style="border-color:var(--bad);color:var(--bad)" type="button">Fshi</button>
       </div>
     </div>
   </div>
 
+  <div class="toast" id="toast">U ruajt</div>
 </div>
 
 <script>
 (function(){
   const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
   const fmt=n=>"L "+(n||0).toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g," ");
-  const today=()=>new Date().toISOString().slice(0,10);
+  const todayLocal=()=>{ const d=new Date(); const y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), da=('0'+d.getDate()).slice(-2); return y+'-'+m+'-'+da; };
   const uid=()=>Math.random().toString(36).slice(2,10);
-  const LS='andi-pro-v1';
-  const THEME='andi-pro-theme';
-  let items=[]; // {id,date,type,amount,category,account,note}
+  const LS='andi-final-v1'; const THEME='andi-pro-theme';
+  let items=[]; // {id,date,type,amount,qty,unit,category,account,note}
   let current=null;
 
   const CATS=[
@@ -279,15 +269,9 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
   function periodFilter(i){
     const p=$('#period').value, d=new Date(i.date), now=new Date();
     if(p==='all') return true;
-    if(p==='today'){ const t=today(); return i.date===t; }
-    if(p==='week'){
-      const sd=new Date(now); sd.setDate(now.getDate()-6); sd.setHours(0,0,0,0);
-      return d>=sd && d<=now;
-    }
-    if(p==='month'){
-      const sd=new Date(now.getFullYear(), now.getMonth(), 1);
-      return d>=sd && d<=now;
-    }
+    if(p==='today'){ return i.date===todayLocal(); }
+    if(p==='week'){ const sd=new Date(now); sd.setDate(now.getDate()-6); sd.setHours(0,0,0,0); return d>=sd && d<=now; }
+    if(p==='month'){ const sd=new Date(now.getFullYear(), now.getMonth(), 1); return d>=sd && d<=now; }
     return true;
   }
 
@@ -322,13 +306,13 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
           <div class="avatar">\${icon}</div>
           <div>
             <div class="title2">\${i.category}</div>
-            <div class="note">\${i.account} • \${i.note? i.note : '—'}</div>
-            <div class="actions"><button class="icon" data-act="edit">✏️</button><button class="icon" data-act="del">🗑️</button></div>
+            <div class="note">\${(i.qty? i.qty:1)} × \${(i.unit? fmt(i.unit):'—')} • \${i.account} • \${i.note? i.note : '—'}</div>
+            <div class="actions"><button class="icon" data-act="edit" type="button">✏️</button><button class="icon" data-act="del" type="button">🗑️</button></div>
           </div>
           <div class="amt \${i.type}">\${(i.type==='income'?'+':'-')+fmt(i.amount)}</div>
         \`;
         row.querySelector('[data-act="edit"]').addEventListener('click', (e)=>{ e.stopPropagation(); openSheet(i); });
-        row.querySelector('[data-act="del"]').addEventListener('click', (e)=>{ e.stopPropagation(); if(confirm('Ta fshij?')){ items=items.filter(x=>x.id!==i.id); save(); kpis(); renderList(); } });
+        row.querySelector('[data-act="del"]').addEventListener('click', (e)=>{ e.stopPropagation(); if(confirm('Ta fshij?')){ items=items.filter(x=>x.id!==i.id); save(); kpis(); renderList(); drawDonut(); drawBars(); toast('U fshi'); } });
         row.addEventListener('click', ()=> openSheet(i));
         wrap.appendChild(row);
       });
@@ -337,7 +321,8 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
   }
 
   function drawDonut(){
-    const svg=$('#donut'); svg.innerHTML='<circle cx="21" cy="21" r="15.9155" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"></circle>';
+    const svg=$('#donut'); if(!svg) return;
+    svg.innerHTML='<circle cx="21" cy="21" r="15.9155" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"></circle>';
     const acc={};
     items.filter(x=>x.type==='expense' && periodFilter(x)).forEach(i=> acc[i.category]=(acc[i.category]||0)+i.amount);
     const entries=Object.entries(acc).sort((a,b)=>b[1]-a[1]);
@@ -355,7 +340,7 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
       svg.appendChild(ring);
       cum += frac;
     });
-    const L=$('#legend'); L.innerHTML='';
+    const L=$('#legend'); if(!L) return; L.innerHTML='';
     entries.forEach(([k,v],i)=>{
       const el=document.createElement('div'); el.className='badge';
       el.innerHTML = \`<span class="sw" style="background:\${COLORS[i%COLORS.length]}"></span><b>\${k}</b> • \${fmt(v)}\`;
@@ -365,7 +350,7 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
   }
 
   function drawBars(){
-    const svg=$('#bars'); svg.innerHTML='';
+    const svg=$('#bars'); if(!svg) return; svg.innerHTML='';
     const list=items.filter(x=>x.type==='expense' && periodFilter(x));
     const days={};
     list.forEach(i=> days[i.date]=(days[i.date]||0)+i.amount);
@@ -374,7 +359,6 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
     const W=320, H=160, pad=24, bw=Math.max(10, (W-pad*2)/keys.length - 6);
     const max=Math.max(...Object.values(days));
     const scale=v=> (H-pad) - (v/max)*(H-pad-30);
-    // axes
     const axis=document.createElementNS('http://www.w3.org/2000/svg','line');
     axis.setAttribute('x1', pad); axis.setAttribute('y1', H-pad);
     axis.setAttribute('x2', W-pad); axis.setAttribute('y2', H-pad);
@@ -391,25 +375,29 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
 
   function buildChips(){
     const wrap=$('#qCats'); wrap.innerHTML='';
-    CATS.forEach(([name,icon],i)=>{
-      const b=document.createElement('button'); b.className='chip'; b.textContent = icon+' '+name;
+    CATS.forEach(([name,icon])=>{
+      const b=document.createElement('button'); b.className='chip'; b.type='button'; b.textContent = icon+' '+name;
       b.addEventListener('click', ()=>{
         $$('.chip').forEach(x=>x.classList.remove('sel')); b.classList.add('sel');
-        $('#qCats').dataset.value=name;
+        wrap.dataset.value=name;
       });
       wrap.appendChild(b);
     });
-    // fill form select too
+    const first = wrap.querySelector('.chip'); if(first){ first.classList.add('sel'); wrap.dataset.value=CATS[0][0]; }
     const sel=$('#fCat'); sel.innerHTML=''; CATS.forEach(([n])=> sel.insertAdjacentHTML('beforeend', `<option>${n}</option>`));
   }
+
+  function toast(msg){ const t=$('#toast'); t.textContent=msg||'OK'; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 
   function openSheet(data){
     current = data ? data.id : null;
     $('#shTitle').textContent = data? 'Përditëso' : 'Regjistrim';
     $('#fType').value = data? data.type : 'expense';
-    $('#fDate').value = data? data.date : today();
+    $('#fDate').value = data? data.date : todayLocal();
+    $('#fQty').value  = data? (data.qty||'') : '';
+    $('#fUnit').value = data? (data.unit||'') : '';
     $('#fAmount').value = data? String(data.amount) : '';
-    $('#fCat').value = data? data.category : 'Blerje ushqimore për shtëpi';
+    $('#fCat').value = data? data.category : CATS[0][0];
     $('#fAcc').value = data? data.account : 'Cash';
     $('#fNote').value = data? data.note : '';
     $('#del').style.display = data? 'block' : 'none';
@@ -417,43 +405,59 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
   }
   function closeSheet(){ $('#sheet').classList.remove('show'); current=null; }
 
-  function addQuick(){
-    const amt = parseInt(($('#qAmount').value||'').replace(/\\D/g,''))||0;
-    if(!amt) return alert('Shkruaj shumën.');
+  const num=v=> parseInt(String(v).replace(/[^\d]/g,''))||0;
+  function calcPreview(){
+    const q=num($('#qQty').value), u=num($('#qUnit').value);
+    const a = q && u ? q*u : num($('#qAmount').value);
+    $('#qPreview').textContent = fmt(a||0);
+  }
+  function calcFormAuto(){
+    const q=num($('#fQty').value), u=num($('#fUnit').value);
+    if(q && u){ $('#fAmount').value = (q*u).toString(); }
+  }
+
+  function addQuick(e){
+    if(e) e.preventDefault();
+    const qty=num($('#qQty').value), unit=num($('#qUnit').value);
+    let amt=num($('#qAmount').value);
+    if(qty && unit){ amt = qty*unit; }
+    if(!amt){ $('#qAmount').focus(); return toast('Shkruaj shumën'); }
     const type = $('#qType').value;
     const cat = $('#qCats').dataset.value || 'Tjetër';
-    const dto = { id:uid(), date:today(), type, amount:amt, category:cat, account:'Cash', note:'' };
-    items.push(dto); save(); $('#qAmount').value='';
-    kpis(); renderList(); drawDonut(); drawBars();
+    const dto = { id:uid(), date:todayLocal(), type, amount:amt, qty:qty||null, unit:unit||null, category:cat, account:'Cash', note:'' };
+    items.push(dto); save();
+    $('#qAmount').value=''; $('#qQty').value=''; $('#qUnit').value=''; calcPreview();
+    kpis(); renderList(); drawDonut(); drawBars(); toast('U shtua');
   }
 
   function saveForm(){
-    const amt = parseInt(($('#fAmount').value||'').replace(/\\D/g,''))||0;
-    if(!amt) return alert('Shkruaj shumën.');
+    const qty=num($('#fQty').value), unit=num($('#fUnit').value);
+    let amt=num($('#fAmount').value);
+    if(qty && unit){ amt = qty*unit; $('#fAmount').value = amt.toString(); }
+    if(!amt){ $('#fAmount').focus(); return toast('Shkruaj shumën'); }
     const dto = {
       id: current || uid(),
-      date: $('#fDate').value || today(),
+      date: $('#fDate').value || todayLocal(),
       type: $('#fType').value,
       amount: amt,
+      qty: qty||null,
+      unit: unit||null,
       category: $('#fCat').value,
       account: $('#fAcc').value || 'Cash',
       note: ($('#fNote').value||'').trim()
     };
-    if(current){
-      const i=items.findIndex(x=>x.id===current); if(i>-1) items[i]=dto;
-    }else{
-      items.push(dto);
-    }
-    save(); kpis(); renderList(); drawDonut(); drawBars(); closeSheet();
+    if(current){ const i=items.findIndex(x=>x.id===current); if(i>-1) items[i]=dto; }
+    else{ items.push(dto); }
+    save(); kpis(); renderList(); drawDonut(); drawBars(); closeSheet(); toast('U ruajt');
   }
   function delForm(){
     if(!current) return; if(!confirm('Ta fshij këtë?')) return;
-    items = items.filter(i=>i.id!==current); save(); kpis(); renderList(); drawDonut(); drawBars(); closeSheet();
+    items = items.filter(i=>i.id!==current); save(); kpis(); renderList(); drawDonut(); drawBars(); closeSheet(); toast('U fshi');
   }
 
   function makeCSV(){
-    const rows=[['id','date','type','amount','category','account','note']];
-    items.forEach(i=> rows.push([i.id,i.date,i.type,i.amount,i.category,i.account,i.note||'']));
+    const rows=[['id','date','type','amount','qty','unit','category','account','note']];
+    items.forEach(i=> rows.push([i.id,i.date,i.type,i.amount,i.qty||'',i.unit||'',i.category,i.account,i.note||'']));
     return rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\\n');
   }
   function exportCSV(){
@@ -468,48 +472,51 @@ body{margin:0;background:radial-gradient(80% 60% at 100% 0%,#1a2140 0%,var(--bg)
       const arr=[]; let cur='',q=false;
       for(const ch of line){ if(ch=='"'){q=!q;continue;} if(ch==','&&!q){arr.push(cur);cur='';} else cur+=ch; } arr.push(cur);
       const g=k=>(arr[idx[k]]||'').replace(/^"|"$/g,'');
-      items.push({ id:g('id')||uid(), date:g('date')||today(), type:g('type')==='income'?'income':'expense',
-        amount:parseInt((g('amount')||'').replace(/\\D/g,''))||0, category:g('category')||'Tjetër',
+      items.push({ id:g('id')||uid(), date:g('date')||todayLocal(), type:g('type')==='income'?'income':'expense',
+        amount:num(g('amount')||''), qty:num(g('qty')||''), unit:num(g('unit')||''), category:g('category')||'Tjetër',
         account:g('account')||'Cash', note:g('note')||'' });
     });
-    save(); kpis(); renderList(); drawDonut(); drawBars();
+    save(); kpis(); renderList(); drawDonut(); drawBars(); toast('CSV u ngarkua');
   }
 
   function switchTab(id){
     ['home','sum','set'].forEach(t=>{
-      $('#view-'+t).classList.toggle('hidden', t!==id);
+      const v=$('#view-'+t); if(v) v.classList.toggle('hidden', t!==id);
       $$('.seg').forEach(b=> b.classList.toggle('active', b.dataset.tab===id));
     });
     if(id==='sum'){ drawDonut(); drawBars(); }
   }
 
   document.addEventListener('DOMContentLoaded', ()=>{
-    load(); initTheme(); buildChips(); kpis(); renderList();
+    load(); initTheme(); buildChips(); kpis(); renderList(); drawDonut(); drawBars();
 
     // tabs
     $$('.seg').forEach(b=> b.addEventListener('click', ()=> switchTab(b.dataset.tab)));
 
-    // quick add
-    $('#qSave').addEventListener('click', addQuick);
+    // quick add + formulas
+    $('#quickAdd').addEventListener('submit', addQuick);
+    ['qQty','qUnit','qAmount'].forEach(id=> $('#'+id).addEventListener('input', calcPreview));
+    calcPreview();
 
-    // edit sheet
+    // edit sheet + autocalc
     $('#save').addEventListener('click', saveForm);
     $('#del').addEventListener('click', delForm);
     $('#close').addEventListener('click', closeSheet);
+    ['fQty','fUnit'].forEach(id=> $('#'+id).addEventListener('input', calcFormAuto));
 
     // summary tools
+    const importEl = $('#import'); if(importEl){
+      importEl.addEventListener('change', e=>{
+        const f=e.target.files[0]; if(!f) return;
+        const r=new FileReader(); r.onload=ev=> importCSV(ev.target.result);
+        r.readAsText(f,'utf-8'); e.target.value='';
+      });
+    }
     $('#export').addEventListener('click', exportCSV);
-    $('#import').addEventListener('change', e=>{
-      const f=e.target.files[0]; if(!f) return;
-      const r=new FileReader(); r.onload=ev=> importCSV(ev.target.result);
-      r.readAsText(f,'utf-8'); e.target.value='';
-    });
-    $('#wipe').addEventListener('click', ()=>{ if(!confirm('Fshi të gjitha të dhënat?')) return; items=[]; save(); kpis(); renderList(); drawDonut(); drawBars(); });
+    $('#wipe').addEventListener('click', ()=>{ if(!confirm('Fshi të gjitha të dhënat?')) return; items=[]; save(); kpis(); renderList(); drawDonut(); drawBars(); toast('U pastrua'); });
 
-    // theme
+    // theme + period
     $('#theme').addEventListener('change', e=> setTheme(e.target.checked));
-
-    // period
     $('#period').addEventListener('change', ()=>{ kpis(); renderList(); drawDonut(); drawBars(); });
   });
 })();
