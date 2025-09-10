@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Görüntüleyici + Dönüştürücü</title>
+  <style>
+    :root{
+      --bg: #0f1320;
+      --panel: #151a2b;
+      --muted: #8a9bb4;
+      --text: #e8eefc;
+      --accent: #6ea8fe;
+      --accent-2: #7ef0c5;
+      --border: #24304a;
+      --danger: #ff6b6b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 700px at 10% -10%, #1c2541 0%, transparent 60%) no-repeat, var(--bg);
+      color: var(--text);
+      line-height:1.4;
+    }
+    header{
+      padding:16px 20px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0));
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(6px);
+    }
+    header h1{
+      margin:0; font-size:20px; letter-spacing:.3px;
+    }
+    header .tag{font-size:12px; color:var(--muted); border:1px solid var(--border); padding:2px 8px; border-radius:999px}
+    main{padding:16px; max-width:1200px; margin:0 auto}
+    .controls{
+      display:grid; gap:10px; margin-bottom:12px;
+      grid-template-columns:1fr;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .card{
+      background: var(--panel);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px;
+    }
+    label{font-size:13px; color:var(--muted)}
+    input[type="file"]{
+      background:#0c1220; border:1px dashed var(--border); color:var(--text);
+      padding:10px; border-radius:12px; width:100%;
+    }
+    .filename{
+      flex:1; min-width:180px;
+      background:#0c1220; border:1px solid var(--border); color:var(--text);
+      padding:10px 12px; border-radius:10px; font-size:16px;
+    }
+    .switch{display:inline-flex; align-items:center; gap:8px; user-select:none}
+    .switch input{appearance:none; width:42px; height:24px; border-radius:999px; background:#0c1220; border:1px solid var(--border); position:relative; outline:none; transition:.2s}
+    .switch input:checked{background: #16304d; border-color:#25527e}
+    .switch input:before{content:""; width:18px; height:18px; border-radius:50%; background:var(--muted);
+      position:absolute; top:2px; left:2px; transition:.2s}
+    .switch input:checked:before{left:22px; background:var(--accent)}
+    .workspace{display:grid; gap:12px}
+    @media(min-width:900px){ .workspace{grid-template-columns:1fr 1fr} }
+    .editor-wrap, .preview-wrap{min-height:340px}
+    .bar{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      padding:10px 12px;
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(0deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      border-top-left-radius:12px; border-top-right-radius:12px;
+    }
+    .bar span{font-weight:600; letter-spacing:.3px}
+    .btns{display:flex; gap:8px; flex-wrap:wrap}
+    button{
+      border:1px solid var(--border);
+      background:#10172a;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:16px; /* >=16px to avoid iOS zoom */
+      cursor:pointer;
+      transition:transform .05s ease, border-color .2s;
+    }
+    button:hover{border-color:#33527c}
+    button:active{transform:translateY(1px)}
+    .btn-accent{border-color:#2c7be5; background:#143152}
+    .btn-danger{border-color:#6b1c1c; background:#2a0f10}
+    textarea{
+      width:100%; min-height:280px; resize:vertical; outline:none;
+      background:#0c1220;
+      color:#dbe8ff;
+      border:1px solid var(--border);
+      padding:12px;
+      border-bottom-left-radius:12px; border-bottom-right-radius:12px;
+      font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    .dropzone{
+      margin-top:10px;
+      border:1px dashed var(--border);
+      border-radius:12px;
+      padding:14px;
+      text-align:center;
+      color:var(--muted);
+      background:#0c1220;
+      font-size:14px;
+    }
+    .dropzone.hover{border-color: var(--accent); color:#cfe3ff}
+    iframe{
+      width:100%; height:calc(100% - 44px);
+      border:0; display:block;
+      background:white;
+      border-bottom-left-radius:12px; border-bottom-right-radius:12px;
+    }
+    .hint{font-size:12px; color:var(--muted); margin-top:6px}
+    footer{padding:12px 16px; color:var(--muted); font-size:12px; text-align:center}
+    .grid-2{display:grid; gap:8px}
+    @media(min-width:620px){ .grid-2{grid-template-columns:1fr auto auto} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HTML Görüntüleyici + Dönüştürücü</h1>
+    <span class="tag">Tek dosya · offline</span>
+  </header>
+
+  <main>
+    <div class="controls card">
+      <div class="row grid-2">
+        <div class="row" style="gap:10px; flex:1">
+          <label for="file">.html dosyası seç:</label>
+          <input id="file" type="file" accept=".html,text/html">
+        </div>
+        <input id="filename" class="filename" type="text" value="index.html" placeholder="dosya-adı.html">
+        <label class="switch"><input id="live" type="checkbox"><span>Canlı önizleme</span></label>
+      </div>
+      <div class="hint">İpucu: Kod yapıştırabilir, .html dosyası yükleyebilir, canlı önizleyebilir ve tek tıkla .html olarak indirebilirsiniz.</div>
+    </div>
+
+    <section class="workspace">
+      <div class="editor-wrap card">
+        <div class="bar">
+          <span>HTML Kodu</span>
+          <div class="btns">
+            <button id="previewBtn" class="btn-accent">Önizle</button>
+            <button id="downloadBtn">İndir (.html)</button>
+            <button id="openBtn">Yeni sekmede aç</button>
+            <button id="clearBtn" class="btn-danger">Temizle</button>
+          </div>
+        </div>
+        <textarea id="code" spellcheck="false" placeholder="Buraya HTML kodunu yapıştır veya aşağıdan .html dosyası yükle..."></textarea>
+        <div id="dropzone" class="dropzone">Ya da .html dosyanızı buraya sürükleyip bırakın (veya düz metin bırakın)</div>
+      </div>
+
+      <div class="preview-wrap card" style="min-height:420px">
+        <div class="bar">
+          <span>Önizleme</span>
+          <div class="btns"><!-- boş ama hizalama için var --></div>
+        </div>
+        <iframe id="preview" sandbox="allow-same-origin allow-forms allow-scripts" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </section>
+
+    <footer>
+      Bu araç, hem <strong>yazı olarak verilen HTML kodu</strong> hem de <strong>.html dosyasını</strong> kabul eder; içeriği önizler ve tek tıkla <em>.html</em> dosyasına dönüştürür.
+    </footer>
+  </main>
+
+  <script>
+    (function(){
+      const $ = s => document.querySelector(s);
+      const code = $("#code");
+      const fileInput = $("#file");
+      const preview = $("#preview");
+      const previewBtn = $("#previewBtn");
+      const downloadBtn = $("#downloadBtn");
+      const openBtn = $("#openBtn");
+      const clearBtn = $("#clearBtn");
+      const live = $("#live");
+      const filename = $("#filename");
+      const dropzone = $("#dropzone");
+      const STORAGE_KEY = "html_viewer_code_v1";
+
+      // ----- helpers
+      function setPreview(html){
+        try {
+          preview.removeAttribute("src"); // reset
+          preview.srcdoc = html;
+        } catch (e) {
+          // Fallback for older browsers
+          const blob = new Blob([html], {type: "text/html;charset=utf-8"});
+          const url = URL.createObjectURL(blob);
+          preview.src = url;
+          setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }
+      }
+      function updatePreview(){
+        setPreview(code.value);
+        try{ localStorage.setItem(STORAGE_KEY, code.value); }catch(_){}
+      }
+      function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), ms); }; }
+      const debouncedPreview = debounce(updatePreview, 250);
+
+      // ----- events
+      previewBtn.addEventListener("click", updatePreview);
+      clearBtn.addEventListener("click", ()=>{
+        code.value = "";
+        updatePreview();
+      });
+      downloadBtn.addEventListener("click", ()=>{
+        const html = code.value;
+        const blob = new Blob([html], {type: "text/html;charset=utf-8"});
+        const a = document.createElement("a");
+        let name = (filename.value || "index.html").trim();
+        if(!name.toLowerCase().endsWith(".html")) name += ".html";
+        a.download = name;
+        a.href = URL.createObjectURL(blob);
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      });
+      let openedUrl = null;
+      openBtn.addEventListener("click", ()=>{
+        const blob = new Blob([code.value], {type: "text/html;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        if(openedUrl) URL.revokeObjectURL(openedUrl);
+        openedUrl = url;
+        window.open(url, "_blank");
+      });
+      fileInput.addEventListener("change", async (e)=>{
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        try{
+          const text = await f.text();
+          code.value = text;
+          filename.value = f.name;
+          updatePreview();
+        }catch(err){
+          alert("Dosya okunamadı.");
+        }
+      });
+      // drag & drop
+      ["dragenter","dragover"].forEach(evt => dropzone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.add("hover");
+      }));
+      ["dragleave","drop"].forEach(evt => dropzone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.remove("hover");
+      }));
+      dropzone.addEventListener("drop", async (e)=>{
+        const dt = e.dataTransfer;
+        if(dt && dt.files && dt.files.length){
+          const f = dt.files[0];
+          const text = await f.text();
+          code.value = text;
+          filename.value = f.name;
+          updatePreview();
+        }else{
+          const text = e.dataTransfer.getData("text/plain");
+          if(text){
+            code.value = text;
+            updatePreview();
+          }
+        }
+      });
+      // live
+      code.addEventListener("input", ()=>{ if(live.checked) debouncedPreview(); });
+
+      // ----- boot
+      let starter = localStorage.getItem(STORAGE_KEY);
+      if(!starter){
+        starter = "<!doctype html>\n<html lang=\"tr\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Merhaba!</title>\n</head>\n<body>\n  <h1 style=\"font-family: ui-sans-serif, system-ui\">Merhaba Dünya 👋</h1>\n  <p>Bu içerik HTML Görüntüleyici ile oluşturuldu.</p>\n</body>\n</html>";
+      }
+      code.value = starter;
+      setPreview(starter);
+    })();
+  </script>
+</body>
+</html>
