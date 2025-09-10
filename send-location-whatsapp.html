@@ -1,119 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>Dërgo Lokacionin në WhatsApp</title>
+<meta name="color-scheme" content="light dark">
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --text:#e7ebf5; --muted:#a9b1c3; --accent:#2ecc71; --warn:#ffb020; --danger:#ff5d5d;
+    --bg:#0f172a; --card:#111827; --txt:#e5e7eb; --muted:#94a3b8; --acc:#22c55e; --acc2:#10b981; --danger:#ef4444;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
-  .wrap{width:100%;max-width:520px;background:var(--card);border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-  h1{margin:0 0 8px;font-size:22px}
-  p{margin:8px 0;color:var(--muted);line-height:1.45}
-  .status{margin:14px 0 10px;padding:12px;border-radius:12px;background:#11151d;color:var(--muted);font-size:14px}
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  button,a.btn{appearance:none;border:0;border-radius:12px;padding:12px 16px;font-weight:600;cursor:pointer;text-decoration:none}
-  .primary{background:var(--accent);color:#0b1b12}
-  .ghost{background:#202736;color:var(--text)}
-  .small{font-size:12px;color:var(--muted);margin-top:10px}
-  .hide{display:none}
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f1f5f9; --card:#ffffff; --txt:#0f172a; --muted:#6b7280; --shadow: 0 8px 24px rgba(2,6,23,.08); }
+  }
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,var(--bg),#0b1024 50%,var(--bg));
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    color:var(--txt); display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .app{
+    width:100%; max-width:520px; background:var(--card); border-radius:18px; box-shadow:var(--shadow);
+    padding:22px; position:relative; overflow:hidden;
+  }
+  h1{margin:0 0 8px; font-size:20px; letter-spacing:.2px}
+  p.lead{margin:0 0 14px; color:var(--muted); font-size:14px}
+  .status{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px;
+    background:rgba(148,163,184,.12); color:var(--muted); font-size:14px; margin:14px 0;
+  }
+  .row{display:flex; gap:10px; margin:12px 0; flex-wrap:wrap}
+  button{
+    appearance:none; border:0; border-radius:14px; padding:14px 16px; font-weight:600; letter-spacing:.2px;
+    background:var(--acc); color:#04130a; cursor:pointer; flex:1; font-size:15px; transition:transform .06s ease, opacity .2s;
+  }
+  button:active{ transform:scale(.98) }
+  button.secondary{ background:#1f2937; color:var(--txt) }
+  button.alt{ background:var(--acc2); }
+  button.danger{ background:var(--danger); color:white }
+  button[disabled]{ opacity:.45; cursor:not-allowed }
+  .info{
+    background:rgba(34,197,94,.1); color:#16a34a; border-left:4px solid var(--acc); padding:12px; border-radius:10px; font-size:14px
+  }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .footer{margin-top:14px; color:var(--muted); font-size:12px; text-align:center}
+  .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:rgba(148,163,184,.15); font-size:12px; color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Dërgo Lokacionin tënd</h1>
-  <p>Kjo faqe do të marrë lokacionin tënd dhe do të përgatisë një mesazh në WhatsApp për numrin e caktuar.</p>
+  <main class="app" role="main">
+    <h1>📍 Dërgo lokacionin tënd</h1>
+    <p class="lead">Faqja përgatit një mesazh WhatsApp me linkun e Google Maps për numrin e caktuar.</p>
 
-  <div id="status" class="status">Duke u përgatitur…</div>
+    <div id="status" class="status">Gati për të filluar. Lejo aksesin te lokacioni.</div>
 
-  <div class="row">
-    <button id="retry" class="ghost hide">Provo përsëri</button>
-    <a id="openWA" class="btn primary hide" target="_self" rel="noopener">Hape WhatsApp</a>
-  </div>
+    <div class="row">
+      <button id="btnAllow">Lejo lokacionin</button>
+      <button id="btnRetry" class="secondary" style="display:none;">Provo përsëri</button>
+    </div>
 
-  <p class="small">
-    ⚠️ Duhet <strong>HTTPS</strong> që të funksionojë. WhatsApp lejon vetëm ndarjen manuale të "live location", këtu dërgohet një link i Google Maps.
-  </p>
-</div>
+    <div class="row">
+      <button id="btnOpen" class="alt" disabled>Hape WhatsApp</button>
+      <button id="btnCopy" class="secondary" disabled>Kopjo tekstin</button>
+    </div>
+
+    <div id="preview" class="info" style="display:none;"></div>
+
+    <div class="footer">
+      <span class="pill">Punon në HTTPS • iOS & Android</span>
+    </div>
+  </main>
 
 <script>
 (function(){
-  const PHONE = "355674001991"; // Numri i fiksuar
+  const PHONE = '355674001991'; 
+  const statusEl = document.getElementById('status');
+  const btnAllow = document.getElementById('btnAllow');
+  const btnRetry = document.getElementById('btnRetry');
+  const btnOpen  = document.getElementById('btnOpen');
+  const btnCopy  = document.getElementById('btnCopy');
+  const preview  = document.getElementById('preview');
 
-  const statusEl = document.getElementById("status");
-  const retryBtn = document.getElementById("retry");
-  const openWA  = document.getElementById("openWA");
+  let coords = null;
+  let textToSend = '';
 
-  function buildWhatsAppUrl(text){
-    const encoded = encodeURIComponent(text);
-    return https://wa.me/${PHONE}?text=${encoded};
-  }
-
-  function setStatus(msg, type="info"){
+  function setStatus(msg, type='info'){
     statusEl.textContent = msg;
-    statusEl.style.color = (type==="error") ? "#ffbcbc" : (type==="warn" ? "#ffdca3" : "var(--muted)");
-    statusEl.style.background = (type==="error") ? "#2a0f13" : (type==="warn" ? "#2a2413" : "#11151d");
-  }
-
-  function openWhatsAppWith(lat, lng){
-    const ts = new Date().toLocaleString("sq-AL");
-    const maps = https://maps.google.com/?q=${lat},${lng};
-    const text =
-`📍 Lokacioni im:
-${maps}
-
-Koordinatat: ${lat.toFixed(6)}, ${lng.toFixed(6)}
-Koha: ${ts}`;
-
-    const url = buildWhatsAppUrl(text);
-    openWA.href = url;
-    openWA.classList.remove("hide");
-    try { window.location.replace(url); } catch(e) {}
-  }
-
-  function handleGeoError(err){
-    if (err && err.code === 1) {
-      setStatus("Leja për lokacionin u refuzua. Aktivizo GPS dhe jep leje.", "warn");
-    } else if (err && err.code === 2) {
-      setStatus("Nuk u gjet burimi i lokacionit. Aktivizo internetin / GPS.", "warn");
-    } else if (err && err.code === 3) {
-      setStatus("Kërkesa për lokacion skadoi. Provo përsëri.", "warn");
-    } else {
-      setStatus("Nuk u mor lokacioni. Provo përsëri.", "warn");
+    if(type==='error'){
+      statusEl.style.background = 'rgba(239,68,68,.12)';
+      statusEl.style.color = '#ef4444';
+    }else{
+      statusEl.style.background = 'rgba(148,163,184,.12)';
+      statusEl.style.color = getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#94a3b8';
     }
-    retryBtn.classList.remove("hide");
   }
 
-  function requestGeo(){
-    retryBtn.classList.add("hide");
-    openWA.classList.add("hide");
-    setStatus("Duke marrë lokacionin… Jep leje nëse kërkohet.");
-    if (!("geolocation" in navigator)) {
-      setStatus("Ky pajisje nuk mbështet lokacion.", "error");
-      openWA.href = buildWhatsAppUrl("Dua të ndaj lokacionin tim:");
-      openWA.classList.remove("hide");
+  function buildMessage(lat, lng){
+    const maps = https://maps.google.com/?q=${lat},${lng};
+    return Përshëndetje! Kjo është lokacioni im aktual:\n${maps}\n\nKoordinatat: ${lat.toFixed(6)}, ${lng.toFixed(6)};
+  }
+
+  function enableActions(){
+    btnOpen.disabled = false;
+    btnCopy.disabled = false;
+    preview.style.display = 'block';
+    preview.innerHTML = <strong>Mesazhi që do të dërgohet:</strong><br><span class="mono">${textToSend.replaceAll('\n','<br>')}</span>;
+  }
+
+  function requestLocation(){
+    if(!('geolocation' in navigator)){
+      setStatus('Pajisja nuk mbështet Geolocation.', 'error');
+      btnRetry.style.display = 'inline-block';
       return;
     }
+    setStatus('Duke marrë lokacionin… (lejo kërkesën)');
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
-        const { latitude, longitude } = pos.coords || {};
-        if (typeof latitude !== "number" || typeof longitude !== "number") {
-          handleGeoError();
-          return;
-        }
-        setStatus("Lokacioni u mor, WhatsApp po hapet…");
-        openWhatsAppWith(latitude, longitude);
+        coords = pos.coords;
+        const { latitude:lat, longitude:lng, accuracy } = coords;
+        textToSend = buildMessage(lat, lng);
+        setStatus(Lokacioni u mor (±${Math.round(accuracy)}m). Mund të hapësh WhatsApp.);
+        enableActions();
       },
-      handleGeoError,
-      { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+      (err)=>{
+        let reason = 'E panjohur';
+        if(err.code === err.PERMISSION_DENIED) reason = 'Leja u refuzua. Lejo lokacionin nga Settings.';
+        else if(err.code === err.POSITION_UNAVAILABLE) reason = 'Lokacioni i paarritshëm. Aktivizo GPS / Internetin.';
+        else if(err.code === err.TIMEOUT) reason = 'Skadoi koha. Provo sërish.';
+        setStatus(S’u mor lokacioni: ${reason}, 'error');
+        btnRetry.style.display = 'inline-block';
+      },
+      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
     );
   }
 
-  retryBtn.addEventListener("click", requestGeo);
-  requestGeo();
+  function openWhatsApp(){
+    if(!textToSend){
+      setStatus('Së pari lejo lokacionin.', 'error');
+      return;
+    }
+    setStatus('Duke hapur WhatsApp… nëse nuk hapet, do të përdoret wa.me.');
+
+    const encoded = encodeURIComponent(textToSend);
+    const appUrl  = whatsapp://send?phone=${PHONE}&text=${encoded};
+    const webUrl  = https://wa.me/${PHONE}?text=${encoded};
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = appUrl;
+    document.body.appendChild(iframe);
+
+    const fallbackTimer = setTimeout(()=>{
+      window.location.href = webUrl;
+    }, 800);
+
+    setTimeout(()=>{ try{ document.body.removeChild(iframe); }catch{} }, 3000);
+  }
+
+  function copyText(){
+    if(!textToSend) return;
+    navigator.clipboard?.writeText(textToSend).then(()=>{
+      setStatus('Teksti u kopjua në kujtesë. Tani mund ta ngjitësh në WhatsApp.');
+    }).catch(()=>{
+      setStatus('S’u kopjua automatikisht. Mund ta përzgjedhësh nga kutia poshtë.', 'error');
+    });
+  }
+
+  btnAllow.addEventListener('click', requestLocation, {passive:true});
+  btnRetry.addEventListener('click', ()=>{ btnRetry.style.display='none'; requestLocation(); }, {passive:true});
+  btnOpen.addEventListener('click', openWhatsApp, {passive:true});
+  btnCopy.addEventListener('click', copyText, {passive:true});
+
+  let lastTouch=0; 
+  window.addEventListener('touchend', e=>{ const now=Date.now(); if(now-lastTouch<350){ e.preventDefault(); } lastTouch=now; }, {passive:false});
 })();
 </script>
 </body>
