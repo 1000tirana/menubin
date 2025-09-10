@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="light dark">
 <style>
   :root{
-    --bg:#0f172a; --card:#111827; --txt:#e5e7eb; --muted:#94a3b8; --acc:#22c55e; --acc2:#10b981; --danger:#ef4444;
+    --bg:#0f172a; --card:#111827; --txt:#e5e7eb; --muted:#94a3b8; --acc:#22c55e; --acc2:#10b981; --danger:#ef4444; --warn:#f59e0b;
     --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   @media (prefers-color-scheme: light){
@@ -20,11 +20,15 @@
     color:var(--txt); display:flex; align-items:center; justify-content:center; padding:20px;
   }
   .app{
-    width:100%; max-width:520px; background:var(--card); border-radius:18px; box-shadow:var(--shadow);
+    width:100%; max-width:560px; background:var(--card); border-radius:18px; box-shadow:var(--shadow);
     padding:22px; position:relative; overflow:hidden;
   }
   h1{margin:0 0 8px; font-size:20px; letter-spacing:.2px}
   p.lead{margin:0 0 14px; color:var(--muted); font-size:14px}
+  .banner{
+    display:none; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px;
+    background:rgba(245,158,11,.12); color:#fbbf24; font-size:13px; margin:10px 0 6px;
+  }
   .status{
     display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:12px;
     background:rgba(148,163,184,.12); color:var(--muted); font-size:14px; margin:14px 0;
@@ -37,14 +41,18 @@
   button:active{ transform:scale(.98) }
   button.secondary{ background:#1f2937; color:var(--txt) }
   button.alt{ background:var(--acc2); }
+  button.warn{ background:var(--warn); color:#111827 }
   button.danger{ background:var(--danger); color:white }
   button[disabled]{ opacity:.45; cursor:not-allowed }
   .info{
     background:rgba(34,197,94,.1); color:#16a34a; border-left:4px solid var(--acc); padding:12px; border-radius:10px; font-size:14px
   }
-  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; word-break: break-word; }
   .footer{margin-top:14px; color:var(--muted); font-size:12px; text-align:center}
   .pill{display:inline-block; padding:6px 10px; border-radius:999px; background:rgba(148,163,184,.15); font-size:12px; color:var(--muted)}
+  .small{ font-size:12px; color:var(--muted) }
+  details{ margin-top:10px; }
+  summary{ cursor:pointer; }
 </style>
 </head>
 <body>
@@ -52,37 +60,55 @@
     <h1>📍 Dërgo lokacionin tënd</h1>
     <p class="lead">Faqja përgatit një mesazh WhatsApp me linkun e Google Maps për numrin e caktuar.</p>
 
+    <div id="iabBanner" class="banner">⚠️ Po hapet brenda një aplikacioni (Instagram, Facebook, etj.).
+      Ju lutem hapeni këtë faqe në <strong>Safari/Chrome</strong> (Share → Open in Browser), përndryshe WhatsApp mund të mos hapet.</div>
+
     <div id="status" class="status">Gati për të filluar. Lejo aksesin te lokacioni.</div>
 
     <div class="row">
       <button id="btnAllow">Lejo lokacionin</button>
       <button id="btnRetry" class="secondary" style="display:none;">Provo përsëri</button>
+      <button id="btnFake" class="secondary" title="Provë pa GPS">Provë pa GPS</button>
     </div>
 
     <div class="row">
       <button id="btnOpen" class="alt" disabled>Hape WhatsApp</button>
+      <button id="btnShare" class="warn" disabled>Ndaj me Share…</button>
       <button id="btnCopy" class="secondary" disabled>Kopjo tekstin</button>
     </div>
 
     <div id="preview" class="info" style="display:none;"></div>
 
+    <details>
+      <summary>❓ Nëse nuk punon, provoni këto</summary>
+      <ol class="small">
+        <li>Hape faqen në <strong>Safari/Chrome</strong>, jo brenda Instagram/TikTok/FB.</li>
+        <li>Lejo <strong>Location Services</strong> për Safari/Chrome (While Using / Precise).</li>
+        <li>Pas lejes, shtyp <strong>Hape WhatsApp</strong> <em>nga i njëjti klik</em> (iOS e kërkon).</li>
+        <li>Nëse prapë jo: përdor <strong>Ndaj me Share…</strong> dhe zgjidh WhatsApp nga lista.</li>
+      </ol>
+    </details>
+
     <div class="footer">
-      <span class="pill">Punon në HTTPS • iOS & Android</span>
+      <span class="pill">HTTPS • iOS & Android • Fallback Share/wa.me</span>
     </div>
   </main>
 
 <script>
 (function(){
-  const PHONE = '355674001991'; 
+  const PHONE = '355674001991'; // wa.me format (pa '+')
   const statusEl = document.getElementById('status');
   const btnAllow = document.getElementById('btnAllow');
   const btnRetry = document.getElementById('btnRetry');
   const btnOpen  = document.getElementById('btnOpen');
   const btnCopy  = document.getElementById('btnCopy');
+  const btnShare = document.getElementById('btnShare');
+  const btnFake  = document.getElementById('btnFake');
   const preview  = document.getElementById('preview');
+  const iabBanner= document.getElementById('iabBanner');
 
-  let coords = null;
   let textToSend = '';
+  let gotLocation = false;
 
   function setStatus(msg, type='info'){
     statusEl.textContent = msg;
@@ -95,16 +121,17 @@
     }
   }
 
-  function buildMessage(lat, lng){
-    const maps = https://maps.google.com/?q=${lat},${lng};
-    return Përshëndetje! Kjo është lokacioni im aktual:\n${maps}\n\nKoordinatat: ${lat.toFixed(6)}, ${lng.toFixed(6)};
+  function buildMessage(lat, lng, acc){
+    const maps = `https://maps.google.com/?q=${lat},${lng}`;
+    return `Përshëndetje! Kjo është lokacioni im aktual:\n${maps}\n\nKoordinatat: ${(+lat).toFixed(6)}, ${(+lng).toFixed(6)}${acc?` (±${Math.round(acc)}m)`:''}`;
   }
 
   function enableActions(){
     btnOpen.disabled = false;
     btnCopy.disabled = false;
+    btnShare.disabled = !(navigator.share);
     preview.style.display = 'block';
-    preview.innerHTML = <strong>Mesazhi që do të dërgohet:</strong><br><span class="mono">${textToSend.replaceAll('\n','<br>')}</span>;
+    preview.innerHTML = `<strong>Mesazhi që do të dërgohet:</strong><br><span class="mono">${textToSend.replaceAll('\n','<br>')}</span>`;
   }
 
   function requestLocation(){
@@ -116,10 +143,10 @@
     setStatus('Duke marrë lokacionin… (lejo kërkesën)');
     navigator.geolocation.getCurrentPosition(
       (pos)=>{
-        coords = pos.coords;
-        const { latitude:lat, longitude:lng, accuracy } = coords;
-        textToSend = buildMessage(lat, lng);
-        setStatus(Lokacioni u mor (±${Math.round(accuracy)}m). Mund të hapësh WhatsApp.);
+        const { latitude:lat, longitude:lng, accuracy:acc } = pos.coords;
+        textToSend = buildMessage(lat, lng, acc);
+        gotLocation = true;
+        setStatus(`Lokacioni u mor (±${Math.round(acc)}m). Mund të hapësh WhatsApp.`);
         enableActions();
       },
       (err)=>{
@@ -127,7 +154,7 @@
         if(err.code === err.PERMISSION_DENIED) reason = 'Leja u refuzua. Lejo lokacionin nga Settings.';
         else if(err.code === err.POSITION_UNAVAILABLE) reason = 'Lokacioni i paarritshëm. Aktivizo GPS / Internetin.';
         else if(err.code === err.TIMEOUT) reason = 'Skadoi koha. Provo sërish.';
-        setStatus(S’u mor lokacioni: ${reason}, 'error');
+        setStatus(`S’u mor lokacioni: ${reason}`, 'error');
         btnRetry.style.display = 'inline-block';
       },
       { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
@@ -136,25 +163,30 @@
 
   function openWhatsApp(){
     if(!textToSend){
-      setStatus('Së pari lejo lokacionin.', 'error');
+      setStatus('Së pari lejo lokacionin (ose Provë pa GPS).', 'error');
       return;
     }
     setStatus('Duke hapur WhatsApp… nëse nuk hapet, do të përdoret wa.me.');
-
     const encoded = encodeURIComponent(textToSend);
-    const appUrl  = whatsapp://send?phone=${PHONE}&text=${encoded};
-    const webUrl  = https://wa.me/${PHONE}?text=${encoded};
+    const appUrl  = `whatsapp://send?phone=${PHONE}&text=${encoded}`;
+    const webUrl  = `https://wa.me/${PHONE}?text=${encoded}`;
 
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = appUrl;
-    document.body.appendChild(iframe);
+    // Prefer location.href on user gesture (iOS-friendly)
+    let fallbackUsed = false;
+    const t = setTimeout(()=>{
+      if(!fallbackUsed){
+        fallbackUsed = true;
+        window.location.href = webUrl;
+      }
+    }, 900);
 
-    const fallbackTimer = setTimeout(()=>{
+    try {
+      window.location.href = appUrl;
+    } catch(e){
+      // If blocked, jump to web fallback immediately
+      clearTimeout(t);
       window.location.href = webUrl;
-    }, 800);
-
-    setTimeout(()=>{ try{ document.body.removeChild(iframe); }catch{} }, 3000);
+    }
   }
 
   function copyText(){
@@ -166,11 +198,46 @@
     });
   }
 
+  async function shareText(){
+    if(!textToSend) return;
+    if(navigator.share){
+      try{
+        await navigator.share({ text: textToSend });
+        setStatus('U nda me sukses. Zgjodhe WhatsApp?', 'info');
+      }catch(err){
+        setStatus('Share u anullua ose dështoi.', 'error');
+      }
+    }else{
+      setStatus('Share API nuk mbështetet në këtë pajisje.', 'error');
+    }
+  }
+
+  function fakeLocation(){
+    const lat = 41.3275, lng = 19.8187; // Tirana qendër
+    textToSend = buildMessage(lat, lng, 25);
+    gotLocation = true;
+    setStatus('Modalitet provë: përdoren koordinata të Tiranës. Hape WhatsApp për test.');
+    enableActions();
+  }
+
+  // In-app browser detection (FB/IG/TikTok/Twitter/Snapchat/WeChat/Line)
+  (function detectIAB(){
+    const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+    const inApp = /(FBAN|FBAV|Instagram|Line|MicroMessenger|WeChat|Twitter|Snapchat|TikTok)/i.test(ua);
+    if(inApp){
+      iabBanner.style.display = 'block';
+    }
+  })();
+
+  // Events
   btnAllow.addEventListener('click', requestLocation, {passive:true});
   btnRetry.addEventListener('click', ()=>{ btnRetry.style.display='none'; requestLocation(); }, {passive:true});
   btnOpen.addEventListener('click', openWhatsApp, {passive:true});
   btnCopy.addEventListener('click', copyText, {passive:true});
+  btnShare.addEventListener('click', shareText, {passive:true});
+  btnFake.addEventListener('click', fakeLocation, {passive:true});
 
+  // Prevent iOS double-tap zoom
   let lastTouch=0; 
   window.addEventListener('touchend', e=>{ const now=Date.now(); if(now-lastTouch<350){ e.preventDefault(); } lastTouch=now; }, {passive:false});
 })();
