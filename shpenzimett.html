@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Andi Harcamaları</title>
+<meta name="theme-color" content="#0b6">
+<style>
+  :root{
+    --bg:#0b0f14; --card:#111820; --muted:#9fb3c8; --primary:#12b886; --accent:#1dd1a1;
+    --danger:#ff6b6b; --warn:#f5a623; --text:#e6edf3; --input:#0f1621; --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#061018,#0a141d);color:var(--text);-webkit-tap-highlight-color:transparent}
+  header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(1.2) blur(8px);background:linear-gradient(180deg,rgba(15,22,33,.85),rgba(15,22,33,.55));box-shadow:var(--shadow)}
+  .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+  .title{font-weight:800;letter-spacing:.3px;font-size:20px}
+  .pill{padding:6px 10px;border-radius:999px;background:rgba(18,184,134,.12);color:#9ef6d2;font-size:12px;font-weight:700}
+  nav{display:flex;gap:8px;padding:8px;overflow:auto;border-top:1px solid rgba(255,255,255,.05)}
+  nav button{flex:1;min-width:0;padding:12px 10px;font-weight:700;font-size:14px;border-radius:12px;border:1px solid rgba(255,255,255,.07);background:#101820;color:var(--muted)}
+  nav button.active{color:#0ff;border-color:#0ff3;outline:2px solid rgba(0,255,200,.15)}
+  main{padding:16px;max-width:900px;margin:0 auto}
+  .card{background:linear-gradient(180deg,#0e1621,#0a121a);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+  .row{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:720px){ .row2{grid-template-columns:1fr 1fr} }
+  label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  input,select,textarea{width:100%;background:var(--input);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 12px;font-size:16px;outline:none}
+  textarea{min-height:90px;resize:vertical}
+  .hint{font-size:12px;color:#9fb3c8;opacity:.9}
+  .btn{appearance:none;border:none;border-radius:14px;padding:14px 16px;background:linear-gradient(180deg,#12b886,#0aa77a);color:#012017;font-weight:800;letter-spacing:.3px;font-size:16px;box-shadow:0 8px 22px rgba(18,184,134,.35)}
+  .btn.secondary{background:#163142;color:#b9d7ff}
+  .btn.ghost{background:transparent;color:#9fd;border:1px dashed #2c5364}
+  .btn.warn{background:linear-gradient(180deg,#f5a623,#b8740a);color:#1b1302}
+  .btn.danger{background:linear-gradient(180deg,#ff6b6b,#d95353);color:#1b0101}
+  .btn:disabled{opacity:.6}
+  .list{margin-top:14px;display:grid;gap:10px}
+  .item{display:grid;gap:8px;grid-template-columns:64px 1fr auto;align-items:center;padding:10px;border-radius:14px;background:#0d1722;border:1px solid rgba(255,255,255,.06)}
+  .thumb{width:64px;height:64px;border-radius:10px;background:#0b0f14;object-fit:cover;border:1px solid rgba(255,255,255,.06)}
+  .cat{font-weight:800}
+  .amt{font-weight:900;color:#94f9d6}
+  .meta{font-size:12px;color:#9fb3c8}
+  .actions{display:flex;gap:8px}
+  .tag{padding:3px 8px;border-radius:999px;background:#13202e;color:#7dc;font-size:11px;border:1px solid #214}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .totals{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:#0f2a22;color:#a6f7df;border:1px solid rgba(0,255,200,.2);padding:8px 10px;border-radius:10px;font-weight:700}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:#0c1a12;color:#b9ffe5;padding:12px 14px;border:1px solid #1f3;border-radius:12px;box-shadow:var(--shadow);z-index:9999;display:none}
+  .hidden{display:none!important}
+  .note{color:#9fb3c8;font-size:13px;margin-top:8px}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#0b1117;border:1px solid #223;padding:2px 6px;border-radius:6px;font-size:12px}
+  .textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);margin:14px 0}
+  footer{color:#7ca;text-align:center;padding:20px;opacity:.7}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="title">Andi Harcamaları</div>
+    <div class="pill">ALL · Leki</div>
+  </div>
+  <nav>
+    <button class="tabBtn active" data-tab="ekle">Harcama Ekle</button>
+    <button class="tabBtn" data-tab="liste">Liste</button>
+    <button class="tabBtn" data-tab="gonder">Gönder & Rapor</button>
+  </nav>
+</header>
+
+<main>
+  <!-- EKLE -->
+  <section id="tab-ekle" class="card">
+    <div class="row row2">
+      <div>
+        <label for="amount">Tutar (ALL)</label>
+        <input id="amount" inputmode="numeric" pattern="[0-9]*" placeholder="Örn: 1250" autocomplete="off">
+        <div class="hint">Sadece sayılar. Sistem otomatik <span class="kbd">L</span> ile formatlar.</div>
+      </div>
+      <div>
+        <label for="category">Kategori</label>
+        <select id="category"></select>
+        <input id="customCat" class="hidden" placeholder="Kategori adı (manuel)">
+      </div>
+      <div class="row">
+        <div>
+          <label for="note">Not (opsiyonel)</label>
+          <textarea id="note" placeholder="Kısa bir not..."></textarea>
+        </div>
+      </div>
+      <div>
+        <label for="photo">Fotoğraf (opsiyonel)</label>
+        <input id="photo" type="file" accept="image/*" capture="environment">
+        <div class="hint">Fotoğraf e-posta raporuna dahil edilmez. Uygulama içinde küçük önizleme gösterilir.</div>
+      </div>
+    </div>
+    <div class="hr"></div>
+    <div class="grid-2">
+      <button id="addBtn" class="btn">Listeye Ekle</button>
+      <button id="clearFormBtn" class="btn secondary">Formu Temizle</button>
+    </div>
+    <div class="totals">
+      <div class="chip" id="todaySum">Bugün: L 0</div>
+      <div class="chip" id="totalSum">Toplam: L 0</div>
+      <div class="chip" id="countChip">Kayıt: 0</div>
+    </div>
+  </section>
+
+  <!-- LİSTE -->
+  <section id="tab-liste" class="card hidden">
+    <div class="grid-2" style="margin-bottom:8px">
+      <button id="exportCsv" class="btn ghost">CSV İndir</button>
+      <button id="resetAll" class="btn danger">Tümünü Sil</button>
+    </div>
+    <div id="list" class="list"></div>
+    <div class="note">Kayıtlar cihazınızda saklanır (localStorage). Büyük fotoğraflar otomatik sıkıştırılır.</div>
+  </section>
+
+  <!-- GÖNDER -->
+  <section id="tab-gonder" class="card hidden">
+    <div class="row row2">
+      <div>
+        <label for="fromName">Gönderen Adı (opsiyonel)</label>
+        <input id="fromName" placeholder="Adınız">
+      </div>
+    </div>
+
+    <div class="hr"></div>
+    <label for="preview">E-posta İçeriği (önizleme)</label>
+    <textarea id="preview" class="textarea" spellcheck="false"></textarea>
+    <div class="grid-2" style="margin-top:8px">
+      <button id="copyPreview" class="btn secondary">Önizlemeyi Kopyala</button>
+      <button id="sendEmail" class="btn">E-postayı Gönder</button>
+    </div>
+    <div class="hr"></div>
+
+    <h3>Toplu Rapor Oluştur</h3>
+    <div class="note">Daha önce gönderdiğiniz e-postalardaki metinleri buraya peş peşe yapıştırın. Uygulama <span class="kbd">DATA:</span> satırlarını okuyup rapor çıkarır.</div>
+    <textarea id="bulkArea" class="textarea" placeholder="Birden çok e-posta gövdesini buraya yapıştırın..." style="min-height:160px"></textarea>
+    <div class="grid-2" style="margin-top:8px">
+      <button id="makeReport" class="btn warn">Raporu Oluştur</button>
+      <button id="clearBulk" class="btn ghost">Alanı Temizle</button>
+    </div>
+    <div id="reportOut" class="list" style="margin-top:12px"></div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<footer>© ANDI — veriler cihazınızda tutulur • E-posta gönderimi EmailJS ile gömülü olarak yapılır.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+/* === EmailJS Sabitleri (GÖMÜLÜ) === */
+const EMAILJS_PUB = "4RID-TTjlORGDwBcs";
+const EMAILJS_SERVICE = "service_l0jmbli";
+const EMAILJS_TEMPLATE = "template_qdlsgdb";
+const EMAIL_TO = "panzlife@gmail.com";
+
+/* ===== Utils ===== */
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+
+const CATS = [
+  "Manuel (kendim yazacağım)","Ev Kirası","Elektrik Faturası","Su Faturası","İnternet Faturası",
+  "Ev için Yemek","Dışarıda Yemek","Deterjanlar / Temizlik","Kıyafet","Ulaşım","Yakıt / Akaryakıt",
+  "Telefon / GSM","Sağlık / İlaç","Eğlence","Hediye","Çocuk / Eğitim","Ev Bakım / Onarım",
+  "Ev Eşyası","Abonelikler","Diğer"
+];
+
+const store = {
+  get(){ try{return JSON.parse(localStorage.getItem('andi_expenses_v1')||'[]')}catch(e){return[]} },
+  set(a){ localStorage.setItem('andi_expenses_v1', JSON.stringify(a)) }
+};
+
+function fmtALL(n){ const s=Math.round(n||0).toString(); return 'L '+s.replace(/\B(?=(\d{3})+(?!\d))/g,' ') }
+function parseIntSafe(str){ if(!str) return 0; const n=parseInt(String(str).replace(/[^\d]/g,''),10); return isNaN(n)?0:n }
+function nowISO(){ return new Date().toISOString() }
+function ymdhm(d){ const dt=(d instanceof Date?d:new Date(d)); const p=n=>String(n).padStart(2,'0'); return dt.getFullYear()+'-'+p(dt.getMonth()+1)+'-'+p(dt.getDate())+' '+p(dt.getHours())+':'+p(dt.getMinutes()) }
+function toast(msg, ok=true){ const el=$('#toast'); el.textContent=msg; el.style.display='block'; el.style.borderColor=ok?'#1f3':'#732'; el.style.color=ok?'#b9ffe5':'#ffd1d1'; clearTimeout(window._t); window._t=setTimeout(()=>el.style.display='none',2200) }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7) }
+
+// Image compress to dataURL (max 1600px)
+function compressImage(file, max=1600, quality=.75){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>{ const img=new Image(); img.onload=()=>{
+      const c=document.createElement('canvas'),x=c.getContext('2d'); let {width:w,height:h}=img;
+      const ratio=Math.min(1,max/Math.max(w,h)); w=Math.round(w*ratio); h=Math.round(h*ratio);
+      c.width=w; c.height=h; x.drawImage(img,0,0,w,h);
+      try{ res(c.toDataURL('image/jpeg',quality)) }catch(e){ rej(e) }
+    }; img.onerror=rej; img.src=r.result }; r.onerror=rej; r.readAsDataURL(file);
+  });
+}
+
+/* ===== State ===== */
+let items = store.get();
+let editingId = null;
+
+/* ===== Tabs ===== */
+$$('.tabBtn').forEach(btn=>btn.addEventListener('click',()=>{
+  $$('.tabBtn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  const tab=btn.dataset.tab; ['ekle','liste','gonder'].forEach(id=>$('#tab-'+id).classList.add('hidden')); $('#tab-'+tab).classList.remove('hidden');
+  if(tab==='gonder') buildPreview(); if(tab==='liste') renderList();
+}));
+
+/* ===== Init categories ===== */
+(function(){
+  const sel=$('#category'); CATS.forEach(c=>{ const o=document.createElement('option'); o.value=o.textContent=c; sel.appendChild(o) });
+})();
+
+$('#category').addEventListener('change',e=>{
+  const isManual=e.target.value.startsWith('Manuel'); $('#customCat').classList.toggle('hidden',!isManual);
+});
+
+/* ===== Form actions ===== */
+$('#clearFormBtn').addEventListener('click', ()=>{
+  $('#amount').value=''; $('#category').value=CATS[0]; $('#customCat').classList.add('hidden'); $('#customCat').value=''; $('#note').value=''; $('#photo').value=''; editingId=null; toast('Form temizlendi');
+});
+
+$('#addBtn').addEventListener('click', async ()=>{
+  const amt=parseIntSafe($('#amount').value); if(!amt){ toast('Lütfen tutar girin',false); return; }
+  let cat=$('#category').value;
+  if(cat.startsWith('Manuel')){ const cc=($('#customCat').value||'').trim(); if(!cc){ toast('Manuel kategori adını yazın',false); return } cat=cc }
+  const note=($('#note').value||'').trim();
+  let photoData=null; const file=$('#photo').files[0];
+  if(file){ try{ photoData=await compressImage(file,1280,.72) }catch(e){ console.warn(e); toast('Foto sıkıştırma başarısız (yoksayılıyor)',false) } }
+
+  if(editingId){ const i=items.findIndex(x=>x.id===editingId); if(i>-1){ items[i]={...items[i],amount:amt,category:cat,note,photo:photoData||items[i].photo} } editingId=null; toast('Kayıt güncellendi') }
+  else{ items.push({id:uid(),ts:nowISO(),amount:amt,category:cat,note,photo:photoData}); toast('Listeye eklendi') }
+
+  store.set(items); $('#amount').value=''; $('#note').value=''; $('#photo').value=''; $('#customCat').value=''; updateTotals(); renderList();
+});
+
+function updateTotals(){
+  const total=items.reduce((a,b)=>a+(b.amount||0),0);
+  const today=new Date().toISOString().slice(0,10);
+  const todaySum=items.filter(x=>x.ts.slice(0,10)===today).reduce((a,b)=>a+(b.amount||0),0);
+  $('#totalSum').textContent='Toplam: '+fmtALL(total);
+  $('#todaySum').textContent='Bugün: '+fmtALL(todaySum);
+  $('#countChip').textContent='Kayıt: '+items.length;
+}
+updateTotals();
+
+/* ===== Render list ===== */
+function renderList(){
+  const wrap=$('#list'); wrap.innerHTML='';
+  if(items.length===0){ wrap.innerHTML='<div class="note">Henüz kayıt yok.</div>'; return }
+  items.slice().reverse().forEach(entry=>{
+    const d=document.createElement('div'); d.className='item';
+    const img=document.createElement(entry.photo?'img':'div'); img.className='thumb';
+    if(entry.photo){ img.src=entry.photo } else { img.style.display='grid'; img.style.placeItems='center'; img.textContent='—'; img.style.color='#456' }
+    const mid=document.createElement('div');
+    mid.innerHTML='<div class="cat">'+escapeHtml(entry.category)+'</div><div class="meta">'+ymdhm(entry.ts)+(entry.note?(' • '+escapeHtml(entry.note)):'')+'</div>';
+    const right=document.createElement('div'); right.style.textAlign='right';
+    right.innerHTML='<div class="amt">'+fmtALL(entry.amount)+'</div><div class="actions" style="margin-top:6px"><button class="btn ghost" data-act="edit">Düzenle</button><button class="btn danger" data-act="del">Sil</button></div>';
+    d.appendChild(img); d.appendChild(mid); d.appendChild(right);
+    d.querySelector('[data-act="edit"]').addEventListener('click',()=>{
+      $('#amount').value=String(entry.amount); $('#note').value=entry.note||'';
+      if(CATS.includes(entry.category)){ $('#category').value=entry.category; $('#customCat').classList.add('hidden'); $('#customCat').value='' }
+      else{ $('#category').value=CATS[0]; $('#customCat').classList.remove('hidden'); $('#customCat').value=entry.category }
+      editingId=entry.id; toast('Düzenleme modunda. Güncellemek için "Listeye Ekle".');
+      $$('.tabBtn').forEach(b=>b.classList.remove('active')); document.querySelector('[data-tab="ekle"]').classList.add('active');
+      ['ekle','liste','gonder'].forEach(id=>$('#tab-'+id).classList.add('hidden')); $('#tab-ekle').classList.remove('hidden');
+    });
+    d.querySelector('[data-act="del"]').addEventListener('click',()=>{
+      if(confirm('Bu kaydı silmek istiyor musunuz?')){ items=items.filter(x=>x.id!==entry.id); store.set(items); renderList(); updateTotals(); toast('Kayıt silindi') }
+    });
+    wrap.appendChild(d);
+  });
+}
+
+$('#resetAll').addEventListener('click',()=>{
+  if(!confirm('Tüm kayıtlar silinsin mi? Bu işlem geri alınamaz.')) return;
+  items=[]; store.set(items); renderList(); updateTotals(); toast('Tüm kayıtlar silindi');
+});
+
+/* ===== CSV export ===== */
+$('#exportCsv').addEventListener('click',()=>{
+  const rows=[['id','tarih','kategori','tutar_ALL','not']].concat(items.map(x=>[x.id,ymdhm(x.ts),x.category,x.amount,(x.note||'').replace(/\n/g,' ')]));
+  const csv=rows.map(r=>r.map(v=>String(v).includes(',')?('"'+String(v).replace(/"/g,'""')+'"'):v).join(',')).join('\n');
+  download('andi-harcamalar.csv',csv,'text/csv;charset=utf-8');
+});
+function download(name,data,type){ const blob=new Blob([data],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url); a.remove()},0) }
+
+/* ===== Email preview & send ===== */
+function buildEmailPayload(){
+  const total=items.reduce((a,b)=>a+(b.amount||0),0);
+  const payload={ver:1,created_at:nowISO(),count:items.length,total_all:total,entries:items.map(x=>({ts:x.ts,amount:x.amount,category:x.category,note:x.note||''}))};
+  const lines=[];
+  lines.push('ANDI-HARCAMA v1');
+  lines.push('Tarih: '+ymdhm(payload.created_at));
+  lines.push('Toplam Kayıt: '+payload.count);
+  lines.push('Toplam Tutar: '+fmtALL(payload.total_all));
+  lines.push('');
+  lines.push('Kayıtlar:');
+  payload.entries.forEach((e,i)=>{ lines.push(${i+1}) ${ymdhm(e.ts)} | ${e.category} | ${fmtALL(e.amount)}${e.note?(' | Not: '+e.note):''}) });
+  lines.push('');
+  lines.push('DATA: '+btoa(unescape(encodeURIComponent(JSON.stringify(payload)))));
+  const body=lines.join('\n');
+  const subject=Andi Harcama Kayıtları — ${ymdhm(payload.created_at)} — ${payload.count} kayıt;
+  return {subject,body};
+}
+function buildPreview(){ const {subject,body}=buildEmailPayload(); $('#preview').value=Konu: ${subject}\n\n${body} }
+$('#copyPreview').addEventListener('click',()=>{ $('#preview').select(); document.execCommand('copy'); toast('Önizleme kopyalandı') });
+
+/* === EmailJS send === */
+$('#sendEmail').addEventListener('click', async ()=>{
+  const {subject,body}=buildEmailPayload();
+  try{
+    if(window.emailjs && !window._ejInit){ emailjs.init(EMAILJS_PUB); window._ejInit=true; }
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      to_email: EMAIL_TO,
+      from_name: ($('#fromName').value||'').trim() || 'Andi Harcamaları',
+      subject, message: body
+    });
+    toast('E-posta gönderildi ✓',true);
+  }catch(e){ console.error(e); toast('Gönderim başarısız: '+(e?.text||e?.message||'Hata'),false) }
+});
+
+/* ===== Bulk report ===== */
+$('#makeReport').addEventListener('click',()=>{
+  const txt=$('#bulkArea').value;
+  const dataLines=(txt.match(/^DATA:\s*.*/gmi)||[]);
+  if(dataLines.length===0){ toast('DATA satırı bulunamadı. Doğru içeriği yapıştırdığınızdan emin olun.',false); return }
+  const all=[];
+  for(const line of dataLines){
+    const b64=line.split('DATA:')[1].trim();
+    try{ const json=JSON.parse(decodeURIComponent(escape(atob(b64)))); if(Array.isArray(json.entries)) all.push(...json.entries) }catch(e){}
+  }
+  if(all.length===0){ toast('Veri çözümlenemedi.',false); return }
+  const byCat={}, byMonth={};
+  all.forEach(e=>{ byCat[e.category]=(byCat[e.category]||0)+(e.amount||0); const m=(e.ts||'').slice(0,7); byMonth[m]=(byMonth[m]||0)+(e.amount||0) });
+  const out=$('#reportOut'); out.innerHTML='';
+  const b1=document.createElement('div'); b1.className='card'; b1.style.padding='12px'; b1.innerHTML='<div class="cat">Kategori Toplamları</div>';
+  for(const [k,v] of Object.entries(byCat).sort((a,b)=>b[1]-a[1])){ const r=document.createElement('div'); r.style.display='flex'; r.style.justifyContent='space-between'; r.style.padding='6px 0'; r.innerHTML=<span class="tag">${escapeHtml(k)}</span><span class="amt">${fmtALL(v)}</span>; b1.appendChild(r) }
+  const b2=document.createElement('div'); b2.className='card'; b2.style.padding='12px'; b2.style.marginTop='10px'; b2.innerHTML='<div class="cat">Aylık Toplamlar</div>';
+  for(const [k,v] of Object.entries(byMonth).sort()){ const r=document.createElement('div'); r.style.display='flex'; r.style.justifyContent='space-between'; r.style.padding='6px 0'; r.innerHTML=<span class="tag">${k}</span><span class="amt">${fmtALL(v)}</span>; b2.appendChild(r) }
+  out.appendChild(b1); out.appendChild(b2);
+  const rows=[['tip','anahtar','tutar_ALL']].concat(Object.entries(byCat).map(([k,v])=>['kategori',k,v])).concat(Object.entries(byMonth).map(([k,v])=>['ay',k,v]));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const btn=document.createElement('button'); btn.className='btn ghost'; btn.textContent='Rapor CSV İndir'; btn.style.marginTop='10px';
+  btn.addEventListener('click',()=>download('andi-rapor.csv',csv,'text/csv;charset=utf-8'));
+  out.appendChild(btn);
+  toast('Rapor hazır ✓');
+});
+$('#clearBulk').addEventListener('click',()=>$('#bulkArea').value='');
+
+/* ===== Helpers ===== */
+function escapeHtml(str=''){ return str.replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s])) }
+
+/* init */
+renderList(); buildPreview();
+</script>
+</body>
+</html>
