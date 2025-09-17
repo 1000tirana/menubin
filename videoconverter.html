@@ -1,171 +1,327 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Süper Basit Video Bul & İndir</title>
-<style>
-  :root{--g:12px;--r:12px}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45;background:#0f1115;color:#e9eef5}
-  header{position:sticky;top:0;z-index:10;background:#0b0d12;border-bottom:1px solid #262b36;padding:16px}
-  h1{margin:0 0 6px;font-size:18px}
-  small{color:#9fb0c6}
-  main{max-width:900px;margin:0 auto;padding:16px}
-  .card{background:#121624;border:1px solid #283045;border-radius:var(--r);padding:14px;margin-bottom:var(--g)}
-  label{display:block;margin:0 0 8px}
-  textarea{width:100%;min-height:200px;background:#0c1019;color:#e9eef5;border:1px solid #2b3242;border-radius:10px;padding:12px;resize:vertical}
-  button{width:100%;margin-top:8px;padding:12px;border:0;border-radius:10px;background:#2f6fed;color:#fff;font-weight:700;cursor:pointer}
-  .hint{font-size:13px;color:#9fb0c6;margin-top:6px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--g)}
-  .item{background:#0d1320;border:1px solid #27324a;border-radius:12px;padding:12px}
-  .item strong{display:block;margin-bottom:6px}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
-  .tag{font-size:12px;color:#9fb0c6}
-  .actions{display:flex;gap:8px;margin-top:10px}
-  .copy{flex:1;background:#1f2533;border-radius:10px;padding:10px;font-weight:700;text-align:center}
-  .dl{flex:1;text-decoration:none}
-  .dl > button{width:100%}
-  .warn{background:#201314;border:1px solid #5f2024;color:#ffb3b8;padding:8px 10px;border-radius:8px;font-size:13px;margin-top:10px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Bul & MP4’e Çevir</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:24px;line-height:1.4;background:#0b0d10;color:#e6e6e6}
+    h1{font-size:20px;margin:0 0 16px}
+    .card{background:#13171c;border:1px solid #22272e;border-radius:12px;padding:16px;margin:12px 0}
+    label{display:block;font-size:13px;margin:6px 0}
+    input,button,textarea{width:100%;box-sizing:border-box;border-radius:10px;border:1px solid #2b3240;background:#0f1318;color:#fff;padding:10px}
+    input::placeholder{color:#8a8f98}
+    button{cursor:pointer;font-weight:600}
+    button.primary{background:#2a6df1;border-color:#2a6df1}
+    button:disabled{opacity:.6;cursor:default}
+    .row{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:720px){.row{grid-template-columns:2fr 1fr}}
+    .list{display:grid;gap:12px}
+    .pill{display:inline-block;background:#1b212a;border:1px solid #2b3240;border-radius:999px;padding:4px 10px;font-size:12px;margin-right:6px}
+    .muted{color:#a7aeb9;font-size:13px}
+    .flex{display:flex;gap:8px;flex-wrap:wrap}
+    video{max-width:100%;border-radius:8px;border:1px solid #2b3240;background:#000}
+    .log{white-space:pre-wrap;background:#0f1318;border:1px dashed #2b3240;border-radius:10px;padding:10px;font-size:12px;max-height:180px;overflow:auto}
+  </style>
 </head>
 <body>
-<header>
-  <h1>Süper Basit Video Bul & İndir</h1>
-  <small>Yalnızca hak sahibi olduğun videoları indir. DRM/HLS/CORS kısıtları aşılmaz.</small>
-</header>
-
-<main>
+  <h1>Video Bul & MP4’e Çevir</h1>
   <div class="card">
-    <label>Hedef sayfanın <b>kaynak HTML</b>’sini veya gömülü player HTML’sini buraya yapıştır</label>
-    <textarea id="input" placeholder="Örn: &lt;video&gt;&lt;source src='https://.../dosya.mp4'&gt;&lt;/video&gt; ..."></textarea>
-    <button id="scanBtn">Tara</button>
-    <div class="hint">İpucu: Sayfada “Kaynak Görüntüle” (veya geliştirici araçları) ile HTML’yi kopyala → buraya yapıştır → Tara.</div>
+    <div class="row">
+      <div>
+        <label>Sayfa URL’si</label>
+        <input id="pageUrl" placeholder="https://ornek-site.com/makale-123" />
+      </div>
+      <div>
+        <label>Proxy URL (opsiyonel)</label>
+        <input id="proxyUrl" placeholder="https://senin-proxy.domain/ (Cloudflare Worker)" />
+      </div>
+    </div>
+    <div class="flex" style="margin-top:10px">
+      <button class="primary" id="scanBtn">Sayfayı Tara</button>
+      <button id="clearBtn">Temizle</button>
+    </div>
+    <p class="muted" style="margin-top:8px">
+      İpucu: CORS izinli olmayan siteler için <b>Proxy URL</b> kullan. Aşağıda Cloudflare Worker kodu mevcut.
+    </p>
+    <div id="status" class="muted"></div>
   </div>
 
   <div class="card">
-    <strong>Sonuçlar</strong>
-    <div id="counts" class="hint" style="margin:6px 0 10px"></div>
-    <div id="results" class="grid"></div>
-    <div id="none" class="hint">Henüz bir şey bulunmadı.</div>
-    <div id="hlsWarn" class="warn" style="display:none">Bazı bağlantılar <b>M3U8/HLS</b> veya <b>MPD/DASH</b> olabilir. Bunlar tek dosya değildir; mobil tarayıcıda doğrudan indirme genelde mümkün olmaz.</div>
+    <h2 style="margin-top:0;font-size:16px">Bulunan Videolar</h2>
+    <div id="results" class="list"></div>
   </div>
 
   <div class="card">
-    <button id="fillDemo">Demo veri yükle (çalıştığını test et)</button>
+    <h2 style="margin-top:0;font-size:16px">Günlük / Log</h2>
+    <div id="log" class="log"></div>
   </div>
-</main>
 
-<script>
-/* ——— Yardımcılar ——— */
-const $ = s => document.querySelector(s);
-const input = $('#input'), resultsEl = $('#results'), countsEl = $('#counts');
-const noneEl = $('#none'), hlsWarn = $('#hlsWarn');
+  <!-- ffmpeg.wasm -->
+  <script type="module">
+    import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js';
 
-/* .mp4 .webm .ogg .m3u8 .mpd url’lerini ham metin içinde de bul */
-const RX_URL = /(https?:\/\/[^\s"'<>]+?\.(?:mp4|webm|og(?:g|v)|m3u8|mpd))(?:[^\s"'<>]*)/ig;
-const uniq = a => [...new Set(a)];
-function extMeta(u){
-  try{
-    const p = new URL(u, location.href).pathname.toLowerCase();
-    if(p.endsWith('.mp4'))  return {ext:'mp4'};
-    if(p.endsWith('.webm')) return {ext:'webm'};
-    if(p.endsWith('.ogg')||p.endsWith('.ogv')) return {ext:'ogg'};
-    if(p.endsWith('.m3u8')) return {ext:'m3u8', hls:true};
-    if(p.endsWith('.mpd'))  return {ext:'mpd', dash:true};
-  }catch{}
-  return {ext:''};
-}
-function fname(u){
-  try{ const n=new URL(u, location.href).pathname.split('/').pop()||'video'; return n.split('?')[0]||'video'; }
-  catch{ return 'video'; }
-}
+    const logEl = document.getElementById('log');
+    const resultsEl = document.getElementById('results');
+    const statusEl = document.getElementById('status');
+    const scanBtn = document.getElementById('scanBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const pageUrlEl = document.getElementById('pageUrl');
+    const proxyUrlEl = document.getElementById('proxyUrl');
 
-/* DOM’tan topla */
-function fromDOM(html){
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const out = [];
-  const push = v => { if(!v) return; try{ out.push(new URL(v, doc.baseURI||location.href).href); }catch{} };
+    const ffmpeg = createFFmpeg({
+      log: true,
+      corePath: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js'
+    });
+    let ffmpegLoaded = false;
 
-  doc.querySelectorAll('video').forEach(v=>{
-    push(v.getAttribute('src'));
-    v.querySelectorAll('source').forEach(s=>push(s.getAttribute('src')));
-    ['data-src','data-hls','data-mp4','data-webm','data-url','data-file'].forEach(a=>push(v.getAttribute(a)));
-  });
-  doc.querySelectorAll('a[href]').forEach(a=>{
-    const h=a.getAttribute('href');
-    if(/\.(mp4|webm|og[gv]|m3u8|mpd)(\?|#|$)/i.test(h)) push(h);
-  });
-  doc.querySelectorAll('iframe[src]').forEach(i=>push(i.getAttribute('src'))); // bilgi amaçlı
-  return uniq(out);
-}
+    function log(msg){ logEl.textContent += (msg + '\\n'); logEl.scrollTop = logEl.scrollHeight; }
+    function setStatus(msg){ statusEl.textContent = msg || ''; }
 
-/* Metinden topla (script/JSON dahil) */
-function fromText(text){
-  const out=[]; let m; RX_URL.lastIndex=0; while((m=RX_URL.exec(text))!==null) out.push(m[1]);
-  return uniq(out);
-}
+    function withProxy(url, proxyBase){
+      if(!proxyBase) return url; // doğrudan
+      const u = new URL(proxyBase);
+      // Worker kodu örneği bu formatı destekler: https://proxy.example/?u=<ENCODED_URL>
+      const proxied = new URL(u.href);
+      proxied.searchParams.set('u', url);
+      return proxied.href;
+    }
 
-/* Sonuçları yaz */
-function render(list){
-  resultsEl.innerHTML=''; hlsWarn.style.display='none';
-  if(!list.length){ noneEl.style.display='block'; countsEl.textContent=''; return; }
-  noneEl.style.display='none';
+    function normalizeUrl(src, base){
+      try { return new URL(src, base).href; } catch(e){ return src; }
+    }
 
-  let s={mp4:0,webm:0,ogg:0,m3u8:0,mpd:0,other:0}, hasHLS=false;
-  list.forEach(u=>{
-    const m=extMeta(u);
-    if(m.hls){ s.m3u8++; hasHLS=true; }
-    else if(m.dash){ s.mpd++; }
-    else if(m.ext==='mp4') s.mp4++;
-    else if(m.ext==='webm') s.webm++;
-    else if(m.ext==='ogg') s.ogg++;
-    else s.other++;
+    async function fetchText(url){
+      const r = await fetch(url, { credentials:'omit', mode:'cors' });
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return await r.text();
+    }
 
-    const div=document.createElement('div'); div.className='item';
-    div.innerHTML = `
-      <strong>${fname(u)}</strong>
-      <div class="tag">${m.ext ? m.ext.toUpperCase() : 'bilinmeyen/iframe'}</div>
-      <div class="hint" style="margin:6px 0"><code>${u}</code></div>
-      <div class="actions">
-        <a class="dl" href="${u}" download="${fname(u)}"><button>İndir</button></a>
-        <button class="copy" data-url="${u}">Kopyala</button>
-      </div>`;
-    resultsEl.appendChild(div);
-  });
+    function extractCandidates(html, base){
+      const dom = new DOMParser().parseFromString(html, 'text/html');
+      const out = new Map();
 
-  countsEl.textContent = Toplam ${list.length} • MP4:${s.mp4} • WEBM:${s.webm} • OGG:${s.ogg} • HLS:${s.m3u8} • DASH:${s.mpd} • Diğer:${s.other};
-  if(hasHLS) hlsWarn.style.display='block';
+      // <video src>, <video><source>, <source type="video/*">
+      dom.querySelectorAll('video[src]').forEach(v=>{
+        const u = normalizeUrl(v.getAttribute('src'), base);
+        out.set(u, { url:u, why:'<video src>' });
+      });
+      dom.querySelectorAll('video source[src]').forEach(v=>{
+        const u = normalizeUrl(v.getAttribute('src'), base);
+        out.set(u, { url:u, why:'<source>' });
+      });
+      dom.querySelectorAll('source[src][type]').forEach(s=>{
+        const t = (s.getAttribute('type')||'').toLowerCase();
+        if(t.startsWith('video/')){
+          const u = normalizeUrl(s.getAttribute('src'), base);
+          out.set(u, { url:u, why:<source type="${t}"> });
+        }
+      });
 
-  resultsEl.querySelectorAll('.copy').forEach(b=>{
-    b.onclick = async ()=>{
-      try{ await navigator.clipboard.writeText(b.dataset.url);
-        b.textContent='Kopyalandı'; setTimeout(()=>b.textContent='Kopyala',1200);
-      }catch{ alert('Kopyalanamadı'); }
-    };
-  });
-}
+      // OpenGraph
+      dom.querySelectorAll('meta[property="og:video"], meta[property="og:video:url"]').forEach(m=>{
+        const u = normalizeUrl(m.getAttribute('content')||'', base);
+        if(u) out.set(u, { url:u, why:'og:video' });
+      });
 
-/* Olaylar */
-document.getElementById('scanBtn').onclick = ()=>{
-  const text = input.value.trim();
-  if(!text){ alert('Önce HTML/metin yapıştır.'); return; }
-  const urls = uniq([...fromDOM(text), ...fromText(text)]);
-  render(urls);
-};
+      // link rel=video_src
+      dom.querySelectorAll('link[rel="video_src"][href]').forEach(l=>{
+        const u = normalizeUrl(l.getAttribute('href')||'', base);
+        if(u) out.set(u, { url:u, why:'link[rel=video_src]' });
+      });
 
-/* Demo: </script> kırılmasın diye güvenli kaçış uygulanmıştır */
-document.getElementById('fillDemo').onclick = ()=>{
-  const demo = [
-    '<video controls><source src="https://cdn.example.com/fragman-1080p.mp4"></video>',
-    '<a href="https://files.example.com/clip.webm?x=1">indir</a>',
-    // Aşağıdaki iki satır, dış <script> bloğunu bozmamak için kapanışı kaçırır:
-    '<scr'+'ipt>const HLS_URL="https://v.example.com/abc/master.m3u8";</scr'+'ipt>',
-    '<iframe src="https://player.example.com/embed/123"></iframe>'
-  ].join('\n');
-  input.value = demo;
-  alert('Demo veri yüklendi. Şimdi "Tara"ya bas.');
-};
-</script>
+      // Basit heuristik: a[href] ile yaygın uzantılar
+      dom.querySelectorAll('a[href]').forEach(a=>{
+        const href = a.getAttribute('href')||'';
+        const u = normalizeUrl(href, base);
+        if(/\.(mp4|webm|mov|ogv)(\?|#|$)/i.test(u)){
+          out.set(u, { url:u, why:'<a href> (dosya uzantısı)' });
+        }
+        if(/\.m3u8(\?|#|$)/i.test(u)){
+          out.set(u, { url:u, why:'HLS .m3u8 (desteklenmez)' });
+        }
+        if(/youtube\.com|youtu\.be|vimeo\.com/i.test(u)){
+          out.set(u, { url:u, why:'Embed (kısıtlı platform)' });
+        }
+      });
+
+      return Array.from(out.values());
+    }
+
+    function guessType(u){
+      if(/\.mp4(\?|#|$)/i.test(u)) return 'mp4';
+      if(/\.webm(\?|#|$)/i.test(u)) return 'webm';
+      if(/\.mov(\?|#|$)/i.test(u)) return 'mov';
+      if(/\.ogv(\?|#|$)/i.test(u)) return 'ogv';
+      if(/\.m3u8(\?|#|$)/i.test(u)) return 'm3u8';
+      return 'unknown';
+    }
+
+    function makeItemUI(item){
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const type = guessType(item.url);
+      const header = document.createElement('div');
+      header.innerHTML = <span class="pill">${type.toUpperCase()}</span><span class="pill">${item.why}</span>;
+      card.appendChild(header);
+
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = item.url;
+      card.appendChild(p);
+
+      // Önizleme (MP4/WEBM/MOV/OGV ve CORS izinliyse)
+      if(type !== 'm3u8' && type !== 'unknown'){
+        const vid = document.createElement('video');
+        vid.controls = true;
+        vid.src = item.url; // CORS izinli değilse çalışmayabilir
+        vid.playsInline = true;
+        vid.style.maxHeight = '260px';
+        card.appendChild(vid);
+      } else {
+        const warn = document.createElement('div');
+        warn.className = 'muted';
+        warn.textContent = (type==='m3u8')
+          ? 'HLS (.m3u8) tarayıcı içi dönüştürme desteklenmiyor.'
+          : 'Biçim tespit edilemedi. Yine de indirmeyi deneyebilirsin.';
+        card.appendChild(warn);
+      }
+
+      // Butonlar
+      const row = document.createElement('div');
+      row.className = 'flex';
+      const dlBtn = document.createElement('button');
+      dlBtn.textContent = 'İndir (orijinal)';
+      dlBtn.onclick = ()=>downloadOriginal(item.url);
+      row.appendChild(dlBtn);
+
+      if(type !== 'mp4' && type !== 'm3u8'){
+        const cvBtn = document.createElement('button');
+        cvBtn.className = 'primary';
+        cvBtn.textContent = 'MP4’e Çevir ve İndir';
+        cvBtn.onclick = ()=>convertToMp4(item.url);
+        row.appendChild(cvBtn);
+      } else if(type === 'mp4') {
+        const info = document.createElement('span');
+        info.className = 'muted';
+        info.textContent = 'Bu video zaten MP4.';
+        row.appendChild(info);
+      }
+      card.appendChild(row);
+
+      // Kısıtlı platform uyarısı
+      if(/youtube\.com|youtu\.be|vimeo\.com/i.test(item.url)){
+        const warn = document.createElement('p');
+        warn.className = 'muted';
+        warn.textContent = 'Bu tür platformlar kullanım şartları nedeniyle desteklenmez.';
+        card.appendChild(warn);
+      }
+
+      return card;
+    }
+
+    async function downloadOriginal(url){
+      try{
+        log('İndiriliyor: ' + url);
+        const r = await fetch(url);
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        const blob = await r.blob();
+        const a = document.createElement('a');
+        const ext = (blob.type && blob.type.includes('mp4')) ? 'mp4' :
+                    (blob.type && blob.type.includes('webm')) ? 'webm' :
+                    (blob.type && blob.type.includes('ogg')) ? 'ogv' :
+                    (blob.type && blob.type.includes('quicktime')) ? 'mov' : 'bin';
+        const filename = 'video.' + ext;
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        log('İndirildi: ' + filename);
+      }catch(e){
+        log('İndirme hatası: ' + e.message);
+        alert('İndirme başarısız olabilir (CORS). Gerekirse Proxy kullan.');
+      }
+    }
+
+    async function ensureFFmpeg(){
+      if(ffmpegLoaded) return;
+      setStatus('FFmpeg yükleniyor (ilk kullanımda biraz sürebilir)…');
+      log('FFmpeg core indiriliyor…');
+      await ffmpeg.load();
+      ffmpegLoaded = true;
+      setStatus('');
+      log('FFmpeg hazır.');
+    }
+
+    async function convertToMp4(url){
+      try{
+        await ensureFFmpeg();
+        log('Video alınıyor: ' + url);
+        const r = await fetch(url);
+        if(!r.ok) throw new Error('HTTP ' + r.status);
+        const blob = await r.blob();
+        const inName = 'input.' + (guessType(url) || 'bin');
+        const outName = 'output.mp4';
+
+        log('FFmpeg’e yazılıyor…');
+        ffmpeg.FS('writeFile', inName, new Uint8Array(await blob.arrayBuffer()));
+
+        // Basit ve uyumlu bir profil: h264 + aac
+        log('Dönüştürme başladı…');
+        await ffmpeg.run('-i', inName, '-c:v', 'libx264', '-preset', 'fast', '-movflags', 'faststart', '-c:a', 'aac', '-b:a', '128k', outName);
+
+        log('Çıktı okunuyor…');
+        const data = ffmpeg.FS('readFile', outName);
+        const outBlob = new Blob([data.buffer], { type:'video/mp4' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(outBlob);
+        a.download = 'converted.mp4';
+        a.click();
+        URL.revokeObjectURL(a.href);
+        log('Dönüşüm tamam: converted.mp4');
+      }catch(e){
+        log('Dönüştürme hatası: ' + e.message);
+        alert('Dönüştürme başarısız olabilir. CORS veya biçim desteklenmiyor olabilir.');
+      }
+    }
+
+    async function scan(){
+      resultsEl.innerHTML = '';
+      const pageUrl = pageUrlEl.value.trim();
+      const proxyBase = proxyUrlEl.value.trim();
+
+      if(!pageUrl){ alert('Sayfa URL’si gir.'); return; }
+      setStatus('Sayfa indiriliyor…');
+      log('Sayfa indiriliyor: ' + pageUrl);
+
+      try{
+        const target = withProxy(pageUrl, proxyBase||null);
+        const html = await fetchText(target);
+        setStatus('Sayfa çözümleniyor…');
+        const items = extractCandidates(html, pageUrl);
+
+        if(items.length === 0){
+          setStatus('Video bulunamadı.');
+          log('Aday video bağlantısı bulunamadı.');
+          return;
+        }
+        setStatus(${items.length} aday bulundu.);
+        items.forEach(it=>{
+          resultsEl.appendChild(makeItemUI(it));
+        });
+      }catch(e){
+        setStatus('Hata: ' + e.message);
+        log('Taramada hata: ' + e.message + ' (CORS olabilir — Proxy kullan)');
+      }
+    }
+
+    scanBtn.addEventListener('click', scan);
+    clearBtn.addEventListener('click', ()=>{
+      resultsEl.innerHTML = '';
+      logEl.textContent = '';
+      statusEl.textContent = '';
+    });
+  </script>
 </body>
 </html>
