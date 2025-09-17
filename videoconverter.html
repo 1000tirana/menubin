@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Süper Basit Video Bul & İndir (yalnız yapıştır)</title>
+<title>Süper Basit Video Bul & İndir</title>
 <style>
   :root{--g:12px;--r:12px}
   *{box-sizing:border-box}
@@ -14,7 +14,7 @@
   main{max-width:900px;margin:0 auto;padding:16px}
   .card{background:#121624;border:1px solid #283045;border-radius:var(--r);padding:14px;margin-bottom:var(--g)}
   label{display:block;margin:0 0 8px}
-  textarea{width:100%;min-height:180px;background:#0c1019;color:#e9eef5;border:1px solid #2b3242;border-radius:10px;padding:12px;resize:vertical}
+  textarea{width:100%;min-height:200px;background:#0c1019;color:#e9eef5;border:1px solid #2b3242;border-radius:10px;padding:12px;resize:vertical}
   button{width:100%;margin-top:8px;padding:12px;border:0;border-radius:10px;background:#2f6fed;color:#fff;font-weight:700;cursor:pointer}
   .hint{font-size:13px;color:#9fb0c6;margin-top:6px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--g)}
@@ -27,7 +27,6 @@
   .dl{flex:1;text-decoration:none}
   .dl > button{width:100%}
   .warn{background:#201314;border:1px solid #5f2024;color:#ffb3b8;padding:8px 10px;border-radius:8px;font-size:13px;margin-top:10px}
-  .ok{background:#122114;border:1px solid #275a2a;color:#c7f3c9;padding:8px 10px;border-radius:8px;font-size:13px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -35,13 +34,13 @@
   <h1>Süper Basit Video Bul & İndir</h1>
   <small>Yalnızca hak sahibi olduğun videoları indir. DRM/HLS/CORS kısıtları aşılmaz.</small>
 </header>
+
 <main>
   <div class="card">
-    <label>Sayfanın *kaynak* HTML’sini veya oynatıcı gömülüsünü buraya yapıştır</label>
+    <label>Hedef sayfanın <b>kaynak HTML</b>’sini veya gömülü player HTML’sini buraya yapıştır</label>
     <textarea id="input" placeholder="Örn: &lt;video&gt;&lt;source src='https://.../dosya.mp4'&gt;&lt;/video&gt; ..."></textarea>
     <button id="scanBtn">Tara</button>
-    <div class="hint">İpucu: Hedef sayfada Safari/Chrome → “Paylaş / Kaynak Görüntüle” veya geliştirici araçlarından HTML’yi kopyalayıp buraya yapıştır.</div>
-    <div class="ok" id="demo" style="display:none"></div>
+    <div class="hint">İpucu: Sayfada “Kaynak Görüntüle” (veya geliştirici araçları) ile HTML’yi kopyala → buraya yapıştır → Tara.</div>
   </div>
 
   <div class="card">
@@ -49,7 +48,7 @@
     <div id="counts" class="hint" style="margin:6px 0 10px"></div>
     <div id="results" class="grid"></div>
     <div id="none" class="hint">Henüz bir şey bulunmadı.</div>
-    <div id="hlsWarn" class="warn" style="display:none">Bazı bağlantılar <b>M3U8/HLS</b> veya <b>MPD/DASH</b>. Bunlar tek dosya değildir; mobil tarayıcıda doğrudan indirme genelde olmaz.</div>
+    <div id="hlsWarn" class="warn" style="display:none">Bazı bağlantılar <b>M3U8/HLS</b> veya <b>MPD/DASH</b> olabilir. Bunlar tek dosya değildir; mobil tarayıcıda doğrudan indirme genelde mümkün olmaz.</div>
   </div>
 
   <div class="card">
@@ -58,70 +57,75 @@
 </main>
 
 <script>
+/* ——— Yardımcılar ——— */
 const $ = s => document.querySelector(s);
-const input = $('#input');
-const resultsEl = $('#results');
-const countsEl = $('#counts');
-const noneEl = $('#none');
-const hlsWarn = $('#hlsWarn');
-const demoNote = $('#demo');
+const input = $('#input'), resultsEl = $('#results'), countsEl = $('#counts');
+const noneEl = $('#none'), hlsWarn = $('#hlsWarn');
 
-// ——— ÇEKİRDEK ———
+/* .mp4 .webm .ogg .m3u8 .mpd url’lerini ham metin içinde de bul */
 const RX_URL = /(https?:\/\/[^\s"'<>]+?\.(?:mp4|webm|og(?:g|v)|m3u8|mpd))(?:[^\s"'<>]*)/ig;
-
-function uniq(a){ return [...new Set(a)]; }
+const uniq = a => [...new Set(a)];
 function extMeta(u){
   try{
     const p = new URL(u, location.href).pathname.toLowerCase();
-    if(p.endsWith('.mp4')) return {ext:'mp4', hls:false, dash:false};
-    if(p.endsWith('.webm')) return {ext:'webm', hls:false, dash:false};
-    if(p.endsWith('.ogg')||p.endsWith('.ogv')) return {ext:'ogg', hls:false, dash:false};
-    if(p.endsWith('.m3u8')) return {ext:'m3u8', hls:true, dash:false};
-    if(p.endsWith('.mpd')) return {ext:'mpd', hls:false, dash:true};
+    if(p.endsWith('.mp4'))  return {ext:'mp4'};
+    if(p.endsWith('.webm')) return {ext:'webm'};
+    if(p.endsWith('.ogg')||p.endsWith('.ogv')) return {ext:'ogg'};
+    if(p.endsWith('.m3u8')) return {ext:'m3u8', hls:true};
+    if(p.endsWith('.mpd'))  return {ext:'mpd', dash:true};
   }catch{}
-  return {ext:'', hls:false, dash:false};
+  return {ext:''};
 }
 function fname(u){
   try{ const n=new URL(u, location.href).pathname.split('/').pop()||'video'; return n.split('?')[0]||'video'; }
   catch{ return 'video'; }
 }
+
+/* DOM’tan topla */
 function fromDOM(html){
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const out = [];
   const push = v => { if(!v) return; try{ out.push(new URL(v, doc.baseURI||location.href).href); }catch{} };
+
   doc.querySelectorAll('video').forEach(v=>{
     push(v.getAttribute('src'));
     v.querySelectorAll('source').forEach(s=>push(s.getAttribute('src')));
     ['data-src','data-hls','data-mp4','data-webm','data-url','data-file'].forEach(a=>push(v.getAttribute(a)));
   });
   doc.querySelectorAll('a[href]').forEach(a=>{
-    const h=a.getAttribute('href'); if(/\.(mp4|webm|og[gv]|m3u8|mpd)(\?|#|$)/i.test(h)) push(h);
+    const h=a.getAttribute('href');
+    if(/\.(mp4|webm|og[gv]|m3u8|mpd)(\?|#|$)/i.test(h)) push(h);
   });
   doc.querySelectorAll('iframe[src]').forEach(i=>push(i.getAttribute('src'))); // bilgi amaçlı
   return uniq(out);
 }
+
+/* Metinden topla (script/JSON dahil) */
 function fromText(text){
   const out=[]; let m; RX_URL.lastIndex=0; while((m=RX_URL.exec(text))!==null) out.push(m[1]);
   return uniq(out);
 }
+
+/* Sonuçları yaz */
 function render(list){
   resultsEl.innerHTML=''; hlsWarn.style.display='none';
   if(!list.length){ noneEl.style.display='block'; countsEl.textContent=''; return; }
   noneEl.style.display='none';
-  let s={mp4:0,webm:0,ogg:0,m3u8:0,mpd:0,other:0}, hls=false;
+
+  let s={mp4:0,webm:0,ogg:0,m3u8:0,mpd:0,other:0}, hasHLS=false;
   list.forEach(u=>{
-    const meta=extMeta(u);
-    if(meta.hls){ s.m3u8++; hls=true; }
-    else if(meta.dash){ s.mpd++; }
-    else if(meta.ext==='mp4') s.mp4++;
-    else if(meta.ext==='webm') s.webm++;
-    else if(meta.ext==='ogg') s.ogg++;
+    const m=extMeta(u);
+    if(m.hls){ s.m3u8++; hasHLS=true; }
+    else if(m.dash){ s.mpd++; }
+    else if(m.ext==='mp4') s.mp4++;
+    else if(m.ext==='webm') s.webm++;
+    else if(m.ext==='ogg') s.ogg++;
     else s.other++;
 
     const div=document.createElement('div'); div.className='item';
     div.innerHTML = `
       <strong>${fname(u)}</strong>
-      <div class="tag">${meta.ext ? meta.ext.toUpperCase() : 'bilinmeyen/iframe'}</div>
+      <div class="tag">${m.ext ? m.ext.toUpperCase() : 'bilinmeyen/iframe'}</div>
       <div class="hint" style="margin:6px 0"><code>${u}</code></div>
       <div class="actions">
         <a class="dl" href="${u}" download="${fname(u)}"><button>İndir</button></a>
@@ -129,30 +133,39 @@ function render(list){
       </div>`;
     resultsEl.appendChild(div);
   });
+
   countsEl.textContent = Toplam ${list.length} • MP4:${s.mp4} • WEBM:${s.webm} • OGG:${s.ogg} • HLS:${s.m3u8} • DASH:${s.mpd} • Diğer:${s.other};
-  hlsWarn.style.display = hls ? 'block' : 'none';
+  if(hasHLS) hlsWarn.style.display='block';
 
   resultsEl.querySelectorAll('.copy').forEach(b=>{
-    b.onclick = async ()=>{ try{ await navigator.clipboard.writeText(b.dataset.url); b.textContent='Kopyalandı'; setTimeout(()=>b.textContent='Kopyala',1200);}catch{ alert('Kopyalanamadı'); } };
+    b.onclick = async ()=>{
+      try{ await navigator.clipboard.writeText(b.dataset.url);
+        b.textContent='Kopyalandı'; setTimeout(()=>b.textContent='Kopyala',1200);
+      }catch{ alert('Kopyalanamadı'); }
+    };
   });
 }
 
-// ——— OLAYLAR ———
-$('#scanBtn').onclick = ()=>{
+/* Olaylar */
+document.getElementById('scanBtn').onclick = ()=>{
   const text = input.value.trim();
   if(!text){ alert('Önce HTML/metin yapıştır.'); return; }
   const urls = uniq([...fromDOM(text), ...fromText(text)]);
   render(urls);
 };
-$('#fillDemo').onclick = ()=>{
-  input.value = `<video controls><source src="https://cdn.example.com/fragman-1080p.mp4"></video>
-<script>const HLS="https://v.example.com/abc/master.m3u8";</script>
-<a href="https://files.example.com/clip.webm?x=1">indir</a>
-<iframe src="https://player.example.com/embed/123"></iframe>`;
-  demoNote.style.display='block';
-  demoNote.textContent='Demo veri yüklendi. Şimdi "Tara"ya bas.';
-};
 
+/* Demo: </script> kırılmasın diye güvenli kaçış uygulanmıştır */
+document.getElementById('fillDemo').onclick = ()=>{
+  const demo = [
+    '<video controls><source src="https://cdn.example.com/fragman-1080p.mp4"></video>',
+    '<a href="https://files.example.com/clip.webm?x=1">indir</a>',
+    // Aşağıdaki iki satır, dış <script> bloğunu bozmamak için kapanışı kaçırır:
+    '<scr'+'ipt>const HLS_URL="https://v.example.com/abc/master.m3u8";</scr'+'ipt>',
+    '<iframe src="https://player.example.com/embed/123"></iframe>'
+  ].join('\n');
+  input.value = demo;
+  alert('Demo veri yüklendi. Şimdi "Tara"ya bas.');
+};
+</script>
 </body>
 </html>
-</script>
