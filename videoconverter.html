@@ -3,160 +3,170 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Video Bul & İndir (İstemci Tarafı)</title>
+<title>Video Bul & İndir — Gelişmiş</title>
 <style>
   :root { --gap:12px; --radius:12px; }
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45;margin:0;background:#0f1115;color:#e9eef5}
-  header{padding:20px 16px;border-bottom:1px solid #2a2f3a;background:#0b0d12;position:sticky;top:0}
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.45;margin:0;background:#0f1115;color:#e9eef5}
+  header{padding:18px 16px;border-bottom:1px solid #2a2f3a;background:#0b0d12;position:sticky;top:0;z-index:10}
   h1{font-size:18px;margin:0 0 6px}
   small{color:#a9b6c6}
-  main{max-width:920px;margin:0 auto;padding:18px 16px 40px}
-  .card{background:#121622;border:1px solid #272c39;border-radius:var(--radius);padding:16px;margin-bottom:var(--gap)}
+  main{max-width:980px;margin:0 auto;padding:18px 16px 40px}
+  .card{background:#121622;border:1px solid #272c39;border-radius:var(--radius);padding:14px;margin-bottom:var(--gap)}
   .row{display:flex;flex-wrap:wrap;gap:var(--gap)}
-  .col{flex:1 1 320px;min-width:280px}
+  .col{flex:1 1 360px;min-width:280px}
   label{display:block;margin:0 0 8px;color:#c9d4e3}
-  textarea,input,button{width:100%;box-sizing:border-box}
+  textarea,input,button{width:100%}
   textarea{min-height:160px;padding:12px;border-radius:10px;border:1px solid #2b3242;background:#0c1019;color:#e9eef5;resize:vertical}
   input{padding:10px;border-radius:10px;border:1px solid #2b3242;background:#0c1019;color:#e9eef5}
   button{cursor:pointer;padding:12px 14px;border:0;border-radius:10px;background:#2f6fed;color:white;font-weight:600}
   button.secondary{background:#1f2533}
-  button:disabled{opacity:.5;cursor:not-allowed}
+  button:disabled{opacity:.55;cursor:not-allowed}
   .hint{font-size:13px;color:#9fb0c6;margin-top:6px}
   .results{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--gap)}
-  .pill{display:inline-block;background:#1a2030;border:1px solid #2a3145;color:#b9c7db;border-radius:999px;padding:4px 10px;font-size:12px;margin-right:6px}
   .item{background:#0d1320;border:1px solid #27324a;border-radius:12px;padding:12px}
   .item strong{display:block;margin-bottom:6px;color:#fff}
-  .item code{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;font-size:12px}
-  .actions{display:flex;gap:8px;margin-top:10px}
-  a.dl, .copy{flex:1;text-align:center;text-decoration:none}
-  .copy{background:#1f2535;color:#d7e2f3;border-radius:10px;padding:10px;font-weight:600}
+  .item code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
   .tag{font-size:12px;color:#9fb0c6}
-  footer{max-width:920px;margin:0 auto;padding:24px 16px;color:#9fb0c6}
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .copy{background:#1f2535;color:#d7e2f3;border-radius:10px;padding:10px;font-weight:600;width:100%}
+  .pill{display:inline-block;background:#1a2030;border:1px solid #2a3145;color:#b9c7db;border-radius:999px;padding:4px 10px;font-size:12px;margin-right:6px}
   .warn{background:#201314;border:1px solid #5f2024;color:#ffb3b8;padding:8px 10px;border-radius:8px;font-size:13px}
+  footer{max-width:980px;margin:0 auto;padding:20px 16px;color:#9fb0c6}
 </style>
 </head>
 <body>
 <header>
   <h1>Video Bul & İndir</h1>
-  <small>Yalnızca indirme hakkın olan içerikler için. DRM/HLS/CORS kısıtları bu araçla aşılmaz.</small>
+  <small>Yalnızca indirme hakkın olan içerikler için. DRM/HLS/CORS kısıtlarını aşmaz.</small>
 </header>
+
 <main>
   <div class="card">
     <div class="row">
       <div class="col">
         <label>1) Sayfa Adresi (opsiyonel)</label>
         <input id="pageUrl" placeholder="https://... (CORS açıksa çalışır)">
-        <div class="hint">Birçok site CORS engeli koyar; çalışmazsa sağdaki yöntemle HTML’yi yapıştır.</div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button id="fetchBtn">URL’den Tara</button>
-          <button id="bookmarkletBtn" class="secondary">Sayfada Çalışan Bookmarklet</button>
+          <button id="bookmarkletBtn" class="secondary">Bookmarklet</button>
         </div>
+        <div class="hint">Birçok site CORS kapalıdır; çalışmazsa aşağıdaki “HTML yapıştır” ile deneyin.</div>
       </div>
       <div class="col">
         <label>2) HTML Kaynağını Yapıştır (önerilen)</label>
-        <textarea id="htmlInput" placeholder="Sayfanın kaynak kodunu buraya yapıştır..."></textarea>
+        <textarea id="htmlInput" placeholder="Sayfanın kaynak kodunu veya gömülü player HTML’sini buraya yapıştır..."></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="parseBtn">Yapıştırılan HTML’yi Tara</button>
+          <button id="parseBtn">Yapıştırılan Metni Tara</button>
+          <button id="demoBtn" class="secondary">Demo veri yükle</button>
           <button id="clearBtn" class="secondary">Temizle</button>
         </div>
-        <div class="hint">İpucu: Çoğu oynatıcıda sağ tık &gt; “View page source” veya geliştirici araçlarından kopyalayabilirsin.</div>
+        <div class="hint">Bu sürüm, yalnızca DOM’u değil *ham metni* de tarar; script/JSON/attribute içindeki linkleri yakalar.</div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <strong>Bulunan Videolar</strong>
+    <strong>Bulunan Öğeler</strong>
     <div id="counts" class="hint" style="margin:6px 0 10px"></div>
     <div id="results" class="results"></div>
     <div id="none" class="hint">Henüz bir şey bulunmadı.</div>
     <div id="hlsWarn" class="warn" style="display:none;margin-top:12px">
-      Bazı bağlantılar <b>M3U8/HLS</b> akışıdır (tek MP4 dosyası değildir). Bunları tarayıcıdan doğrudan tek dosya olarak indirmek mümkün olmayabilir.
+      <b>M3U8/HLS</b> veya <b>MPD/DASH</b> akışları tek dosya değildir; mobil tarayıcıda tek tıkla indirme genelde mümkün değildir.
     </div>
   </div>
 </main>
 
 <footer>
   <div class="hint">
-    Desteklenen türler: <span class="pill">.mp4</span><span class="pill">.webm</span><span class="pill">.ogg</span><span class="pill">.m3u8 (HLS)</span><span class="pill">.mpd (DASH)</span><br>
-    İpuçları: ① Gömülü iframe’lerin <code>src</code> adresini de yapıştır. ② <code>&lt;video&gt;</code>/<code>&lt;source&gt;</code> bloklarını doğrudan yapıştırırsan en sağlıklısı.
+    Tanınan uzantılar: <span class="pill">.mp4</span><span class="pill">.webm</span><span class="pill">.ogg</span>
+    <span class="pill">.m3u8</span><span class="pill">.mpd</span> • Ayrıca <span class="pill">&lt;iframe src&gt;</span> listelenir.
   </div>
 </footer>
 
 <script>
-const pageUrl = document.getElementById('pageUrl');
-const htmlInput = document.getElementById('htmlInput');
-const fetchBtn = document.getElementById('fetchBtn');
-const parseBtn = document.getElementById('parseBtn');
-const clearBtn = document.getElementById('clearBtn');
-const resultsEl = document.getElementById('results');
-const noneEl = document.getElementById('none');
-const countsEl = document.getElementById('counts');
-const hlsWarn = document.getElementById('hlsWarn');
-const bookmarkletBtn = document.getElementById('bookmarkletBtn');
+const $ = sel => document.querySelector(sel);
+const pageUrl = $('#pageUrl');
+const htmlInput = $('#htmlInput');
+const fetchBtn = $('#fetchBtn');
+const parseBtn = $('#parseBtn');
+const demoBtn  = $('#demoBtn');
+const clearBtn = $('#clearBtn');
+const resultsEl = $('#results');
+const noneEl = $('#none');
+const countsEl = $('#counts');
+const hlsWarn = $('#hlsWarn');
+const bmBtn = $('#bookmarkletBtn');
 
-const EXT_TYPE = (u)=>{
-  try{
-    const url = new URL(u, location.href);
-    const path = url.pathname.toLowerCase();
-    if (path.endsWith('.mp4')) return {type:'video/mp4', ext:'mp4'};
-    if (path.endsWith('.webm')) return {type:'video/webm', ext:'webm'};
-    if (path.endsWith('.ogg') || path.endsWith('.ogv')) return {type:'video/ogg', ext:'ogg'};
-    if (path.endsWith('.m3u8')) return {type:'application/vnd.apple.mpegurl', ext:'m3u8', hls:true};
-    if (path.endsWith('.mpd')) return {type:'application/dash+xml', ext:'mpd', dash:true};
-    return {type:'', ext:''};
-  }catch(_){ return {type:'', ext:''}; }
-};
+const RX_URL = /(https?:\/\/[^\s"'<>]+?\.(?:mp4|webm|og(?:g|v)|m3u8|mpd))(?:[^\s"'<>]*)/ig;
 
 function uniq(arr){ return Array.from(new Set(arr)); }
 
-function pickName(u){
+function extMeta(u){
   try{
-    const url = new URL(u, location.href);
-    const base = url.pathname.split('/').pop() || 'video';
-    return base.split('?')[0] || 'video';
-  }catch(_){ return 'video'; }
+    const url = new URL(u, location.href); const p = url.pathname.toLowerCase();
+    if (p.endsWith('.mp4')) return {ext:'mp4', type:'video/mp4'};
+    if (p.endsWith('.webm')) return {ext:'webm', type:'video/webm'};
+    if (p.endsWith('.ogg') || p.endsWith('.ogv')) return {ext:'ogg', type:'video/ogg'};
+    if (p.endsWith('.m3u8')) return {ext:'m3u8', type:'application/vnd.apple.mpegurl', hls:true};
+    if (p.endsWith('.mpd')) return {ext:'mpd', type:'application/dash+xml', dash:true};
+  }catch{}
+  return {ext:'', type:''};
 }
 
-function collectFromDoc(doc){
-  const urls = [];
-  const push = v => { if(v && typeof v === 'string'){ try{ urls.push(new URL(v, doc.baseURI||location.href).href); }catch{ /* ignore */ } } };
+function filenameFrom(u){
+  try{
+    const n = new URL(u, location.href).pathname.split('/').pop() || 'video';
+    return n.split('?')[0] || 'video';
+  }catch{ return 'video'; }
+}
 
-  // <video src>, <video><source>, data-* attributes commonly used by players
+function collectFromDOM(doc){
+  const out = [];
+  const push = v => { if(!v) return; try{ out.push(new URL(v, doc.baseURI||location.href).href); }catch{} };
+
+  // video/src + source
   doc.querySelectorAll('video').forEach(v=>{
     push(v.getAttribute('src'));
     v.querySelectorAll('source').forEach(s=>push(s.getAttribute('src')));
-    ['data-src','data-hls','data-mp4','data-webm','data-url'].forEach(a=>push(v.getAttribute(a)));
+    ['data-src','data-hls','data-mp4','data-webm','data-url','data-file'].forEach(a=>push(v.getAttribute(a)));
   });
 
-  // direct links in anchors
+  // anchor href’ler
   doc.querySelectorAll('a[href]').forEach(a=>{
-    const href = a.getAttribute('href');
-    if (/\.(mp4|webm|og[gv]|m3u8|mpd)(\?|#|$)/i.test(href)) push(href);
+    const h=a.getAttribute('href');
+    if(/\.(mp4|webm|og[gv]|m3u8|mpd)(\?|#|$)/i.test(h)) push(h);
   });
 
-  // common script tags that inline playlist urls (very heuristic)
-  doc.querySelectorAll('script').forEach(s=>{
-    const t = s.textContent || '';
-    (t.match(/https?:\/\/[^\s'"]+\.(mp4|webm|og[gv]|m3u8|mpd)[^\s'"]*/gi)||[]).forEach(u=>push(u));
+  // iframe src (bilgi amaçlı)
+  doc.querySelectorAll('iframe[src]').forEach(i=>{
+    const s = i.getAttribute('src');
+    push(s);
   });
 
-  return uniq(urls);
+  return uniq(out);
+}
+
+function collectFromText(text){
+  const out = [];
+  let m; RX_URL.lastIndex = 0;
+  while((m = RX_URL.exec(text)) !== null){
+    out.push(m[1]);
+  }
+  return uniq(out);
 }
 
 function render(urls){
   resultsEl.innerHTML = '';
   let hlsSeen = false;
-  if (!urls.length){
-    noneEl.style.display = 'block';
-    countsEl.textContent = '';
-    hlsWarn.style.display = 'none';
-    return;
+  if(!urls.length){
+    noneEl.style.display='block'; countsEl.textContent=''; hlsWarn.style.display='none'; return;
   }
-  noneEl.style.display = 'none';
+  noneEl.style.display='none';
 
   const summary = {mp4:0, webm:0, ogg:0, m3u8:0, mpd:0, other:0};
   urls.forEach(u=>{
-    const meta = EXT_TYPE(u);
+    const meta = extMeta(u);
     if (meta.hls) { summary.m3u8++; hlsSeen = true; }
     else if (meta.dash) summary.mpd++;
     else if (meta.ext==='mp4') summary.mp4++;
@@ -164,12 +174,12 @@ function render(urls){
     else if (meta.ext==='ogg') summary.ogg++;
     else summary.other++;
 
-    const name = pickName(u);
-    const item = document.createElement('div');
-    item.className = 'item';
-    item.innerHTML = `
+    const name = filenameFrom(u);
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
       <strong>${name}</strong>
-      <div class="tag">${meta.ext ? meta.ext.toUpperCase() : 'bilinmeyen tür'}</div>
+      <div class="tag">${meta.ext ? meta.ext.toUpperCase() : 'bilinmeyen/iframe'}</div>
       <div class="hint" style="margin:6px 0"><code>${u}</code></div>
       <div class="actions">
         <a class="dl" href="${u}" download="${name}" target="_blank" rel="noopener">
@@ -178,88 +188,86 @@ function render(urls){
         <button class="copy" data-url="${u}">Kopyala</button>
       </div>
     `;
-    resultsEl.appendChild(item);
+    resultsEl.appendChild(div);
   });
 
-  countsEl.textContent = Bulunan bağlantılar → MP4:${summary.mp4} • WEBM:${summary.webm} • OGG:${summary.ogg} • HLS(M3U8):${summary.m3u8} • DASH(MPD):${summary.mpd} • Diğer:${summary.other};
+  countsEl.textContent = Toplam: ${urls.length} • MP4:${summary.mp4} • WEBM:${summary.webm} • OGG:${summary.ogg} • HLS:${summary.m3u8} • DASH:${summary.mpd} • Diğer:${summary.other};
   hlsWarn.style.display = hlsSeen ? 'block' : 'none';
 
-  // copy handlers
   resultsEl.querySelectorAll('.copy').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
-      try{
-        await navigator.clipboard.writeText(btn.dataset.url);
-        btn.textContent = 'Kopyalandı';
-        setTimeout(()=>btn.textContent='Kopyala', 1200);
-      }catch(_){
-        alert('Kopyalanamadı.');
-      }
+      try{ await navigator.clipboard.writeText(btn.dataset.url);
+        btn.textContent='Kopyalandı'; setTimeout(()=>btn.textContent='Kopyala',1200);
+      }catch{ alert('Kopyalanamadı.'); }
     });
   });
 }
 
-async function fetchAndParse(url){
+async function fetchURL(u){
   try{
     fetchBtn.disabled = true; fetchBtn.textContent = 'Taranıyor...';
-    const res = await fetch(url, {mode:'cors'}); // çoğu sitede CORS engeli olabilir
+    const res = await fetch(u, {mode:'cors'}); // CORS engellenebilir
     const html = await res.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    const urls = collectFromDoc(doc);
+    const urls = uniq([...collectFromDOM(doc), ...collectFromText(html)]);
     render(urls);
-  }catch(err){
-    alert('Alınamadı (CORS olabilir). HTML kaynağını yapıştırmayı deneyin.');
-    console.error(err);
+    if(!urls.length) alert('Hiç link bulunamadı. Sayfanın DEĞİL, oynatıcının gömülü HTML’sini yapıştırmayı deneyin.');
+  }catch(e){
+    alert('Alınamadı (CORS olabilir). En garantisi: HTML’yi yapıştırıp Tara.');
+    console.error(e);
   }finally{
-    fetchBtn.disabled = false; fetchBtn.textContent = 'URL’den Tara';
+    fetchBtn.disabled=false; fetchBtn.textContent='URL’den Tara';
   }
 }
 
 parseBtn.addEventListener('click', ()=>{
-  const html = htmlInput.value.trim();
-  if(!html){ alert('Önce HTML yapıştır.'); return; }
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  render(collectFromDoc(doc));
+  const text = htmlInput.value.trim();
+  if(!text){ alert('Önce HTML/metin yapıştır.'); return; }
+  const doc = new DOMParser().parseFromString(text, 'text/html');
+  const urls = uniq([...collectFromDOM(doc), ...collectFromText(text)]);
+  render(urls);
 });
 
 fetchBtn.addEventListener('click', ()=>{
   const u = pageUrl.value.trim();
   if(!u){ alert('Önce bir URL yaz.'); return; }
-  fetchAndParse(u);
+  fetchURL(u);
+});
+
+demoBtn.addEventListener('click', ()=>{
+  htmlInput.value =
+`<video controls>
+  <source src="https://cdn.example.com/media/trailer-1080p.mp4">
+</video>
+<script>
+  // Bazı siteler linki script içinde tutar:
+  const PLAYLIST = "https://video.example.com/ab/cd/master.m3u8";
+</script>
+<a href="https://files.example.com/clip.webm?token=xyz">İndir (webm)</a>
+<iframe src="https://player.example.com/embed/12345"></iframe>`;
+  alert('Demo veri eklendi. "Yapıştırılan Metni Tara"ya bas.');
 });
 
 clearBtn.addEventListener('click', ()=>{
-  htmlInput.value = ''; resultsEl.innerHTML=''; noneEl.style.display='block'; countsEl.textContent=''; hlsWarn.style.display='none';
+  htmlInput.value=''; resultsEl.innerHTML=''; noneEl.style.display='block'; countsEl.textContent=''; hlsWarn.style.display='none';
 });
 
-// Bookmarklet rehberi
-bookmarkletBtn.addEventListener('click', ()=>{
-  const code = `
-    (function(){
-      try{
-        const urls = [];
-        const push = u => { if(u && typeof u==='string'){ try{ urls.push(new URL(u, location.href).href); }catch{} } };
-        document.querySelectorAll('video').forEach(v=>{
-          push(v.getAttribute('src'));
-          v.querySelectorAll('source').forEach(s=>push(s.getAttribute('src')));
-          ['data-src','data-hls','data-mp4','data-webm','data-url'].forEach(a=>push(v.getAttribute(a)));
-        });
-        document.querySelectorAll('a[href]').forEach(a=>{
-          const h=a.getAttribute('href');
-          if(/\.(mp4|webm|og[gv]|m3u8|mpd)(\\?|#|$)/i.test(h)) push(h);
-        });
-        const u2 = Array.from(new Set(urls));
-        if(!u2.length){ alert('Video bağlantısı bulunamadı.'); return; }
-        const text = 'Bulunan bağlantılar:\\n\\n' + u2.join('\\n');
-        const w = window.open('', '_blank', 'width=720,height=480');
-        w.document.write('<pre style="white-space:pre-wrap;font:14px/1.5 ui-monospace,monospace;padding:16px">'+text.replace(/[&<>]/g,s=>({ "&":"&amp;","<":"&lt;",">":"&gt;" }[s]))+'</pre>');
-      }catch(e){ alert('Hata: '+e); }
-    })();
-  `.replace(/\n\s+/g,' ');
-  const href = 'javascript:' + encodeURIComponent(code);
-  const help = `
-    <p>Bu metni yer imlerine sürükle: <a href="${href}">▶ Video Bul (Bookmarklet)</a></p>
-    <p>Sonra herhangi bir video sayfasındayken bu yer imine tıkla; sayfada bulunan video linklerini açılan pencerede göreceksin.</p>
-  `;
+// Bookmarklet: sayfanın içinde çalışır (CORS yok). Bulunan linkleri yeni sekmede listeler.
+bmBtn.addEventListener('click', ()=>{
+  const code = `(function(){try{
+    const urls=[];const push=u=>{if(u&&typeof u==='string'){try{urls.push(new URL(u,location.href).href);}catch{}}};
+    document.querySelectorAll('video').forEach(v=>{push(v.getAttribute('src'));v.querySelectorAll('source').forEach(s=>push(s.getAttribute('src')));['data-src','data-hls','data-mp4','data-webm','data-url','data-file'].forEach(a=>push(v.getAttribute(a)));});
+    document.querySelectorAll('a[href]').forEach(a=>{const h=a.getAttribute('href');if(/\\.(mp4|webm|og(?:g|v)|m3u8|mpd)(\\?|#|$)/i.test(h)) push(h);});
+    document.querySelectorAll('iframe[src]').forEach(i=>push(i.getAttribute('src')));
+    const rx=/(https?:\\/\\/[^\\s"'<>]+?\\.(?:mp4|webm|og(?:g|v)|m3u8|mpd))(?:[^\\s"'<>]*)/ig;
+    rx.lastIndex=0; (document.documentElement.outerHTML.match(rx)||[]).forEach(s=>push(s));
+    const out=[...new Set(urls)];
+    if(!out.length){ alert('Video bağlantısı bulunamadı.'); return; }
+    const txt='Bulunan bağlantılar:\\n\\n'+out.join('\\n');
+    const w=window.open('','_blank','width=760,height=520'); w.document.write('<pre style="white-space:pre-wrap;font:14px/1.5 ui-monospace,monospace;padding:16px">'+txt.replace(/[&<>]/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[s]))+'</pre>');
+  }catch(e){ alert('Hata: '+e); }})();`;
+  const href = 'javascript:' + encodeURIComponent(code.replace(/\n\s+/g,' '));
+  const help = '<p>Bu bağlantıyı yer imlerine sürükle: <a href="'+href+'">▶ Video Bul (Bookmarklet)</a></p><p>Hedef sayfadayken yerimine tıkla; linkler yeni pencerede listelenecek.</p>';
   const w = window.open('', '_blank'); w.document.write(help);
 });
 </script>
