@@ -1,188 +1,109 @@
-// ==== Ayarlar & Çeviri ====
-const L = {
-  sq:{ title:"Lista QR", camOn:"Kamera: Hap", camOff:"Kamera: Mbyllur",
-       start:"Start", stop:"Stop", switch:"Ndërro Kamerën", torch:"Dritë",
-       clear:"Pastro", placeholder:"Shkruaj kodin...", add:"Shto",
-       last:"I fundit:", copied:"Kopjuar!", askDel:"A jeni i sigurt për fshirjen?", askClear:"Të pastrohet lista?" },
-  en:{ title:"QR List", camOn:"Camera: On", camOff:"Camera: Off",
-       start:"Start", stop:"Stop", switch:"Switch Camera", torch:"Flash",
-       clear:"Clear", placeholder:"Type a code...", add:"Add",
-       last:"Last:", copied:"Copied!", askDel:"Are you sure to delete?", askClear:"Clear the whole list?" },
-  tr:{ title:"QR Liste", camOn:"Kamera: Açık", camOff:"Kamera: Kapalı",
-       start:"Başlat", stop:"Durdur", switch:"Kamera Değiştir", torch:"Flaş",
-       clear:"Temizle", placeholder:"Kod yaz...", add:"Ekle",
-       last:"Son:", copied:"Kopyalandı!", askDel:"Silmek istediğine emin misin?", askClear:"Liste tamamen temizlensin mi?" },
-};
-const LS_ITEMS = "qrItems_clean_v2";
-const LS_LANG  = "qr_lang";
+const $ = (id)=>document.getElementById(id);
 
-// ==== Kısa yardımcılar ====
-const $  = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-const last4 = s => (s||"").replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase();
+// Sot (etiketë)
+const now = new Date();
+$("today").textContent = now.toLocaleDateString("sq-AL",{day:"2-digit",month:"short",year:"numeric"});
 
-// ==== DOM elemanları ====
-const video = $('#video'), scanFrame = $('#scanFrame'), camStatus = $('#camStatus');
-const startBtn = $('#startBtn'), stopBtn = $('#stopBtn'), switchBtn = $('#switchBtn'), torchBtn = $('#torchBtn'), resetBtn = $('#resetBtn');
-const manualInput = $('#manualInput'), manualAddBtn = $('#manualAddBtn');
-const copyBtn = $('#copyBtn'), waBtn = $('#waBtn');
-const listEl = $('#list'), lastBanner = $('#lastBanner'), lastValue = $('#lastValue');
-const tTitle = $('#t-title'), tLast = $('#t-last');
+// Parazgjedhje: lista popullore nga TIA (ndrysho kur të duash)
+const DEFAULT_DESTS = [
+  "ATH","SKG","BEG","SOF","BUD","VIE","MXP","FCO","BGY","VCE",
+  "PRG","BER","IST","SAW","STN","LGW","BCN","MAD","PSA","FRA","MUC"
+];
+const STORAGE_KEY = "tia_dests_v1";
 
-// ==== Durum ====
-let stream=null, track=null, scanning=false, lastScanAt=0;
-let items=[], seen=new Set(), torchOn=false, facing='environment';
-let lang = localStorage.getItem(LS_LANG) || 'sq';
-
-// ==== Dil ====
-function setLang(x){
-  lang = (x in L) ? x : 'sq';
-  localStorage.setItem(LS_LANG, lang);
-  tTitle.textContent = L[lang].title;
-  tLast.textContent  = L[lang].last;
-  camStatus.textContent = scanning ? L[lang].camOn : L[lang].camOff;
-  startBtn.textContent  = L[lang].start;
-  stopBtn.textContent   = L[lang].stop;
-  switchBtn.textContent = L[lang].switch;
-  torchBtn.textContent  = L[lang].torch;
-  resetBtn.textContent  = L[lang].clear;
-  manualInput.placeholder = L[lang].placeholder;
-  manualAddBtn.textContent = L[lang].add;
-  copyBtn.textContent = (lang==='tr'?'Kopyala':lang==='en'?'Copy':'Kopjo');
+function getDests(){
+  const s = localStorage.getItem(STORAGE_KEY);
+  let arr = s ? s.split(",").map(x=>x.trim().toUpperCase()).filter(Boolean) : DEFAULT_DESTS;
+  arr = Array.from(new Set(arr)); // unik
+  return arr;
 }
-$$('.flags [data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-setLang(lang); // açılışta Arnavutça (varsayılan 'sq')
+function setDests(list){
+  localStorage.setItem(STORAGE_KEY, list.join(","));
+}
 
-// ==== Liste ====
-function render(){
-  listEl.innerHTML = '';
-  items.forEach((v,i)=>{
-    const li = document.createElement('li');
-    li.className = 'item';
-    li.innerHTML = <div class="index">${i+1}</div><div class="value">${v}</div><button class="del">×</button>;
-    li.querySelector('.del').onclick = () => {
-      if(confirm(L[lang].askDel)){
-        items.splice(i,1);
-        seen = new Set(items);
-        render(); save();
-      }
-    };
-    listEl.appendChild(li);
+function updateChips(){
+  const dests = getDests();
+  $("chips").innerHTML = dests.map(d=><span class="chip">${d}</span>).join("");
+  $("destCount").textContent = dests.length;
+}
+
+// Lidhje pa data: fokus “from today onwards”
+function gFlightsLink(from,to){
+  const q = encodeURIComponent(flights from ${from} to ${to} from today);
+  return https://www.google.com/travel/flights?q=${q}&hl=sq;
+}
+function skyscannerLink(from,to){
+  return https://www.skyscanner.net/transport/flights/${from.toLowerCase()}/${to.toLowerCase()}/?locale=sq-AL&currency=EUR;
+}
+function kiwiLink(from,to){
+  return https://www.kiwi.com/en/search/results/${from}-anytime/${to}-anytime?sortBy=price;
+}
+
+function buildLinks(){
+  const from = "TIA";
+  const dests = getDests();
+  const out = [];
+  dests.forEach(to=>{
+    out.push({label:${from} → ${to} · Google Flights, url:gFlightsLink(from,to)});
+    out.push({label:${from} → ${to} · Skyscanner,     url:skyscannerLink(from,to)});
+    out.push({label:${from} → ${to} · Kiwi,            url:kiwiLink(from,to)});
   });
-}
-const exportText = () => items.map((v,i)=>${i+1}. ${v}).join('\n');
-
-function save(){ localStorage.setItem(LS_ITEMS, JSON.stringify(items)); }
-function load(){
-  const raw = localStorage.getItem(LS_ITEMS);
-  if(raw){ items = JSON.parse(raw)||[]; seen = new Set(items); render(); }
-}
-load();
-
-// ==== Kamera ====
-function flashOverlay(dup){
-  scanFrame.classList.remove('glow-green','glow-red'); scanFrame.offsetWidth;
-  scanFrame.classList.add(dup?'glow-red':'glow-green');
-  clearTimeout(scanFrame._t); scanFrame._t=setTimeout(()=>scanFrame.classList.remove('glow-green','glow-red'),350);
-}
-function showBanner(v,dup){
-  lastValue.textContent = v || '—';
-  lastBanner.style.display='flex';
-  lastBanner.classList.toggle('duplicate', !!dup);
+  return out;
 }
 
-async function startCam(){
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing } });
-    video.srcObject = stream;
-    await video.play();
-    scanning = true;
-    camStatus.textContent = L[lang].camOn;
-    track = stream.getVideoTracks()[0] || null;
-    torchOn = false;
-    const caps = track && track.getCapabilities ? track.getCapabilities() : {};
-    torchBtn.disabled = !(caps && 'torch' in caps);
-    scanLoop();
-  }catch(e){
-    alert(e && e.message ? e.message : e);
-  }
-}
-function stopCam(){
-  scanning = false;
-  if(stream){ stream.getTracks().forEach(t=>t.stop()); }
-  video.srcObject = null;
-  track=null; torchOn=false;
-  torchBtn.disabled = true;
-  camStatus.textContent = L[lang].camOff;
-}
-function switchCam(){
-  facing = (facing==='environment') ? 'user' : 'environment';
-  stopCam(); startCam();
-}
-async function toggleTorch(){
-  if(!track || !track.applyConstraints) return;
-  const caps = track.getCapabilities ? track.getCapabilities() : {};
-  if(!caps.torch) return;
-  try{
-    torchOn = !torchOn;
-    await track.applyConstraints({ advanced:[{ torch: torchOn }] });
-  }catch(e){ torchOn=false; }
+function renderLinks(){
+  const links = buildLinks();
+  const list = $("list");
+  list.innerHTML = "";
+  links.forEach(l=>{
+    const a = document.createElement("a");
+    a.href = l.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = l.label;
+    list.appendChild(a);
+  });
+  $("count").textContent = ${links.length} lidhje;
+  $("results").style.display = "block";
 }
 
-async function scanLoop(){
-  if(!scanning) return;
-  const now = performance.now();
-  if(now - lastScanAt < 140){ return requestAnimationFrame(scanLoop); }
-  lastScanAt = now;
-  if(video.readyState >= 2){
-    // jsQR global olarak yüklendi mi?
-    if(typeof jsQR === 'function'){
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d', { willReadFrequently:true });
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const img = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const qr = jsQR(img.data, canvas.width, canvas.height);
-      if(qr && qr.data){
-        const v = last4(qr.data.trim());
-        if(v){
-          const dup = seen.has(v);
-          if(!dup){ seen.add(v); items.push(v); render(); save(); }
-          flashOverlay(dup); showBanner(v, dup);
-        }
-      }
-    }
-  }
-  requestAnimationFrame(scanLoop);
-}
+// Sheet controls
+function openSheet(open){ $("sheet").classList.toggle("open", !!open); }
+$("editBtn").addEventListener("click", ()=>{
+  $("destsBox").value = getDests().join(", ");
+  openSheet(true);
+});
+$("closeSheet").addEventListener("click", ()=>openSheet(false));
+$("saveDests").addEventListener("click", ()=>{
+  const raw = $("destsBox").value.split(",").map(s=>s.trim().toUpperCase()).filter(Boolean);
+  const uniq = Array.from(new Set(raw));
+  if(uniq.length===0){ alert("Vendos të paktën një destinacion."); return; }
+  setDests(uniq);
+  updateChips();
+  openSheet(false);
+});
 
-// ==== Manuel ekleme / paylaşım ====
-function addManual(){
-  const v = last4(manualInput.value.trim());
-  if(!v) return;
-  const dup = seen.has(v);
-  if(!dup){ seen.add(v); items.push(v); render(); save(); }
-  flashOverlay(dup); showBanner(v, dup);
-  manualInput.value='';
-}
-function copyAll(){ const t=exportText(); if(t) navigator.clipboard.writeText(t); }
-function waShare(){ const t=exportText(); if(t) window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank'); }
-function clearAll(){ if(confirm(L[lang].askClear)){ items=[]; seen.clear(); render(); save(); } }
+// Buttons
+$("goBtn").addEventListener("click", renderLinks);
+$("fabGo").addEventListener("click", renderLinks);
 
-// ==== Event bağlama ====
-startBtn.addEventListener('click', startCam);
-stopBtn .addEventListener('click', stopCam);
-switchBtn.addEventListener('click', switchCam);
-torchBtn.addEventListener('click', toggleTorch);
-resetBtn.addEventListener('click', clearAll);
-manualAddBtn.addEventListener('click', addManual);
-manualInput.addEventListener('keyup', e=>{ if(e.key==='Enter') addManual(); });
-copyBtn.addEventListener('click', copyAll);
-waBtn  .addEventListener('click', waShare);
+$("openAllBtn").addEventListener("click", ()=>{
+  const anchors = Array.from(document.querySelectorAll("#list a"));
+  if(anchors.length===0){ renderLinks(); }
+  const links = Array.from(document.querySelectorAll("#list a")).map(a=>a.href);
+  if(links.length===0){ alert('Së pari shtyp “Kërko fluturime të lira”.'); return; }
+  if(!confirm(Do të hapen ${links.length} dritare/sekme. Vazhdon?)) return;
+  links.forEach((u,i)=> setTimeout(()=>window.open(u,"_blank"), i*160));
+});
 
-// Önceden izin verildiyse otomatik başlat (bazı tarayıcılar destekler)
-if(navigator.permissions && navigator.permissions.query){
-  try{
-    navigator.permissions.query({name:'camera'}).then(p=>{ if(p.state==='granted') startCam(); }).catch(()=>{});
-  }catch(_){}
-}
+$("copyBtn").addEventListener("click", async ()=>{
+  const anchors = Array.from(document.querySelectorAll("#list a"));
+  if(anchors.length===0){ renderLinks(); }
+  const text = Array.from(document.querySelectorAll("#list a")).map(a=>a.href).join("\n");
+  try{ await navigator.clipboard.writeText(text); alert("Lidhjet u kopjuan ✅"); }
+  catch{ alert("Nuk u kopjua. Kopjoji manualisht nga lista."); }
+});
+
+// Init
+updateChips();
+$("fromTag").textContent = "TIA";
+
+// (Opsionale) faqja të gjenerojë menjëherë listën kur hapet:
+// window.addEventListener("load", renderLinks);
