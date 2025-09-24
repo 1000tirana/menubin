@@ -6,10 +6,7 @@
   <title>TIA → Fluturime të Lira</title>
   <meta name="theme-color" content="#111"/>
   <style>
-    :root{
-      --bg:#111; --fg:#fff; --muted:#b5b5b5; --card:#1a1a1a; --acc:#00d084;
-      --chip:#2a2a2a; --border:#2a2a2a;
-    }
+    :root{ --bg:#111; --fg:#fff; --muted:#b5b5b5; --card:#1a1a1a; --acc:#00d084; --chip:#2a2a2a; --border:#2a2a2a; }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
     .app{max-width:720px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
@@ -30,7 +27,7 @@
     .sheet{position:fixed;inset:auto 0 0 0;background:var(--bg);border-top:1px solid var(--border);border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .25s ease;z-index:20}
     .sheet.open{transform:translateY(0)}
     .sheet .grab{width:56px;height:5px;background:#3a3a3a;border-radius:999px;margin:10px auto}
-    textarea, input{width:100%;background:#0f0f0f;color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px}
+    textarea,input{width:100%;background:#0f0f0f;color:var(--fg);border:1px solid var(--border);border-radius:12px;padding:10px;font-size:14px}
     .fab{position:fixed;right:16px;bottom:16px;z-index:30}
     .fab button{border-radius:999px;height:56px;min-width:56px;padding:0 18px;border:0;background:var(--acc);color:#0b0b0b;font-weight:800;box-shadow:0 6px 20px rgba(0,0,0,.35)}
     .bottomnav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 8px;z-index:10}
@@ -73,13 +70,10 @@
     </div>
 
     <div class="card">
-      <div class="muted">
-        Këshillë: Hap Google Flights “Price graph / Date grid” dhe shiko kur bie çmimi.
-      </div>
+      <div class="muted">Këshillë: Hap Google Flights “Price graph / Date grid” dhe shiko kur bie çmimi.</div>
     </div>
   </div>
 
-  <!-- Bottom sheet: Edit destinations -->
   <div class="sheet" id="sheet">
     <div class="grab"></div>
     <div style="padding:12px 14px 18px">
@@ -93,10 +87,8 @@
     </div>
   </div>
 
-  <!-- FAB -->
   <div class="fab"><button id="fabGo">🔎</button></div>
 
-  <!-- Bottom Nav (pamje) -->
   <div class="bottomnav">
     <div class="item">🏠<div>Ballina</div></div>
     <div class="item">✈️<div>Fluturime</div></div>
@@ -105,7 +97,101 @@
   </div>
 </div>
 
-<!-- JS -->
-<script defer src="app.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+
+  // Datë etiketa
+  const now = new Date();
+  $('today').textContent = now.toLocaleDateString('sq-AL', {day:'2-digit', month:'short', year:'numeric'});
+
+  // Parazgjedhje destinacionesh (TIA → …)
+  const DEFAULT_DESTS = ["ATH","SKG","BEG","SOF","BUD","VIE","MXP","FCO","BGY","VCE","PRG","BER","IST","SAW","STN","LGW","BCN","MAD","PSA","FRA","MUC"];
+  const STORAGE_KEY = 'tia_dests_v1';
+
+  function getDests(){
+    const s = localStorage.getItem(STORAGE_KEY);
+    let arr = s ? s.split(',').map(x=>x.trim().toUpperCase()).filter(Boolean) : DEFAULT_DESTS;
+    return Array.from(new Set(arr));
+  }
+  function setDests(list){ localStorage.setItem(STORAGE_KEY, list.join(',')); }
+
+  function updateChips(){
+    const dests = getDests();
+    $('chips').innerHTML = dests.map(d=><span class="chip">${d}</span>).join('');
+    $('destCount').textContent = dests.length;
+  }
+
+  // Lidhje pa data (from today onwards)
+  function gFlightsLink(from,to){
+    const q = encodeURIComponent(flights from ${from} to ${to} from today);
+    return https://www.google.com/travel/flights?q=${q}&hl=sq;
+  }
+  function skyscannerLink(from,to){
+    return https://www.skyscanner.net/transport/flights/${from.toLowerCase()}/${to.toLowerCase()}/?locale=sq-AL&currency=EUR;
+  }
+  function kiwiLink(from,to){
+    return https://www.kiwi.com/en/search/results/${from}-anytime/${to}-anytime?sortBy=price;
+  }
+
+  function buildLinks(){
+    const from = 'TIA';
+    const dests = getDests();
+    const out = [];
+    dests.forEach(to=>{
+      out.push({label:${from} → ${to} · Google Flights, url:gFlightsLink(from,to)});
+      out.push({label:${from} → ${to} · Skyscanner, url:skyscannerLink(from,to)});
+      out.push({label:${from} → ${to} · Kiwi, url:kiwiLink(from,to)});
+    });
+    return out;
+  }
+
+  function renderLinks(){
+    const links = buildLinks();
+    const list = $('list');
+    list.innerHTML = '';
+    links.forEach(l=>{
+      const a = document.createElement('a');
+      a.href = l.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = l.label;
+      list.appendChild(a);
+    });
+    $('count').textContent = ${links.length} lidhje;
+    $('results').style.display = 'block';
+  }
+
+  // Bottom sheet
+  function openSheet(open){ $('sheet').classList.toggle('open', !!open); }
+  $('editBtn').addEventListener('click', ()=>{ $('destsBox').value = getDests().join(', '); openSheet(true); });
+  $('closeSheet').addEventListener('click', ()=>openSheet(false));
+  $('saveDests').addEventListener('click', ()=>{
+    const raw = $('destsBox').value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+    const uniq = Array.from(new Set(raw));
+    if(!uniq.length){ alert('Vendos të paktën një destinacion.'); return; }
+    setDests(uniq); updateChips(); openSheet(false);
+  });
+
+  // Butona
+  $('goBtn').addEventListener('click', renderLinks);
+  $('fabGo').addEventListener('click', renderLinks);
+  $('openAllBtn').addEventListener('click', ()=>{
+    const anchors = Array.from(document.querySelectorAll('#list a'));
+    if(!anchors.length){ renderLinks(); }
+    const links = Array.from(document.querySelectorAll('#list a')).map(a=>a.href);
+    if(!links.length){ alert('Së pari shtyp “Kërko fluturime të lira”.'); return; }
+    if(!confirm(Do të hapen ${links.length} dritare/sekme. Vazhdon?)) return;
+    links.forEach((u,i)=> setTimeout(()=>window.open(u,'_blank'), i*160));
+  });
+  $('copyBtn').addEventListener('click', async ()=>{
+    const anchors = Array.from(document.querySelectorAll('#list a'));
+    if(!anchors.length){ renderLinks(); }
+    const text = Array.from(document.querySelectorAll('#list a')).map(a=>a.href).join('\n');
+    try{ await navigator.clipboard.writeText(text); alert('Lidhjet u kopjuan ✅'); }
+    catch{ alert('Nuk u kopjua. Kopjoji manualisht.'); }
+  });
+
+  // Init
+  updateChips(); $('fromTag').textContent = 'TIA';
+  // Auto render në hapje? Shkruaje vijën e mëposhtme:
+  // window.addEventListener('load', renderLinks);
+</script>
 </body>
 </html>
