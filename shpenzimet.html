@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shpenzimet • MiniApp</title>
+<meta name="theme-color" content="#6a5ae0">
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#1f2340;
+    --muted:#7c82a1;
+    --primary:#6a5ae0;
+    --primary-2:#7f6ff0;
+    --danger:#ff5959;
+    --success:#27ae60;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  .wrap{display:flex; flex-direction:column; min-height:100vh; padding-bottom:72px;}
+  header{
+    background:linear-gradient(135deg, var(--primary), var(--primary-2));
+    color:#fff;
+    border-bottom-left-radius:28px;
+    border-bottom-right-radius:28px;
+    padding:28px 22px 18px;
+    position:relative;
+    overflow:hidden;
+  }
+  header .title{font-size:28px; font-weight:800; display:flex; align-items:center; gap:12px}
+  header .title .emoji{font-size:26px}
+  header .big-number{font-size:40px; font-weight:900; margin-top:12px}
+  header .sub{opacity:.9; margin-top:6px}
+  .stats{
+    display:flex; gap:14px; padding:14px 16px; transform:translateY(-24px);
+  }
+  .stat-card{
+    flex:1; background:var(--card); border-radius:18px; padding:14px;
+    box-shadow:var(--shadow); text-align:left;
+  }
+  .stat-head{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); letter-spacing:.2px}
+  .stat-value{font-weight:800; font-size:20px; margin-top:6px}
+  main{padding:0 16px 24px}
+  h3.sec{font-size:16px; color:var(--text); display:flex; align-items:center; gap:8px}
+  .empty{
+    margin:28px auto 0; text-align:center; color:var(--muted);
+  }
+  .empty .emoji{font-size:42px; margin-bottom:8px}
+  .list{display:flex; flex-direction:column; gap:10px; margin-top:12px}
+  .item{
+    display:flex; align-items:center; gap:12px; padding:12px; background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+  }
+  .ic{
+    width:40px; height:40px; border-radius:12px; display:grid; place-items:center; font-size:18px; color:#fff;
+    background:var(--primary);
+  }
+  .meta{flex:1}
+  .meta .t{font-weight:700}
+  .meta .s{font-size:12px; color:var(--muted); margin-top:2px}
+  .amt{font-weight:800}
+  .del{
+    border:none; background:transparent; color:var(--danger); font-size:20px; padding:6px 8px; cursor:pointer;
+  }
+  /* Bottom nav */
+  .nav{
+    position:fixed; left:0; right:0; bottom:0; height:64px; background:#fff; display:flex; justify-content:space-around; align-items:center; box-shadow:0 -6px 30px rgba(0,0,0,.06);
+    border-top-left-radius:16px; border-top-right-radius:16px;
+  }
+  .nav .btn{display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--muted); text-decoration:none; font-size:12px}
+  .nav .btn.active{color:var(--primary); font-weight:700}
+  .fab{
+    position:relative; top:-22px; width:64px; height:64px; background:var(--primary); border-radius:999px; display:grid; place-items:center; color:#fff; font-size:28px; box-shadow:0 10px 24px rgba(106,90,224,.45); border:none; cursor:pointer;
+  }
+  /* Tabs */
+  .tab{display:none}
+  .tab.active{display:block}
+  /* Modal */
+  .modal{
+    position:fixed; inset:0; background:rgba(0,0,0,.28); display:none; place-items:end; padding:16px;
+  }
+  .modal.on{display:grid}
+  .sheet{
+    width:100%; background:#fff; border-radius:24px; padding:16px 16px 20px; animation:pop .15s ease-out;
+  }
+  @keyframes pop{from{transform:translateY(10px); opacity:0} to{transform:none; opacity:1}}
+  .row{display:flex; gap:10px}
+  label{font-size:13px; color:var(--muted)}
+  input, select, textarea{
+    width:100%; padding:12px 12px; border:1px solid #e6e7ee; border-radius:12px; font-size:16px; outline:none;
+    background:#fff;
+  }
+  .actions{display:flex; gap:10px; margin-top:10px}
+  .btnP{flex:1; background:var(--primary); color:#fff; border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
+  .btnS{flex:1; background:#f0f1f8; color:var(--text); border:none; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
+  /* Analysis bars */
+  .bars{margin-top:8px; display:flex; flex-direction:column; gap:6px}
+  .bar{background:#eef0ff; border-radius:10px; overflow:hidden}
+  .bar span{display:block; height:12px; background:var(--primary);}
+  .bar meta{display:flex}
+  .bar-label{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin:4px 2px}
+  /* Desktop niceties */
+  @media(min-width:700px){ .wrap{max-width:520px; margin:0 auto} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title"><span class="emoji">💰</span><span>Shpenzimet</span></div>
+    <div class="big-number"><span id="hdrTotal">0</span> L</div>
+    <div class="sub">Këtë muaj</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-head">📊 TOTALE</div>
+      <div class="stat-value"><span id="statTotal">0</span> L</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-head">📅 SOT</div>
+      <div class="stat-value"><span id="statToday">0</span> L</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-head">🗓️ MUAJ</div>
+      <div class="stat-value"><span id="statMonth">0</span> L</div>
+    </div>
+  </div>
+
+  <main>
+    <section id="tab-home" class="tab active">
+      <h3 class="sec">🕒 Të fundit</h3>
+      <div id="recentList" class="list"></div>
+      <div id="emptyHome" class="empty" hidden>
+        <div class="emoji">📝</div>
+        <div><b>Asnjë shpenzim deri tani</b></div>
+        <div style="margin-top:6px">Shtoni shpenzimin tuaj të parë!</div>
+      </div>
+    </section>
+
+    <section id="tab-list" class="tab">
+      <h3 class="sec">📚 Lista</h3>
+      <div class="row" style="margin:8px 0 10px">
+        <input id="q" placeholder="Kërko sipas emrit ose kategorisë..." oninput="renderAll()">
+        <select id="fCat" onchange="renderAll()">
+          <option value="">Të gjitha</option>
+        </select>
+      </div>
+      <div id="allList" class="list"></div>
+    </section>
+
+    <section id="tab-analytics" class="tab">
+      <h3 class="sec">📈 Analiza e muajit</h3>
+      <div id="bars" class="bars"></div>
+      <small style="color:var(--muted)">Shënim: grafiku është thjesht ilustrues (pa biblioteka të jashtme).</small>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <h3 class="sec">⚙️ Cilësime</h3>
+      <div class="item">
+        <div class="ic">ℹ️</div>
+        <div class="meta">
+          <div class="t">Ruajtja e të dhënave</div>
+          <div class="s">Të dhënat ruhen vetëm në pajisjen tuaj (localStorage).</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="ic">🧹</div>
+        <div class="meta">
+          <div class="t">Pastro të gjitha</div>
+          <div class="s">Fshini të gjitha shpenzimet.</div>
+        </div>
+        <button class="del" onclick="clearAll()">🗑️</button>
+      </div>
+      <div class="item">
+        <div class="ic">⬇️</div>
+        <div class="meta">
+          <div class="t">Eksporto (JSON)</div>
+          <div class="s">Shkarkoni kopjen rezervë të të dhënave.</div>
+        </div>
+        <button class="del" style="color:var(--primary)" onclick="exportData()">⤓</button>
+      </div>
+      <div class="item">
+        <div class="ic">⬆️</div>
+        <div class="meta">
+          <div class="t">Importo (JSON)</div>
+          <div class="s">Ngarkoni një skedar të ruajtur më parë.</div>
+          <input id="importFile" type="file" accept="application/json" onchange="importData(this.files[0])">
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Bottom nav -->
+<nav class="nav">
+  <a class="btn active" data-tab="home" onclick="switchTab('home')">🏠<span>Kreu</span></a>
+  <a class="btn" data-tab="list" onclick="switchTab('list')">📋<span>Lista</span></a>
+  <button class="fab" id="openAdd" aria-label="Shto shpenzim">＋</button>
+  <a class="btn" data-tab="analytics" onclick="switchTab('analytics')">📈<span>Analiza</span></a>
+  <a class="btn" data-tab="settings" onclick="switchTab('settings')">⚙️<span>Cilësime</span></a>
+</nav>
+
+<!-- Add modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
+    <div class="row">
+      <div style="flex:2">
+        <label>Emri</label>
+        <input id="mName" placeholder="p.sh. Karburant">
+      </div>
+      <div style="flex:1">
+        <label>Shuma (L)</label>
+        <input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0">
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div style="flex:1">
+        <label>Kategoria</label>
+        <select id="mCat"></select>
+      </div>
+      <div style="flex:1">
+        <label>Data</label>
+        <input id="mDate" type="date">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btnS" onclick="closeModal()">Mbyll</button>
+      <button class="btnP" onclick="saveExpense()">Ruaj</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='shpenzimet_v1';
+const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
+
+// State
+let data = load();
+init();
+
+function init(){
+  // Build category selects
+  const mCat=document.getElementById('mCat');
+  const fCat=document.getElementById('fCat');
+  DEFAULT_CATS.forEach(c=>{
+    const o=document.createElement('option'); o.value=c; o.textContent=c; mCat.appendChild(o.cloneNode(true));
+    fCat.appendChild(o);
+  });
+  // Prepare date
+  document.getElementById('mDate').value = new Date().toISOString().slice(0,10);
+  // FAB
+  document.getElementById('openAdd').addEventListener('click', openModal);
+  // Initial render
+  render();
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw){return {items:[]};}
+    const d = JSON.parse(raw);
+    if(!Array.isArray(d.items)) d.items=[];
+    return d;
+  }catch(e){ console.warn('load fail', e); return {items:[]}; }
+}
+function persist(){ localStorage.setItem(KEY, JSON.stringify(data)); }
+
+function openModal(){ document.getElementById('modal').classList.add('on'); }
+function closeModal(){ document.getElementById('modal').classList.remove('on'); }
+
+function saveExpense(){
+  const name = document.getElementById('mName').value.trim();
+  const amt = parseFloat(document.getElementById('mAmt').value);
+  const cat = document.getElementById('mCat').value;
+  const date = document.getElementById('mDate').value || new Date().toISOString().slice(0,10);
+  if(!name || !amt || isNaN(amt)){ alert('Ju lutem plotësoni emrin dhe shumën.'); return; }
+  data.items.push({id:cryptoRandom(), name, amt, cat, date});
+  persist();
+  document.getElementById('mName').value='';
+  document.getElementById('mAmt').value='';
+  closeModal();
+  render();
+}
+
+function delExpense(id){
+  if(!confirm('Fshini këtë shpenzim?')) return;
+  data.items = data.items.filter(x=>x.id!==id);
+  persist(); render();
+}
+
+function cryptoRandom(){
+  // simple random id
+  return 'id'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelectorAll('.nav .btn').forEach(x=>x.classList.remove('active'));
+  document.querySelector(`.nav .btn[data-tab="${t}"]`).classList.add('active');
+  if(t==='analytics') renderBars();
+  if(t==='list') renderAll();
+}
+
+function render(){
+  // Stats
+  const total = sum(data.items.map(x=>x.amt));
+  const today = sum(data.items.filter(isToday).map(x=>x.amt));
+  const month = sum(data.items.filter(isThisMonth).map(x=>x.amt));
+  setText('hdrTotal', fmt(total));
+  setText('statTotal', fmt(total));
+  setText('statToday', fmt(today));
+  setText('statMonth', fmt(month));
+
+  // Recent (last 8)
+  const recent = [...data.items].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  const list = document.getElementById('recentList');
+  list.innerHTML='';
+  if(recent.length===0){
+    document.getElementById('emptyHome').hidden=false;
+  }else{
+    document.getElementById('emptyHome').hidden=true;
+    recent.forEach(item=> list.appendChild(row(item)));
+  }
+  // Analysis
+  renderBars();
+}
+
+function renderAll(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const cat = document.getElementById('fCat').value;
+  let items = [...data.items].sort((a,b)=>b.date.localeCompare(a.date));
+  if(q) items = items.filter(x => x.name.toLowerCase().includes(q) || x.cat.toLowerCase().includes(q));
+  if(cat) items = items.filter(x=>x.cat===cat);
+  const box = document.getElementById('allList'); box.innerHTML='';
+  items.forEach(item=>box.appendChild(row(item)));
+}
+
+function row(item){
+  const el = document.createElement('div'); el.className='item';
+  const ic = document.createElement('div'); ic.className='ic'; ic.textContent = pickEmoji(item.cat);
+  const meta = document.createElement('div'); meta.className='meta';
+  const t = document.createElement('div'); t.className='t'; t.textContent=item.name;
+  const s = document.createElement('div'); s.className='s'; s.textContent = [item.cat, prettyDate(item.date)].join(' • ');
+  meta.appendChild(t); meta.appendChild(s);
+  const amt = document.createElement('div'); amt.className='amt'; amt.textContent = fmt(item.amt)+' L';
+  const del = document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delExpense(item.id);
+  el.append(ic, meta, amt, del);
+  return el;
+}
+
+function pickEmoji(cat){
+  const map = {
+    'Ushqime':'🍔', 'Transport':'⛽', 'Shtëpia':'🏠', 'Argëtim':'🎟️', 'Fatura':'💡','Të tjera':'🧾'
+  };
+  return map[cat] || '💸';
+}
+
+function sum(arr){ return arr.reduce((a,b)=>a+Number(b||0),0); }
+function fmt(n){ return (Math.round(n*100)/100).toLocaleString('sq-AL'); }
+function isToday(x){ const d=new Date(x.date); const t=new Date(); return d.getFullYear()==t.getFullYear() && d.getMonth()==t.getMonth() && d.getDate()==t.getDate(); }
+function isThisMonth(x){ const d=new Date(x.date); const t=new Date(); return d.getFullYear()==t.getFullYear() && d.getMonth()==t.getMonth(); }
+function prettyDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('sq-AL',{day:'2-digit', month:'short', year:'numeric'}); }
+function setText(id, v){ document.getElementById(id).textContent=v; }
+
+function renderBars(){
+  // Build per-category totals for current month
+  const monthItems = data.items.filter(isThisMonth);
+  const byCat = Object.fromEntries(DEFAULT_CATS.map(c=>[c,0]));
+  monthItems.forEach(x=>byCat[x.cat]=(byCat[x.cat]||0)+Number(x.amt));
+  const all = Object.entries(byCat).filter(([,v])=>v>0);
+  const total = sum(all.map(([,v])=>v)) || 1;
+  const wrap = document.getElementById('bars'); wrap.innerHTML='';
+  if(all.length===0){
+    wrap.innerHTML = '<div class="empty">Asnjë të dhënë për këtë muaj.</div>'; return;
+  }
+  all.forEach(([cat,val])=>{
+    const label = document.createElement('div'); label.className='bar-label'; label.innerHTML = `<span>${pickEmoji(cat)} ${cat}</span><span>${fmt(val)} L</span>`;
+    const bar = document.createElement('div'); bar.className='bar';
+    const span=document.createElement('span'); span.style.width = (100*val/total)+'%';
+    bar.appendChild(span);
+    wrap.append(label, bar);
+  });
+}
+
+function clearAll(){
+  if(!confirm('Të fshihen të gjitha të dhënat?')) return;
+  data.items=[]; persist(); render(); renderAll();
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='shpenzimet-backup.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(file){
+  if(!file) return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const d=JSON.parse(fr.result);
+      if(!d || !Array.isArray(d.items)) throw new Error('Skedar i pavlefshëm');
+      data=d; persist(); render(); renderAll(); alert('Importi u krye me sukses.');
+    }catch(e){ alert('Nuk u importua: '+e.message); }
+  };
+  fr.readAsText(file);
+}
+</script>
+</body>
+</html>
