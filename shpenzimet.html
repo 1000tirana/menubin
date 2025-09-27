@@ -55,7 +55,7 @@
       display:flex;gap:12px;align-items:center;background:var(--card);
       border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px
     }
-    /* (BÜYÜTTÜM) Yuvarlak rozet – dıştan içe yeşilden aça */
+    /* (BÜYÜK) Yuvarlak rozet – dıştan içe yeşilden aça */
     .ic{
       width:52px;height:52px;border-radius:50%;
       display:grid;place-items:center;color:#0d1117;
@@ -95,17 +95,27 @@
     }
     .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-    /* Alt navigasyon + FAB */
+    /* ===== ALT NAV + FAB (orta boşluklu, eşit mesafe) ===== */
     nav.nav{
-      position:fixed;left:0;right:0;bottom:0;
+      --fab-gap: 110px; /* FAB genişliği + nefes payı */
+      position:fixed; left:0; right:0; bottom:0;
       height:calc(76px + var(--safe-bottom));
-      padding:0 12px var(--safe-bottom);background:var(--card);
-      border-top:1px solid var(--border);
-      display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;
-      box-shadow:0 -10px 30px rgba(0,0,0,.35);border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
+      padding:0 12px var(--safe-bottom);
+      background:var(--card); border-top:1px solid var(--border);
+      box-shadow:0 -10px 30px rgba(0,0,0,.35);
+      border-top-left-radius:16px; border-top-right-radius:16px; z-index:2000;
+
+      /* 5 kolon: 1 | 2 | (boş) | 4 | 5  */
+      display:grid;
+      grid-template-columns: 1fr 1fr var(--fab-gap) 1fr 1fr;
+      align-items:center;
     }
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
-    /* (BÜYÜTTÜM) nav ikon rozetleri */
+    .btn:nth-of-type(1){grid-column:1;}
+    .btn:nth-of-type(2){grid-column:2;}
+    .btn:nth-of-type(3){grid-column:4;}
+    .btn:nth-of-type(4){grid-column:5;}
+    /* nav ikon rozetleri (büyük) */
     .btn .ico{
       width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
       background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
@@ -114,7 +124,7 @@
     .btn.active{color:#79c0ff}
     .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%);}
 
-    /* FAB (küçük ve ortada) */
+    /* FAB (küçük ve ortada sabit) */
     .nav .fab{
       position:absolute;left:50%;transform:translateX(-50%);
       top:-22px;width:56px;height:56px;
@@ -401,7 +411,7 @@ function emojiCat(c){const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'�
 async function loadDebts(){try{const { data }=await withRetry(()=>supabase.from('debts').select('*').eq('user_id', sessionUser.id).order('created_at',{ascending:false}).limit(2000));debts=data||[];drawDebts();refreshHeader();}catch(e){alert('Gabim ngarkimi (borxhe): '+(e?.message||e));}}
 async function saveDebt(){const name=document.getElementById('dName').value.trim();const amt=parseFloat(document.getElementById('dAmt').value);const kind=segValue('segType');const due=document.getElementById('dDate').value||null;if(!name||!amt||isNaN(amt)){alert('Plotëso emrin dhe shumën.');return;}const payload={user_id:sessionUser.id,name,amount:amt,kind,due,status:'open'};const {data,error}=await supabase.from('debts').insert(payload).select().single();if(error){alert('Gabim: '+error.message);return;}debts.unshift(data);document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');closeModal('Debt');drawDebts();refreshHeader();}
 async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
-/* (YENİ) Öderken onay soruyor */
+/* Ödeme onayı */
 async function payDebt(id){
   if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
   const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
