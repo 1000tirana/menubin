@@ -36,7 +36,7 @@
     .chip.ok{background:#e9f8ef;color:#137a3a}
     h3.sec{margin:0 0 8px}
 
-    /* Bottom nav + FAB */
+    /* Bottom nav + FAB (tam ortalı) */
     nav.nav{position:fixed;left:0;right:0;bottom:0;height:70px;background:#fff;display:grid;grid-template-columns:1fr 1fr auto 1fr 1fr;align-items:center;box-shadow:0 -8px 28px rgba(0,0,0,.06);border-top-left-radius:16px;border-top-right-radius:16px;padding:0 10px}
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted);text-decoration:none}
     .btn.active{color:var(--primary);font-weight:800}
@@ -55,12 +55,12 @@
     .tabs button{flex:1;border:none;padding:10px;border-radius:10px;background:#f1f2fa;cursor:pointer}
     .tabs button.active{background:var(--primary);color:#fff;font-weight:700}
 
-    /* Segment i thjeshtë (Lloji) */
-    .seg{background:#f0f1f8;border-radius:12px;padding:4px;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+    /* Segmente */
+    .seg{background:#f0f1f8;border-radius:12px;padding:4px;display:grid;gap:4px}
+    .seg.two{grid-template-columns:1fr 1fr}
+    .seg.three{grid-template-columns:1fr 1fr 1fr}
     .seg button{border:none;padding:10px;border-radius:10px;background:transparent;cursor:pointer;font-weight:700;color:#555}
     .seg button.active{background:var(--primary);color:#fff}
-    /* Segment 3 opsione (filtër) */
-    .seg.three{grid-template-columns:1fr 1fr 1fr}
 
     @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
   </style>
@@ -128,17 +128,17 @@
     <section id="tab-list" class="tab">
       <h3 class="sec">📚 Lista</h3>
       <div class="row" style="margin:8px 0 10px">
-        <input id="q" placeholder="Kërko..." oninput="renderAll()">
-        <select id="fCat" onchange="renderAll()"><option value="">Të gjitha</option></select>
+        <input id="q" placeholder="Kërko..." oninput="drawAll()">
+        <select id="fCat" onchange="drawAll()"><option value="">Të gjitha</option></select>
       </div>
       <div id="allList" class="list"></div>
     </section>
 
-    <!-- Borxhet (e thjeshtuara) -->
+    <!-- Borxhet (thjeshtë) -->
     <section id="tab-debts" class="tab">
       <h3 class="sec">💳 Borxhet</h3>
       <div class="row" style="margin:8px 0 10px">
-        <input id="dq" placeholder="Kërko borxhe..." oninput="renderDebts()">
+        <input id="dq" placeholder="Kërko borxhe..." oninput="drawDebts()">
       </div>
       <div class="seg three" id="dSegFilter" style="margin-bottom:8px">
         <button type="button" class="active" data-val="">Të gjitha</button>
@@ -203,7 +203,7 @@
   </div>
 </div>
 
-<!-- Modal: Borxh (thjesht) -->
+<!-- Modal: Borxh -->
 <div class="modal" id="modalDebt">
   <div class="sheet">
     <h3 style="margin:4px 0 10px">➕ Shto borxh</h3>
@@ -214,7 +214,7 @@
     <div class="row" style="margin-top:8px">
       <div style="flex:1">
         <label>Lloji</label>
-        <div id="segType" class="seg">
+        <div id="segType" class="seg two">
           <button type="button" class="active" data-val="borrow">Mora hua</button>
           <button type="button" data-val="lend">Dhash hua</button>
         </div>
@@ -261,7 +261,11 @@ alter table public.debts enable row level security;
 create index if not exists debts_user_due  on public.debts(user_id,due);
 create index if not exists debts_user_kind on public.debts(user_id,kind);
 
--- RLS (për të dyja): SELECT/INSERT/UPDATE/DELETE me kushtin auth.uid() = user_id
+-- RLS për të dyja:
+-- SELECT using (auth.uid() = user_id)
+-- INSERT with check (auth.uid() = user_id)
+-- UPDATE using (auth.uid() = user_id) with check (auth.uid() = user_id)
+-- DELETE using (auth.uid() = user_id)
 */
 
 const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
@@ -277,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Segmente
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType', b));
-  document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b); renderDebts();});
+  document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b); drawDebts();});
 
   document.getElementById('openAdd').addEventListener('click', () => {
     if(activeTab==='debts') openModal('Debt'); else openModal('Exp');
@@ -343,17 +347,17 @@ function refreshHeader(){
     const total=sum(debts.map(n=>Number(n.amount||0)));
     const open=sum(debts.filter(x=>x.status!=='paid').map(n=>Number(n.amount||0)));
     const paid=sum(debts.filter(x=>x.status==='paid').map(n=>Number(n.amount||0)));
-    set('hdrTotal',fmt(open));
+    setText('hdrTotal',fmt(open));
     s1.textContent='Gjithsej'; s2.textContent='Detyrime'; s3.textContent='Paguar';
-    set('stat1',fmt(total)); set('stat2',fmt(open)); set('stat3',fmt(paid));
+    setText('stat1',fmt(total)); setText('stat2',fmt(open)); setText('stat3',fmt(paid));
   }else{
     icon.textContent='💰'; text.textContent='Shpenzimet'; sub.textContent='Këtë muaj';
     const total=sum(items.map(x=>Number(x.amount||0)));
     const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
     const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
-    set('hdrTotal',fmt(month));
+    setText('hdrTotal',fmt(month));
     s1.textContent='Totale'; s2.textContent='Sot'; s3.textContent='Muaj';
-    set('stat1',fmt(total)); set('stat2',fmt(today)); set('stat3',fmt(month));
+    setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
   }
 }
 function openModal(which){ document.getElementById('modal'+which).classList.add('on'); }
@@ -454,7 +458,7 @@ async function payDebt(id){
 }
 async function loadDebts(){
   const { data, error } = await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
-  if(error){ debts=[]; return; }
+  if(error){ debts=[]; return; } // nëse tabela s’është gati, mos alarmo
   debts=data||[]; drawDebts(); refreshHeader();
 }
 function drawDebts(){
@@ -473,22 +477,20 @@ function drawDebts(){
       const ic=document.createElement('div'); ic.className='ic'; ic.textContent=(x.status==='paid')?'✅':'💳';
       const meta=document.createElement('div'); meta.className='meta';
       const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
-      const bits=[];
-      bits.push(x.kind==='borrow'?'Mora hua':'Dhash hua');
-      if(x.due) bits.push('Afati: '+fmtDate(x.due));
+      const bits=[]; bits.push(x.kind==='borrow'?'Mora hua':'Dhash hua'); if(x.due) bits.push('Afati: '+fmtDate(x.due));
       const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
       meta.appendChild(t); meta.appendChild(s);
+
       const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
-      const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L';
-      right.appendChild(amt);
+      const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L'; right.appendChild(amt);
       if(x.status==='open'){
         const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent='Paguaj'; pay.onclick=()=>payDebt(x.id);
         right.appendChild(pay);
       }else{
-        const badge=document.createElement('span'); badge.className='chip ok'; badge.textContent='Paguar';
-        right.appendChild(badge);
+        const badge=document.createElement('span'); badge.className='chip ok'; badge.textContent='Paguar'; right.appendChild(badge);
       }
       const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
+
       el.append(ic,meta,right,del); box.appendChild(el);
     });
   }
@@ -500,7 +502,7 @@ function segValue(segId){ return document.querySelector('#'+segId+' .active')?.d
 function resetSeg(segId,val){ const p=document.getElementById(segId); p.querySelectorAll('button').forEach(x=>x.classList.toggle('active', x.dataset.val===val)); }
 
 /* ===== Helpers ===== */
-function set(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
+function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
 function sum(a){ return a.reduce((s,n)=>s+Number(n||0),0); }
 function fmt(n){ return (Math.round(n*100)/100).toLocaleString('sq-AL'); }
 function isToday(x){ const d=new Date(x.d); const t=new Date(); return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate(); }
