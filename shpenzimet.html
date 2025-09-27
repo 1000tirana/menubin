@@ -55,13 +55,14 @@
       display:flex;gap:12px;align-items:center;background:var(--card);
       border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px
     }
-    /* Yuvarlak rozet – dıştan içe yeşilden aça */
+    /* (BÜYÜTTÜM) Yuvarlak rozet – dıştan içe yeşilden aça */
     .ic{
-      width:42px;height:42px;border-radius:50%;
+      width:52px;height:52px;border-radius:50%;
       display:grid;place-items:center;color:#0d1117;
-      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
       box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
-      border:1px solid rgba(255,255,255,.06)
+      border:1px solid rgba(255,255,255,.06);
+      font-size:24px;         /* emoji boyutu */
     }
     .meta{flex:1}
     .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
@@ -104,26 +105,27 @@
       box-shadow:0 -10px 30px rgba(0,0,0,.35);border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
     }
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
+    /* (BÜYÜTTÜM) nav ikon rozetleri */
     .btn .ico{
-      width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
-      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
-      box-shadow:inset 0 1px 3px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.06); font-size:18px
+      width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
+      box-shadow:inset 0 1px 3px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.06); font-size:22px
     }
-    .btn.active{color:#79c0ff} /* seçili yazı rengi hafif mavi gibi */
-    .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 40%, #1f6feb 100%);}
+    .btn.active{color:#79c0ff}
+    .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%);}
 
-    /* Daha küçük FAB */
+    /* FAB (küçük ve ortada) */
     .nav .fab{
       position:absolute;left:50%;transform:translateX(-50%);
       top:-22px;width:56px;height:56px;
-      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
       border:1px solid rgba(255,255,255,.06);
       border-radius:999px;color:#0d1117;font-size:28px;
       display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);
       cursor:pointer;z-index:2100;pointer-events:auto;
     }
     .nav .fab::after{content:"";position:absolute;inset:-12px;border-radius:999px;}
-    @supports (-webkit-touch-callout: none) { .nav .fab{ top:-24px; } } /* iOS ufak ofset */
+    @supports (-webkit-touch-callout: none) { .nav .fab{ top:-24px; } }
 
     .tab{display:none}.tab.active{display:block}
 
@@ -262,7 +264,7 @@
   </main>
 </div>
 
-<!-- Alt menü + FAB (ikonlar rozet içinde) -->
+<!-- Alt menü + FAB -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
   <a class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
@@ -399,7 +401,13 @@ function emojiCat(c){const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'�
 async function loadDebts(){try{const { data }=await withRetry(()=>supabase.from('debts').select('*').eq('user_id', sessionUser.id).order('created_at',{ascending:false}).limit(2000));debts=data||[];drawDebts();refreshHeader();}catch(e){alert('Gabim ngarkimi (borxhe): '+(e?.message||e));}}
 async function saveDebt(){const name=document.getElementById('dName').value.trim();const amt=parseFloat(document.getElementById('dAmt').value);const kind=segValue('segType');const due=document.getElementById('dDate').value||null;if(!name||!amt||isNaN(amt)){alert('Plotëso emrin dhe shumën.');return;}const payload={user_id:sessionUser.id,name,amount:amt,kind,due,status:'open'};const {data,error}=await supabase.from('debts').insert(payload).select().single();if(error){alert('Gabim: '+error.message);return;}debts.unshift(data);document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');closeModal('Debt');drawDebts();refreshHeader();}
 async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
-async function payDebt(id){const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();if(error){alert('Gabim: '+error.message);return;}debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();}
+/* (YENİ) Öderken onay soruyor */
+async function payDebt(id){
+  if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
+  const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
+  if(error){alert('Gabim: '+error.message);return;}
+  debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
+}
 function drawDebts(){
   const q=(document.getElementById('dq').value||'').trim().toLowerCase();
   const kindFilter=segValue('dSegFilter');
