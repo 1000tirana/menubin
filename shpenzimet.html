@@ -22,7 +22,7 @@
     }
 
     /* App shell */
-    .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(120px + var(--safe-bottom))}
+    .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
     header{
       background:linear-gradient(135deg,var(--primary),var(--primary2));
       color:#fff;border-bottom-left-radius:28px;border-bottom-right-radius:28px;
@@ -39,7 +39,9 @@
     .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
     .item{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:12px}
     .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--primary);color:#fff}
-    .meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta .s{font-size:12px;color:var(--muted)}
+    .meta{flex:1}
+    .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta .s{font-size:12px;color:var(--muted)}
     .amt{font-weight:800}
     .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
 
@@ -74,16 +76,17 @@
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none}
     .btn.active{color:var(--primary);font-weight:800}
 
-    /* FAB şimdi nav’ın İÇİNDE ve tam ortada */
+    /* FAB nav'ın içinde — KÜÇÜK */
     .nav .fab{
       position:absolute;left:50%;transform:translateX(-50%);
-      top:-22px; /* nav ile birleşik görünüm */
-      width:56px;height:56px;background:var(--primary);border:none;border-radius:999px;color:#fff;
-      display:grid;place-items:center;box-shadow:0 14px 32px rgba(106,90,224,.45);
+      top:-22px;                   /* etiketlerden uzak */
+      width:60px;height:60px;      /* küçültüldü */
+      background:var(--primary);border:none;border-radius:999px;color:#fff;
+      display:grid;place-items:center;box-shadow:0 12px 26px rgba(106,90,224,.40);
       cursor:pointer;z-index:2100;pointer-events:auto;
     }
-    .nav .fab::after{content:"";position:absolute;inset:-14px;border-radius:999px;} /* geniş hit-area */
-    @supports (-webkit-touch-callout: none) { .nav .fab{ top:-28px; } } /* iOS ufak ofset */
+    .nav .fab::after{content:"";position:absolute;inset:-12px;border-radius:999px;} /* geniş hit-area */
+    @supports (-webkit-touch-callout: none) { .nav .fab{ top:-24px; } } /* iOS ufak ofset */
 
     .tab{display:none}.tab.active{display:block}
 
@@ -177,9 +180,7 @@
 
     <section id="tab-debts" class="tab">
       <h3 class="sec">💳 Borxhet</h3>
-      <div class="row" style="margin:8px 0 10px">
-        <input id="dq" placeholder="Kërko borxhe..." oninput="drawDebts()">
-      </div>
+      <div class="row" style="margin:8px 0 10px"><input id="dq" placeholder="Kërko borxhe..." oninput="drawDebts()"></div>
       <div class="seg three" id="dSegFilter" style="margin-bottom:8px">
         <button type="button" class="active" data-val="">Të gjitha</button>
         <button type="button" data-val="borrow">Mora hua</button>
@@ -231,7 +232,7 @@
   <a class="btn" data-tab="debts" onclick="switchTab('debts')">💳<span>Borxhet</span></a>
   <a class="btn" data-tab="settings" onclick="switchTab('settings')">⚙️<span>Cilësime</span></a>
 
-  <!-- FAB artık nav'ın içinde -->
+  <!-- FAB artık nav'ın içinde, 60px -->
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
@@ -253,13 +254,14 @@
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ===== Supabase config (senin projen) ===== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
+/* Küçük yardımcılar */
 async function withRetry(task){let err;for(let i=0;i<3;i++){try{return await task()}catch(e){err=e;await new Promise(r=>setTimeout(r,600*(i+1)))}}throw err}
 const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
-
 let sessionUser=null, items=[], debts=[], profile={balance:0}, activeTab='home';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -269,11 +271,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
-  // Seg butonları
+  // Segment butonları
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b); drawDebts();});
 
-  // FAB: pointerup/touchend/click (nav içi)
+  // FAB — nav içi (pointerup/touchend/click)
   const fab=document.getElementById('openAdd');
   const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
   fab.addEventListener('pointerup', fabOpen, {passive:true});
