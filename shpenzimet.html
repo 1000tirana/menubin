@@ -107,15 +107,15 @@
       <div style="font-weight:800">Normal Holding</div>
       <div class="muted" id="who">@user</div>
     </div>
-    <div class="title">💰 <span>Shpenzimet</span></div>
+    <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Shpenzimet</span></div>
     <div class="big"><span id="hdrTotal">0</span> L</div>
-    <div class="muted">Këtë muaj</div>
+    <div class="muted" id="hdrSub">Këtë muaj</div>
   </header>
 
   <div class="stats">
-    <div class="card"><div class="muted">📊 Totale</div><div style="font-weight:800;font-size:20px"><span id="statTotal">0</span> L</div></div>
-    <div class="card"><div class="muted">📅 Sot</div><div style="font-weight:800;font-size:20px"><span id="statToday">0</span> L</div></div>
-    <div class="card"><div class="muted">🗓️ Muaj</div><div style="font-weight:800;font-size:20px"><span id="statMonth">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800;font-size:20px"><span id="stat1">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800;font-size:20px"><span id="stat2">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800;font-size:20px"><span id="stat3">0</span> L</div></div>
   </div>
 
   <main>
@@ -141,8 +141,13 @@
       <h3 class="sec">💳 Borxhet</h3>
       <div class="row" style="margin:8px 0 10px">
         <input id="dq" placeholder="Kërko borxhe..." oninput="renderDebts()">
+        <select id="dKind" onchange="renderDebts()">
+          <option value="">Gjitha</option>
+          <option value="lend">Dhash hua (verdëm)</option>
+          <option value="borrow">Mora hua (aldım)</option>
+        </select>
         <select id="dStatus" onchange="renderDebts()">
-          <option value="">Gjitha</option><option value="open">Hapur</option><option value="paid">Paguar</option>
+          <option value="">Gjitha</option><option value="open">Detyrim</option><option value="paid">Pagova</option>
         </select>
       </div>
       <div id="debtList" class="list"></div>
@@ -212,10 +217,21 @@
       <div style="flex:1"><label>Shuma (L)</label><input id="dAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
     </div>
     <div class="row" style="margin-top:8px">
-      <div style="flex:1"><label>Status</label>
-        <select id="dStat"><option value="open">Hapur</option><option value="paid">Paguar</option></select>
+      <div style="flex:1"><label>Lloj (Tip)</label>
+        <select id="dType">
+          <option value="lend">Dhash hua (borç verdim)</option>
+          <option value="borrow">Mora hua (borç aldım)</option>
+        </select>
       </div>
-      <div style="flex:1"><label>Afati</label><input id="dDate" type="date"></div>
+      <div style="flex:1"><label>Status</label>
+        <select id="dStat">
+          <option value="open">Detyrim (ödenecek)</option>
+          <option value="paid">Pagova (ödendi)</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div style="flex:1"><label>Afati (vade)</label><input id="dDate" type="date"></div>
     </div>
     <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
   </div>
@@ -228,7 +244,7 @@
 const SUPABASE_URL = 'https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 // =============================================
-/* SQL (Supabase SQL editor'da bir kez çalıştır):
+/* SQL (bir kez):
 create extension if not exists pgcrypto;
 create table if not exists public.expenses (
   id uuid primary key default gen_random_uuid(),
@@ -236,21 +252,25 @@ create table if not exists public.expenses (
   name text not null, amount numeric not null, category text not null,
   d date not null, created_at timestamptz default now()
 );
+alter table public.expenses enable row level security;
 create index if not exists expenses_user_d on public.expenses(user_id, d);
 
 create table if not exists public.debts (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   name text not null, amount numeric not null,
-  status text not null default 'open', due date, created_at timestamptz default now()
+  status text not null default 'open', due date, created_at timestamptz default now(), 
+  kind text not null default 'lend'  -- 'lend' | 'borrow'
 );
+alter table public.debts enable row level security;
 create index if not exists debts_user_due on public.debts(user_id, due);
+create index if not exists debts_user_kind on public.debts(user_id, kind);
 
--- RLS'i açın ve her iki tablo için şu politikaları ekleyin:
--- SELECT:  using (auth.uid() = user_id)
--- INSERT:  with check (auth.uid() = user_id)
--- UPDATE:  using (auth.uid() = user_id) with check (auth.uid() = user_id)
--- DELETE:  using (auth.uid() = user_id)
+-- RLS (her iki tablo için):
+-- SELECT  using (auth.uid() = user_id)
+-- INSERT  with check (auth.uid() = user_id)
+-- UPDATE  using (auth.uid() = user_id) with check (auth.uid() = user_id)
+-- DELETE  using (auth.uid() = user_id)
 */
 const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -270,10 +290,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // restore session
   const { data: { session } } = await supabase.auth.getSession();
-  if(session?.user){ sessionUser=session.user; showApp(); await Promise.all([loadExpenses(), loadDebts()]); } else showGate();
+  if(session?.user){ sessionUser=session.user; showApp(); await Promise.all([loadExpenses(), loadAllDebts()]); } else showGate();
 
   supabase.auth.onAuthStateChange(async (_event, session) => {
-    if(session?.user){ sessionUser=session.user; showApp(); await Promise.all([loadExpenses(), loadDebts()]); }
+    if(session?.user){ sessionUser=session.user; showApp(); await Promise.all([loadExpenses(), loadAllDebts()]); }
     else { sessionUser=null; showGate(); }
   });
 });
@@ -284,7 +304,7 @@ function showApp(){
   document.getElementById('gate').style.display='none'; document.getElementById('app').hidden=false; document.getElementById('navbar').hidden=false;
   document.getElementById('who').textContent = shortEmail(sessionUser?.email);
   document.getElementById('userInfo').textContent = shortEmail(sessionUser?.email);
-  render();
+  updateHeader(); render(); renderDebts();
 }
 function swapAuth(which){
   document.getElementById('tabLoginBtn').classList.toggle('active', which==='login');
@@ -315,8 +335,31 @@ function switchTab(t){
   document.getElementById('tab-'+t).classList.add('active');
   document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));
   document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');
+  updateHeader();
   if(t==='list') renderAll();
   if(t==='debts') renderDebts();
+}
+function updateHeader(){
+  const icon=document.getElementById('hdrIcon'), text=document.getElementById('hdrText'), sub=document.getElementById('hdrSub');
+  const s1=document.getElementById('s1name'), s2=document.getElementById('s2name'), s3=document.getElementById('s3name');
+
+  if(activeTab==='debts'){
+    icon.textContent='💳'; text.textContent='Borxhet'; sub.textContent='Detyrimet tuaja';
+    const total=sum(debts.map(n=>Number(n.amount||0)));
+    const open=sum(debts.filter(x=>x.status!=='paid').map(n=>Number(n.amount||0)));
+    const paid=sum(debts.filter(x=>x.status==='paid').map(n=>Number(n.amount||0)));
+    setText('hdrTotal',fmt(open));
+    s1.textContent='Gjithsej'; s2.textContent='Detyrim'; s3.textContent='Pagova';
+    setText('stat1',fmt(total)); setText('stat2',fmt(open)); setText('stat3',fmt(paid));
+  }else{
+    icon.textContent='💰'; text.textContent='Shpenzimet'; sub.textContent='Këtë muaj';
+    const total=sum(items.map(x=>Number(x.amount||0)));
+    const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
+    const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
+    setText('hdrTotal',fmt(month));
+    s1.textContent='Totale'; s2.textContent='Sot'; s3.textContent='Muaj';
+    setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
+  }
 }
 function openModal(kind){ document.getElementById('modal'+kind).classList.add('on'); }
 function closeModal(kind){ document.getElementById('modal'+kind).classList.remove('on'); }
@@ -349,24 +392,20 @@ async function saveExpense(){
   if(error){ alert('Gabim: '+error.message); return; }
   items.unshift(data);
   document.getElementById('mName').value=''; document.getElementById('mAmt').value='';
-  closeModal('Exp'); render(); renderAll();
+  closeModal('Exp'); render(); renderAll(); updateHeader();
 }
 async function delExpense(id){
   if(!confirm('Fshini këtë shpenzim?')) return;
   const { error } = await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);
   if(error){ alert('Gabim: '+error.message); return; }
-  items=items.filter(x=>x.id!==id); render(); renderAll();
+  items=items.filter(x=>x.id!==id); render(); renderAll(); updateHeader();
 }
 async function loadExpenses(){
   const { data, error } = await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
   if(error){ alert('Gabim ngarkimi: '+error.message); return; }
-  items=data||[]; render(); renderAll();
+  items=data||[]; render(); renderAll(); updateHeader();
 }
 function render(){
-  const total=sum(items.map(x=>Number(x.amount||0)));
-  const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
-  const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
-  setText('hdrTotal',fmt(total)); setText('statTotal',fmt(total)); setText('statToday',fmt(today)); setText('statMonth',fmt(month));
   const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
   const list=document.getElementById('recentList'); list.innerHTML='';
   if(recent.length===0){ document.getElementById('emptyHome').style.display='block'; }
@@ -397,32 +436,37 @@ function pickEmoji(cat){ const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':
 async function saveDebt(){
   const name=document.getElementById('dName').value.trim();
   const amt=parseFloat(document.getElementById('dAmt').value);
-  const status=document.getElementById('dStat').value;
+  const kind=document.getElementById('dType').value;     // 'lend' | 'borrow'
+  const status=document.getElementById('dStat').value;   // 'open' | 'paid'
   const due=document.getElementById('dDate').value || null;
   if(!name||!amt||isNaN(amt)){ alert('Plotëso emrin dhe shumën.'); return; }
-  const { data, error } = await supabase.from('debts').insert({ user_id:sessionUser.id, name, amount:amt, status, due }).select().single();
+  const payload={ user_id:sessionUser.id, name, amount:amt, status, due, kind };
+  const { data, error } = await supabase.from('debts').insert(payload).select().single();
   if(error){ alert('Gabim: '+error.message); return; }
   debts.unshift(data);
   document.getElementById('dName').value=''; document.getElementById('dAmt').value='';
-  closeModal('Debt'); renderDebts();
+  closeModal('Debt'); renderDebts(); updateHeader();
 }
 async function delDebt(id){
   if(!confirm('Fshini këtë borxh?')) return;
   const { error } = await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
   if(error){ alert('Gabim: '+error.message); return; }
-  debts=debts.filter(x=>x.id!==id); renderDebts();
+  debts=debts.filter(x=>x.id!==id); renderDebts(); updateHeader();
 }
-async function loadDebts(){
+async function loadAllDebts(){
   const { data, error } = await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
-  if(error){ alert('Gabim ngarkimi (debts): '+error.message); return; }
-  debts=data||[]; renderDebts();
+  if(error){ debts=[]; return; }  // tablo yoksa sessiz geç
+  debts=data||[]; renderDebts(); updateHeader();
 }
 function renderDebts(){
   const q=(document.getElementById('dq').value||'').trim().toLowerCase();
   const st=document.getElementById('dStatus').value;
+  const kind=document.getElementById('dKind').value;
   let arr=[...debts];
   if(q) arr=arr.filter(x=>x.name.toLowerCase().includes(q));
   if(st) arr=arr.filter(x=>x.status===st);
+  if(kind) arr=arr.filter(x=>x.kind===kind);
+
   const box=document.getElementById('debtList'); box.innerHTML='';
   if(arr.length===0){ document.getElementById('emptyDebts').style.display='block'; }
   else{
@@ -432,7 +476,10 @@ function renderDebts(){
       const ic=document.createElement('div'); ic.className='ic'; ic.textContent=(x.status==='paid')?'✅':'💳';
       const meta=document.createElement('div'); meta.className='meta';
       const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
-      const bits=[]; if(x.status) bits.push(x.status==='paid'?'Paguar':'Hapur'); if(x.due) bits.push('Afati: '+pretty(x.due));
+      const bits=[];
+      bits.push(x.kind==='lend' ? 'Dhash hua (verdëm)' : 'Mora hua (aldım)');
+      bits.push(x.status==='paid' ? 'Pagova' : 'Detyrim');
+      if(x.due) bits.push('Afati: '+pretty(x.due));
       const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
       meta.appendChild(t); meta.appendChild(s);
       const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L';
