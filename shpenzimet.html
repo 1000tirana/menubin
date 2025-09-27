@@ -4,18 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Normal Holding • Shpenzimet</title>
-  <meta name="theme-color" content="#2da44e">
+  <meta name="theme-color" content="#0d1117">
   <style>
-    /* ===== Tema: GitHub Light + Yeşil ===== */
+    /* ===== GitHub Dark tema ===== */
     :root{
-      --bg:#f6f8fa;           /* GitHub arkaplan */
-      --card:#ffffff;
-      --text:#1f2328;         /* GitHub metin */
-      --muted:#656d76;        /* ikincil metin */
-      --primary:#2da44e;      /* GitHub yeşil */
+      --bg:#0d1117;           /* ana arkaplan (siyah) */
+      --card:#161b22;         /* kart / nav arkaplanı */
+      --border:#30363d;       /* kenarlık */
+      --text:#c9d1d9;         /* ana metin */
+      --muted:#8b949e;        /* ikincil metin */
+      --primary:#2ea043;      /* GitHub green */
       --primary2:#238636;     /* koyu yeşil */
-      --danger:#cf222e;       /* GitHub kırmızı */
-      --shadow:0 10px 30px rgba(31,35,40,.08);
+      --danger:#f85149;       /* kırmızı */
+      --shadow:0 10px 30px rgba(0,0,0,.35);
       --safe-top:env(safe-area-inset-top,0px);
       --safe-bottom:env(safe-area-inset-bottom,0px);
     }
@@ -30,66 +31,95 @@
     /* Uygulama iskeleti */
     .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
     header{
-      background:linear-gradient(135deg,var(--primary),var(--primary2));
-      color:#fff;border-bottom-left-radius:28px;border-bottom-right-radius:28px;
-      padding:calc(16px + var(--safe-top)) 18px 16px;box-shadow:0 10px 26px rgba(45,164,78,.28)
+      background:linear-gradient(135deg,var(--primary2) 0%, var(--primary) 100%);
+      color:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px;
+      padding:calc(10px + var(--safe-top)) 16px 12px;
+      box-shadow:0 10px 28px rgba(35,134,54,.35)
     }
     header .top{display:flex;justify-content:space-between;align-items:center}
-    header .title{font-size:24px;font-weight:900;display:flex;gap:10px;margin-top:8px}
-    header .big{font-size:38px;font-weight:900;margin-top:10px}
-    .muted{color:var(--muted)}
+    header .title{font-size:20px;font-weight:900;display:flex;gap:8px;margin-top:6px}
+    header .big{font-size:32px;font-weight:900;margin-top:8px}
+    header .muted{color:#e6edf3;opacity:.8}
 
-    .stats{display:flex;gap:12px;padding:12px 14px;transform:translateY(-18px)}
-    .card{flex:1;background:var(--card);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+    .stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
+    .card{
+      flex:1;background:var(--card);border:1px solid var(--border);
+      border-radius:14px;padding:12px;box-shadow:var(--shadow)
+    }
 
-    main{padding:0 14px 24px}
+    main{padding:0 12px 20px}
     h3.sec{margin:0 0 8px}
 
     .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-    .item{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:12px}
-    .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--primary);color:#fff}
+    .item{
+      display:flex;gap:12px;align-items:center;background:var(--card);
+      border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px
+    }
+    /* Yuvarlak rozet – dıştan içe yeşilden aça */
+    .ic{
+      width:42px;height:42px;border-radius:50%;
+      display:grid;place-items:center;color:#0d1117;
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
+      box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
+      border:1px solid rgba(255,255,255,.06)
+    }
     .meta{flex:1}
-    .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
     .meta .s{font-size:12px;color:var(--muted)}
-    .amt{font-weight:800}
+    .amt{font-weight:900;color:#e6edf3}
     .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
 
     .row{display:flex;gap:10px}
     label{font-size:13px;color:var(--muted)}
     input,select{
-      width:100%;padding:12px;border:1px solid #d0d7de;border-radius:12px;
-      font-size:16px;background:#fff;-webkit-appearance:none
+      width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;
+      font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none
     }
     .actions{display:flex;gap:10px;margin-top:10px}
     .btnP,.btnS,.btnMini,.btn,button{
-      font-size:16px; /* iOS zoom’u engeller */
-      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-      -webkit-user-select:none; user-select:none;
+      font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+      -webkit-user-select:none;user-select:none;
     }
-    .btnP{flex:1;background:var(--primary);color:#fff;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
-    .btnS{flex:1;background:#e7f3ec;color:#1f2328;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
-    .btnMini{background:#e7f3ec;border:none;padding:8px 10px;border-radius:10px;font-weight:800;color:#1f2328;cursor:pointer}
-    .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#ddf4ff;color:#1f2328}
-    .chip.ok{background:#dafbe1;color:#1f2328}
+    .btnP{
+      flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);
+      color:#fff;border:1px solid #2ea043;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer
+    }
+    .btnS{
+      flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);
+      padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer
+    }
+    .btnMini{
+      background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;
+      font-weight:800;color:#e6edf3;cursor:pointer
+    }
+    .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-    /* Alt navigasyon + FAB (ortada) */
+    /* Alt navigasyon + FAB */
     nav.nav{
       position:fixed;left:0;right:0;bottom:0;
-      height:calc(70px + var(--safe-bottom));
-      padding:0 10px var(--safe-bottom);background:#fff;display:grid;
-      grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;
-      box-shadow:0 -8px 28px rgba(31,35,40,.06);border-top-left-radius:16px;border-top-right-radius:16px;
-      z-index:2000;
+      height:calc(76px + var(--safe-bottom));
+      padding:0 12px var(--safe-bottom);background:var(--card);
+      border-top:1px solid var(--border);
+      display:grid;grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;
+      box-shadow:0 -10px 30px rgba(0,0,0,.35);border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
     }
-    .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none}
-    .btn.active{color:var(--primary);font-weight:800}
+    .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
+    .btn .ico{
+      width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
+      box-shadow:inset 0 1px 3px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.06); font-size:18px
+    }
+    .btn.active{color:#79c0ff} /* seçili yazı rengi hafif mavi gibi */
+    .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 40%, #1f6feb 100%);}
 
-    /* Küçük FAB */
+    /* Daha küçük FAB */
     .nav .fab{
       position:absolute;left:50%;transform:translateX(-50%);
-      top:-22px;width:60px;height:60px;
-      background:var(--primary);border:none;border-radius:999px;color:#fff;
-      display:grid;place-items:center;box-shadow:0 12px 26px rgba(45,164,78,.35);
+      top:-22px;width:56px;height:56px;
+      background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 40%, #2ea043 100%);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:999px;color:#0d1117;font-size:28px;
+      display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);
       cursor:pointer;z-index:2100;pointer-events:auto;
     }
     .nav .fab::after{content:"";position:absolute;inset:-12px;border-radius:999px;}
@@ -98,22 +128,22 @@
     .tab{display:none}.tab.active{display:block}
 
     /* Modal alt sayfa */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;place-items:end;padding:14px;z-index:3000}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
     .modal.on{display:grid}
-    .sheet{background:#fff;border-radius:22px;padding:14px 14px 18px;width:100%;box-shadow:0 -10px 26px rgba(0,0,0,.14)}
+    .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
 
     /* Giriş paneli */
     .gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:4000}
-    .panel{background:#fff;width:min(520px,92vw);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+    .panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
     .tabs{display:flex;gap:6px;margin-bottom:10px}
-    .tabs button{flex:1;border:none;padding:10px;border-radius:10px;background:#e7f3ec;color:#1f2328;cursor:pointer}
-    .tabs button.active{background:var(--primary);color:#fff;font-weight:700}
+    .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
+    .tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
-    .seg{background:#e7f3ec;border-radius:12px;padding:4px;display:grid;gap:4px}
+    .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
     .seg.two{grid-template-columns:1fr 1fr}
     .seg.three{grid-template-columns:1fr 1fr 1fr}
-    .seg button{border:none;padding:10px;border-radius:10px;background:transparent;cursor:pointer;font-weight:700;color:#1f2328}
-    .seg button.active{background:var(--primary);color:#fff}
+    .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
+    .seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
 
     @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
   </style>
@@ -123,7 +153,7 @@
 <div id="gate" class="gate">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:900;font-size:20px">Normal Holding</div>
+      <div style="font-weight:900;font-size:18px">Normal Holding</div>
       <div class="muted">Shpenzimet • Cloud</div>
     </div>
     <div class="tabs">
@@ -164,9 +194,9 @@
   </header>
 
   <div class="stats">
-    <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800;font-size:20px"><span id="stat1">0</span> L</div></div>
-    <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800;font-size:20px"><span id="stat2">0</span> L</div></div>
-    <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800;font-size:20px"><span id="stat3">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0</span> L</div></div>
   </div>
 
   <main>
@@ -202,25 +232,25 @@
       <div class="item">
         <div class="ic">👤</div>
         <div class="meta"><div class="t">Përdoruesi</div><div class="s muted" id="userInfo">—</div></div>
-        <button class="del" style="color:#1f2328" onclick="logout()">🚪</button>
+        <button class="del" style="color:#e6edf3" onclick="logout()">🚪</button>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px">💼 Gjendja (L)</h4>
+        <h4 style="margin:0 0 8px;color:#e6edf3">💼 Gjendja (L)</h4>
         <div class="row"><input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="p.sh. 50000"></div>
         <div class="actions"><button class="btnP" onclick="saveBalance()">Ruaj gjendjen</button></div>
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px">Nëse nuk vendosësh, merret 0 dhe bilanci del negativ kur shpenzon.</div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px">📧 Ndrysho email</h4>
+        <h4 style="margin:0 0 8px;color:#e6edf3">📧 Ndrysho email</h4>
         <div class="row"><input id="newEmail" placeholder="email i ri p.sh. user@domain.com"></div>
         <div class="actions"><button class="btnP" onclick="changeEmail()">Ruaj email</button></div>
         <div id="emailMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px">🔐 Ndrysho fjalëkalimin</h4>
+        <h4 style="margin:0 0 8px;color:#e6edf3">🔐 Ndrysho fjalëkalimin</h4>
         <div class="row">
           <input id="newPass" type="password" placeholder="Fjalëkalimi i ri (min. 6)">
           <input id="newPass2" type="password" placeholder="Përsërit fjalëkalimin">
@@ -232,12 +262,12 @@
   </main>
 </div>
 
-<!-- Alt menü + FAB -->
+<!-- Alt menü + FAB (ikonlar rozet içinde) -->
 <nav class="nav" id="navbar" style="display:none">
-  <a class="btn active" data-tab="home" onclick="switchTab('home')">🏠<span>Kreu</span></a>
-  <a class="btn" data-tab="list" onclick="switchTab('list')">📋<span>Lista</span></a>
-  <a class="btn" data-tab="debts" onclick="switchTab('debts')">💳<span>Borxhet</span></a>
-  <a class="btn" data-tab="settings" onclick="switchTab('settings')">⚙️<span>Cilësime</span></a>
+  <a class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
+  <a class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
+  <a class="btn" data-tab="debts" onclick="switchTab('debts')"><span class="ico">💳</span><span>Borxhet</span></a>
+  <a class="btn" data-tab="settings" onclick="switchTab('settings')"><span class="ico">⚙️</span><span>Cilësime</span></a>
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
@@ -260,7 +290,7 @@
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ===== Supabase config (senin projen) ===== */
+/* ===== Supabase config ===== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -271,28 +301,23 @@ const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tj
 let sessionUser=null, items=[], debts=[], profile={balance:0}, activeTab='home';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // placeholder e-mailler
   document.getElementById('loginEmail').placeholder='emri@gmail.com';
   document.getElementById('regEmail').placeholder='emri@gmail.com';
 
-  // kategoriler
   const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
   DEFAULT_CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;mCat.appendChild(o.cloneNode(true));fCat.appendChild(o);});
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
-  // segment butonları
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b);drawDebts();});
 
-  // FAB — nav içi (pointerup/touchend/click)
   const fab=document.getElementById('openAdd');
   const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
   fab.addEventListener('pointerup', fabOpen, {passive:true});
   fab.addEventListener('touchend', fabOpen, {passive:true});
   fab.addEventListener('click', fabOpen);
 
-  // oturum
   const {data:{session}}=await supabase.auth.getSession();
   if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), loadExpenses(), loadDebts()]);}
   else showGate();
@@ -402,7 +427,7 @@ function drawDebts(){
       const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';
       pay.onclick=()=>payDebt(x.id); right.appendChild(pay);
     }else{
-      const badge=document.createElement('span'); badge.className='chip ok'; badge.textContent='Paguar'; right.appendChild(badge);
+      const badge=document.createElement('span'); badge.className='chip'; badge.textContent='Paguar'; right.appendChild(badge);
     }
 
     const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
