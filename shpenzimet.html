@@ -6,7 +6,6 @@
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
 <style>
-/* ===== GitHub Dark tema ===== */
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e;
@@ -16,9 +15,9 @@
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);
-  font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg);overscroll-behavior:none;overflow-x:hidden}
+body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;touch-action:manipulation}
 .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
 header{
   background:linear-gradient(135deg,var(--primary2) 0%, var(--primary) 100%);
@@ -36,7 +35,7 @@ h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
 
-/* Büyük yuvarlak rozet – dıştan içe yeşilden açığa */
+/* Yuvarlak ikon – dıştan içe yeşilden açığa */
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
@@ -58,14 +57,15 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* ALT NAV + FAB (orta boşluklu, eşit mesafe) */
+/* Alt NAV (orta boşluk sabit) + GPU hack */
 nav.nav{
   --fab-gap: 110px;
-  position:fixed;left:0;right:0;bottom:0;
+  position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
   height:calc(76px + var(--safe-bottom));padding:0 12px var(--safe-bottom);
   background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
   border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
-  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center
+  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;
+  backface-visibility:hidden;will-change:transform
 }
 .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
 .btn:nth-of-type(1){grid-column:1}.btn:nth-of-type(2){grid-column:2}.btn:nth-of-type(3){grid-column:4}.btn:nth-of-type(4){grid-column:5}
@@ -75,7 +75,7 @@ nav.nav{
 .btn.active{color:#79c0ff}
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
 
-/* FAB */
+/* FAB (biraz küçük) */
 .nav .fab{
   position:absolute;left:50%;transform:translateX(-50%);
   top:-22px;width:56px;height:56px;border-radius:999px;
@@ -99,15 +99,16 @@ nav.nav{
 .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
 .tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
-/* Segments */
+/* Segmentler */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
 .seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
 
-/* Emoji picker */
-.picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.picker button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:38px;height:38px;font-size:20px;cursor:pointer}
+/* Emoji picker modal */
+.picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
+.picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
+#emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
 
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
 </style>
@@ -208,16 +209,19 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KATEGORIAT: shto/fshi + emoji -->
+      <!-- KATEGORI: emoji butonu + modal -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
         <div style="border-top:1px solid var(--border);margin:12px 0"></div>
         <div class="row">
-          <div style="width:66px">
+          <div style="width:130px">
             <label>Emoji</label>
-            <input id="newCatEmoji" maxlength="2" placeholder="🍔">
-            <div class="picker" id="emojiQuick"></div>
+            <button class="btnS" id="emojiBtn" onclick="openEmojiPicker()">
+              <span id="emojiPreview" class="ic" style="width:38px;height:38px;font-size:20px;background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);margin-right:8px">🍔</span>
+              Zgjidh emoji
+            </button>
+            <input id="newCatEmoji" value="🍔" hidden>
           </div>
           <div style="flex:1">
             <label>Emri i kategorisë</label>
@@ -279,15 +283,20 @@ nav.nav{
   <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
 </div></div>
 
+<!-- Modal: Emoji seçici -->
+<div class="modal" id="modalEmoji"><div class="sheet">
+  <h3 style="margin:4px 0 10px">🙂 Zgjidh një emoji</h3>
+  <div id="emojiGrid" class="picker-grid"></div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Emoji')">Mbyll</button></div>
+</div></div>
+
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ===== Supabase config ===== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* Defaults */
 const DEFAULT_CATS=[
   {name:'Ushqime',emoji:'🍔'},
   {name:'Transport',emoji:'⛽'},
@@ -299,14 +308,11 @@ const DEFAULT_CATS=[
 
 let sessionUser=null, items=[], debts=[], profile={balance:0}, cats=[...DEFAULT_CATS], activeTab='home';
 
-/* Init */
 document.addEventListener('DOMContentLoaded', async () => {
-  // emoji hızlı seçim
-  const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🧒 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊'.split(' ');
-  const box=document.getElementById('emojiQuick'); picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e};box.appendChild(b);});
-
-  // kategori selectlerini hazırla
-  refreshCategorySelects();
+  // Emoji modalı doldur
+  const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🧒 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 🧯 🧪 🧳 ✈️ 🚗 ⛵ 🪙 💳 💎 🎓 📚 🖥️ 🔌 🔋 🧥 👟 🍼 🧻 🧴 🐶 🐱'.split(' ');
+  const grid=document.getElementById('emojiGrid');
+  picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});
 
   document.getElementById('loginEmail').placeholder='emri@gmail.com';
   document.getElementById('regEmail').placeholder='emri@gmail.com';
@@ -339,6 +345,9 @@ async function registerUser(){const email=document.getElementById('regEmail').va
 async function login(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const box=document.getElementById('authMsg');box.textContent='';const {error}=await supabase.auth.signInWithPassword({email,password:pass});if(error) box.textContent='Gabim: '+error.message}
 async function logout(){await supabase.auth.signOut()}
 function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');refreshHeader();if(t==='list')drawAll();if(t==='debts')drawDebts();}
+
+/* Emoji modal */
+function openEmojiPicker(){openModal('Emoji')}
 
 /* Profil (balance) */
 async function ensureProfile(){
