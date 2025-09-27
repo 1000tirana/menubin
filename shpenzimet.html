@@ -7,44 +7,67 @@
 <meta name="theme-color" content="#6a5ae0">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-:root{
-  --primary:#6a5ae0; --primary2:#7f6ff0; --muted:#7c82a1; --text:#1f2340; --bg:#f6f7fb;
-}
-body{background:var(--bg); color:var(--text);}
-.app-wrap{min-height:100vh; padding-bottom:92px;}
-header.hero{
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  color:#fff; border-bottom-left-radius:24px; border-bottom-right-radius:24px;
-  box-shadow:0 14px 30px rgba(106,90,224,.28);
-}
+:root{--primary:#6a5ae0;--primary2:#7f6ff0;--muted:#7c82a1;--text:#1f2340;--bg:#f6f7fb}
+body{background:var(--bg);color:var(--text)}
+.app-wrap{min-height:100vh;padding-bottom:92px}
+header.hero{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:0 14px 30px rgba(106,90,224,.28)}
 .hero .email{opacity:.9}
-.stat-card{border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.06)}
-.list-item{border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.stat-card{border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.list-item{border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
 /* bottom nav */
 .nav-bottom{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -10px 28px rgba(0,0,0,.07);border-top-left-radius:18px;border-top-right-radius:18px}
 .nav-bottom .grid{display:grid;grid-template-columns:1fr 1fr auto 1fr 1fr;align-items:center}
-.nav-bottom a{color:var(--muted); text-decoration:none; display:flex; flex-direction:column; align-items:center; padding:10px 0; font-size:12px}
-.nav-bottom a.active{color:var(--primary); font-weight:700}
-.fab{justify-self:center; transform:translateY(-22px); width:64px; height:64px; border-radius:999px; border:0; background:var(--primary); color:#fff; font-size:28px; display:grid; place-items:center; box-shadow:0 14px 30px rgba(106,90,224,.5)}
+.nav-bottom a{color:var(--muted);text-decoration:none;display:flex;flex-direction:column;align-items:center;padding:10px 0;font-size:12px}
+.nav-bottom a.active{color:var(--primary);font-weight:700}
+.fab{justify-self:center;transform:translateY(-22px);width:64px;height:64px;border-radius:999px;border:0;background:var(--primary);color:#fff;font-size:28px;display:grid;place-items:center;box-shadow:0 14px 30px rgba(106,90,224,.5)}
 /* segmented */
-.seg{background:#eef0f8; border-radius:12px; padding:4px; display:grid; gap:4px}
-.seg-2{grid-template-columns:1fr 1fr}
+.seg{background:#eef0f8;border-radius:12px;padding:4px;display:grid;gap:4px}
 .seg-5{grid-template-columns:repeat(5,1fr)}
-.seg button{border:0; padding:8px; border-radius:10px; background:transparent; font-weight:700; color:#4a4f6a}
-.seg button.active{background:var(--primary); color:#fff}
-.badge-soft{background:#eef0f8; color:#4a4f6a}
+.seg button{border:0;padding:8px;border-radius:10px;background:transparent;font-weight:700;color:#4a4f6a}
+.seg button.active{background:var(--primary);color:#fff}
+.badge-soft{background:#eef0f8;color:#4a4f6a}
 section.tab{display:none}
 section.tab.active{display:block}
 /* desktop side nav */
 @media(min-width:992px){
   .nav-bottom{display:none}
-  .with-sidenav{display:grid; grid-template-columns:220px 1fr; gap:18px}
-  .sidenav{position:sticky; top:18px; align-self:start}
-  .sidenav .list-group-item.active{background:var(--primary); border-color:var(--primary)}
+  .with-sidenav{display:grid;grid-template-columns:220px 1fr;gap:18px}
+  .sidenav{position:sticky;top:18px;align-self:start}
+  .sidenav .list-group-item.active{background:var(--primary);border-color:var(--primary)}
 }
+/* boot overlay */
+#boot{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;font:600 16px ui-rounded,system-ui,-apple-system; color:#1f2340; z-index:9999}
+#boot small{color:#7c82a1;display:block;margin-top:6px}
+#boot.err{background:#fff0f0;color:#b00020}
 </style>
 </head>
 <body>
+
+<!-- BOOT OVERLAY + SUPABASE LOADER (çift CDN) -->
+<div id="boot">Po ngarkohet…<small>ju lutem prisni</small></div>
+<script>
+(function(){
+  if(location.search.includes('sw=off') && 'serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister()))
+  }
+  function load(u){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+  function ok(){return window.supabase && window.supabase.createClient}
+  (async function ensure(){
+    try{
+      if(!ok()) await load('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');
+      if(!ok()) await load('https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js');
+      if(!ok()) throw new Error('Supabase SDK nuk u ngarkua (CDN).');
+      window.__SB_READY__=true; document.dispatchEvent(new Event('supabase-ready'));
+    }catch(e){
+      const b=document.getElementById('boot'); b.className='err';
+      b.innerHTML='Gabim: nuk u ngarkua Supabase SDK.<br><small>'+ (e?.message||e) +'</small>'; console.error(e);
+    }
+  })();
+})();
+function showBootErr(e){const b=document.getElementById('boot'); if(b){b.className='err'; b.innerHTML='Gabim nisje: '+(e?.message||e)}}
+</script>
+
+<!-- ======================= AUTH (Gate) ======================= -->
 <div id="gate" class="container py-5" style="max-width:520px; display:none">
   <div class="card shadow-sm">
     <div class="card-body">
@@ -55,29 +78,26 @@ section.tab.active{display:block}
         <li class="nav-item"><button class="nav-link" data-auth="register">Regjistrohu</button></li>
         <li class="nav-item"><button class="nav-link" data-auth="reset">Harrove fjalëkalimin?</button></li>
       </ul>
-
       <div data-pane="login">
         <div class="mb-2"><label class="form-label">Email</label><input id="loginEmail" class="form-control" autocomplete="username"></div>
         <div class="mb-3"><label class="form-label">Fjalëkalimi</label><input id="loginPass" type="password" class="form-control" autocomplete="current-password"></div>
         <button class="btn btn-primary w-100" id="btnLogin">Hyr</button>
       </div>
-
       <div data-pane="register" style="display:none">
         <div class="mb-2"><label class="form-label">Email</label><input id="regEmail" class="form-control" autocomplete="username"></div>
         <div class="mb-3"><label class="form-label">Fjalëkalimi (min 8)</label><input id="regPass" type="password" class="form-control" autocomplete="new-password"></div>
         <button class="btn btn-primary w-100" id="btnRegister">Krijo llogari</button>
       </div>
-
       <div data-pane="reset" style="display:none">
         <div class="mb-3"><label class="form-label">Email</label><input id="resetEmail" class="form-control" autocomplete="username"></div>
         <button class="btn btn-primary w-100" id="btnReset">Dërgo lidhjen e rivendosjes</button>
       </div>
-
       <div id="authMsg" class="mt-3 small text-muted"></div>
     </div>
   </div>
 </div>
 
+<!-- ======================= APP ======================= -->
 <div id="app" style="display:none">
   <div class="container app-wrap with-sidenav">
     <!-- DESKTOP SIDE NAV -->
@@ -97,7 +117,7 @@ section.tab.active{display:block}
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <div class="fw-bold">Normal Holding</div>
-            <div class="email small" id="who">@përdoruesi</div>
+            <div class="email small" id="who">@perdoruesi</div>
           </div>
           <div class="display-6 fw-bold text-end"><span id="balance">0</span> <small class="fs-6">ALL</small></div>
         </div>
@@ -107,28 +127,19 @@ section.tab.active{display:block}
       <!-- STATS -->
       <div class="row g-3 px-1 px-md-0">
         <div class="col-4">
-          <div class="card stat-card">
-            <div class="card-body p-2 text-center">
-              <div class="small text-muted">Shpenzim i sotëm</div>
-              <div class="fw-bold" id="todayExpense">0</div>
-            </div>
-          </div>
+          <div class="card stat-card"><div class="card-body p-2 text-center">
+            <div class="small text-muted">Shpenzim i sotëm</div><div class="fw-bold" id="todayExpense">0</div>
+          </div></div>
         </div>
         <div class="col-4">
-          <div class="card stat-card">
-            <div class="card-body p-2 text-center">
-              <div class="small text-muted">Të ardhura sot</div>
-              <div class="fw-bold" id="todayIncome">0</div>
-            </div>
-          </div>
+          <div class="card stat-card"><div class="card-body p-2 text-center">
+            <div class="small text-muted">Të ardhura sot</div><div class="fw-bold" id="todayIncome">0</div>
+          </div></div>
         </div>
         <div class="col-4">
-          <div class="card stat-card">
-            <div class="card-body p-2 text-center">
-              <div class="small text-muted">Huatë aktive</div>
-              <div class="fw-bold" id="activeDebts">0</div>
-            </div>
-          </div>
+          <div class="card stat-card"><div class="card-body p-2 text-center">
+            <div class="small text-muted">Huatë aktive</div><div class="fw-bold" id="activeDebts">0</div>
+          </div></div>
         </div>
       </div>
 
@@ -215,7 +226,7 @@ section.tab.active{display:block}
         <div class="px-1 px-md-0">
           <div class="card shadow-sm mb-3"><div class="card-body">
             <h6 class="mb-1">Përdoruesi</h6>
-            <div class="small text-muted">Emri i shfaqur: <b id="uName">@përdoruesi</b></div>
+            <div class="small text-muted">Emri i shfaqur: <b id="uName">@perdoruesi</b></div>
             <div class="small text-muted">Email: <b id="uEmail">-</b></div>
             <button class="btn btn-outline-secondary btn-sm mt-2" id="btnLogout">Dil</button>
           </div></div>
@@ -272,16 +283,13 @@ section.tab.active{display:block}
           <button data-val="Mora hua">Mora hua</button>
           <button data-val="Kthim hua">Kthim hua</button>
         </div>
-
         <div class="row g-2">
           <div class="col-6"><label class="form-label">Shuma (ALL)</label><input id="txAmt" type="number" step="0.01" class="form-control"></div>
           <div class="col-6"><label class="form-label">Data</label><input id="txDate" type="date" class="form-control"></div>
           <div class="col-6"><label class="form-label">Ora</label><input id="txTime" type="time" class="form-control"></div>
           <div class="col-6"><label class="form-label">Llogaria</label><select id="txAcc" class="form-select"></select></div>
           <div class="col-6"><label class="form-label">Kategoria</label><select id="txCat" class="form-select"></select></div>
-
-          <!-- Kontakti + Afati (vetëm për hua) -->
-          <div class="col-6" id="wrapContact" style="display:none">
+          <div class="col-6" id="wrapContact" style="display:none; position:relative">
             <label class="form-label">Kontakti (shkruaj për ta kërkuar…)</label>
             <input id="txContact" class="form-control" autocomplete="off">
             <div id="suggestions" class="list-group position-absolute w-100" style="z-index:1055; display:none"></div>
@@ -289,7 +297,6 @@ section.tab.active{display:block}
           <div class="col-6" id="wrapDue" style="display:none">
             <label class="form-label">Afati</label><input id="txDue" type="date" class="form-control">
           </div>
-
           <div class="col-12"><label class="form-label">Përshkrimi</label><textarea id="txDesc" class="form-control" rows="2"></textarea></div>
         </div>
       </div>
@@ -302,11 +309,17 @@ section.tab.active{display:block}
 </div>
 
 <!-- JS DEPS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
+/* Supabase hazır olana kadar bekle */
+if(!window.__SB_READY__){
+  document.addEventListener('supabase-ready', ()=>{ try{ initApp(); } catch(e){ showBootErr(e) } });
+}else{ try{ initApp(); } catch(e){ showBootErr(e) } }
+
+/* ============================= APP ============================= */
+function initApp(){
 /* ===================== KONFIG SUPABASE ===================== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
@@ -314,117 +327,82 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 /* ========== SQL — ekzekutoje 1 herë në Supabase SQL Editor ==========
 create extension if not exists pgcrypto;
--- CONTACTS
 create table if not exists public.contacts(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
   emri text not null, telefoni text null, shenime text null, created_at timestamptz default now()
 );
 create index if not exists idx_contacts_user_name on public.contacts(user_id, emri);
--- ACCOUNTS
 create table if not exists public.accounts(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
   emri text not null, lloji text not null default 'Portofol', saldo_fillestare numeric default 0, created_at timestamptz default now()
 );
--- CATEGORIES
 create table if not exists public.categories(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
   emri text not null, tipi text not null, ngjyra text default '#6a5ae0'
 );
--- TRANSACTIONS
 create table if not exists public.transactions(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
   account_id uuid not null references public.accounts(id) on delete cascade,
   category_id uuid null references public.categories(id) on delete set null,
   contact_id uuid null references public.contacts(id) on delete set null,
-  tipi text not null, -- 'Të ardhura'|'Shpenzim'|'Dhashë hua'|'Mora hua'|'Kthim hua'
-  shuma numeric(12,2) not null, pershkrimi text null,
-  data date not null, ora time not null default now()::time, created_at timestamptz default now()
+  tipi text not null, shuma numeric(12,2) not null, pershkrimi text null, data date not null, ora time not null default now()::time, created_at timestamptz default now()
 );
 create index if not exists idx_tx_user_date on public.transactions(user_id, data);
-
--- DEBTS
 create table if not exists public.debts(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
   contact_id uuid not null references public.contacts(id) on delete cascade,
-  drejtimi text not null, -- 'Dhashë hua'|'Mora hua'
-  shuma_fillestare numeric(12,2) not null,
-  shuma_e_mbetur numeric(12,2) not null,
+  drejtimi text not null, shuma_fillestare numeric(12,2) not null, shuma_e_mbetur numeric(12,2) not null,
   data_fillimit date not null, afati date null, status text not null default 'Aktive'
 );
 create index if not exists idx_debts_user_status on public.debts(user_id, status);
-
 create table if not exists public.debt_payments(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  debt_id uuid not null references public.debts(id) on delete cascade,
-  shuma numeric(12,2) not null, data date not null, shenime text null
+  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
+  debt_id uuid not null references public.debts(id) on delete cascade, shuma numeric(12,2) not null, data date not null, shenime text null
 );
 create index if not exists idx_debtpay_user_date on public.debt_payments(user_id, data);
-
--- RLS për të gjitha tabelat (select/insert/update/delete vetë të tuat)
 alter table public.contacts enable row level security;
 alter table public.accounts enable row level security;
 alter table public.categories enable row level security;
 alter table public.transactions enable row level security;
 alter table public.debts enable row level security;
 alter table public.debt_payments enable row level security;
-
 create policy if not exists "own select" on public.contacts for select using (auth.uid()=user_id);
 create policy if not exists "own ins" on public.contacts for insert with check (auth.uid()=user_id);
 create policy if not exists "own upd" on public.contacts for update using (auth.uid()=user_id) with check (auth.uid()=user_id);
 create policy if not exists "own del" on public.contacts for delete using (auth.uid()=user_id);
-
--- përsërite 4 politikat edhe për accounts, categories, transactions, debts, debt_payments (me të njëjtët emra).
+-- të njëjtat 4 politika për accounts, categories, transactions, debts, debt_payments.
 ===================================================================== */
 
-/* ===================== STATE ===================== */
-let me=null;            // session user
-let accounts=[], categories=[], contacts=[], transactions=[], debts=[], debtPays=[];
+let me=null, accounts=[], categories=[], contacts=[], transactions=[], debts=[], debtPays=[];
 let chartMonthly=null;
 const fmtALL = n => new Intl.NumberFormat('sq-AL',{maximumFractionDigits:2}).format(Number(n||0));
 const todayISO = () => new Date().toISOString().slice(0,10);
+const escapeHtml = s => (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+const fmtDate = iso => { if(!iso) return ''; const d=new Date(iso+'T00:00:00'); return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`; };
 
 /* ===================== AUTH UI ===================== */
-const gate=document.getElementById('gate');
-const app=document.getElementById('app');
+const gate=document.getElementById('gate'), app=document.getElementById('app');
 document.querySelectorAll('[data-auth]').forEach(b=>{
-  b.onclick=()=>{
-    document.querySelectorAll('[data-auth]').forEach(x=>x.classList.remove('active'));
+  b.onclick=()=>{ document.querySelectorAll('[data-auth]').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     const tgt=b.getAttribute('data-auth');
     document.querySelectorAll('[data-pane]').forEach(p=>p.style.display=(p.getAttribute('data-pane')===tgt)?'block':'none');
     document.getElementById('authMsg').textContent='';
   };
 });
-document.getElementById('btnLogin').onclick=async()=>{
-  setAuthMsg('');
-  const email=val('#loginEmail'), pass=val('#loginPass');
-  const {error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error) setAuthMsg('Gabim: '+error.message);
-};
-document.getElementById('btnRegister').onclick=async()=>{
-  setAuthMsg('');
-  const email=val('#regEmail'), pass=val('#regPass');
-  if(!email || pass.length<8) return setAuthMsg('Fjalëkalimi të jetë ≥ 8.');
+document.getElementById('btnLogin').onclick=async()=>{ setAuthMsg(''); const email=val('#loginEmail'), pass=val('#loginPass');
+  const {error}=await sb.auth.signInWithPassword({email,password:pass}); if(error) setAuthMsg('Gabim: '+error.message); };
+document.getElementById('btnRegister').onclick=async()=>{ setAuthMsg(''); const email=val('#regEmail'), pass=val('#regPass');
+  if(!email||pass.length<8) return setAuthMsg('Fjalëkalimi të jetë ≥ 8.');
   const {error}=await sb.auth.signUp({email,password:pass});
-  setAuthMsg(error?('Gabim: '+error.message):'U krijua. Të dërguam një email verifikimi.');
-};
-document.getElementById('btnReset').onclick=async()=>{
-  setAuthMsg('');
-  const email=val('#resetEmail');
+  setAuthMsg(error?('Gabim: '+error.message):'U krijua. Të dërguam një email verifikimi.'); };
+document.getElementById('btnReset').onclick=async()=>{ setAuthMsg(''); const email=val('#resetEmail');
   const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
-  setAuthMsg(error?('Gabim: '+error.message):'U dërgua email për rivendosje.');
-};
+  setAuthMsg(error?('Gabim: '+error.message):'U dërgua email për rivendosje.'); };
 function setAuthMsg(t){document.getElementById('authMsg').textContent=t}
+function val(sel){return document.querySelector(sel).value.trim()}
 
-/* session */
-(async()=>{
-  const {data:{session}}=await sb.auth.getSession();
+(async()=>{ const {data:{session}}=await sb.auth.getSession();
   if(session?.user){ me=session.user; afterLogin(); } else { gate.style.display='block'; }
 })();
 sb.auth.onAuthStateChange((_e,session)=>{ if(session?.user){ me=session.user; afterLogin(); } else { showGate(); }});
@@ -434,188 +412,114 @@ function showApp(){ gate.style.display='none'; app.style.display='block'; }
 /* ===================== AFTER LOGIN ===================== */
 async function afterLogin(){
   showApp();
-  document.getElementById('who').textContent = (me.email||'-').split('@')[0];
-  document.getElementById('uName').textContent = (me.email||'-').split('@')[0];
-  document.getElementById('uEmail').textContent = me.email||'-';
+  const mask=(me.email||'-').split('@')[0];
+  document.getElementById('who').textContent=mask;
+  document.getElementById('uName').textContent=mask;
+  document.getElementById('uEmail').textContent=me.email||'-';
 
   await Promise.all([loadAccounts(), loadCategories(), loadContacts()]);
   await ensureDefaults();
   await Promise.all([loadTransactions(), loadDebts(), loadDebtPays()]);
   refreshAllUI();
+
+  // boot overlay kapat
+  const b=document.getElementById('boot'); if(b) b.style.display='none';
 }
 
 /* ===================== LOADERS ===================== */
-async function loadAccounts(){
-  const {data}=await sb.from('accounts').select('*').eq('user_id',me.id).order('created_at',{ascending:true});
-  accounts=data||[];
-}
-async function loadCategories(){
-  const {data}=await sb.from('categories').select('*').eq('user_id',me.id).order('emri',{ascending:true});
-  categories=data||[];
-}
-async function loadContacts(term=''){
-  let q=sb.from('contacts').select('*').eq('user_id',me.id).order('emri',{ascending:true});
-  if(term) q=q.ilike('emri','%'+term+'%').limit(10);
-  const {data}=await q;
-  contacts=data||[];
-}
-async function loadTransactions(){
-  const {data}=await sb.from('transactions').select('*').eq('user_id',me.id).order('data',{ascending:false}).order('created_at',{ascending:false}).limit(500);
-  transactions=data||[];
-}
-async function loadDebts(){
-  const {data}=await sb.from('debts').select('*, contacts!inner(emri)').eq('user_id',me.id).order('data_fillimit',{ascending:false});
-  debts=data||[];
-}
-async function loadDebtPays(){
-  const {data}=await sb.from('debt_payments').select('*').eq('user_id',me.id).order('data',{ascending:false});
-  debtPays=data||[];
-}
+async function loadAccounts(){ const {data}=await sb.from('accounts').select('*').eq('user_id',me.id).order('created_at',{ascending:true}); accounts=data||[]; }
+async function loadCategories(){ const {data}=await sb.from('categories').select('*').eq('user_id',me.id).order('emri',{ascending:true}); categories=data||[]; }
+async function loadContacts(term=''){ let q=sb.from('contacts').select('*').eq('user_id',me.id).order('emri',{ascending:true}); if(term) q=q.ilike('emri','%'+term+'%').limit(10); const {data}=await q; contacts=data||[]; }
+async function loadTransactions(){ const {data}=await sb.from('transactions').select('*').eq('user_id',me.id).order('data',{ascending:false}).order('created_at',{ascending:false}).limit(500); transactions=data||[]; }
+async function loadDebts(){ const {data}=await sb.from('debts').select('*, contacts!inner(emri)').eq('user_id',me.id).order('data_fillimit',{ascending:false}); debts=data||[]; }
+async function loadDebtPays(){ const {data}=await sb.from('debt_payments').select('*').eq('user_id',me.id).order('data',{ascending:false}); debtPays=data||[]; }
 
-/* ===================== DEFAULT DATA ===================== */
+/* ===================== DEFAULTS ===================== */
 async function ensureDefaults(){
-  if(accounts.length===0){
-    await sb.from('accounts').insert({user_id:me.id,emri:'Portofol',lloji:'Portofol',saldo_fillestare:0});
-    await loadAccounts();
-  }
+  if(accounts.length===0){ await sb.from('accounts').insert({user_id:me.id,emri:'Portofol',lloji:'Portofol',saldo_fillestare:0}); await loadAccounts(); }
   if(categories.length===0){
     const seed=[['Ushqime','Shpenzim'],['Transport','Shpenzim'],['Qira','Shpenzim'],['Pagë','Të ardhura'],['Shitje','Të ardhura']];
-    await sb.from('categories').insert(seed.map(([emri,tipi])=>({user_id:me.id,emri,tipi})));
-    await loadCategories();
+    await sb.from('categories').insert(seed.map(([emri,tipi])=>({user_id:me.id,emri,tipi}))); await loadCategories();
   }
-  // fill dropdowns
-  fillSelect('#txAcc', accounts, 'id','emri');
-  fillSelect('#txCat', categories, 'id','emri');
-  fillSelect('#fCat', [{id:'',emri:'Kategoria'}].concat(categories),'id','emri');
-  fillSelect('#fAcc', [{id:'',emri:'Llogaria'}].concat(accounts),'id','emri');
+  fillSelect('#txAcc',accounts,'id','emri'); fillSelect('#txCat',categories,'id','emri');
+  fillSelect('#fCat',[{id:'',emri:'Kategoria'}].concat(categories),'id','emri');
+  fillSelect('#fAcc',[{id:'',emri:'Llogaria'}].concat(accounts),'id','emri');
 }
 
 /* ===================== UI HELPERS ===================== */
-function val(sel){return document.querySelector(sel).value.trim()}
-function fillSelect(sel, arr, v='id', t='emri'){
-  const el=document.querySelector(sel); el.innerHTML='';
-  arr.forEach(o=>{ const opt=document.createElement('option'); opt.value=o[v]??''; opt.textContent=o[t]; el.appendChild(opt); });
-}
+function fillSelect(sel,arr,v='id',t='emri'){ const el=document.querySelector(sel); el.innerHTML=''; arr.forEach(o=>{const op=document.createElement('option'); op.value=o[v]??''; op.textContent=o[t]; el.appendChild(op)}) }
 function itemTxRow(x){
-  const cat = categories.find(c=>c.id===x.category_id)?.emri || '';
-  const acc = accounts.find(a=>a.id===x.account_id)?.emri || '';
-  const contact = contacts.find(c=>c.id===x.contact_id)?.emri || '';
-  const badgeType = x.tipi==='Shpenzim'?'bg-danger-subtle text-danger':
-                    x.tipi==='Të ardhura'?'bg-success-subtle text-success':
-                    x.tipi==='Kthim hua'?'bg-dark-subtle text-dark':'bg-primary-subtle text-primary';
-  const div=document.createElement('div');
-  div.className='list-item p-2';
-  div.innerHTML=`
-    <div class="d-flex justify-content-between align-items-center">
-      <div>
-        <span class="badge ${badgeType}">${x.tipi}</span>
-        <b class="ms-2">${cat || acc || '-'}</b>
-        ${contact?`<span class="text-muted small ms-1">• ${contact}</span>`:''}
-        <div class="small text-muted">${fmtDate(x.data)} • ${x.ora?.slice(0,5) || ''} ${x.pershkrimi?('• '+escapeHtml(x.pershkrimi)):""}</div>
-      </div>
-      <div class="fw-bold">${fmtALL(x.shuma)} ALL</div>
-    </div>`;
-  return div;
+  const cat=categories.find(c=>c.id===x.category_id)?.emri||''; const acc=accounts.find(a=>a.id===x.account_id)?.emri||''; const contact=contacts.find(c=>c.id===x.contact_id)?.emri||'';
+  const badge = x.tipi==='Shpenzim'?'bg-danger-subtle text-danger': x.tipi==='Të ardhura'?'bg-success-subtle text-success': x.tipi==='Kthim hua'?'bg-dark-subtle text-dark':'bg-primary-subtle text-primary';
+  const d=document.createElement('div'); d.className='list-item p-2';
+  d.innerHTML=`<div class="d-flex justify-content-between align-items-center">
+    <div><span class="badge ${badge}">${x.tipi}</span>
+      <b class="ms-2">${cat||acc||'-'}</b>${contact?`<span class="text-muted small ms-1">• ${contact}</span>`:''}
+      <div class="small text-muted">${fmtDate(x.data)} • ${x.ora?.slice(0,5)||''} ${x.pershkrimi?('• '+escapeHtml(x.pershkrimi)):""}</div>
+    </div><div class="fw-bold">${fmtALL(x.shuma)} ALL</div></div>`;
+  return d;
 }
 function itemContactRow(c){
-  const div=document.createElement('div'); div.className='list-item p-2';
-  const totalDebts = debts.filter(d=>d.contact_id===c.id && d.status==='Aktive');
-  const mbetje = totalDebts.reduce((s,d)=>s+Number(d.shuma_e_mbetur||0),0);
-  div.innerHTML=`<div class="d-flex justify-content-between align-items-center">
+  const d=document.createElement('div'); d.className='list-item p-2';
+  const aktive = debts.filter(x=>x.contact_id===c.id && x.status==='Aktive');
+  const mb = aktive.reduce((s,x)=>s+Number(x.shuma_e_mbetur||0),0);
+  d.innerHTML=`<div class="d-flex justify-content-between align-items-center">
     <div><b>${escapeHtml(c.emri)}</b><div class="small text-muted">${c.telefoni||''}</div></div>
-    <div class="text-end"><div class="small text-muted">Aktive: ${totalDebts.length}</div><div class="fw-bold">${fmtALL(mbetje)} ALL</div></div>
+    <div class="text-end"><div class="small text-muted">Aktive: ${aktive.length}</div><div class="fw-bold">${fmtALL(mb)} ALL</div></div>
   </div>`;
-  return div;
+  return d;
 }
-function fmtDate(iso){ if(!iso) return ''; const d=new Date(iso+'T00:00:00'); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=d.getFullYear(); return `${dd}.${mm}.${yy}`;}
-function escapeHtml(s){return (s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
 
 /* ===================== REFRESH UI ===================== */
 function refreshAllUI(){
-  // balance
-  const inc = transactions.filter(t=>t.tipi==='Të ardhura').reduce((s,t)=>s+Number(t.shuma),0);
-  const exp = transactions.filter(t=>t.tipi==='Shpenzim').reduce((s,t)=>s+Number(t.shuma),0);
-  document.getElementById('balance').textContent = fmtALL(inc-exp);
-  // stats
+  const inc=transactions.filter(t=>t.tipi==='Të ardhura').reduce((s,t)=>s+Number(t.shuma),0);
+  const exp=transactions.filter(t=>t.tipi==='Shpenzim').reduce((s,t)=>s+Number(t.shuma),0);
+  document.getElementById('balance').textContent=fmtALL(inc-exp);
   const tISO=todayISO();
-  const tExp=transactions.filter(t=>t.data===tISO && t.tipi==='Shpenzim').reduce((s,t)=>s+Number(t.shuma),0);
-  const tInc=transactions.filter(t=>t.data===tISO && t.tipi==='Të ardhura').reduce((s,t)=>s+Number(t.shuma),0);
-  const actDebts=debts.filter(d=>d.status==='Aktive').length;
-  document.getElementById('todayExpense').textContent=fmtALL(tExp);
-  document.getElementById('todayIncome').textContent=fmtALL(tInc);
-  document.getElementById('activeDebts').textContent=actDebts;
+  document.getElementById('todayExpense').textContent=fmtALL(transactions.filter(t=>t.data===tISO&&t.tipi==='Shpenzim').reduce((s,t)=>s+Number(t.shuma),0));
+  document.getElementById('todayIncome').textContent=fmtALL(transactions.filter(t=>t.data===tISO&&t.tipi==='Të ardhura').reduce((s,t)=>s+Number(t.shuma),0));
+  document.getElementById('activeDebts').textContent=debts.filter(d=>d.status==='Aktive').length;
 
-  // latest
-  const latest=document.getElementById('latestList'); latest.innerHTML='';
-  transactions.slice(0,10).forEach(t=>latest.appendChild(itemTxRow(t)));
-  document.getElementById('emptyHome').style.display = transactions.length? 'none':'block';
-
-  // tx list (with filters)
-  renderTxList();
-
-  // contacts list
-  renderContacts();
-
-  // reports
-  renderReports();
+  const latest=document.getElementById('latestList'); latest.innerHTML=''; transactions.slice(0,10).forEach(t=>latest.appendChild(itemTxRow(t)));
+  document.getElementById('emptyHome').style.display=transactions.length?'none':'block';
+  renderTxList(); renderContacts(); renderReports();
 }
 function renderTxList(){
   const list=document.getElementById('txList'); list.innerHTML='';
   let arr=[...transactions];
   const from=val('#fDateFrom'), to=val('#fDateTo'), type=document.getElementById('fType').value, cat=val('#fCat'), acc=val('#fAcc'), cont=val('#fContact').toLowerCase();
-  if(from) arr=arr.filter(t=>t.data>=from);
-  if(to) arr=arr.filter(t=>t.data<=to);
-  if(type) arr=arr.filter(t=>t.tipi===type);
-  if(cat) arr=arr.filter(t=>t.category_id===cat);
-  if(acc) arr=arr.filter(t=>t.account_id===acc);
+  if(from) arr=arr.filter(t=>t.data>=from); if(to) arr=arr.filter(t=>t.data<=to);
+  if(type) arr=arr.filter(t=>t.tipi===type); if(cat) arr=arr.filter(t=>t.category_id===cat); if(acc) arr=arr.filter(t=>t.account_id===acc);
   if(cont) arr=arr.filter(t=> (contacts.find(c=>c.id===t.contact_id)?.emri.toLowerCase()||'').includes(cont));
   arr.forEach(t=>list.appendChild(itemTxRow(t)));
-  document.getElementById('emptyTx').style.display = arr.length?'none':'block';
+  document.getElementById('emptyTx').style.display=arr.length?'none':'block';
 }
 function renderContacts(){
-  const q=val('#qContact').toLowerCase();
-  const cl=document.getElementById('contactsList'); cl.innerHTML='';
+  const q=val('#qContact').toLowerCase(); const box=document.getElementById('contactsList'); box.innerHTML='';
   let arr=[...contacts]; if(q) arr=arr.filter(c=>c.emri.toLowerCase().includes(q));
-  arr.forEach(c=>cl.appendChild(itemContactRow(c)));
-  document.getElementById('emptyContacts').style.display = arr.length?'none':'block';
+  arr.forEach(c=>box.appendChild(itemContactRow(c)));
+  document.getElementById('emptyContacts').style.display=arr.length?'none':'block';
 }
 function renderReports(){
-  // monthly buckets (YYYY-MM)
   const mapInc={}, mapExp={};
-  transactions.forEach(t=>{
-    const ym=(t.data||'').slice(0,7);
-    if(t.tipi==='Të ardhura') mapInc[ym]=(mapInc[ym]||0)+Number(t.shuma);
-    if(t.tipi==='Shpenzim') mapExp[ym]=(mapExp[ym]||0)+Number(t.shuma);
-  });
+  transactions.forEach(t=>{const ym=(t.data||'').slice(0,7); if(t.tipi==='Të ardhura') mapInc[ym]=(mapInc[ym]||0)+Number(t.shuma); if(t.tipi==='Shpenzim') mapExp[ym]=(mapExp[ym]||0)+Number(t.shuma);});
   const months=[...new Set([...Object.keys(mapInc),...Object.keys(mapExp)])].sort();
   const inc=months.map(m=>mapInc[m]||0), exp=months.map(m=>mapExp[m]||0);
-  const ctx=document.getElementById('chartMonthly');
-  if(chartMonthly) chartMonthly.destroy();
-  chartMonthly=new Chart(ctx,{type:'line',data:{labels:months, datasets:[
-    {label:'Të ardhura',data:inc},
-    {label:'Shpenzime',data:exp}
-  ]}, options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{ticks:{callback:v=>fmtALL(v)}}}});
-
-  // top categories
-  const sums={};
-  transactions.filter(t=>t.tipi==='Shpenzim').forEach(t=>{
-    const name=categories.find(c=>c.id===t.category_id)?.emri||'(pa kategori)';
-    sums[name]=(sums[name]||0)+Number(t.shuma);
-  });
+  const ctx=document.getElementById('chartMonthly'); if(window.Chart){ if(chartMonthly) chartMonthly.destroy();
+    chartMonthly=new Chart(ctx,{type:'line',data:{labels:months,datasets:[{label:'Të ardhura',data:inc},{label:'Shpenzime',data:exp}]},
+      options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{ticks:{callback:v=>fmtALL(v)}}}})}
+  const sums={}; transactions.filter(t=>t.tipi==='Shpenzim').forEach(t=>{const name=categories.find(c=>c.id===t.category_id)?.emri||'(pa kategori)'; sums[name]=(sums[name]||0)+Number(t.shuma)});
   const top=Object.entries(sums).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const box=document.getElementById('topCats'); box.innerHTML='';
-  top.forEach(([k,v])=>{ const d=document.createElement('div'); d.innerHTML=`<div class="d-flex justify-content-between"><span>${escapeHtml(k)}</span><b>${fmtALL(v)} ALL</b></div>`; box.appendChild(d); });
-
-  // debt report
+  const box=document.getElementById('topCats'); box.innerHTML=''; top.forEach(([k,v])=>{const d=document.createElement('div'); d.innerHTML=`<div class="d-flex justify-content-between"><span>${escapeHtml(k)}</span><b>${fmtALL(v)} ALL</b></div>`; box.appendChild(d);});
   const lend=debts.filter(d=>d.drejtimi==='Dhashë hua').reduce((s,d)=>s+Number(d.shuma_fillestare||0),0);
   const borrow=debts.filter(d=>d.drejtimi==='Mora hua').reduce((s,d)=>s+Number(d.shuma_fillestare||0),0);
   const left=debts.reduce((s,d)=>s+Number(d.shuma_e_mbetur||0),0);
   const active=debts.filter(d=>d.status==='Aktive').length;
   setText('#rLend',fmtALL(lend)); setText('#rBorrow',fmtALL(borrow)); setText('#rLeft',fmtALL(left)); setText('#rActive',active);
 }
-
-/* ===================== NAV ===================== */
 function setText(sel,txt){const el=document.querySelector(sel); if(el) el.textContent=txt}
+
+/* ===================== NAV + EVENTS ===================== */
 function switchTab(name){
   document.querySelectorAll('section.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
@@ -624,8 +528,6 @@ function switchTab(name){
 }
 document.querySelectorAll('.nav-bottom a, .sidenav a').forEach(a=>a.onclick=()=>switchTab(a.getAttribute('data-tab')));
 document.getElementById('btnFAB').onclick=()=>openTxModal();
-
-/* ===================== QUICK BUTTONS & FILTERS ===================== */
 document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>openTxModal(b.getAttribute('data-quick')));
 ['fDateFrom','fDateTo','fType','fCat','fAcc','fContact'].forEach(id=>document.getElementById(id).addEventListener('input',renderTxList));
 document.getElementById('btnExport').onclick=exportCSV;
@@ -641,202 +543,116 @@ document.getElementById('txTypeSeg').querySelectorAll('button').forEach(b=>{
 function currentType(){return document.querySelector('#txTypeSeg .active').dataset.val}
 function toggleLoanFields(){
   const t=currentType();
-  const showLoan = (t==='Dhashë hua'||t==='Mora hua'||t==='Kthim hua');
-  document.getElementById('wrapContact').style.display = showLoan? 'block':'none';
-  document.getElementById('wrapDue').style.display = (t==='Dhashë hua'||t==='Mora hua')? 'block':'none';
-  // kategori gizle/göster
-  document.getElementById('txCat').closest('.col-6').style.display = (t==='Shpenzim'||t==='Të ardhura')?'block':'none';
+  const showLoan=(t==='Dhashë hua'||t==='Mora hua'||t==='Kthim hua');
+  document.getElementById('wrapContact').style.display=showLoan?'block':'none';
+  document.getElementById('wrapDue').style.display=(t==='Dhashë hua'||t==='Mora hua')?'block':'none';
+  document.getElementById('txCat').closest('.col-6').style.display=(t==='Shpenzim'||t==='Të ardhura')?'block':'none';
 }
 function openTxModal(presetType){
-  if(presetType){
-    document.querySelectorAll('#txTypeSeg button').forEach(x=>x.classList.toggle('active', x.dataset.val===presetType));
-    toggleLoanFields();
-  }
-  document.getElementById('txAmt').value='';
-  document.getElementById('txContact').value='';
-  document.getElementById('txDue').value='';
-  modal.show();
+  if(presetType){ document.querySelectorAll('#txTypeSeg button').forEach(x=>x.classList.toggle('active',x.dataset.val===presetType)); toggleLoanFields(); }
+  document.getElementById('txAmt').value=''; document.getElementById('txContact').value=''; document.getElementById('txContact').dataset.id=''; document.getElementById('txContact').dataset.new='';
+  document.getElementById('txDue').value=''; modal.show();
 }
 document.getElementById('btnSaveTx').onclick=saveTransaction;
 
 /* Autocomplete i kontakteve */
 const sbox=document.getElementById('suggestions');
 document.getElementById('txContact').addEventListener('input', async (e)=>{
-  const term = e.target.value.trim();
-  if(!term){ sbox.style.display='none'; return; }
-  await loadContacts(term);
-  sbox.innerHTML='';
-  contacts.forEach(c=>{
-    const a=document.createElement('a'); a.className='list-group-item list-group-item-action'; a.textContent=c.emri;
-    a.onclick=()=>{e.target.value=c.emri; sbox.style.display='none'; e.target.dataset.id=c.id};
-    sbox.appendChild(a);
-  });
-  // “Shto kontakt të ri: {term}”
+  const term=e.target.value.trim(); if(!term){ sbox.style.display='none'; return; }
+  await loadContacts(term); sbox.innerHTML='';
+  contacts.forEach(c=>{const a=document.createElement('a'); a.className='list-group-item list-group-item-action'; a.textContent=c.emri;
+    a.onclick=()=>{e.target.value=c.emri; e.target.dataset.id=c.id; e.target.dataset.new=''; sbox.style.display='none'}; sbox.appendChild(a)});
   const add=document.createElement('a'); add.className='list-group-item list-group-item-action text-primary';
   add.textContent='Shto kontakt të ri: '+term;
-  add.onclick=()=>{ e.target.dataset.id=''; e.target.dataset.new=term; sbox.style.display='none'; };
-  sbox.appendChild(add);
+  add.onclick=()=>{e.target.dataset.id=''; e.target.dataset.new=term; sbox.style.display='none'}; sbox.appendChild(add);
   sbox.style.display='block';
 });
-document.addEventListener('click', (ev)=>{ if(!sbox.contains(ev.target) && ev.target.id!=='txContact') sbox.style.display='none'; });
+document.addEventListener('click',ev=>{ if(!sbox.contains(ev.target) && ev.target.id!=='txContact') sbox.style.display='none'; });
 
 /* ===================== SAVE ===================== */
 async function saveTransaction(){
-  const t=currentType();
-  const shuma = Number(val('#txAmt')); if(!(shuma>0)) return alert('Shkruaj shumën.');
-  const data=val('#txDate')||todayISO(); const ora=val('#txTime')||'12:00';
-  const accId=val('#txAcc')||accounts[0]?.id;
-  let catId=val('#txCat')||null;
-  const desc=val('#txDesc');
-
-  // Kontakt
+  const t=currentType(); const shuma=Number(val('#txAmt')); if(!(shuma>0)) return alert('Shkruaj shumën.');
+  const data=val('#txDate')||todayISO(); const ora=val('#txTime')||'12:00'; const accId=val('#txAcc')||accounts[0]?.id; let catId=val('#txCat')||null; const desc=val('#txDesc');
   let contactId=null, contactName=val('#txContact');
   if(document.getElementById('wrapContact').style.display!=='none'){
-    // nëse u zgjodh nga sugjerimet
-    contactId = document.getElementById('txContact').dataset.id||null;
-    const newName = document.getElementById('txContact').dataset.new;
-    if(!contactId && (newName||contactName)){
-      const nameToUse = (newName||contactName).trim();
-      if(nameToUse){
-        const {data:c} = await sb.from('contacts').insert({user_id:me.id, emri:nameToUse}).select().single();
-        contactId = c?.id || null;
-      }
-    }
-    if(!contactId){ return alert('Zgjidh ose krijo një kontakt.'); }
+    contactId=document.getElementById('txContact').dataset.id||null;
+    const newName=document.getElementById('txContact').dataset.new;
+    if(!contactId && (newName||contactName)){ const toUse=(newName||contactName).trim();
+      const {data:c}=await sb.from('contacts').insert({user_id:me.id, emri:toUse}).select().single(); contactId=c?.id||null; }
+    if(!contactId) return alert('Zgjidh ose krijo një kontakt.');
   }
-
-  // kategori auto
-  if((t==='Shpenzim'||t==='Të ardhura') && !catId){
-    const fallback = categories.find(c=>c.tipi===t) || categories[0];
-    catId=fallback?.id||null;
-  }
-
-  // ruaj transaksionin
-  const txPayload={user_id:me.id, account_id:accId, category_id:catId, contact_id:contactId,
-    tipi:t, shuma, pershkrimi:desc, data, ora};
-  const {data:tx, error:txErr}=await sb.from('transactions').insert(txPayload).select().single();
+  if((t==='Shpenzim'||t==='Të ardhura') && !catId){ const fb=categories.find(c=>c.tipi===t)||categories[0]; catId=fb?.id||null; }
+  const {data:tx,error:txErr}=await sb.from('transactions').insert({user_id:me.id,account_id:accId,category_id:catId,contact_id:contactId,tipi:t,shuma, pershkrimi:desc, data, ora}).select().single();
   if(txErr){ alert('Diçka shkoi keq. Provo përsëri.'); return; }
-
-  // hua?
-  if(t==='Dhashë hua' || t==='Mora hua'){
+  if(t==='Dhashë hua'||t==='Mora hua'){
     const drej=t; const due=val('#txDue')||null;
-    const {data:d}=await sb.from('debts').insert({
-      user_id:me.id, contact_id:contactId, drejtimi:drej,
-      shuma_fillestare:shuma, shuma_e_mbetur:shuma,
-      data_fillimit:data, afati:due, status:'Aktive'
-    }).select().single();
+    const {data:d}=await sb.from('debts').insert({user_id:me.id,contact_id:contactId,drejtimi:drej,shuma_fillestare:shuma,shuma_e_mbetur:shuma,data_fillimit:data,afati:due,status:'Aktive'}).select().single();
     if(d) debts.unshift(d);
   }
   if(t==='Kthim hua'){
-    // Zgjidh huanë aktive të fundit për kontaktin (më e thjeshta)
-    const target = debts.find(d=>d.contact_id===contactId && d.status==='Aktive');
-    if(!target) { alert('S’u gjet hua aktive për këtë kontakt.'); return; }
-    // pagesë
+    const target=debts.find(d=>d.contact_id===contactId && d.status==='Aktive');
+    if(!target){ alert('S’u gjet hua aktive për këtë kontakt.'); return; }
     await sb.from('debt_payments').insert({user_id:me.id,debt_id:target.id,shuma:shuma,data});
-    const left = Math.max(0, Number(target.shuma_e_mbetur) - shuma);
-    const status = left===0?'Mbyllur':'Aktive';
+    const left=Math.max(0,Number(target.shuma_e_mbetur)-shuma); const status=left===0?'Mbyllur':'Aktive';
     const {data:newD}=await sb.from('debts').update({shuma_e_mbetur:left,status}).eq('id',target.id).select().single();
-    // përditëso cache
-    const idx=debts.findIndex(x=>x.id===target.id); if(idx>-1) debts[idx]=newD;
+    const i=debts.findIndex(x=>x.id===target.id); if(i>-1) debts[i]=newD;
   }
-
-  // rifresko
-  transactions.unshift(tx); modal.hide();
-  await loadContacts(); // që lista të jetë e plotë
-  refreshAllUI();
-  alert('U ruajt me sukses.');
+  transactions.unshift(tx); modal.hide(); await loadContacts(); refreshAllUI(); alert('U ruajt me sukses.');
 }
 
-/* ===================== CONTACTS CRUD (shpejt) ===================== */
-document.getElementById('btnAddContact').onclick=async()=>{
-  const name=prompt('Emri i kontaktit:'); if(!name) return;
-  const tel=prompt('Telefoni (opsionale):')||null;
-  const {data:c}=await sb.from('contacts').insert({user_id:me.id, emri:name, telefoni:tel}).select().single();
-  if(c){ contacts.unshift(c); renderContacts(); }
-};
+/* ===================== CONTACTS QUICK ===================== */
+document.getElementById('btnAddContact').onclick=async()=>{ const name=prompt('Emri i kontaktit:'); if(!name) return; const tel=prompt('Telefoni (opsionale):')||null;
+  const {data:c}=await sb.from('contacts').insert({user_id:me.id, emri:name, telefoni:tel}).select().single(); if(c){ contacts.unshift(c); renderContacts(); } };
 
 /* ===================== EXPORT CSV ===================== */
 function exportCSV(){
-  // përdor filtrin aktual
   const rows=[['Data','Ora','Tipi','Shuma','Kategoria','Llogaria','Kontakti','Përshkrimi']];
-  const lis=document.querySelectorAll('#txList .list-item');
-  // në vend të DOM parsing, përdor filtër logjik:
   const from=val('#fDateFrom'), to=val('#fDateTo'), type=document.getElementById('fType').value, cat=val('#fCat'), acc=val('#fAcc'), cont=val('#fContact').toLowerCase();
-  let arr=[...transactions];
-  if(from) arr=arr.filter(t=>t.data>=from);
-  if(to) arr=arr.filter(t=>t.data<=to);
-  if(type) arr=arr.filter(t=>t.tipi===type);
-  if(cat) arr=arr.filter(t=>t.category_id===cat);
-  if(acc) arr=arr.filter(t=>t.account_id===acc);
-  if(cont) arr=arr.filter(t=> (contacts.find(c=>c.id===t.contact_id)?.emri.toLowerCase()||'').includes(cont));
-  arr.forEach(t=>{
-    const catN=categories.find(c=>c.id===t.category_id)?.emri||'';
-    const accN=accounts.find(a=>a.id===t.account_id)?.emri||'';
-    const contN=contacts.find(c=>c.id===t.contact_id)?.emri||'';
-    rows.push([fmtDate(t.data),t.ora?.slice(0,5)||'',t.tipi,String(t.shuma).replace('.',','),catN,accN,contN,(t.pershkrimi||'').replace(/\n/g,' ')]);
-  });
-  const csv = rows.map(r=>r.map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
-  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  const a=document.createElement('a'); a.href=url; a.download='transaksionet.csv'; a.click(); URL.revokeObjectURL(url);
+  let arr=[...transactions]; if(from) arr=arr.filter(t=>t.data>=from); if(to) arr=arr.filter(t=>t.data<=to); if(type) arr=arr.filter(t=>t.tipi===type);
+  if(cat) arr=arr.filter(t=>t.category_id===cat); if(acc) arr=arr.filter(t=>t.account_id===acc); if(cont) arr=arr.filter(t=> (contacts.find(c=>c.id===t.contact_id)?.emri.toLowerCase()||'').includes(cont));
+  arr.forEach(t=>{ const catN=categories.find(c=>c.id===t.category_id)?.emri||''; const accN=accounts.find(a=>a.id===t.account_id)?.emri||''; const contN=contacts.find(c=>c.id===t.contact_id)?.emri||'';
+    rows.push([fmtDate(t.data),t.ora?.slice(0,5)||'',t.tipi,String(t.shuma).replace('.',','),catN,accN,contN,(t.pershkrimi||'').replace(/\n/g,' ')]) });
+  const csv=rows.map(r=>r.map(x=>`"${(x??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); const a=document.createElement('a'); a.href=url; a.download='transaksionet.csv'; a.click(); URL.revokeObjectURL(url);
 }
 
 /* ===================== ACCOUNT: email/password ===================== */
 document.getElementById('btnLogout').onclick=()=>sb.auth.signOut();
-document.getElementById('btnChangeEmail').onclick=async()=>{
-  const ne=val('#newEmail'), cur=val('#currPassForEmail');
-  if(!ne || !cur) return msg('#msgEmail','Plotëso të dy fushat.');
-  const {error:reErr}=await sb.auth.signInWithPassword({email:me.email,password:cur});
-  if(reErr) return msg('#msgEmail','Fjalëkalim i pasaktë.');
-  const {error}=await sb.auth.updateUser({email:ne});
-  msg('#msgEmail', error?('Gabim: '+error.message):'Të dërguam një email verifikimi.');
-};
-document.getElementById('btnChangePass').onclick=async()=>{
-  const old=val('#oldPass'), p1=val('#newPass'), p2=val('#newPass2');
+document.getElementById('btnChangeEmail').onclick=async()=>{ const ne=val('#newEmail'), cur=val('#currPassForEmail');
+  if(!ne||!cur) return msg('#msgEmail','Plotëso të dy fushat.');
+  const {error:reErr}=await sb.auth.signInWithPassword({email:me.email,password:cur}); if(reErr) return msg('#msgEmail','Fjalëkalim i pasaktë.');
+  const {error}=await sb.auth.updateUser({email:ne}); msg('#msgEmail', error?('Gabim: '+error.message):'Të dërguam një email verifikimi.'); };
+document.getElementById('btnChangePass').onclick=async()=>{ const old=val('#oldPass'), p1=val('#newPass'), p2=val('#newPass2');
   if(!old||!p1||p1.length<8||p1!==p2) return msg('#msgPass','Kontrollo fushat (min 8).');
-  const {error:reErr}=await sb.auth.signInWithPassword({email:me.email,password:old});
-  if(reErr) return msg('#msgPass','Fjalëkalim i pasaktë.');
-  const {error}=await sb.auth.updateUser({password:p1});
-  msg('#msgPass', error?('Gabim: '+error.message):'U përditësua me sukses.');
-};
-function msg(sel,t){ document.querySelector(sel).textContent=t||'' }
+  const {error:reErr}=await sb.auth.signInWithPassword({email:me.email,password:old}); if(reErr) return msg('#msgPass','Fjalëkalim i pasaktë.');
+  const {error}=await sb.auth.updateUser({password:p1}); msg('#msgPass', error?('Gabim: '+error.message):'U përditësua me sukses.'); };
+function msg(sel,t){document.querySelector(sel).textContent=t||''}
 
-/* ===================== PWA (manifest + SW nga një file i vetëm) ===================== */
+/* ===================== PWA (manifest + SW nga i vetmi file) ===================== */
 (function setupPWA(){
-  // manifest (blob)
-  const manifest = {
-    name:"Normal Holding • Gjithçka", short_name:"Gjithçka",
-    start_url: location.pathname, display:"standalone", background_color:"#ffffff", theme_color:"#6a5ae0",
-    icons:[{src:"https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4b0.svg",sizes:"any",type:"image/svg+xml"}]
-  };
-  const murl = URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
+  const manifest={name:"Normal Holding • Gjithçka",short_name:"Gjithçka",start_url:location.pathname,display:"standalone",background_color:"#ffffff",theme_color:"#6a5ae0",
+    icons:[{src:"https://cdn.jsdelivr.net/gh/twitter/twemoji/assets/svg/1f4b0.svg",sizes:"any",type:"image/svg+xml"}]};
+  const murl=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));
   const link=document.createElement('link'); link.rel='manifest'; link.href=murl; document.head.appendChild(link);
-
-  // service worker (blob)
   if('serviceWorker' in navigator){
-    const swCode=`
+    const sw=`
       const CACHE='nh-cache-v1';
       const ASSETS=[location.href,'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
-        'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+        'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
         'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'];
       self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
       self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
       self.addEventListener('fetch',e=>{
         if(e.request.method!=='GET') return;
-        e.respondWith(
-          caches.match(e.request).then(r=> r || fetch(e.request).then(res=>{
-            const copy=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return res;
-          }).catch(()=> caches.match(location.href)))
-        );
+        e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request).then(res=>{const cp=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,cp)); return res;}).catch(()=>caches.match(location.href))));
       });
     `;
-    const swURL=URL.createObjectURL(new Blob([swCode],{type:'text/javascript'}));
-    navigator.serviceWorker.register(swURL);
+    const url=URL.createObjectURL(new Blob([sw],{type:'text/javascript'}));
+    navigator.serviceWorker.register(url);
   }
 })();
-
-/* ===================== EVENT BINDINGS ===================== */
-document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') document.getElementById('suggestions').style.display='none'; });
-
+} // END initApp
 </script>
 </body>
 </html>
