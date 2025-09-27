@@ -20,8 +20,6 @@
       font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
       -webkit-text-size-adjust:100%;
     }
-
-    /* App shell */
     .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(120px + var(--safe-bottom))}
     header{
       background:linear-gradient(135deg,var(--primary),var(--primary2));
@@ -42,18 +40,11 @@
     .meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta .s{font-size:12px;color:var(--muted)}
     .amt{font-weight:800}
     .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
-
     .row{display:flex;gap:10px}
     label{font-size:13px;color:var(--muted)}
-    input,select{
-      width:100%;padding:12px;border:1px solid #e6e7ee;border-radius:12px;
-      font-size:16px;background:#fff;-webkit-appearance:none
-    }
+    input,select{width:100%;padding:12px;border:1px solid #e6e7ee;border-radius:12px;font-size:16px;background:#fff;-webkit-appearance:none}
     .actions{display:flex;gap:10px;margin-top:10px}
-    .btnP,.btnS,.btnMini,.btn,button{
-      font-size:16px; /* iOS zoom’u önler */
-      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-    }
+    .btnP,.btnS,.btnMini,.btn,button{font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
     .btnP{flex:1;background:var(--primary);color:#fff;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
     .btnS{flex:1;background:#f0f1f8;color:#1f2340;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
     .btnMini{background:#eef0fb;border:none;padding:8px 10px;border-radius:10px;font-weight:800;cursor:pointer}
@@ -61,7 +52,7 @@
     .chip.ok{background:#e9f8ef;color:#137a3a}
     h3.sec{margin:0 0 8px}
 
-    /* Bottom nav (FAB ARTIK BURADA DEĞİL) */
+    /* NAV */
     nav.nav{
       position:fixed;left:0;right:0;bottom:0;height:calc(70px + var(--safe-bottom));
       padding:0 10px var(--safe-bottom);background:#fff;display:grid;
@@ -71,15 +62,6 @@
     }
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none}
     .btn.active{color:var(--primary);font-weight:800}
-
-    /* FAB: nav’dan bağımsız, en üst katmanda */
-    .fab{
-      position:fixed;left:50%;transform:translateX(-50%);
-      bottom:calc(42px + var(--safe-bottom));
-      width:66px;height:66px;background:var(--primary);border-radius:999px;color:#fff;
-      display:grid;place-items:center;border:none;box-shadow:0 12px 28px rgba(106,90,224,.45);
-      cursor:pointer;z-index:4000;pointer-events:auto;
-    }
 
     .tab{display:none}.tab.active{display:block}
 
@@ -220,7 +202,6 @@
   </main>
 </div>
 
-<!-- Alt menü (FAB YOK) -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')">🏠<span>Kreu</span></a>
   <a class="btn" data-tab="list" onclick="switchTab('list')">📋<span>Lista</span></a>
@@ -228,8 +209,7 @@
   <a class="btn" data-tab="settings" onclick="switchTab('settings')">⚙️<span>Cilësime</span></a>
 </nav>
 
-<!-- FAB: bağımsız buton -->
-<button class="fab" id="openAdd" aria-label="Shto">＋</button>
+<!-- FAB ve geniş tıklama alanı: JS ile eklenecek -->
 
 <!-- Modalet -->
 <div class="modal" id="modalExp"><div class="sheet">
@@ -253,34 +233,24 @@ const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* Retry helper */
-async function withRetry(task, label) {
-  let err;
-  for (let i=0;i<3;i++){
-    try { return await task(); }
-    catch(e){ err = e; await new Promise(r=>setTimeout(r, 600*(i+1))); }
-  }
-  throw err ?? new Error(label || 'Loading failed');
-}
-
+/* Helpers */
+async function withRetry(task){let err;for(let i=0;i<3;i++){try{return await task()}catch(e){err=e;await new Promise(r=>setTimeout(r,600*(i+1)))}}throw err}
 const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
-
 let sessionUser=null, items=[], debts=[], profile={balance:0}, activeTab='home';
 
 /* ===== Start ===== */
 document.addEventListener('DOMContentLoaded', async () => {
+  // kategoriler
   const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
   DEFAULT_CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;mCat.appendChild(o.cloneNode(true));fCat.appendChild(o);});
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
+  // FAB ve geniş "hit alanı"nı dinamik oluştur
+  buildFab();
+
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b); drawDebts();});
-
-  // FAB: aktif tab'a göre modal aç
-  document.getElementById('openAdd').addEventListener('click',()=>{
-    if(activeTab==='debts') openModal('Debt'); else openModal('Exp');
-  });
 
   const {data:{session}}=await supabase.auth.getSession();
   if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), loadExpenses(), loadDebts()]);}
@@ -291,6 +261,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     else{sessionUser=null; showGate();}
   });
 });
+
+/* ===== FAB ===== */
+function buildFab(){
+  const hit=document.createElement('div');
+  hit.id='fabHit';
+  Object.assign(hit.style,{
+    position:'fixed',left:'50%',transform:'translateX(-50%)',
+    bottom:'calc(132px + env(safe-area-inset-bottom,0px))',
+    width:'130px',height:'130px',borderRadius:'50%',
+    zIndex:'2147483646',background:'transparent',pointerEvents:'auto'
+  });
+  const btn=document.createElement('button');
+  btn.id='fabBtn'; btn.setAttribute('aria-label','Shto');
+  btn.textContent='＋';
+  Object.assign(btn.style,{
+    position:'fixed',left:'50%',transform:'translateX(-50%)',
+    bottom:'calc(150px + env(safe-area-inset-bottom,0px))',
+    width:'74px',height:'74px',borderRadius:'999px',border:'none',
+    background:'var(--primary)',color:'#fff',fontSize:'34px',
+    display:'grid',placeItems:'center',boxShadow:'0 16px 34px rgba(106,90,224,.45)',
+    zIndex:'2147483647',cursor:'pointer',pointerEvents:'auto',
+    touchAction:'manipulation',WebkitTapHighlightColor:'transparent'
+  });
+  const open=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
+  hit.addEventListener('pointerup', open, {passive:true});
+  hit.addEventListener('click', open);
+  btn.addEventListener('pointerup', open, {passive:true});
+  btn.addEventListener('click', open);
+  window.addEventListener('resize', ()=>{/* yeniden pozisyon: CSS calc kullanıldığı için gerek yok */});
+
+  document.body.append(hit, btn);
+}
+
+/* Modaller açılınca FAB'ı gizle, kapanınca göster */
+function openModal(which){
+  document.getElementById('modal'+which).classList.add('on');
+  const b=document.getElementById('fabBtn'), h=document.getElementById('fabHit');
+  if(b) b.style.display='none'; if(h) h.style.display='none';
+}
+function closeModal(which){
+  document.getElementById('modal'+which).classList.remove('on');
+  const b=document.getElementById('fabBtn'), h=document.getElementById('fabHit');
+  if(b) b.style.display='grid'; if(h) h.style.display='block';
+}
 
 /* ===== UI helpers ===== */
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
@@ -305,10 +319,7 @@ function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x
 /* ===== Profile (balance) ===== */
 async function ensureProfile(){
   try{
-    const { data } = await withRetry(
-      () => supabase.from('profiles').select('*').eq('user_id', sessionUser.id).single(),
-      'profiles'
-    );
+    const { data } = await withRetry(()=>supabase.from('profiles').select('*').eq('user_id', sessionUser.id).single());
     profile = data || { balance:0 };
   }catch(_){
     try{
@@ -326,11 +337,11 @@ async function saveBalance(){
   if(!error){profile=data; refreshHeader();}
 }
 
-/* ===== Settings extras ===== */
+/* ===== Email / Password ===== */
 async function changeEmail(){const el=document.getElementById('newEmail');const msg=document.getElementById('emailMsg');msg.textContent='';const e=(el.value||'').trim();if(!e||!e.includes('@')){msg.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});msg.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit te email-i i ri.';if(!error)el.value=''}
 async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,msg=document.getElementById('passMsg');msg.textContent='';if(!p1||p1.length<6){msg.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){msg.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});msg.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
 
-/* ===== Header refresh ===== */
+/* ===== Header ===== */
 function refreshHeader(){
   const icon=document.getElementById('hdrIcon'), text=document.getElementById('hdrText'), sub=document.getElementById('hdrSub');
   const s1=document.getElementById('s1name'), s2=document.getElementById('s2name'), s3=document.getElementById('s3name');
@@ -356,67 +367,22 @@ function refreshHeader(){
 }
 
 /* ===== Shpenzimet ===== */
-async function loadExpenses(){
-  try{
-    const { data } = await withRetry(
-      () => supabase.from('expenses')
-            .select('*')
-            .eq('user_id', sessionUser.id)
-            .order('d',{ascending:false})
-            .limit(2000),
-      'expenses'
-    );
-    items = data || [];
-    drawHome(); drawAll(); refreshHeader();
-  }catch(e){
-    alert('Gabim ngarkimi (shpenzime): ' + (e?.message || e));
-  }
-}
-async function saveExpense(){
-  const name=document.getElementById('mName').value.trim();
-  const amt=parseFloat(document.getElementById('mAmt').value);
-  const cat=document.getElementById('mCat').value;
-  const d=document.getElementById('mDate').value;
-  if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}
-  const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
-  if(error){alert('Gabim: '+error.message);return;}
-  items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';
-  closeModal('Exp');drawHome();drawAll();refreshHeader();
-}
-async function delExpense(id){
-  if(!confirm('Fshini këtë shpenzim?'))return;
-  const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);
-  if(error){alert('Gabim: '+error.message);return;}
-  items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();
-}
+async function loadExpenses(){try{const { data }=await withRetry(()=>supabase.from('expenses').select('*').eq('user_id', sessionUser.id).order('d',{ascending:false}).limit(2000));items=data||[];drawHome();drawAll();refreshHeader();}catch(e){alert('Gabim ngarkimi (shpenzime): '+(e?.message||e));}}
+async function saveExpense(){const name=document.getElementById('mName').value.trim();const amt=parseFloat(document.getElementById('mAmt').value);const cat=document.getElementById('mCat').value;const d=document.getElementById('mDate').value;if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();if(error){alert('Gabim: '+error.message);return;}items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();}
+async function delExpense(id){if(!confirm('Fshini këtë shpenzim?'))return;const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();}
 function drawHome(){const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);const list=document.getElementById('recentList');list.innerHTML='';document.getElementById('emptyHome').style.display=recent.length?'none':'block';recent.forEach(x=>list.appendChild(rowExpense(x)))}
 function drawAll(){const q=(document.getElementById('q').value||'').trim().toLowerCase();const cat=document.getElementById('fCat').value;let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));if(cat)arr=arr.filter(x=>x.category===cat);const box=document.getElementById('allList');box.innerHTML='';arr.forEach(x=>box.appendChild(rowExpense(x)))}
 function rowExpense(x){const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiCat(x.category);const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');meta.appendChild(t);meta.appendChild(s);const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount)+' L';const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);el.append(ic,meta,amt,del);return el}
 function emojiCat(c){const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'🏠','Argëtim':'🎟️','Fatura':'💡','Të tjera':'🧾'};return m[c]||'💸'}
 
 /* ===== Borxhet ===== */
-async function loadDebts(){
-  try{
-    const { data } = await withRetry(
-      () => supabase.from('debts')
-            .select('*')
-            .eq('user_id', sessionUser.id)
-            .order('created_at',{ascending:false})
-            .limit(2000),
-      'debts'
-    );
-    debts = data || [];
-    drawDebts(); refreshHeader();
-  }catch(e){
-    alert('Gabim ngarkimi (borxhe): ' + (e?.message || e));
-  }
-}
-async function saveDebt(){const name=document.getElementById('dName').value.trim();const amt=parseFloat(document.getElementById('dAmt').value);const kind=segValue('segType');const due=document.getElementById('dDate').value||null;if(!name||!amt||isNaN(amt)){alert('Plotëso emrin dhe shumën.');return;}const payload={user_id:sessionUser.id,name,amount:amt,kind,due,status:'open'};const {data,error}=await supabase.from('debts').insert(payload).select().single();if(error){alert('Gabim: '+error.message);return;}debts.unshift(data);document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');closeModal('Debt');drawDebts();refreshHeader()}
-async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader()}
-async function payDebt(id){const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();if(error){alert('Gabim: '+error.message);return;}debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader()}
+async function loadDebts(){try{const { data }=await withRetry(()=>supabase.from('debts').select('*').eq('user_id', sessionUser.id).order('created_at',{ascending:false}).limit(2000));debts=data||[];drawDebts();refreshHeader();}catch(e){alert('Gabim ngarkimi (borxhe): '+(e?.message||e));}}
+async function saveDebt(){const name=document.getElementById('dName').value.trim();const amt=parseFloat(document.getElementById('dAmt').value);const kind=segValue('segType');const due=document.getElementById('dDate').value||null;if(!name||!amt||isNaN(amt)){alert('Plotëso emrin dhe shumën.');return;}const payload={user_id:sessionUser.id,name,amount:amt,kind,due,status:'open'};const {data,error}=await supabase.from('debts').insert(payload).select().single();if(error){alert('Gabim: '+error.message);return;}debts.unshift(data);document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');closeModal('Debt');drawDebts();refreshHeader();}
+async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
+async function payDebt(id){const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();if(error){alert('Gabim: '+error.message);return;}debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();}
 function drawDebts(){const q=(document.getElementById('dq').value||'').trim().toLowerCase();const kindFilter=segValue('dSegFilter');let arr=[...debts];if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q));if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);const box=document.getElementById('debtList');box.innerHTML='';document.getElementById('emptyDebts').style.display=arr.length?'none':'block';arr.forEach(x=>{const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=(x.status==='paid')?'✅':'💳';const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua'];if(x.due)bits.push('Afati: '+fmtDate(x.due));const s=document.createElement('div');s.className='s';s.textContent=bits.join(' • ');meta.appendChild(t);meta.appendChild(s);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='8px';const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount)+' L';right.appendChild(amt);if(x.status==='open'){const pay=document.createElement('button');pay.className='btnMini';pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';pay.onclick=()=>payDebt(x.id);right.appendChild(pay);}else{const badge=document.createElement('span');badge.className='chip ok';badge.textContent='Paguar';right.appendChild(badge);}const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delDebt(x.id);el.append(ic,meta,right,del);box.appendChild(el);})}
 
-/* ===== Segments & helpers ===== */
+/* ===== Misc ===== */
 function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
 function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
 function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
