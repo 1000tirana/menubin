@@ -20,6 +20,8 @@
       font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
       -webkit-text-size-adjust:100%;
     }
+
+    /* App shell */
     .wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(120px + var(--safe-bottom))}
     header{
       background:linear-gradient(135deg,var(--primary),var(--primary2));
@@ -29,22 +31,30 @@
     header .top{display:flex;justify-content:space-between;align-items:center}
     header .title{font-size:24px;font-weight:900;display:flex;gap:10px;margin-top:8px}
     header .big{font-size:38px;font-weight:900;margin-top:10px}
-
     .stats{display:flex;gap:12px;padding:12px 14px;transform:translateY(-18px)}
     .card{flex:1;background:var(--card);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
     .muted{color:var(--muted)}
     main{padding:0 14px 24px}
+
     .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
     .item{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:12px}
     .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--primary);color:#fff}
     .meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta .s{font-size:12px;color:var(--muted)}
     .amt{font-weight:800}
     .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
+
     .row{display:flex;gap:10px}
     label{font-size:13px;color:var(--muted)}
-    input,select{width:100%;padding:12px;border:1px solid #e6e7ee;border-radius:12px;font-size:16px;background:#fff;-webkit-appearance:none}
+    input,select{
+      width:100%;padding:12px;border:1px solid #e6e7ee;border-radius:12px;
+      font-size:16px;background:#fff;-webkit-appearance:none
+    }
     .actions{display:flex;gap:10px;margin-top:10px}
-    .btnP,.btnS,.btnMini,.btn,button{font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+    .btnP,.btnS,.btnMini,.btn,button{
+      font-size:16px; /* iOS zoom’u engeller */
+      touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+      -webkit-user-select:none; user-select:none;
+    }
     .btnP{flex:1;background:var(--primary);color:#fff;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
     .btnS{flex:1;background:#f0f1f8;color:#1f2340;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
     .btnMini{background:#eef0fb;border:none;padding:8px 10px;border-radius:10px;font-weight:800;cursor:pointer}
@@ -52,26 +62,38 @@
     .chip.ok{background:#e9f8ef;color:#137a3a}
     h3.sec{margin:0 0 8px}
 
-    /* NAV */
+    /* Bottom nav (grid) + FAB docked */
     nav.nav{
-      position:fixed;left:0;right:0;bottom:0;height:calc(70px + var(--safe-bottom));
+      position:fixed;left:0;right:0;bottom:0;
+      height:calc(70px + var(--safe-bottom));
       padding:0 10px var(--safe-bottom);background:#fff;display:grid;
       grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;
       box-shadow:0 -8px 28px rgba(0,0,0,.06);border-top-left-radius:16px;border-top-right-radius:16px;
-      z-index:50;
+      z-index:2000;
     }
     .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none}
     .btn.active{color:var(--primary);font-weight:800}
 
+    /* FAB şimdi nav’ın İÇİNDE ve tam ortada */
+    .nav .fab{
+      position:absolute;left:50%;transform:translateX(-50%);
+      top:-26px; /* nav ile birleşik görünüm */
+      width:72px;height:72px;background:var(--primary);border:none;border-radius:999px;color:#fff;
+      display:grid;place-items:center;box-shadow:0 14px 32px rgba(106,90,224,.45);
+      cursor:pointer;z-index:2100;pointer-events:auto;
+    }
+    .nav .fab::after{content:"";position:absolute;inset:-14px;border-radius:999px;} /* geniş hit-area */
+    @supports (-webkit-touch-callout: none) { .nav .fab{ top:-28px; } } /* iOS ufak ofset */
+
     .tab{display:none}.tab.active{display:block}
 
     /* Modal */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;place-items:end;padding:14px;z-index:2000}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.28);display:none;place-items:end;padding:14px;z-index:3000}
     .modal.on{display:grid}
     .sheet{background:#fff;border-radius:22px;padding:14px 14px 18px;width:100%;box-shadow:0 -10px 26px rgba(0,0,0,.14)}
 
     /* Auth gate */
-    .gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:3000}
+    .gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:4000}
     .panel{background:#fff;width:min(520px,92vw);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
     .tabs{display:flex;gap:6px;margin-bottom:10px}
     .tabs button{flex:1;border:none;padding:10px;border-radius:10px;background:#f1f2fa;cursor:pointer}
@@ -202,14 +224,16 @@
   </main>
 </div>
 
+<!-- Alt menü + FAB (birleşik) -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')">🏠<span>Kreu</span></a>
   <a class="btn" data-tab="list" onclick="switchTab('list')">📋<span>Lista</span></a>
   <a class="btn" data-tab="debts" onclick="switchTab('debts')">💳<span>Borxhet</span></a>
   <a class="btn" data-tab="settings" onclick="switchTab('settings')">⚙️<span>Cilësime</span></a>
-</nav>
 
-<!-- FAB ve geniş tıklama alanı: JS ile eklenecek -->
+  <!-- FAB artık nav'ın içinde -->
+  <button class="fab" id="openAdd" aria-label="Shto">＋</button>
+</nav>
 
 <!-- Modalet -->
 <div class="modal" id="modalExp"><div class="sheet">
@@ -226,32 +250,37 @@
   <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
 </div></div>
 
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ===== Supabase ===== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* Helpers */
 async function withRetry(task){let err;for(let i=0;i<3;i++){try{return await task()}catch(e){err=e;await new Promise(r=>setTimeout(r,600*(i+1)))}}throw err}
 const DEFAULT_CATS=['Ushqime','Transport','Shtëpia','Argëtim','Fatura','Të tjera'];
+
 let sessionUser=null, items=[], debts=[], profile={balance:0}, activeTab='home';
 
-/* ===== Start ===== */
 document.addEventListener('DOMContentLoaded', async () => {
-  // kategoriler
+  // Kategoriler
   const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
   DEFAULT_CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;mCat.appendChild(o.cloneNode(true));fCat.appendChild(o);});
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
-  // FAB ve geniş "hit alanı"nı dinamik oluştur
-  buildFab();
-
+  // Seg butonları
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b); drawDebts();});
 
+  // FAB: pointerup/touchend/click (nav içi)
+  const fab=document.getElementById('openAdd');
+  const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
+  fab.addEventListener('pointerup', fabOpen, {passive:true});
+  fab.addEventListener('touchend', fabOpen, {passive:true});
+  fab.addEventListener('click', fabOpen);
+
+  // Oturum
   const {data:{session}}=await supabase.auth.getSession();
   if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), loadExpenses(), loadDebts()]);}
   else showGate();
@@ -261,50 +290,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     else{sessionUser=null; showGate();}
   });
 });
-
-/* ===== FAB ===== */
-function buildFab(){
-  const hit=document.createElement('div');
-  hit.id='fabHit';
-  Object.assign(hit.style,{
-    position:'fixed',left:'50%',transform:'translateX(-50%)',
-    bottom:'calc(132px + env(safe-area-inset-bottom,0px))',
-    width:'130px',height:'130px',borderRadius:'50%',
-    zIndex:'2147483646',background:'transparent',pointerEvents:'auto'
-  });
-  const btn=document.createElement('button');
-  btn.id='fabBtn'; btn.setAttribute('aria-label','Shto');
-  btn.textContent='＋';
-  Object.assign(btn.style,{
-    position:'fixed',left:'50%',transform:'translateX(-50%)',
-    bottom:'calc(150px + env(safe-area-inset-bottom,0px))',
-    width:'74px',height:'74px',borderRadius:'999px',border:'none',
-    background:'var(--primary)',color:'#fff',fontSize:'34px',
-    display:'grid',placeItems:'center',boxShadow:'0 16px 34px rgba(106,90,224,.45)',
-    zIndex:'2147483647',cursor:'pointer',pointerEvents:'auto',
-    touchAction:'manipulation',WebkitTapHighlightColor:'transparent'
-  });
-  const open=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
-  hit.addEventListener('pointerup', open, {passive:true});
-  hit.addEventListener('click', open);
-  btn.addEventListener('pointerup', open, {passive:true});
-  btn.addEventListener('click', open);
-  window.addEventListener('resize', ()=>{/* yeniden pozisyon: CSS calc kullanıldığı için gerek yok */});
-
-  document.body.append(hit, btn);
-}
-
-/* Modaller açılınca FAB'ı gizle, kapanınca göster */
-function openModal(which){
-  document.getElementById('modal'+which).classList.add('on');
-  const b=document.getElementById('fabBtn'), h=document.getElementById('fabHit');
-  if(b) b.style.display='none'; if(h) h.style.display='none';
-}
-function closeModal(which){
-  document.getElementById('modal'+which).classList.remove('on');
-  const b=document.getElementById('fabBtn'), h=document.getElementById('fabHit');
-  if(b) b.style.display='grid'; if(h) h.style.display='block';
-}
 
 /* ===== UI helpers ===== */
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
@@ -336,9 +321,7 @@ async function saveBalance(){
   const box=document.getElementById('balMsg'); box.textContent= error?('Gabim: '+error.message):'U ruajt.';
   if(!error){profile=data; refreshHeader();}
 }
-
-/* ===== Email / Password ===== */
-async function changeEmail(){const el=document.getElementById('newEmail');const msg=document.getElementById('emailMsg');msg.textContent='';const e=(el.value||'').trim();if(!e||!e.includes('@')){msg.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});msg.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit te email-i i ri.';if(!error)el.value=''}
+async function changeEmail(){const el=document.getElementById('newEmail');const msg=document.getElementById('emailMsg');msg.textContent='';const e=(el.value||'').trim();if(!e||!e.includes('@')){msg.textcontent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});msg.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit te email-i i ri.';if(!error)el.value=''}
 async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,msg=document.getElementById('passMsg');msg.textContent='';if(!p1||p1.length<6){msg.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){msg.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});msg.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
 
 /* ===== Header ===== */
@@ -380,12 +363,44 @@ async function loadDebts(){try{const { data }=await withRetry(()=>supabase.from(
 async function saveDebt(){const name=document.getElementById('dName').value.trim();const amt=parseFloat(document.getElementById('dAmt').value);const kind=segValue('segType');const due=document.getElementById('dDate').value||null;if(!name||!amt||isNaN(amt)){alert('Plotëso emrin dhe shumën.');return;}const payload={user_id:sessionUser.id,name,amount:amt,kind,due,status:'open'};const {data,error}=await supabase.from('debts').insert(payload).select().single();if(error){alert('Gabim: '+error.message);return;}debts.unshift(data);document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');closeModal('Debt');drawDebts();refreshHeader();}
 async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
 async function payDebt(id){const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();if(error){alert('Gabim: '+error.message);return;}debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();}
-function drawDebts(){const q=(document.getElementById('dq').value||'').trim().toLowerCase();const kindFilter=segValue('dSegFilter');let arr=[...debts];if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q));if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);const box=document.getElementById('debtList');box.innerHTML='';document.getElementById('emptyDebts').style.display=arr.length?'none':'block';arr.forEach(x=>{const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=(x.status==='paid')?'✅':'💳';const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua'];if(x.due)bits.push('Afati: '+fmtDate(x.due));const s=document.createElement('div');s.className='s';s.textContent=bits.join(' • ');meta.appendChild(t);meta.appendChild(s);const right=document.createElement('div');right.style.display='flex';right.style.alignItems='center';right.style.gap='8px';const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount)+' L';right.appendChild(amt);if(x.status==='open'){const pay=document.createElement('button');pay.className='btnMini';pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';pay.onclick=()=>payDebt(x.id);right.appendChild(pay);}else{const badge=document.createElement('span');badge.className='chip ok';badge.textContent='Paguar';right.appendChild(badge);}const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delDebt(x.id);el.append(ic,meta,right,del);box.appendChild(el);})}
+function drawDebts(){
+  const q=(document.getElementById('dq').value||'').trim().toLowerCase();
+  const kindFilter=segValue('dSegFilter');
+  let arr=[...debts];
+  if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q));
+  if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
 
-/* ===== Misc ===== */
+  const box=document.getElementById('debtList'); box.innerHTML='';
+  document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
+
+  arr.forEach(x=>{
+    const el=document.createElement('div'); el.className='item';
+    const ic=document.createElement('div'); ic.className='ic'; ic.textContent=(x.status==='paid')?'✅':'💳';
+    const meta=document.createElement('div'); meta.className='meta';
+    const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
+    const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua']; if(x.due) bits.push('Afati: '+fmtDate(x.due));
+    const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
+    meta.appendChild(t); meta.appendChild(s);
+    const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
+    const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L';
+    right.appendChild(amt);
+    if(x.status==='open'){
+      const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';
+      pay.onclick=()=>payDebt(x.id); right.appendChild(pay);
+    }else{
+      const badge=document.createElement('span'); badge.className='chip ok'; badge.textContent='Paguar'; right.appendChild(badge);
+    }
+    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
+    el.append(ic,meta,right,del); box.appendChild(el);
+  });
+}
+
+/* ===== Segments & helpers ===== */
 function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
 function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
 function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
+function openModal(which){document.getElementById('modal'+which).classList.add('on')}
+function closeModal(which){document.getElementById('modal'+which).classList.remove('on')}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
 function fmt(n){return (Math.round(n*100)/100).toLocaleString('sq-AL')}
