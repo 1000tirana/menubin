@@ -424,10 +424,7 @@ function refreshHeader(){
   const statsEl = document.querySelector('.stats');          // kartlar
   const big  = document.querySelector('header .big');        // büyük toplam
 
-  // Ayarlar sekmesinde sadece "Cilësime" başlığı görünsün
-  if (activeTab === 'settings') {
-    icon.textContent = '⚙️';
-    text.textContent = 'Cilësime';
+
 
     // üst kısmı tamamen gizle
     if (sub)  sub.style.display  = 'none';
