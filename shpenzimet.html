@@ -34,11 +34,14 @@ main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
+
+/* Yuvarlak ikon */
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
+  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.06); font-size:24px}
-.meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
+.meta{flex:1}
+.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
 .meta .s{font-size:12px;color:var(--muted)}
 .amt{font-weight:900;color:#e6edf3}
 .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
@@ -49,7 +52,7 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
   font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none}
 .actions{display:flex;gap:10px;margin-top:10px}
 .btnP,.btnS,.btnMini{font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
-.btnP{flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);color:#fff;border:1px solid #2ea043;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
+.btnP{flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);color:#fff;border:1px solid var(--primary2);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
 .btnS{flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
@@ -67,16 +70,16 @@ nav.nav{
 .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
 .btn:nth-of-type(1){grid-column:1}.btn:nth-of-type(2){grid-column:2}.btn:nth-of-type(3){grid-column:4}.btn:nth-of-type(4){grid-column:5}
 .btn .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
+  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
   box-shadow:inset 0 1px 3px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06);font-size:24px}
 .btn.active{color:#79c0ff}
-.btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
+.btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, var(--blue) 100%)}
 
 /* FAB */
 .nav .fab{
   position:absolute;left:50%;transform:translateX(-50%);
   top:-22px;width:56px;height:56px;border-radius:999px;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
+  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
   border:1px solid rgba(255,255,255,.06);color:#0d1117;font-size:28px;
   display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);
   cursor:pointer;z-index:2100;pointer-events:auto
@@ -94,13 +97,13 @@ nav.nav{
 .panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
 .tabs{display:flex;gap:6px;margin-bottom:10px}
 .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
-.tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
+.tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:var(--primary2);color:#fff;font-weight:800}
 
 /* Segmentler */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
-.seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
+.seg button.active{background:linear-gradient(180deg,var(--blue) 0%, #1158c7 100%);color:#fff}
 
 /* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
@@ -116,7 +119,7 @@ nav.nav{
 <div id="gate" class="gate">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:900;font-size:18px">Normal Holding</div>
+      <div id="brandGate" style="font-weight:900;font-size:18px">Normal Holding</div>
       <div class="muted">Shpenzimet • Cloud</div>
     </div>
     <div class="tabs">
@@ -148,7 +151,7 @@ nav.nav{
 <div class="wrap" id="app" style="display:none">
   <header>
     <div class="top">
-      <div style="font-weight:800">Normal Holding</div>
+      <div id="brandTop" style="font-weight:800">Normal Holding</div>
       <div class="muted" id="who">@përdoruesi</div>
     </div>
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
@@ -206,6 +209,7 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
+      <!-- KATEGORI -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -214,7 +218,7 @@ nav.nav{
           <div style="width:130px">
             <label>Emoji</label>
             <button class="btnS" id="emojiBtn" onclick="openEmojiPicker()">
-              <span id="emojiPreview" class="ic" style="width:38px;height:38px;font-size:20px;background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);margin-right:8px">🍔</span>
+              <span id="emojiPreview" class="ic" style="width:38px;height:38px;font-size:20px;background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);margin-right:8px">🍔</span>
               Zgjidh emoji
             </button>
             <input id="newCatEmoji" value="🍔" hidden>
@@ -241,16 +245,65 @@ nav.nav{
         <div class="actions"><button class="btnP" onclick="changePassword()">Ruaj fjalëkalimin</button></div>
         <div id="passMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
+
+      <!-- ==== SA VETËM ADMIN ==== -->
+      <div id="adminCard" class="card" style="margin-top:12px; display:none">
+        <h4 style="margin:0 0 8px;color:#e6edf3">🛡️ Admin Paneli</h4>
+        <div class="row">
+          <div style="flex:1">
+            <label>Emri i aplikacionit</label>
+            <input id="inpAppName" placeholder="p.sh. Normal Holding">
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:12px 0"></div>
+        <h5 style="margin:0 0 6px;color:#e6edf3">🎨 Tema renkleri</h5>
+        <div class="row">
+          <div style="flex:1"><label>bg</label><input id="c_bg" type="color"></div>
+          <div style="flex:1"><label>card</label><input id="c_card" type="color"></div>
+          <div style="flex:1"><label>border</label><input id="c_border" type="color"></div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div style="flex:1"><label>text</label><input id="c_text" type="color"></div>
+          <div style="flex:1"><label>muted</label><input id="c_muted" type="color"></div>
+          <div style="flex:1"><label>primary</label><input id="c_primary" type="color"></div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div style="flex:1"><label>primary2</label><input id="c_primary2" type="color"></div>
+          <div style="flex:1"><label>blue</label><input id="c_blue" type="color"></div>
+          <div style="flex:1"><label>danger</label><input id="c_danger" type="color"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:12px 0"></div>
+        <h5 style="margin:0 0 6px;color:#e6edf3">🧭 Alt menü</h5>
+        <div class="row">
+          <label style="display:flex;gap:8px;align-items:center"><input id="visHome" type="checkbox"> Kreu</label>
+          <label style="display:flex;gap:8px;align-items:center"><input id="visList" type="checkbox"> Lista</label>
+          <label style="display:flex;gap:8px;align-items:center"><input id="visDebts" type="checkbox"> Borxhet</label>
+          <label style="display:flex;gap:8px;align-items:center"><input id="visSettings" type="checkbox"> Cilësime</label>
+        </div>
+
+        <div class="actions" style="margin-top:12px">
+          <button class="btnS" onclick="previewAdmin()">Önizleme</button>
+          <button class="btnP" onclick="saveAdmin()">Kaydet</button>
+        </div>
+        <div class="actions">
+          <button class="btnMini" onclick="resetDefaults()">Sıfırla (varsayılan)</button>
+        </div>
+        <div id="adminMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      </div>
+      <!-- ==== /ADMIN ==== -->
+
     </section>
   </main>
 </div>
 
 <!-- Alt menü + FAB -->
 <nav class="nav" id="navbar" style="display:none">
-  <a class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
-  <a class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
-  <a class="btn" data-tab="debts" onclick="switchTab('debts')"><span class="ico">💳</span><span>Borxhet</span></a>
-  <a class="btn" data-tab="settings" onclick="switchTab('settings')"><span class="ico">⚙️</span><span>Cilësime</span></a>
+  <a id="nav-home" class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
+  <a id="nav-list" class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
+  <a id="nav-debts" class="btn" data-tab="debts" onclick="switchTab('debts')"><span class="ico">💳</span><span>Borxhet</span></a>
+  <a id="nav-settings" class="btn" data-tab="settings" onclick="switchTab('settings')"><span class="ico">⚙️</span><span>Cilësime</span></a>
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
@@ -302,13 +355,19 @@ const DEFAULT_CATS=[
   {name:'Të tjera',emoji:'🧾'}
 ];
 
+const defaultSettings={
+  app_name:'Normal Holding',
+  theme:{bg:'#0d1117',card:'#161b22',border:'#30363d',text:'#c9d1d9',muted:'#8b949e',primary:'#2ea043',primary2:'#238636',blue:'#1f6feb',danger:'#f85149'},
+  nav_visible:{home:true,list:true,debts:true,settings:true}
+};
+
 let sessionUser=null, items=[], debts=[], profile={balance:0}, cats=[...DEFAULT_CATS], activeTab='home';
+let isAdmin=false, appSettings=JSON.parse(JSON.stringify(defaultSettings));
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Emoji modalı doldur
+  // Emoji modal
   const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🧒 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 🧯 🧪 🧳 ✈️ 🚗 ⛵ 🪙 💳 💎 🎓 📚 🖥️ 🔌 🔋 🧥 👟 🍼 🧻 🧴 🐶 🐱'.split(' ');
-  const grid=document.getElementById('emojiGrid');
-  picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});
+  const grid=document.getElementById('emojiGrid'); picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});
 
   document.getElementById('loginEmail').placeholder='emri@gmail.com';
   document.getElementById('regEmail').placeholder='emri@gmail.com';
@@ -323,16 +382,123 @@ document.addEventListener('DOMContentLoaded', async () => {
   ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
 
   const {data:{session}}=await supabase.auth.getSession();
-  if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);}
-  else showGate();
+  if(session?.user){sessionUser=session.user; await initAfterLogin(); } else showGate();
 
   supabase.auth.onAuthStateChange(async (_e,session)=>{
-    if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);}
+    if(session?.user){sessionUser=session.user; await initAfterLogin(); }
     else{sessionUser=null; showGate();}
   });
 });
 
+async function initAfterLogin(){
+  showApp();
+  await checkAdmin();
+  await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadSettings(), loadExpenses(), loadDebts()]);
+  applySettings(); // tema & menü
+}
+
+/* ADMIN: rol kontrolü */
+async function checkAdmin(){
+  try{
+    const { data, error } = await supabase.from('admins').select('user_id').eq('user_id',sessionUser.id).limit(1);
+    isAdmin = !error && Array.isArray(data) && data.length>0;
+  }catch{ isAdmin=false }
+  document.getElementById('adminCard').style.display = isAdmin ? 'block' : 'none';
+}
+
+/* SETTINGS yükle/kaydet/uygula */
+async function loadSettings(){
+  const { data, error } = await supabase.from('settings').select('data').eq('id','default').maybeSingle?.() ?? {};
+  // maybeSingle v2: bazı SDK’larda yok; fallback:
+  let row=null;
+  if(!data){
+    const r = await supabase.from('settings').select('data').eq('id','default').limit(1);
+    if(!r.error && Array.isArray(r.data) && r.data.length){ row=r.data[0]; }
+  } else { row=data; }
+
+  if(row && row.data){ appSettings = deepMerge(defaultSettings, row.data); }
+  else { appSettings = JSON.parse(JSON.stringify(defaultSettings)); }
+  fillAdminForm();
+}
+function applySettings(){
+  // Tema
+  const t=appSettings.theme||defaultSettings.theme;
+  for(const k in t){ document.documentElement.style.setProperty(`--${k}`, t[k]); }
+  // App adı
+  const name = appSettings.app_name || 'Normal Holding';
+  setText('brandTop', name); setText('brandGate', name);
+  // Menü görünürlüğü
+  const vis=appSettings.nav_visible||defaultSettings.nav_visible;
+  showHide('nav-home', vis.home);
+  showHide('nav-list', vis.list);
+  showHide('nav-debts', vis.debts);
+  showHide('nav-settings', vis.settings);
+  // theme-color meta
+  const meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.setAttribute('content', t.bg||'#0d1117');
+}
+function showHide(id,flag){ const el=document.getElementById(id); if(!el) return; el.style.display = flag ? 'flex' : 'none'; }
+function fillAdminForm(){
+  if(!isAdmin) return;
+  const t=appSettings.theme, v=appSettings.nav_visible;
+  document.getElementById('inpAppName').value = appSettings.app_name||'';
+  setColor('c_bg', t.bg); setColor('c_card', t.card); setColor('c_border', t.border);
+  setColor('c_text', t.text); setColor('c_muted', t.muted); setColor('c_primary', t.primary);
+  setColor('c_primary2', t.primary2); setColor('c_blue', t.blue); setColor('c_danger', t.danger);
+  document.getElementById('visHome').checked = !!v.home;
+  document.getElementById('visList').checked = !!v.list;
+  document.getElementById('visDebts').checked = !!v.debts;
+  document.getElementById('visSettings').checked = !!v.settings;
+}
+function setColor(id,val){ const el=document.getElementById(id); if(el) el.value = toHex(val); }
+function toHex(v){ // #rgb/#rrggbb
+  const ctx=document.createElement('canvas').getContext('2d'); ctx.fillStyle=v; return ctx.fillStyle; }
+
+function readAdminForm(){
+  const t={
+    bg:val('c_bg'), card:val('c_card'), border:val('c_border'), text:val('c_text'),
+    muted:val('c_muted'), primary:val('c_primary'), primary2:val('c_primary2'),
+    blue:val('c_blue'), danger:val('c_danger')
+  };
+  const nav_visible={
+    home:checked('visHome'), list:checked('visList'),
+    debts:checked('visDebts'), settings:checked('visSettings')
+  };
+  const app_name=(document.getElementById('inpAppName').value||'').trim() || 'Normal Holding';
+  return { app_name, theme:t, nav_visible };
+}
+function val(id){ const e=document.getElementById(id); return e?e.value:'' }
+function checked(id){ const e=document.getElementById(id); return !!(e && e.checked) }
+
+function previewAdmin(){
+  appSettings = deepMerge(appSettings, readAdminForm());
+  applySettings();
+  msg('adminMsg','(Önizleme uygulandı, kaydetmek için Kaydet’e basın)');
+}
+async function saveAdmin(){
+  if(!isAdmin){ msg('adminMsg','Yetki yok.'); return; }
+  const newData = readAdminForm();
+  const merged = deepMerge(defaultSettings, newData);
+  const { data, error } = await supabase.from('settings').upsert({id:'default', data:merged}).select().single();
+  if(error){ msg('adminMsg','Hata: '+error.message); return; }
+  appSettings = data.data || merged; applySettings();
+  msg('adminMsg','Kaydedildi.');
+}
+function resetDefaults(){
+  if(!isAdmin){ msg('adminMsg','Yetki yok.'); return; }
+  appSettings = JSON.parse(JSON.stringify(defaultSettings));
+  fillAdminForm(); applySettings(); msg('adminMsg','Varsayılana döndü (Kaydet ile kalıcı olur).');
+}
+
 /* UI helpers */
+function deepMerge(a,b){ // shallow-safe
+  const out=JSON.parse(JSON.stringify(a));
+  for(const k in b){
+    if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k])){
+      out[k]=deepMerge(out[k]||{}, b[k]);
+    }else out[k]=b[k];
+  }
+  return out;
+}
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
 function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none'}
 function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=emailShort(sessionUser?.email);refreshHeader();drawHome();drawDebts()}
@@ -350,7 +516,7 @@ async function ensureProfile(){
 }
 async function saveBalance(){const v=parseFloat(document.getElementById('balInput').value);const b=isNaN(v)?0:v;const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';if(!error){profile=data;refreshHeader();}}
 async function changeEmail(){const e=(document.getElementById('newEmail').value||'').trim();const m=document.getElementById('emailMsg');m.textContent='';if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.'}
-async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textcontent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
+async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
 
 /* Kategoritë */
 async function ensureCategoriesSeed(){
@@ -410,7 +576,7 @@ function emojiFor(catName){
   return m[catName]||'💸';
 }
 
-/* Bakiye/başlık – Settings’te gizle */
+/* Başlık/istatistikler – Settings'te gizle */
 function refreshHeader(){
   const icon=document.getElementById('hdrIcon'),
         text=document.getElementById('hdrText'),
@@ -480,7 +646,7 @@ async function saveDebt(){
   const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'};
   const {data,error}=await supabase.from('debts').insert(payload).select().single();
   if(error){alert('Gabim: '+error.message);return;}
-  // >>> BAKİYE ETKİSİ: borrow +, lend -
+  // BAKİYE ETKİSİ: borrow +, lend -
   await adjustBalance(kind==='borrow' ? +amt : -amt);
   debts.unshift(data);
   document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');
@@ -492,7 +658,7 @@ async function delDebt(id){
   if(!confirm('Fshini këtë borxh?')) return;
   const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
   if(error){alert('Gabim: '+error.message);return;}
-  // >>> OPEN ise, eklenirken yapılan etkiyi geri al:
+  // OPEN ise, eklenirken yapılan etkiyi geri al:
   if(d.status==='open'){
     await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
   }
@@ -504,7 +670,7 @@ async function payDebt(id){
   if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
   const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
   if(error){alert('Gabim: '+error.message);return;}
-  // >>> ÖDEME ETKİSİ: borrow ödeme → -, lend geri ödeme → +
+  // ÖDEME ETKİSİ: borrow ödeme → -, lend geri ödeme → +
   await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
   debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
 }
@@ -543,13 +709,17 @@ function drawDebts(){
   });
 }
 
+/* Emoji modal */
+function openEmojiPicker(){openModal('Emoji')}
+function openModal(w){document.getElementById('modal'+w).classList.add('on')}
+function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
+
 /* Helpers */
 function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
 function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
 function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
-function openModal(w){document.getElementById('modal'+w).classList.add('on')}
-function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
+function msg(id,txt){const e=document.getElementById(id); if(e) e.textContent=txt}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
 function fmt(n){return (Math.round(n*100)/100).toLocaleString('sq-AL')}
 function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
