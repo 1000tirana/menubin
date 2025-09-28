@@ -6,7 +6,7 @@
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
 <style>
-/* ============== THEME (GitHub koyu) ============== */
+/* ================= THEME (GitHub koyu) ================= */
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e;
@@ -19,9 +19,9 @@
 *{box-sizing:border-box}
 html,body{height:100%;background:var(--bg);overscroll-behavior:none;overflow-x:hidden}
 body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;touch-action:manipulation}
-.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
+.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:110px}
 
-/* ============== HEADER ============== */
+/* ================= HEADER ================= */
 header{
   background:linear-gradient(135deg,var(--primary2),var(--primary));
   color:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px;
@@ -32,7 +32,7 @@ header .title{font-size:20px;font-weight:900;display:flex;gap:8px;margin-top:6px
 header .big{font-size:32px;font-weight:900;margin-top:8px}
 header .muted{color:#e6edf3;opacity:.85}
 
-/* ============== STATS / LIST ============== */
+/* ================= STATS / LIST ================= */
 .stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
 .card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
 main{padding:0 12px 20px}
@@ -40,7 +40,7 @@ h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
 
-/* Yuvarlak ikon – dıştan içe gradient (daha parlak) */
+/* Yuvarlak ikon – dıştan içe gradient */
 .ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 2px 5px rgba(0,0,0,.55), 0 8px 18px rgba(0,0,0,.45);
@@ -62,69 +62,53 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* ============== YENİ ALT NAV TASARIM ============== */
+/* ================= ALT MENÜ – bank tarzi ================= */
 nav.nav{
-  --fab-gap: 118px; /* + ile iki yan düğme arası boşluk */
-  position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
-  height:calc(86px + var(--safe-bottom));padding:0 16px calc(12px + var(--safe-bottom));
-  /* cam/frosted */
-  background:rgba(22,27,34,.72);
-  border-top:1px solid rgba(240,246,252,.08);
-  -webkit-backdrop-filter:saturate(1.4) blur(18px);
-  backdrop-filter:saturate(1.4) blur(18px);
-  box-shadow:0 -22px 38px rgba(0,0,0,.5);
-  border-top-left-radius:22px;border-top-right-radius:22px;z-index:2000;
-
-  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;
-  backface-visibility:hidden;will-change:transform
+  --fab-gap:120px; /* + ile yan buton arası */
+  position:fixed; left:0; right:0; bottom:0;
+  height:96px; padding:0 18px 20px; z-index:2000;
+  background:#ffffff;
+  border-top-left-radius:26px; border-top-right-radius:26px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.12);
+  display:grid; grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;
+  align-items:center; justify-items:center;
 }
-/* notch efekti (FAB etrafında yumuşak karanlık) */
 nav.nav::before{
   content:""; position:absolute; left:50%; transform:translateX(-50%);
-  top:-14px; width:130px; height:54px; pointer-events:none;
-  border-bottom-left-radius:65px;border-bottom-right-radius:65px;
-  box-shadow:0 -18px 0 18px rgba(22,27,34,.72);
+  top:-18px; width:120px; height:56px;
+  background:#ffffff; border-bottom-left-radius:60px; border-bottom-right-radius:60px;
+  box-shadow:0 -12px 24px rgba(0,0,0,.06);
 }
-/* butonlar */
-.btn{justify-self:center;text-decoration:none;color:var(--muted);display:flex;flex-direction:column;align-items:center}
-.btn .ico{
-  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:inset 0 1.5px 3px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.45);
-  font-size:26px
+.nav .btn{ text-decoration:none; color:#8b949e; display:flex; flex-direction:column; align-items:center; gap:7px;}
+.nav .btn .ico{
+  width:54px; height:54px; border-radius:50%;
+  display:grid; place-items:center; font-size:26px; color:#0d1117;
+  background:radial-gradient(circle at 30% 30%, #ffffff 0%, #eef2f7 55%, #e6ebf3 100%);
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.08), 0 6px 14px rgba(0,0,0,.08);
 }
-.btn span.label{font-size:14px;margin-top:6px;letter-spacing:.2px}
-.btn.active{color:#79c0ff}
-.btn.active .ico{
-  background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%);
+.nav .btn span.label{font-size:14px}
+.nav .btn.active{color:#d92c2c}
+.nav .btn.active .ico{
+  background:radial-gradient(circle at 30% 30%, #ffefef 0%, #ffdede 55%, #ffc9c9 100%);
+  border-color:#ffc5c5;
 }
-
-/* eşit aralık – FAB ortada sabit, diğerleri iki yanda */
-.btn:nth-of-type(1){grid-column:1}
-.btn:nth-of-type(2){grid-column:2}
-.btn:nth-of-type(3){grid-column:4}
-.btn:nth-of-type(4){grid-column:5}
-
-/* FAB (biraz küçük ama tok) */
 .nav .fab{
-  position:absolute;left:50%;transform:translateX(-50%);top:-26px;
-  width:64px;height:64px;border-radius:999px;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
-  border:1px solid rgba(255,255,255,.08);color:#0d1117;font-size:30px;
-  display:grid;place-items:center;box-shadow:0 16px 30px rgba(0,0,0,.55), inset 0 1.5px 4px rgba(0,0,0,.6);
-  cursor:pointer;z-index:2100;pointer-events:auto
+  position:absolute; left:50%; transform:translateX(-50%); top:-34px;
+  width:72px; height:72px; border-radius:999px; cursor:pointer;
+  background:radial-gradient(circle at 30% 30%, #ffffff 0%, #eef2f7 55%, #e6ebf3 100%);
+  border:1px solid rgba(0,0,0,.06); color:#0d1117; font-size:32px;
+  display:grid; place-items:center;
+  box-shadow:0 18px 28px rgba(0,0,0,.20), inset 0 3px 6px rgba(255,255,255,.65);
+  z-index:2100;
 }
-.nav .fab::after{
-  content:"";position:absolute;inset:-10px;pointer-events:none;
-  background:radial-gradient(closest-side, rgba(46,160,67,.45), transparent 65%);
-  filter:blur(10px);border-radius:999px;z-index:-1
-}
-@supports (-webkit-touch-callout:none){.nav .fab{top:-28px}}
+@supports (-webkit-touch-callout:none){ .nav .fab{ top:-36px } }
+.nav .btn:nth-of-type(1){grid-column:1}
+.nav .btn:nth-of-type(2){grid-column:2}
+.nav .btn:nth-of-type(3){grid-column:4}
+.nav .btn:nth-of-type(4){grid-column:5}
 
-.tab{display:none}.tab.active{display:block}
-
-/* ============== MODALS & GATE ============== */
+/* ================= MODALS & GATE ================= */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
@@ -135,7 +119,7 @@ nav.nav::before{
 .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
 .tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
-/* Segment ve emoji picker */
+/* Segment & emoji picker */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
@@ -149,7 +133,7 @@ nav.nav::before{
 </head>
 <body>
 
-<!-- ========== AUTH ========== -->
+<!-- ================= AUTH ================= -->
 <div id="gate" class="gate">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -181,7 +165,7 @@ nav.nav::before{
   </div>
 </div>
 
-<!-- ========== APP ========== -->
+<!-- ================= APP ================= -->
 <div class="wrap" id="app" style="display:none">
   <header>
     <div class="top">
@@ -282,7 +266,7 @@ nav.nav::before{
   </main>
 </div>
 
-<!-- ===== ALT NAV + FAB ===== -->
+<!-- ================= ALT NAV ================= -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')">
     <span class="ico">🏠</span><span class="label">Kreu</span>
@@ -299,7 +283,7 @@ nav.nav::before{
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
-<!-- ===== MODALS ===== -->
+<!-- ================= MODALS ================= -->
 <div class="modal" id="modalExp"><div class="sheet">
   <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
   <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma (L)</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div></div>
@@ -329,7 +313,7 @@ nav.nav::before{
   <div class="actions"><button class="btnS" onclick="closeModal('Emoji')">Mbyll</button></div>
 </div></div>
 
-<!-- ===== Supabase ===== -->
+<!-- ================= Supabase ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
@@ -376,6 +360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 /* ---- UI helpers ---- */
+function openEmojiPicker(){ openModal('Emoji'); }
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
 function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none'}
 function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=emailShort(sessionUser?.email);refreshHeader();drawHome();drawDebts()}
@@ -549,6 +534,7 @@ function drawDebts(){
 
 /* Helpers */
 function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));p.querySelector(`[data-val="${val}"]`)?.classList.add('active')}
 function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
