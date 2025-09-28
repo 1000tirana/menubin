@@ -34,14 +34,11 @@ main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
-
-/* Yuvarlak ikon – dıştan içe yeşilden açığa */
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.06); font-size:24px}
-.meta{flex:1}
-.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
+.meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
 .meta .s{font-size:12px;color:var(--muted)}
 .amt{font-weight:900;color:#e6edf3}
 .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
@@ -57,7 +54,7 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* Alt NAV (orta boşluk sabit) + GPU hack */
+/* Alt NAV – ortası boşluklu grid */
 nav.nav{
   --fab-gap: 110px;
   position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
@@ -75,7 +72,7 @@ nav.nav{
 .btn.active{color:#79c0ff}
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
 
-/* FAB (biraz küçük) */
+/* FAB */
 .nav .fab{
   position:absolute;left:50%;transform:translateX(-50%);
   top:-22px;width:56px;height:56px;border-radius:999px;
@@ -87,7 +84,7 @@ nav.nav{
 @supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
 
-/* Modallar */
+/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
@@ -209,7 +206,6 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KATEGORI -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -354,7 +350,7 @@ async function ensureProfile(){
 }
 async function saveBalance(){const v=parseFloat(document.getElementById('balInput').value);const b=isNaN(v)?0:v;const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';if(!error){profile=data;refreshHeader();}}
 async function changeEmail(){const e=(document.getElementById('newEmail').value||'').trim();const m=document.getElementById('emailMsg');m.textContent='';if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.'}
-async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
+async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textcontent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
 
 /* Kategoritë */
 async function ensureCategoriesSeed(){
@@ -414,7 +410,7 @@ function emojiFor(catName){
   return m[catName]||'💸';
 }
 
-/* Başlık/istatistikler – Settings'te gizle */
+/* Bakiye/başlık – Settings’te gizle */
 function refreshHeader(){
   const icon=document.getElementById('hdrIcon'),
         text=document.getElementById('hdrText'),
@@ -450,6 +446,20 @@ function refreshHeader(){
   }
 }
 
+/* ********  BAKİYE AYARLAYICI  ******** */
+async function adjustBalance(delta){
+  const cur=Number(profile?.balance||0);
+  const next=cur + Number(delta||0);
+  const {data,error}=await supabase.from('profiles')
+    .upsert({user_id:sessionUser.id,balance:next})
+    .select().single();
+  if(!error){
+    profile=data;
+    document.getElementById('balInput').value=profile.balance;
+    refreshHeader();
+  }
+}
+
 /* Shpenzimet */
 async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
 async function saveExpense(){const name=document.getElementById('mName').value.trim();const amt=parseFloat(document.getElementById('mAmt').value);const cat=document.getElementById('mCat').value;const d=document.getElementById('mDate').value;if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();if(error){alert('Gabim: '+error.message);return;}items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();}
@@ -464,21 +474,38 @@ async function saveDebt(){
   const party=document.getElementById('dParty').value.trim();
   const name=(document.getElementById('dName').value||'').trim();
   const amt=parseFloat(document.getElementById('dAmt').value);
-  const kind=segValue('segType');
+  const kind=segValue('segType'); // borrow/lend
   const due=document.getElementById('dDate').value||null;
   if(!party||!amt||isNaN(amt)){alert('Shkruaj Palën (Emri) dhe shumën.');return;}
   const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'};
   const {data,error}=await supabase.from('debts').insert(payload).select().single();
   if(error){alert('Gabim: '+error.message);return;}
+  // >>> BAKİYE ETKİSİ: borrow +, lend -
+  await adjustBalance(kind==='borrow' ? +amt : -amt);
   debts.unshift(data);
   document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');
   closeModal('Debt');drawDebts();refreshHeader();
 }
-async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
+async function delDebt(id){
+  const d=debts.find(x=>x.id===id);
+  if(!d){return;}
+  if(!confirm('Fshini këtë borxh?')) return;
+  const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
+  if(error){alert('Gabim: '+error.message);return;}
+  // >>> OPEN ise, eklenirken yapılan etkiyi geri al:
+  if(d.status==='open'){
+    await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
+  }
+  debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();
+}
 async function payDebt(id){
+  const d=debts.find(x=>x.id===id); if(!d) return;
+  if(d.status==='paid'){return;}
   if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
   const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
   if(error){alert('Gabim: '+error.message);return;}
+  // >>> ÖDEME ETKİSİ: borrow ödeme → -, lend geri ödeme → +
+  await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
   debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
 }
 function drawDebts(){
