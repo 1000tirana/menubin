@@ -10,7 +10,7 @@
 <meta name="color-scheme" content="dark light">
 <link rel="preconnect" href="https://nvpjqvggaiipwziolend.supabase.co" crossorigin>
 
-<!-- Basit CSP (inline script nedeniyle 'unsafe-inline' gerekiyor) -->
+<!-- Basit CSP -->
 <meta http-equiv="Content-Security-Policy"
   content="default-src 'self';
            img-src 'self' data: https:;
@@ -38,7 +38,7 @@ body{
 }
 .wrap{
   display:flex; flex-direction:column;
-  min-height:100dvh; /* iOS alt bar dalgalanmasına karşı */
+  min-height:100dvh;
   padding-bottom:calc(110px + var(--safe-bottom))
 }
 header{
@@ -286,7 +286,7 @@ nav.nav{
         <div id="passMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- SA VETEM ADMIN (UI'da saklanır, RLS ile koruma önerildi) -->
+      <!-- SA VETEM ADMIN (UI'da saklanır) -->
       <div id="adminCard" class="card" style="margin-top:12px; display:none">
         <h4 style="margin:0 0 8px;color:#e6edf3">🛡️ Admin Paneli</h4>
         <div class="row">
@@ -449,7 +449,6 @@ async function checkAdmin(){
 
 /* ====== Settings ====== */
 async function loadSettings(){
-  // maybeSingle() tüm sürümlerde yok; fallback ile al
   let row=null;
   const r = await supabase.from('settings').select('data').eq('id','default').limit(1);
   if(!r.error && Array.isArray(r.data) && r.data.length){ row=r.data[0]; }
@@ -519,8 +518,11 @@ function swapAuth(w){id('tabLoginBtn').classList.toggle('active',w==='login'); i
 async function registerUser(){
   const email=id('regEmail').value.trim(), pass=id('regPass').value, box=id('regMsg'); box.textContent='';
   if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
-  const redirect = window.location.href; // GitHub Pages tam sayfa
-  const {error}=await supabase.auth.signUp({ email, password:pass, options:{ emailRedirectTo: redirect } });
+  /* REDIRECT sabit → GH Pages'teki sayfan */
+  const REDIRECT_URL='https://1000tirana.github.io/menubin/shpenzimet.html';
+  const {error}=await supabase.auth.signUp({
+    email, password:pass, options:{ emailRedirectTo: REDIRECT_URL }
+  });
   box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
 }
 async function login(){
