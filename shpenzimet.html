@@ -87,7 +87,7 @@ nav.nav{
 @supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
 
-/* Modal */
+/* Modallar */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
@@ -155,11 +155,11 @@ nav.nav{
       <div class="muted" id="who">@përdoruesi</div>
     </div>
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
-    <div class="big"><span id="hdrTotal">0</span> L</div>
+    <div class="big" id="hdrBig"><span id="hdrTotal">0</span> L</div>
     <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
   </header>
 
-  <div class="stats">
+  <div class="stats" id="statsBar">
     <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span> L</div></div>
     <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0</span> L</div></div>
     <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0</span> L</div></div>
@@ -209,7 +209,7 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KATEGORI: emoji butonu + modal -->
+      <!-- KATEGORI -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -346,9 +346,6 @@ async function login(){const email=document.getElementById('loginEmail').value.t
 async function logout(){await supabase.auth.signOut()}
 function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');refreshHeader();if(t==='list')drawAll();if(t==='debts')drawDebts();}
 
-/* Emoji modal */
-function openEmojiPicker(){openModal('Emoji')}
-
 /* Profil (balance) */
 async function ensureProfile(){
   try{const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();profile=data||{balance:0}}
@@ -417,59 +414,41 @@ function emojiFor(catName){
   return m[catName]||'💸';
 }
 
+/* Başlık/istatistikler – Settings'te gizle */
 function refreshHeader(){
-  const icon = document.getElementById('hdrIcon');
-  const text = document.getElementById('hdrText');
-  const sub  = document.getElementById('hdrSub');
-  const statsEl = document.querySelector('.stats');          // kartlar
-  const big  = document.querySelector('header .big');        // büyük toplam
+  const icon=document.getElementById('hdrIcon'),
+        text=document.getElementById('hdrText'),
+        sub=document.getElementById('hdrSub'),
+        big=document.getElementById('hdrBig'),
+        stats=document.getElementById('statsBar');
 
-
-
-    // üst kısmı tamamen gizle
-    if (sub)  sub.style.display  = 'none';
-    if (big)  big.style.display  = 'none';
-    if (statsEl) statsEl.style.display = 'none';
-    return; // diğer hesaplamaları yapma
-  }
-
-  // Ayarlardan çıkınca geri göster
-  if (sub)  sub.style.display  = '';
-  if (big)  big.style.display  = '';
-  if (statsEl) statsEl.style.display = 'flex';
-
-  // Borxhet sekmesi
-  if (activeTab === 'debts') {
-    icon.textContent = '💳';
-    text.textContent = 'Borxhet';
-    sub.textContent  = 'Detyrimet & Më detyrohen';
-
-    const borrowOpen = sum(debts.filter(x => x.kind==='borrow' && x.status!=='paid').map(n=>Number(n.amount||0)));
-    const lendOpen   = sum(debts.filter(x => x.kind==='lend'   && x.status!=='paid').map(n=>Number(n.amount||0)));
-    setText('hdrTotal', fmt(borrowOpen));
-
-    setText('s1name','Gjithsej'); setText('s2name','Detyrime'); setText('s3name','Më detyrohen');
-    const total = sum(debts.map(n=>Number(n.amount||0)));
-    setText('stat1',fmt(total)); setText('stat2',fmt(borrowOpen)); setText('stat3',fmt(lendOpen));
+  if(activeTab==='settings'){
+    icon.textContent='⚙️'; text.textContent='Cilësime';
+    big.style.display='none'; sub.style.display='none'; stats.style.display='none';
     return;
+  }else{
+    big.style.display='block'; sub.style.display='block'; stats.style.display='flex';
   }
 
-  // Kreu / Lista (varsayılan) — bilanço
-  icon.textContent = '💰';
-  text.textContent = 'Bilanci';
-  sub.textContent  = 'Gjendja − Shpenzimet (totale)';
-
-  const total = sum(items.map(x=>Number(x.amount||0)));
-  const today = sum(items.filter(isToday).map(x=>Number(x.amount||0)));
-  const month = sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
-  const remain = Number(profile?.balance||0) - total;
-
-  setText('hdrTotal', fmt(remain));
-  setText('s1name','Totale'); setText('s2name','Sot'); setText('s3name','Muaj');
-  setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
+  if(activeTab==='debts'){
+    icon.textContent='💳'; text.textContent='Borxhet'; sub.textContent='Detyrimet & Më detyrohen';
+    const borrowOpen=sum(debts.filter(x=>x.kind==='borrow' && x.status!=='paid').map(n=>Number(n.amount||0)));
+    const lendOpen  =sum(debts.filter(x=>x.kind==='lend'   && x.status!=='paid').map(n=>Number(n.amount||0)));
+    setText('hdrTotal',fmt(borrowOpen));
+    setText('s1name','Gjithsej'); setText('s2name','Detyrime'); setText('s3name','Më detyrohen');
+    const total=sum(debts.map(n=>Number(n.amount||0)));
+    setText('stat1',fmt(total)); setText('stat2',fmt(borrowOpen)); setText('stat3',fmt(lendOpen));
+  }else{
+    icon.textContent='💰'; text.textContent='Bilanci'; sub.textContent='Gjendja − Shpenzimet (totale)';
+    const total=sum(items.map(x=>Number(x.amount||0)));
+    const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
+    const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
+    const remain=Number(profile?.balance||0) - total;
+    setText('hdrTotal',fmt(remain));
+    setText('s1name','Totale'); setText('s2name','Sot'); setText('s3name','Muaj');
+    setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
+  }
 }
-
-
 
 /* Shpenzimet */
 async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
