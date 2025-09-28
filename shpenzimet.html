@@ -417,29 +417,62 @@ function emojiFor(catName){
   return m[catName]||'💸';
 }
 
-/* Başlık/istatistikler */
 function refreshHeader(){
-  const icon=document.getElementById('hdrIcon'), text=document.getElementById('hdrText'), sub=document.getElementById('hdrSub');
-  const s1=document.getElementById('s1name'), s2=document.getElementById('s2name'), s3=document.getElementById('s3name');
-  if(activeTab==='debts'){
-    icon.textContent='💳'; text.textContent='Borxhet'; sub.textContent='Detyrimet & Më detyrohen';
-    const borrowOpen=sum(debts.filter(x=>x.kind==='borrow' && x.status!=='paid').map(n=>Number(n.amount||0)));
-    const lendOpen=sum(debts.filter(x=>x.kind==='lend' && x.status!=='paid').map(n=>Number(n.amount||0)));
-    setText('hdrTotal',fmt(borrowOpen));
-    s1.textContent='Gjithsej'; s2.textContent='Detyrime'; s3.textContent='Më detyrohen';
-    const total=sum(debts.map(n=>Number(n.amount||0)));
-    setText('stat1',fmt(total)); setText('stat2',fmt(borrowOpen)); setText('stat3',fmt(lendOpen));
-  }else{
-    icon.textContent='💰'; text.textContent='Bilanci'; sub.textContent='Gjendja − Shpenzimet (totale)';
-    const total=sum(items.map(x=>Number(x.amount||0)));
-    const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
-    const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
-    const remain=Number(profile?.balance||0) - total;
-    setText('hdrTotal',fmt(remain));
-    s1.textContent='Totale'; s2.textContent='Sot'; s3.textContent='Muaj';
-    setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
+  const icon = document.getElementById('hdrIcon');
+  const text = document.getElementById('hdrText');
+  const sub  = document.getElementById('hdrSub');
+  const statsEl = document.querySelector('.stats');          // kartlar
+  const big  = document.querySelector('header .big');        // büyük toplam
+
+  // Ayarlar sekmesinde sadece "Cilësime" başlığı görünsün
+  if (activeTab === 'settings') {
+    icon.textContent = '⚙️';
+    text.textContent = 'Cilësime';
+
+    // üst kısmı tamamen gizle
+    if (sub)  sub.style.display  = 'none';
+    if (big)  big.style.display  = 'none';
+    if (statsEl) statsEl.style.display = 'none';
+    return; // diğer hesaplamaları yapma
   }
+
+  // Ayarlardan çıkınca geri göster
+  if (sub)  sub.style.display  = '';
+  if (big)  big.style.display  = '';
+  if (statsEl) statsEl.style.display = 'flex';
+
+  // Borxhet sekmesi
+  if (activeTab === 'debts') {
+    icon.textContent = '💳';
+    text.textContent = 'Borxhet';
+    sub.textContent  = 'Detyrimet & Më detyrohen';
+
+    const borrowOpen = sum(debts.filter(x => x.kind==='borrow' && x.status!=='paid').map(n=>Number(n.amount||0)));
+    const lendOpen   = sum(debts.filter(x => x.kind==='lend'   && x.status!=='paid').map(n=>Number(n.amount||0)));
+    setText('hdrTotal', fmt(borrowOpen));
+
+    setText('s1name','Gjithsej'); setText('s2name','Detyrime'); setText('s3name','Më detyrohen');
+    const total = sum(debts.map(n=>Number(n.amount||0)));
+    setText('stat1',fmt(total)); setText('stat2',fmt(borrowOpen)); setText('stat3',fmt(lendOpen));
+    return;
+  }
+
+  // Kreu / Lista (varsayılan) — bilanço
+  icon.textContent = '💰';
+  text.textContent = 'Bilanci';
+  sub.textContent  = 'Gjendja − Shpenzimet (totale)';
+
+  const total = sum(items.map(x=>Number(x.amount||0)));
+  const today = sum(items.filter(isToday).map(x=>Number(x.amount||0)));
+  const month = sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
+  const remain = Number(profile?.balance||0) - total;
+
+  setText('hdrTotal', fmt(remain));
+  setText('s1name','Totale'); setText('s2name','Sot'); setText('s3name','Muaj');
+  setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
 }
+
+
 
 /* Shpenzimet */
 async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
