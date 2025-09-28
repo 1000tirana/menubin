@@ -4,7 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Normal Holding • Shpenzimet</title>
+
+<!-- Renk ve performans -->
 <meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<link rel="preconnect" href="https://nvpjqvggaiipwziolend.supabase.co" crossorigin>
+
+<!-- Basit CSP (inline script nedeniyle 'unsafe-inline' gerekiyor) -->
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self';
+           img-src 'self' data: https:;
+           style-src 'self' 'unsafe-inline';
+           script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/@supabase;
+           connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+           base-uri 'none'; form-action 'self'; frame-ancestors 'none'">
+
 <style>
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
@@ -16,12 +30,20 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box}
-html,body{height:100%;background:var(--bg);overscroll-behavior:none;overflow-x:hidden}
-body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;touch-action:manipulation}
-.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
+html,body{height:100%; background:var(--bg); overscroll-behavior:none; overflow-x:hidden}
+body{
+  margin:0; color:var(--text);
+  font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{
+  display:flex; flex-direction:column;
+  min-height:100dvh; /* iOS alt bar dalgalanmasına karşı */
+  padding-bottom:calc(110px + var(--safe-bottom))
+}
 header{
   background:linear-gradient(135deg,var(--primary2) 0%, var(--primary) 100%);
-  color:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px;
+  color:#fff; border-bottom-left-radius:22px; border-bottom-right-radius:22px;
   padding:calc(10px + var(--safe-top)) 16px 12px; box-shadow:0 10px 28px rgba(35,134,54,.35)
 }
 header .top{display:flex;justify-content:space-between;align-items:center}
@@ -36,30 +58,42 @@ h3.sec{margin:0 0 8px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
 
 /* Yuvarlak ikon */
-.ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
+.ic{
+  width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
-  border:1px solid rgba(255,255,255,.06); font-size:24px}
+  border:1px solid rgba(255,255,255,.06); font-size:24px
+}
 .meta{flex:1}
 .meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
 .meta .s{font-size:12px;color:var(--muted)}
 .amt{font-weight:900;color:#e6edf3}
 .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
 
+/* Form */
 .row{display:flex;gap:10px}
 label{font-size:13px;color:var(--muted)}
-input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;
-  font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none}
+input,select{
+  width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;
+  font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none
+}
 .actions{display:flex;gap:10px;margin-top:10px}
-.btnP,.btnS,.btnMini{font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
-.btnP{flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);color:#fff;border:1px solid var(--primary2);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
-.btnS{flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
-.btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
+.btnP,.btnS,.btnMini{
+  font-size:16px; user-select:none; cursor:pointer; touch-action:manipulation;
+}
+.btnP{
+  flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);
+  color:#fff;border:1px solid var(--primary2);padding:12px 16px;border-radius:12px;font-weight:800
+}
+.btnS{flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:12px 16px;border-radius:12px;font-weight:800}
+.btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3}
+
+/* Etiket */
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
 /* Alt NAV – ortası boşluklu grid */
 nav.nav{
-  --fab-gap: 110px;
+  --fab-gap: 120px;
   position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
   height:calc(76px + var(--safe-bottom));padding:0 12px var(--safe-bottom);
   background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
@@ -67,11 +101,16 @@ nav.nav{
   display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;
   backface-visibility:hidden;will-change:transform
 }
-.btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
+.btn{
+  justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:var(--muted);text-decoration:none; touch-action:manipulation;
+}
 .btn:nth-of-type(1){grid-column:1}.btn:nth-of-type(2){grid-column:2}.btn:nth-of-type(3){grid-column:4}.btn:nth-of-type(4){grid-column:5}
-.btn .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
+.btn .ico{
+  width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06);font-size:24px}
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06);font-size:24px
+}
 .btn.active{color:#79c0ff}
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, var(--blue) 100%)}
 
@@ -82,7 +121,7 @@ nav.nav{
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, var(--primary) 100%);
   border:1px solid rgba(255,255,255,.06);color:#0d1117;font-size:28px;
   display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);
-  cursor:pointer;z-index:2100;pointer-events:auto
+  z-index:2100; pointer-events:auto; touch-action:manipulation; cursor:pointer;
 }
 @supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
@@ -102,14 +141,15 @@ nav.nav{
 /* Segmentler */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
-.seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
+.seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3;touch-action:manipulation}
 .seg button.active{background:linear-gradient(180deg,var(--blue) 0%, #1158c7 100%);color:#fff}
 
 /* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
-.picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
+.picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer;touch-action:manipulation}
 #emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
 
+/* Küçük ekran merkezi genişlik */
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
 </style>
 </head>
@@ -149,7 +189,7 @@ nav.nav{
 
 <!-- ===== APLIKACIONI ===== -->
 <div class="wrap" id="app" style="display:none">
-  <header>
+  <header id="hdr">
     <div class="top">
       <div id="brandTop" style="font-weight:800">Normal Holding</div>
       <div class="muted" id="who">@përdoruesi</div>
@@ -246,7 +286,7 @@ nav.nav{
         <div id="passMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- ==== SA VETËM ADMIN ==== -->
+      <!-- SA VETEM ADMIN (UI'da saklanır, RLS ile koruma önerildi) -->
       <div id="adminCard" class="card" style="margin-top:12px; display:none">
         <h4 style="margin:0 0 8px;color:#e6edf3">🛡️ Admin Paneli</h4>
         <div class="row">
@@ -292,8 +332,6 @@ nav.nav{
         </div>
         <div id="adminMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
-      <!-- ==== /ADMIN ==== -->
-
     </section>
   </main>
 </div>
@@ -342,10 +380,12 @@ nav.nav{
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ====== Supabase config ====== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
+/* ====== Varsayılanlar ====== */
 const DEFAULT_CATS=[
   {name:'Ushqime',emoji:'🍔'},
   {name:'Transport',emoji:'⛽'},
@@ -364,8 +404,9 @@ const defaultSettings={
 let sessionUser=null, items=[], debts=[], profile={balance:0}, cats=[...DEFAULT_CATS], activeTab='home';
 let isAdmin=false, appSettings=JSON.parse(JSON.stringify(defaultSettings));
 
+/* ====== Init ====== */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Emoji modal
+  // Emoji modalı doldur
   const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🧒 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 🧯 🧪 🧳 ✈️ 🚗 ⛵ 🪙 💳 💎 🎓 📚 🖥️ 🔌 🔋 🧥 👟 🍼 🧻 🧴 🐶 🐱'.split(' ');
   const grid=document.getElementById('emojiGrid'); picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});
 
@@ -374,8 +415,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
-  document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
-  document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b);drawDebts();});
+  document.querySelectorAll('#segType button').forEach(b=>b.addEventListener('click',()=>toggleSeg('segType',b),{passive:true}));
+  document.querySelectorAll('#dSegFilter button').forEach(b=>b.addEventListener('click',()=>{toggleSeg('dSegFilter',b);drawDebts();},{passive:true}));
 
   const fab=document.getElementById('openAdd');
   const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
@@ -397,7 +438,7 @@ async function initAfterLogin(){
   applySettings(); // tema & menü
 }
 
-/* ADMIN: rol kontrolü */
+/* ====== Admin kontrol ====== */
 async function checkAdmin(){
   try{
     const { data, error } = await supabase.from('admins').select('user_id').eq('user_id',sessionUser.id).limit(1);
@@ -406,124 +447,135 @@ async function checkAdmin(){
   document.getElementById('adminCard').style.display = isAdmin ? 'block' : 'none';
 }
 
-/* SETTINGS yükle/kaydet/uygula */
+/* ====== Settings ====== */
 async function loadSettings(){
-  const { data, error } = await supabase.from('settings').select('data').eq('id','default').maybeSingle?.() ?? {};
-  // maybeSingle v2: bazı SDK’larda yok; fallback:
+  // maybeSingle() tüm sürümlerde yok; fallback ile al
   let row=null;
-  if(!data){
-    const r = await supabase.from('settings').select('data').eq('id','default').limit(1);
-    if(!r.error && Array.isArray(r.data) && r.data.length){ row=r.data[0]; }
-  } else { row=data; }
-
+  const r = await supabase.from('settings').select('data').eq('id','default').limit(1);
+  if(!r.error && Array.isArray(r.data) && r.data.length){ row=r.data[0]; }
   if(row && row.data){ appSettings = deepMerge(defaultSettings, row.data); }
   else { appSettings = JSON.parse(JSON.stringify(defaultSettings)); }
   fillAdminForm();
 }
 function applySettings(){
-  // Tema
   const t=appSettings.theme||defaultSettings.theme;
   for(const k in t){ document.documentElement.style.setProperty(`--${k}`, t[k]); }
-  // App adı
   const name = appSettings.app_name || 'Normal Holding';
   setText('brandTop', name); setText('brandGate', name);
-  // Menü görünürlüğü
   const vis=appSettings.nav_visible||defaultSettings.nav_visible;
-  showHide('nav-home', vis.home);
-  showHide('nav-list', vis.list);
-  showHide('nav-debts', vis.debts);
-  showHide('nav-settings', vis.settings);
-  // theme-color meta
+  showHide('nav-home', vis.home); showHide('nav-list', vis.list);
+  showHide('nav-debts', vis.debts); showHide('nav-settings', vis.settings);
   const meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.setAttribute('content', t.bg||'#0d1117');
 }
-function showHide(id,flag){ const el=document.getElementById(id); if(!el) return; el.style.display = flag ? 'flex' : 'none'; }
+function showHide(id,flag){ const el=document.getElementById(id); if(el) el.style.display = flag ? 'flex' : 'none'; }
 function fillAdminForm(){
   if(!isAdmin) return;
   const t=appSettings.theme, v=appSettings.nav_visible;
-  document.getElementById('inpAppName').value = appSettings.app_name||'';
+  id('inpAppName').value = appSettings.app_name||'';
   setColor('c_bg', t.bg); setColor('c_card', t.card); setColor('c_border', t.border);
   setColor('c_text', t.text); setColor('c_muted', t.muted); setColor('c_primary', t.primary);
   setColor('c_primary2', t.primary2); setColor('c_blue', t.blue); setColor('c_danger', t.danger);
-  document.getElementById('visHome').checked = !!v.home;
-  document.getElementById('visList').checked = !!v.list;
-  document.getElementById('visDebts').checked = !!v.debts;
-  document.getElementById('visSettings').checked = !!v.settings;
+  id('visHome').checked = !!v.home; id('visList').checked = !!v.list;
+  id('visDebts').checked = !!v.debts; id('visSettings').checked = !!v.settings;
 }
 function setColor(id,val){ const el=document.getElementById(id); if(el) el.value = toHex(val); }
-function toHex(v){ // #rgb/#rrggbb
-  const ctx=document.createElement('canvas').getContext('2d'); ctx.fillStyle=v; return ctx.fillStyle; }
-
+function toHex(v){ const ctx=document.createElement('canvas').getContext('2d'); ctx.fillStyle=v; return ctx.fillStyle; }
 function readAdminForm(){
-  const t={
-    bg:val('c_bg'), card:val('c_card'), border:val('c_border'), text:val('c_text'),
-    muted:val('c_muted'), primary:val('c_primary'), primary2:val('c_primary2'),
-    blue:val('c_blue'), danger:val('c_danger')
-  };
-  const nav_visible={
-    home:checked('visHome'), list:checked('visList'),
-    debts:checked('visDebts'), settings:checked('visSettings')
-  };
-  const app_name=(document.getElementById('inpAppName').value||'').trim() || 'Normal Holding';
+  const t={bg:val('c_bg'), card:val('c_card'), border:val('c_border'), text:val('c_text'),
+           muted:val('c_muted'), primary:val('c_primary'), primary2:val('c_primary2'),
+           blue:val('c_blue'), danger:val('c_danger')};
+  const nav_visible={home:checked('visHome'), list:checked('visList'), debts:checked('visDebts'), settings:checked('visSettings')};
+  const app_name=(val('inpAppName')||'Normal Holding').trim();
   return { app_name, theme:t, nav_visible };
 }
-function val(id){ const e=document.getElementById(id); return e?e.value:'' }
-function checked(id){ const e=document.getElementById(id); return !!(e && e.checked) }
-
-function previewAdmin(){
-  appSettings = deepMerge(appSettings, readAdminForm());
-  applySettings();
-  msg('adminMsg','(Önizleme uygulandı, kaydetmek için Kaydet’e basın)');
-}
+function previewAdmin(){ appSettings = deepMerge(appSettings, readAdminForm()); applySettings(); msg('adminMsg','(Önizleme uygulandı, kaydet için Kaydet)'); }
 async function saveAdmin(){
   if(!isAdmin){ msg('adminMsg','Yetki yok.'); return; }
-  const newData = readAdminForm();
-  const merged = deepMerge(defaultSettings, newData);
+  const merged = deepMerge(defaultSettings, readAdminForm());
   const { data, error } = await supabase.from('settings').upsert({id:'default', data:merged}).select().single();
   if(error){ msg('adminMsg','Hata: '+error.message); return; }
-  appSettings = data.data || merged; applySettings();
-  msg('adminMsg','Kaydedildi.');
+  appSettings = data?.data || merged; applySettings(); msg('adminMsg','Kaydedildi.');
 }
 function resetDefaults(){
   if(!isAdmin){ msg('adminMsg','Yetki yok.'); return; }
-  appSettings = JSON.parse(JSON.stringify(defaultSettings));
-  fillAdminForm(); applySettings(); msg('adminMsg','Varsayılana döndü (Kaydet ile kalıcı olur).');
+  appSettings = JSON.parse(JSON.stringify(defaultSettings)); fillAdminForm(); applySettings(); msg('adminMsg','Varsayılana döndü.');
 }
 
-/* UI helpers */
-function deepMerge(a,b){ // shallow-safe
-  const out=JSON.parse(JSON.stringify(a));
-  for(const k in b){
-    if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k])){
-      out[k]=deepMerge(out[k]||{}, b[k]);
-    }else out[k]=b[k];
-  }
-  return out;
-}
+/* ====== UI helpers ====== */
+function deepMerge(a,b){ const out=JSON.parse(JSON.stringify(a)); for(const k in b){ if(b[k] && typeof b[k]==='object' && !Array.isArray(b[k])) out[k]=deepMerge(out[k]||{}, b[k]); else out[k]=b[k]; } return out; }
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
-function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none'}
-function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=emailShort(sessionUser?.email);refreshHeader();drawHome();drawDebts()}
-function swapAuth(w){document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');document.getElementById('authLogin').style.display=(w==='login')?'block':'none';document.getElementById('authReg').style.display=(w==='reg')?'block':'none'}
-async function registerUser(){const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPass').value;const box=document.getElementById('regMsg');box.textContent='';if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}const {error}=await supabase.auth.signUp({email,password:pass});box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.'}
-async function login(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const box=document.getElementById('authMsg');box.textContent='';const {error}=await supabase.auth.signInWithPassword({email,password:pass});if(error) box.textContent='Gabim: '+error.message}
-async function logout(){await supabase.auth.signOut()}
-function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');refreshHeader();if(t==='list')drawAll();if(t==='debts')drawDebts();}
+function id(x){return document.getElementById(x)}
+function setText(id,v){ const e=document.getElementById(id); if(e) e.textContent=v }
+function msg(id,txt){ const e=document.getElementById(id); if(e) e.textContent=txt }
+function val(id){ const e=document.getElementById(id); return e?e.value:'' }
+function checked(id){ const e=document.getElementById(id); return !!(e && e.checked) }
 
-/* Profil (balance) */
+/* ====== Gate/App görünürlüğü ====== */
+function showGate(){id('gate').style.display='grid'; id('app').style.display='none'; id('navbar').style.display='none'}
+function showApp(){id('gate').style.display='none'; id('app').style.display='block'; id('navbar').style.display='grid'; setText('who',emailShort(sessionUser?.email)); setText('userInfo',emailShort(sessionUser?.email)); refreshHeader(); drawHome(); drawDebts()}
+
+/* ====== Auth & Redirect ====== */
+function swapAuth(w){id('tabLoginBtn').classList.toggle('active',w==='login'); id('tabRegBtn').classList.toggle('active',w==='reg'); id('authLogin').style.display=(w==='login')?'block':'none'; id('authReg').style.display=(w==='reg')?'block':'none'}
+async function registerUser(){
+  const email=id('regEmail').value.trim(), pass=id('regPass').value, box=id('regMsg'); box.textContent='';
+  if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
+  const redirect = window.location.href; // GitHub Pages tam sayfa
+  const {error}=await supabase.auth.signUp({ email, password:pass, options:{ emailRedirectTo: redirect } });
+  box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
+}
+async function login(){
+  const email=id('loginEmail').value.trim(), pass=id('loginPass').value, box=id('authMsg'); box.textContent='';
+  const {error}=await supabase.auth.signInWithPassword({email,password:pass});
+  if(error) box.textContent='Gabim: '+error.message;
+}
+async function logout(){await supabase.auth.signOut()}
+
+/* ====== Sekmeler ====== */
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  id('tab-'+t).classList.add('active');
+  document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));
+  document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');
+
+  // Ayarlar'da header + stats gizle
+  const showHeader = t!=='settings';
+  id('hdr').style.display = showHeader ? 'block' : 'none';
+  id('statsBar').style.display = showHeader ? 'flex' : 'none';
+
+  refreshHeader();
+  if(t==='list')drawAll();
+  if(t==='debts')drawDebts();
+}
+
+/* ====== Profil (balance) ====== */
 async function ensureProfile(){
   try{const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();profile=data||{balance:0}}
   catch{try{const {data}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:0}).select().single();profile=data||{balance:0}}catch{}}
-  document.getElementById('balInput').value=profile.balance??0;refreshHeader();
+  id('balInput').value=profile.balance??0;refreshHeader();
 }
-async function saveBalance(){const v=parseFloat(document.getElementById('balInput').value);const b=isNaN(v)?0:v;const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';if(!error){profile=data;refreshHeader();}}
-async function changeEmail(){const e=(document.getElementById('newEmail').value||'').trim();const m=document.getElementById('emailMsg');m.textContent='';if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.'}
-async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
+async function saveBalance(){
+  const v=parseFloat(id('balInput').value); const b=isNaN(v)?0:v;
+  const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();
+  id('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.'; if(!error){profile=data;refreshHeader();}
+}
+async function changeEmail(){
+  const e=(id('newEmail').value||'').trim(); const m=id('emailMsg'); m.textContent='';
+  if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}
+  const {error}=await supabase.auth.updateUser({email:e}); m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.';
+}
+async function changePassword(){
+  const p1=id('newPass').value,p2=id('newPass2').value,m=id('passMsg'); m.textContent='';
+  if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}
+  if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}
+  const {error}=await supabase.auth.updateUser({password:p1});
+  m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.'; if(!error){id('newPass').value=''; id('newPass2').value='';}
+}
 
-/* Kategoritë */
+/* ====== Kategoriler ====== */
 async function ensureCategoriesSeed(){
   const {data}=await supabase.from('categories').select('id').eq('user_id',sessionUser.id).limit(1);
-  if(!data || data.length===0){
-    await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
-  }
+  if(!data || data.length===0) await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
 }
 async function loadCategories(){
   const {data,error}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
@@ -531,7 +583,7 @@ async function loadCategories(){
   renderCatList(); refreshCategorySelects(); drawAll();
 }
 function renderCatList(){
-  const box=document.getElementById('catList'); box.innerHTML='';
+  const box=id('catList'); box.innerHTML='';
   cats.forEach(c=>{
     const el=document.createElement('div'); el.className='item';
     const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'🧾';
@@ -545,7 +597,7 @@ function renderCatList(){
   });
 }
 function refreshCategorySelects(){
-  const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
+  const mCat=id('mCat'), fCat=id('fCat');
   mCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
   cats.forEach(c=>{
     const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'•')+' '+c.name;
@@ -554,20 +606,20 @@ function refreshCategorySelects(){
   });
 }
 async function addCategory(){
-  const name=(document.getElementById('newCatName').value||'').trim();
-  const emoji=(document.getElementById('newCatEmoji').value||'').trim() || '🧾';
-  const msg=document.getElementById('catMsg'); msg.textContent='';
-  if(!name){msg.textContent='Shkruaj emrin e kategorisë.';return;}
+  const name=(id('newCatName').value||'').trim();
+  const emoji=(id('newCatEmoji').value||'').trim() || '🧾';
+  const msgBox=id('catMsg'); msgBox.textContent='';
+  if(!name){msgBox.textContent='Shkruaj emrin e kategorisë.';return;}
   const {data,error}=await supabase.from('categories').insert({user_id:sessionUser.id,name,emoji}).select().single();
-  if(error){msg.textContent='Gabim: '+error.message;return;}
-  cats.push({name:data.name,emoji:data.emoji,id:data.id}); document.getElementById('newCatName').value=''; renderCatList(); refreshCategorySelects();
-  msg.textContent='U shtua.';
+  if(error){msgBox.textContent='Gabim: '+error.message;return;}
+  cats.push({name:data.name,emoji:data.emoji,id:data.id}); id('newCatName').value=''; renderCatList(); refreshCategorySelects();
+  msgBox.textContent='U shtua.';
 }
-async function deleteCategory(id){
+async function deleteCategory(idv){
   if(!confirm('Fshije këtë kategori?')) return;
-  const {error}=await supabase.from('categories').delete().eq('id',id).eq('user_id',sessionUser.id);
+  const {error}=await supabase.from('categories').delete().eq('id',idv).eq('user_id',sessionUser.id);
   if(error){alert('Gabim: '+error.message);return;}
-  cats=cats.filter(c=>c.id!==id); renderCatList(); refreshCategorySelects(); drawAll();
+  cats=cats.filter(c=>c.id!==idv); renderCatList(); refreshCategorySelects(); drawAll();
 }
 function emojiFor(catName){
   const hit=cats.find(c=>c.name===catName);
@@ -576,21 +628,11 @@ function emojiFor(catName){
   return m[catName]||'💸';
 }
 
-/* Başlık/istatistikler – Settings'te gizle */
+/* ====== Başlık/istatistikler ====== */
 function refreshHeader(){
-  const icon=document.getElementById('hdrIcon'),
-        text=document.getElementById('hdrText'),
-        sub=document.getElementById('hdrSub'),
-        big=document.getElementById('hdrBig'),
-        stats=document.getElementById('statsBar');
-
-  if(activeTab==='settings'){
-    icon.textContent='⚙️'; text.textContent='Cilësime';
-    big.style.display='none'; sub.style.display='none'; stats.style.display='none';
-    return;
-  }else{
-    big.style.display='block'; sub.style.display='block'; stats.style.display='flex';
-  }
+  const icon=id('hdrIcon'), text=id('hdrText'), sub=id('hdrSub'), big=id('hdrBig'), stats=id('statsBar');
+  if(activeTab==='settings'){ big.style.display='none'; sub.style.display='none'; stats.style.display='none'; return; }
+  else { big.style.display='block'; sub.style.display='block'; stats.style.display='flex'; }
 
   if(activeTab==='debts'){
     icon.textContent='💳'; text.textContent='Borxhet'; sub.textContent='Detyrimet & Më detyrohen';
@@ -612,77 +654,105 @@ function refreshHeader(){
   }
 }
 
-/* ********  BAKİYE AYARLAYICI  ******** */
+/* ====== Bakiye yardımcı ====== */
 async function adjustBalance(delta){
   const cur=Number(profile?.balance||0);
   const next=cur + Number(delta||0);
-  const {data,error}=await supabase.from('profiles')
-    .upsert({user_id:sessionUser.id,balance:next})
-    .select().single();
-  if(!error){
-    profile=data;
-    document.getElementById('balInput').value=profile.balance;
-    refreshHeader();
-  }
+  const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:next}).select().single();
+  if(!error){ profile=data; id('balInput').value=profile.balance; refreshHeader(); }
 }
 
-/* Shpenzimet */
-async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
-async function saveExpense(){const name=document.getElementById('mName').value.trim();const amt=parseFloat(document.getElementById('mAmt').value);const cat=document.getElementById('mCat').value;const d=document.getElementById('mDate').value;if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();if(error){alert('Gabim: '+error.message);return;}items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();}
-async function delExpense(id){if(!confirm('Fshini këtë shpenzim?'))return;const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();}
-function drawHome(){const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);const list=document.getElementById('recentList');list.innerHTML='';document.getElementById('emptyHome').style.display=recent.length?'none':'block';recent.forEach(x=>list.appendChild(rowExpense(x)))}
-function drawAll(){const q=(document.getElementById('q').value||'').trim().toLowerCase();const cat=document.getElementById('fCat').value;let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));if(cat)arr=arr.filter(x=>x.category===cat);const box=document.getElementById('allList');box.innerHTML='';arr.forEach(x=>box.appendChild(rowExpense(x)))}
-function rowExpense(x){const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');meta.appendChild(t);meta.appendChild(s);const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount)+' L';const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);el.append(ic,meta,amt,del);return el}
+/* ====== Shpenzimet ====== */
+async function loadExpenses(){
+  const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
+  if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}
+  items=data||[]; drawHome(); drawAll(); refreshHeader();
+}
+async function saveExpense(){
+  const name=id('mName').value.trim(), amt=parseFloat(id('mAmt').value), cat=id('mCat').value, d=id('mDate').value;
+  if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}
+  const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
+  if(error){alert('Gabim: '+error.message);return;}
+  items.unshift(data); id('mName').value=''; id('mAmt').value=''; closeModal('Exp'); drawHome(); drawAll(); refreshHeader();
+}
+async function delExpense(idv){
+  if(!confirm('Fshini këtë shpenzim?'))return;
+  const {error}=await supabase.from('expenses').delete().eq('id',idv).eq('user_id',sessionUser.id);
+  if(error){alert('Gabim: '+error.message);return;}
+  items=items.filter(x=>x.id!==idv); drawHome(); drawAll(); refreshHeader();
+}
+function drawHome(){
+  const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
+  const list=id('recentList'); list.innerHTML='';
+  id('emptyHome').style.display=recent.length?'none':'block';
+  recent.forEach(x=>list.appendChild(rowExpense(x)));
+}
+function drawAll(){
+  const q=(id('q').value||'').trim().toLowerCase(), cat=id('fCat').value;
+  let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));
+  if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));
+  if(cat)arr=arr.filter(x=>x.category===cat);
+  const box=id('allList'); box.innerHTML=''; arr.forEach(x=>box.appendChild(rowExpense(x)));
+}
+function rowExpense(x){
+  const el=document.createElement('div'); el.className='item';
+  const ic=document.createElement('div'); ic.className='ic'; ic.textContent=emojiFor(x.category);
+  const meta=document.createElement('div'); meta.className='meta';
+  const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
+  const s=document.createElement('div'); s.className='s'; s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');
+  meta.appendChild(t); meta.appendChild(s);
+  const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L';
+  const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delExpense(x.id);
+  el.append(ic,meta,amt,del); return el;
+}
 
-/* Borxhet */
-async function loadDebts(){const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (borxhe): '+error.message);return;}debts=data||[];drawDebts();refreshHeader();}
+/* ====== Borxhet ====== */
+async function loadDebts(){
+  const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
+  if(error){alert('Gabim ngarkimi (borxhe): '+error.message);return;}
+  debts=data||[]; drawDebts(); refreshHeader();
+}
 async function saveDebt(){
-  const party=document.getElementById('dParty').value.trim();
-  const name=(document.getElementById('dName').value||'').trim();
-  const amt=parseFloat(document.getElementById('dAmt').value);
+  const party=id('dParty').value.trim();
+  const name=(id('dName').value||'').trim();
+  const amt=parseFloat(id('dAmt').value);
   const kind=segValue('segType'); // borrow/lend
-  const due=document.getElementById('dDate').value||null;
+  const due=id('dDate').value||null;
   if(!party||!amt||isNaN(amt)){alert('Shkruaj Palën (Emri) dhe shumën.');return;}
   const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'};
   const {data,error}=await supabase.from('debts').insert(payload).select().single();
   if(error){alert('Gabim: '+error.message);return;}
-  // BAKİYE ETKİSİ: borrow +, lend -
+  // Bakiye: borrow → +, lend → -
   await adjustBalance(kind==='borrow' ? +amt : -amt);
   debts.unshift(data);
-  document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');
-  closeModal('Debt');drawDebts();refreshHeader();
+  id('dParty').value=''; id('dName').value=''; id('dAmt').value=''; resetSeg('segType','borrow');
+  closeModal('Debt'); drawDebts(); refreshHeader();
 }
-async function delDebt(id){
-  const d=debts.find(x=>x.id===id);
-  if(!d){return;}
+async function delDebt(idv){
+  const d=debts.find(x=>x.id===idv); if(!d){return;}
   if(!confirm('Fshini këtë borxh?')) return;
-  const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
+  const {error}=await supabase.from('debts').delete().eq('id',idv).eq('user_id',sessionUser.id);
   if(error){alert('Gabim: '+error.message);return;}
-  // OPEN ise, eklenirken yapılan etkiyi geri al:
-  if(d.status==='open'){
-    await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
-  }
-  debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();
+  if(d.status==='open'){ await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount)); }
+  debts=debts.filter(x=>x.id!==idv); drawDebts(); refreshHeader();
 }
-async function payDebt(id){
-  const d=debts.find(x=>x.id===id); if(!d) return;
-  if(d.status==='paid'){return;}
+async function payDebt(idv){
+  const d=debts.find(x=>x.id===idv); if(!d) return;
+  if(d.status==='paid') return;
   if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
-  const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
+  const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',idv).eq('user_id',sessionUser.id).select().single();
   if(error){alert('Gabim: '+error.message);return;}
-  // ÖDEME ETKİSİ: borrow ödeme → -, lend geri ödeme → +
   await adjustBalance(d.kind==='borrow' ? -Number(d.amount) : +Number(d.amount));
-  debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
+  debts=debts.map(x=>x.id===idv?data:x); drawDebts(); refreshHeader();
 }
 function drawDebts(){
-  const q=(document.getElementById('dq').value||'').trim().toLowerCase();
+  const q=(id('dq').value||'').trim().toLowerCase();
   const kindFilter=segValue('dSegFilter');
   let arr=[...debts];
   if(q)arr=arr.filter(x=>(x.party||'').toLowerCase().includes(q)||(x.name||'').toLowerCase().includes(q));
   if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
 
-  const box=document.getElementById('debtList'); box.innerHTML='';
-  document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
+  const box=id('debtList'); box.innerHTML=''; id('emptyDebts').style.display=arr.length?'none':'block';
 
   arr.forEach(x=>{
     const el=document.createElement('div'); el.className='item';
@@ -709,17 +779,13 @@ function drawDebts(){
   });
 }
 
-/* Emoji modal */
+/* ====== Emoji modal & küçük yardımcılar ====== */
 function openEmojiPicker(){openModal('Emoji')}
-function openModal(w){document.getElementById('modal'+w).classList.add('on')}
-function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
-
-/* Helpers */
-function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
-function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
-function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
-function msg(id,txt){const e=document.getElementById(id); if(e) e.textContent=txt}
+function openModal(w){id('modal'+w).classList.add('on')}
+function closeModal(w){id('modal'+w).classList.remove('on')}
+function toggleSeg(idv,btn){const p=id(idv);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+function segValue(idv){return document.querySelector('#'+idv+' .active')?.dataset.val||''}
+function resetSeg(idv,valv){const p=id(idv);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===valv))}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
 function fmt(n){return (Math.round(n*100)/100).toLocaleString('sq-AL')}
 function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
