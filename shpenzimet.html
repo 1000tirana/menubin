@@ -5,189 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
-
-<!-- =========================================================
-   SUPABASE: ŞEMA + RLS (bir kere çalıştır)
-   ---------------------------------------------------------
-   -- SQL Editor'a yapıştır → Run
--------------------------------------------------------------
-create extension if not exists pgcrypto;
-
--- Kullanıcı profili / tercihleri
-create table if not exists public.profiles(
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  balance numeric default 0,
-  currency text not null default 'ALL',
-  num_format text not null default 'eu',  -- 'eu' => 23.456,78  | 'us' => 23,456.78
-  week_start int not null default 1,      -- 1=Hën (Pazartesi), 0=Die (Pazar)
-  locale text not null default 'sq-AL',
-  setup_done boolean not null default false,
-  pin_hash text,                          -- app içi PIN (opsiyonel, SHA256)
-  created_at timestamptz default now()
-);
-
--- Harcama
-create table if not exists public.expenses(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  name text not null,
-  amount numeric not null,
-  category text not null,
-  d date not null,
-  created_at timestamptz default now()
-);
-create index if not exists expenses_user_d on public.expenses(user_id, d);
-
--- Gelir
-create table if not exists public.incomes(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  name text not null,
-  amount numeric not null,
-  category text not null,
-  d date not null,
-  created_at timestamptz default now()
-);
-create index if not exists incomes_user_d on public.incomes(user_id, d);
-
--- Kategori (gider + gelir)
-create table if not exists public.categories(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  name text not null,
-  emoji text,
-  kind text not null default 'expense',   -- 'expense' | 'income'
-  created_at timestamptz default now()
-);
-create index if not exists categories_user_kind on public.categories(user_id, kind);
-
--- Borç
-create table if not exists public.debts(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  party text not null,                    -- kişi/şirket adı
-  name text,                              -- açıklama
-  amount numeric not null,
-  kind text not null default 'borrow',    -- borrow (mora hua) | lend (dhash hua)
-  status text not null default 'open',    -- open | paid
-  due date,
-  created_at timestamptz default now()
-);
-create index if not exists debts_user_kind on public.debts(user_id, kind);
-
--- Basit hatırlatmalar (opsiyonel, uygulama içinde uyarı)
-create table if not exists public.reminders(
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  text text not null,
-  at timestamptz not null,
-  is_done boolean not null default false,
-  created_at timestamptz default now()
-);
-create index if not exists reminders_user_at on public.reminders(user_id, at);
-
--- RLS
-alter table public.profiles  enable row level security;
-alter table public.expenses  enable row level security;
-alter table public.incomes   enable row level security;
-alter table public.categories enable row level security;
-alter table public.debts     enable row level security;
-alter table public.reminders enable row level security;
-
--- Policies (idempotent)
-do $$
-begin
-  if not exists (select 1 from pg_policies where polname='profiles_select_own') then
-    create policy profiles_select_own on public.profiles
-      for select using (auth.uid() = user_id);
-  end if;
-  if not exists (select 1 from pg_policies where polname='profiles_upsert_own') then
-    create policy profiles_upsert_own on public.profiles
-      for insert with check (auth.uid() = user_id);
-    create policy profiles_update_own on public.profiles
-      for update using (auth.uid() = user_id);
-  end if;
-
-  if not exists (select 1 from pg_policies where polname='expenses_all_own') then
-    create policy expenses_all_own on public.expenses
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  end if;
-
-  if not exists (select 1 from pg_policies where polname='incomes_all_own') then
-    create policy incomes_all_own on public.incomes
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  end if;
-
-  if not exists (select 1 from pg_policies where polname='categories_all_own') then
-    create policy categories_all_own on public.categories
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  end if;
-
-  if not exists (select 1 from pg_policies where polname='debts_all_own') then
-    create policy debts_all_own on public.debts
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  end if;
-
-  if not exists (select 1 from pg_policies where polname='reminders_all_own') then
-    create policy reminders_all_own on public.reminders
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
-  end if;
-end $$;
-========================================================= -->
-
 <style>
-/* ---------- GitHub koyu tema + senin “yuvarlak-ışık” ikon stillerin ---------- */
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e;
-  --primary:#2ea043; --primary2:#238636; --blue:#1f6feb; --danger:#f85149;
+  --primary:#2ea043; --primary2:#238636;
+  --blue:#1f6feb; --danger:#f85149;
   --shadow:0 10px 30px rgba(0,0,0,.35);
-  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --nav-h:76px;               /* nav yüksekliği */
+  --fab-gap:110px;            /* ortadaki boşluk */
 }
-*{box-sizing:border-box} html,body{height:100%;background:var(--bg)}
-body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;touch-action:manipulation;overscroll-behavior:none}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg);overflow-x:hidden;overscroll-behavior:none}
+body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;touch-action:manipulation}
 
-/* App shell */
-.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(110px + var(--safe-bottom))}
-header{background:linear-gradient(135deg,var(--primary2),var(--primary));color:#fff;border-bottom-left-radius:18px;border-bottom-right-radius:18px;padding:calc(8px + var(--safe-top)) 14px 10px;box-shadow:0 8px 26px rgba(35,134,54,.35)}
+/* iOS lastik kaydırmada altta görünen boşluğu NAV ile aynı renge boyamak için */
+body::after{
+  content:"";position:fixed;left:0;right:0;bottom:0;
+  height:calc(22px + var(--safe-bottom));
+  background:var(--card);
+  z-index:1500;pointer-events:none;
+}
+
+.wrap{display:flex;flex-direction:column;min-height:100vh;
+  padding-bottom:calc(var(--nav-h) + var(--safe-bottom))
+}
+
+/* ====== Header ====== */
+header{
+  background:linear-gradient(135deg,var(--primary2) 0%, var(--primary) 100%);
+  color:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px;
+  padding:calc(10px + var(--safe-top)) 16px 12px; box-shadow:0 10px 28px rgba(35,134,54,.35)
+}
 header .top{display:flex;justify-content:space-between;align-items:center}
-header .title{font-size:18px;font-weight:900;display:flex;gap:8px;margin-top:6px}
-header .big{font-size:30px;font-weight:900;margin-top:6px}
+header .title{font-size:20px;font-weight:900;display:flex;gap:8px;margin-top:6px}
+header .big{font-size:32px;font-weight:900;margin-top:8px}
 header .muted{color:#e6edf3;opacity:.8}
-.stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-10px)}
+.stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
 .card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
 main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
 
-/* Yuvarlak “ışıklı” ikon */
+/* Yuvarlak ikon */
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
   border:1px solid rgba(255,255,255,.06); font-size:24px}
-.meta{flex:1}.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
+.meta{flex:1}
+.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
 .meta .s{font-size:12px;color:var(--muted)}
 .amt{font-weight:900;color:#e6edf3}
 .del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
 
 .row{display:flex;gap:10px}
 label{font-size:13px;color:var(--muted)}
-input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none}
+input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;
+  font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none}
 .actions{display:flex;gap:10px;margin-top:10px}
-.btnP,.btnS,.btnMini{font-size:16px;user-select:none;-webkit-tap-highlight-color:transparent}
-.btnP{flex:1;background:linear-gradient(180deg,var(--primary),var(--primary2));color:#fff;border:1px solid #2ea043;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
+.btnP,.btnS,.btnMini{font-size:16px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+.btnP{flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);color:#fff;border:1px solid #2ea043;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
 .btnS{flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* Alt nav — ortada fab boşluğu */
+/* ====== Alt NAV (orta boşluk sabit) ====== */
 nav.nav{
-  --fab-gap:110px;
-  position:fixed;left:0;right:0;bottom:0;height:calc(76px + var(--safe-bottom));padding:0 12px var(--safe-bottom);
+  position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
+  height:calc(var(--nav-h) + var(--safe-bottom));padding:0 12px var(--safe-bottom);
   background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
   border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
-  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center
+  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;
+  backface-visibility:hidden;will-change:transform
+}
+/* lastik kaydırmada nav altında da aynı rengi göster */
+nav.nav::after{
+  content:"";position:fixed;left:0;right:0;bottom:0;height:calc(22px + var(--safe-bottom));
+  background:var(--card);z-index:-1;pointer-events:none
 }
 .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
 .btn:nth-of-type(1){grid-column:1}.btn:nth-of-type(2){grid-column:2}.btn:nth-of-type(3){grid-column:4}.btn:nth-of-type(4){grid-column:5}
@@ -198,49 +95,46 @@ nav.nav{
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
 
 /* FAB (biraz küçük) */
-.nav .fab{position:absolute;left:50%;transform:translateX(-50%);top:-22px;width:56px;height:56px;border-radius:999px;
+.nav .fab{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:-22px;width:56px;height:56px;border-radius:999px;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
-  border:1px solid rgba(255,255,255,.06);color:#0d1117;font-size:28px;display:grid;place-items:center;
-  box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);cursor:pointer;z-index:2100}
-
-/* Modal/sheets */
+  border:1px solid rgba(255,255,255,.06);color:#0d1117;font-size:28px;
+  display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(0,0,0,.6);
+  cursor:pointer;z-index:2100;pointer-events:auto
+}
+@supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
+
+/* ====== Modal ====== */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
 
-/* Auth gate */
+/* ====== Auth gate ====== */
 .gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:4000}
 .panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
-.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
-.tabs button.active{background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:#2ea043;color:#fff;font-weight:800}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
+.tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
 /* Segmentler */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
-.seg button.active{background:linear-gradient(180deg,#1f6feb,#1158c7);color:#fff}
+.seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
 
-/* Emoji picker */
+/* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
 .picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
 #emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
-
-/* Onboarding */
-.onb{position:fixed;inset:0;background:var(--bg);display:none;z-index:4500;padding:16px}
-.onb .box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;height:100%;display:flex;flex-direction:column;gap:12px}
-
-/* PIN kilidi (opsiyonel) */
-.pinGate{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;place-items:center;z-index:5000}
-.pinBox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;width:min(420px,92vw)}
-.pinBox input{letter-spacing:6px;text-align:center}
 
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
 </style>
 </head>
 <body>
 
-<!-- ============== GİRİŞ / KAYIT ============== -->
+<!-- ===== HYRJE / REGJISTRIM ===== -->
 <div id="gate" class="gate">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -255,7 +149,7 @@ nav.nav{
       <label>Email</label>
       <input id="loginEmail" placeholder="emri@gmail.com" autocomplete="username">
       <div class="row" style="margin-top:8px">
-        <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••"></div>
+        <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       </div>
       <div class="actions"><button class="btnP" onclick="login()">Hyr</button></div>
       <div id="authMsg" class="muted" style="margin-top:6px"></div>
@@ -272,55 +166,7 @@ nav.nav{
   </div>
 </div>
 
-<!-- ============== ONBOARDING (ilk kurulum) ============== -->
-<div id="onb" class="onb">
-  <div class="box">
-    <h3 style="margin:6px 0">🚀 Fillimi i shpejtë</h3>
-    <div class="card">
-      <h4 style="margin:0 0 8px">Preferencat kryesore</h4>
-      <div class="row">
-        <div style="flex:1">
-          <label>Monedha</label>
-          <select id="onbCurrency">
-            <option value="ALL" selected>ALL — Albania Lek</option>
-            <option value="EUR">EUR — Euro</option>
-            <option value="USD">USD — US Dollar</option>
-            <option value="TRY">TRY — Türk Lirası</option>
-          </select>
-        </div>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <div style="flex:1">
-          <label>Dita e parë e javës</label>
-          <div id="onbWeek" class="seg two">
-            <button class="active" data-val="1">E hënë</button>
-            <button data-val="0">E diel</button>
-          </div>
-        </div>
-        <div style="flex:1">
-          <label>Formati i numrave</label>
-          <div id="onbNum" class="seg two">
-            <button class="active" data-val="eu">23.456,78</button>
-            <button data-val="us">23,456.78</button>
-          </div>
-        </div>
-      </div>
-      <div class="actions" style="margin-top:12px"><button class="btnP" onclick="finishOnboarding()">Vazhdo</button></div>
-    </div>
-  </div>
-</div>
-
-<!-- ============== PIN KİLİDİ (opsiyonel) ============== -->
-<div id="pinGate" class="pinGate">
-  <div class="pinBox">
-    <h3 style="margin:0 0 8px">🔒 Fut PIN-in</h3>
-    <input id="pinInput" maxlength="6" placeholder="••••" inputmode="numeric">
-    <div class="actions" style="margin-top:10px"><button class="btnP" onclick="checkPin()">Hap</button></div>
-    <div id="pinMsg" class="muted" style="margin-top:6px"></div>
-  </div>
-</div>
-
-<!-- ============== UYGULAMA ============== -->
+<!-- ===== APLIKACIONI ===== -->
 <div class="wrap" id="app" style="display:none">
   <header>
     <div class="top">
@@ -328,25 +174,25 @@ nav.nav{
       <div class="muted" id="who">@përdoruesi</div>
     </div>
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
-    <div class="big"><span id="hdrTotal">0</span> <span id="currSym">L</span></div>
-    <div class="muted" id="hdrSub">Gjendja + Të ardhura − Shpenzime</div>
+    <div class="big"><span id="hdrTotal">0</span> L</div>
+    <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
   </header>
 
   <div class="stats">
-    <div class="card"><div class="muted">Shpenzime (muaj)</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="statExpMonth">0</span> <span id="currSym1">L</span></div></div>
-    <div class="card"><div class="muted">Të ardhura (muaj)</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="statIncMonth">0</span> <span id="currSym2">L</span></div></div>
-    <div class="card"><div class="muted">Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="statTodayNet">0</span> <span id="currSym3">L</span></div></div>
+    <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0</span> L</div></div>
+    <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0</span> L</div></div>
   </div>
 
   <main>
     <section id="tab-home" class="tab active">
-      <h3 class="sec">🕒 Të fundit (shpenzime + të ardhura)</h3>
+      <h3 class="sec">🕒 Të fundit</h3>
       <div id="recentList" class="list"></div>
-      <div id="emptyHome" class="muted" style="text-align:center;margin-top:12px">Asgjë për tani.</div>
+      <div id="emptyHome" class="muted" style="text-align:center;margin-top:16px">Asnjë shpenzim deri tani.</div>
     </section>
 
     <section id="tab-list" class="tab">
-      <h3 class="sec">📚 Shpenzimet</h3>
+      <h3 class="sec">📚 Lista</h3>
       <div class="row" style="margin:8px 0 10px">
         <input id="q" placeholder="Kërko..." oninput="drawAll()">
         <select id="fCat" onchange="drawAll()"><option value="">Të gjitha</option></select>
@@ -363,7 +209,7 @@ nav.nav{
         <button type="button" data-val="lend">Dhash hua</button>
       </div>
       <div id="debtList" class="list"></div>
-      <div id="emptyDebts" class="muted" style="text-align:center;margin-top:16px">Asnjë borxh.</div>
+      <div id="emptyDebts" class="muted" style="text-align:center;margin-top:16px">Asnjë borxh deri tani.</div>
     </section>
 
     <section id="tab-settings" class="tab">
@@ -376,28 +222,13 @@ nav.nav{
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">💼 Gjendja fillestare</h4>
+        <h4 style="margin:0 0 8px;color:#e6edf3">💼 Gjendja (L)</h4>
         <div class="row"><input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="p.sh. 50000"></div>
         <div class="actions"><button class="btnP" onclick="saveBalance()">Ruaj gjendjen</button></div>
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">🌍 Preferencat</h4>
-        <div class="row">
-          <div style="flex:1"><label>Monedha</label><select id="prefCurrency" onchange="savePrefs()">
-            <option value="ALL">ALL — Albania Lek</option><option value="EUR">EUR — Euro</option><option value="USD">USD — US Dollar</option><option value="TRY">TRY — Türk Lirası</option>
-          </select></div>
-          <div style="flex:1"><label>Dita e parë</label><select id="prefWeek" onchange="savePrefs()"><option value="1">E hënë</option><option value="0">E diel</option></select></div>
-        </div>
-        <div class="row" style="margin-top:8px">
-          <div style="flex:1"><label>Formati i numrave</label><select id="prefNum" onchange="savePrefs()"><option value="eu">23.456,78</option><option value="us">23,456.78</option></select></div>
-          <div style="flex:1"><label>Gjuha</label><select id="prefLang" onchange="savePrefs()"><option value="sq-AL">Shqip</option><option value="tr-TR">Türkçe</option></select></div>
-        </div>
-        <div class="muted" id="prefMsg" style="margin-top:6px;font-size:12px"></div>
-      </div>
-
-      <!-- KATEGORİLER -->
+      <!-- KATEGORI -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -412,55 +243,32 @@ nav.nav{
             <input id="newCatEmoji" value="🍔" hidden>
           </div>
           <div style="flex:1">
-            <label>Emri i kategorisë</label><input id="newCatName" placeholder="p.sh. Ushqime">
-          </div>
-          <div style="width:160px">
-            <label>Lloji</label><select id="newCatKind"><option value="expense">Shpenzim</option><option value="income">Të ardhura</option></select>
+            <label>Emri i kategorisë</label>
+            <input id="newCatName" placeholder="p.sh. Ushqime">
           </div>
         </div>
         <div class="actions"><button class="btnP" onclick="addCategory()">Shto kategori</button></div>
         <div id="catMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- PIN -->
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">🔒 PIN i aplikacionit (opsional)</h4>
-        <div class="row"><input id="pinNew" placeholder="PIN (4-6 shifra)" inputmode="numeric" maxlength="6"><input id="pinAgain" placeholder="Përsërit PIN" inputmode="numeric" maxlength="6"></div>
-        <div class="actions"><button class="btnP" onclick="savePin()">Ruaj PIN</button><button class="btnS" onclick="removePin()">Hiq PIN</button></div>
-        <div id="pinSaveMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+        <h4 style="margin:0 0 8px;color:#e6edf3">📧 Ndrysho email</h4>
+        <div class="row"><input id="newEmail" placeholder="email i ri p.sh. user@domain.com"></div>
+        <div class="actions"><button class="btnP" onclick="changeEmail()">Ruaj email</button></div>
+        <div id="emailMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- E-posta / Şifre -->
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">📧 / 🔐 Llogaria</h4>
-        <div class="row"><input id="newEmail" placeholder="email i ri p.sh. user@domain.com"><button class="btnMini" onclick="changeEmail()">Ruaj email</button></div>
-        <div class="row" style="margin-top:8px"><input id="newPass" type="password" placeholder="Fjalëkalimi i ri (min. 6)"><input id="newPass2" type="password" placeholder="Përsërit fjalëkalimin"><button class="btnMini" onclick="changePassword()">Ruaj fjalëkalimin</button></div>
-        <div id="acctMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-      </div>
-
-      <!-- Yedekle / Geri yükle -->
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">🗂️ Yedekle & Geri ngarko</h4>
-        <div class="row">
-          <button class="btnP" onclick="exportData()">Eksporto JSON</button>
-          <input id="impFile" type="file" accept="application/json" style="display:none" onchange="importData(event)">
-          <button class="btnS" onclick="document.getElementById('impFile').click()">Ngarko JSON</button>
-        </div>
-        <div id="backupMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-      </div>
-
-      <!-- Hatırlatıcılar (uygulama içi) -->
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">⏰ Kujtuesit</h4>
-        <div class="row"><input id="remText" placeholder="p.sh. Paguaj qiranë"><input id="remAt" type="datetime-local"></div>
-        <div class="actions"><button class="btnP" onclick="addReminder()">Shto kujtues</button></div>
-        <div id="remList" class="list" style="margin-top:10px"></div>
+        <h4 style="margin:0 0 8px;color:#e6edf3">🔐 Ndrysho fjalëkalimin</h4>
+        <div class="row"><input id="newPass" type="password" placeholder="Fjalëkalimi i ri (min. 6)"><input id="newPass2" type="password" placeholder="Përsërit fjalëkalimin"></div>
+        <div class="actions"><button class="btnP" onclick="changePassword()">Ruaj fjalëkalimin</button></div>
+        <div id="passMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
     </section>
   </main>
 </div>
 
-<!-- Alt menü -->
+<!-- Alt menü + FAB -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
   <a class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
@@ -469,19 +277,29 @@ nav.nav{
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
-<!-- Modal: Ekle (Expense/Income seçimi) -->
-<div class="modal" id="modalAdd"><div class="sheet">
-  <h3 style="margin:4px 0 10px">➕ Shto</h3>
-  <div id="segAdd" class="seg two"><button class="active" data-val="expense">Shpenzim</button><button data-val="income">Të ardhura</button></div>
-  <div id="boxExp" style="margin-top:10px">
-    <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma</label><input id="mAmt" type="number" step="0.01" inputmode="decimal"></div></div>
-    <div class="row" style="margin-top:8px"><div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
+<!-- Modal: Shpenzim -->
+<div class="modal" id="modalExp"><div class="sheet">
+  <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
+  <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma (L)</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div></div>
+  <div class="row" style="margin-top:8px"><div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Exp')">Mbyll</button><button class="btnP" onclick="saveExpense()">Ruaj</button></div>
+</div></div>
+
+<!-- Modal: Borxh -->
+<div class="modal" id="modalDebt"><div class="sheet">
+  <h3 style="margin:4px 0 10px">➕ Shto borxh</h3>
+  <div class="row">
+    <div style="flex:1"><label>Palë (Emri)</label><input id="dParty" placeholder="p.sh. Arben / ACME sh.p.k."></div>
+    <div style="flex:1"><label>Shuma (L)</label><input id="dAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
   </div>
-  <div id="boxInc" style="display:none;margin-top:10px">
-    <div class="row"><div style="flex:2"><label>Burimi</label><input id="iName" placeholder="p.sh. Pagë"></div><div style="flex:1"><label>Shuma</label><input id="iAmt" type="number" step="0.01" inputmode="decimal"></div></div>
-    <div class="row" style="margin-top:8px"><div style="flex:1"><label>Kategoria</label><select id="iCat"></select></div><div style="flex:1"><label>Data</label><input id="iDate" type="date"></div></div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Lloji</label><div id="segType" class="seg two"><button type="button" class="active" data-val="borrow">Mora hua</button><button type="button" data-val="lend">Dhash hua</button></div></div>
+    <div style="flex:1"><label>Afati (opsionale)</label><input id="dDate" type="date"></div>
   </div>
-  <div class="actions"><button class="btnS" onclick="closeModal('Add')">Mbyll</button><button class="btnP" onclick="saveAdd()">Ruaj</button></div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Përshkrimi (opsionale)</label><input id="dName" placeholder="p.sh. Telefon i ri"></div>
+  </div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
 </div></div>
 
 <!-- Modal: Emoji seçici -->
@@ -491,373 +309,234 @@ nav.nav{
   <div class="actions"><button class="btnS" onclick="closeModal('Emoji')">Mbyll</button></div>
 </div></div>
 
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ===== Supabase ayarların ===== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ===== Varsayılan kategoriler ===== */
-const DEF_EXP=[{name:'Ushqime',emoji:'🍔'},{name:'Transport',emoji:'⛽'},{name:'Shtëpia',emoji:'🏠'},{name:'Argëtim',emoji:'🎟️'},{name:'Fatura',emoji:'💡'},{name:'Të tjera',emoji:'🧾'}];
-const DEF_INC=[{name:'Pagë',emoji:'💼'},{name:'Shitje',emoji:'💳'},{name:'Të tjera',emoji:'💰'}];
+const DEFAULT_CATS=[
+  {name:'Ushqime',emoji:'🍔'},
+  {name:'Transport',emoji:'⛽'},
+  {name:'Shtëpia',emoji:'🏠'},
+  {name:'Argëtim',emoji:'🎟️'},
+  {name:'Fatura',emoji:'💡'},
+  {name:'Të tjera',emoji:'🧾'}
+];
 
-let sessionUser=null, profile={balance:0,currency:'ALL',num_format:'eu',week_start:1,locale:'sq-AL',setup_done:false};
-let cats=[], expenses=[], incomes=[], debts=[], reminders=[];
-let activeTab='home', currSymbol='L';
+let sessionUser=null, items=[], debts=[], profile={balance:0}, cats=[...DEFAULT_CATS], activeTab='home';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Emoji grid
-  '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 ⚽ 🧾 💊 ✈️ 🚗 💳 💎 💼 💰'.split(' ').forEach(e=>{
-    const b=document.createElement('button');b.textContent=e;b.onclick=()=>{id('newCatEmoji').value=e;id('emojiPreview').textContent=e;closeModal('Emoji')};id('emojiGrid').appendChild(b)
-  });
+  // Emoji modalı doldur
+  const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 ⚽ 🧾 💊 ✈️ 🚗 🪙 💳 💎 🎓 📚 🖥️ 🔌 🔋 🧥 👟 🍼'.split(' ');
+  const grid=document.getElementById('emojiGrid');
+  picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});
 
-  // FAB
-  const fab=id('openAdd'); ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,()=>openAddSheet(),{passive:true}));
+  document.getElementById('loginEmail').placeholder='emri@gmail.com';
+  document.getElementById('regEmail').placeholder='emri@gmail.com';
+  document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
-  // Toggle add type
-  qAll('#segAdd button').forEach(b=>b.onclick=()=>{toggleSeg('segAdd',b); const v=segValue('segAdd'); id('boxExp').style.display=v==='expense'?'block':'none'; id('boxInc').style.display=v==='income'?'block':'none';});
+  document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
+  document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b);drawDebts();});
 
-  // auth
+  // FAB click tüm tarayıcılarda çalışsın
+  const fab=document.getElementById('openAdd');
+  const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
+  ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
+
+  // oturum
   const {data:{session}}=await supabase.auth.getSession();
-  if(session?.user){sessionUser=session.user; await boot();}
+  if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);}
   else showGate();
 
   supabase.auth.onAuthStateChange(async (_e,session)=>{
-    if(session?.user){sessionUser=session.user; await boot();}
+    if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);}
     else{sessionUser=null; showGate();}
   });
 });
 
-/* ===== Boot ===== */
-async function boot(){
-  await Promise.all([loadProfile(), seedCategories(), loadCategories(), loadAllData()]);
-  showApp();
-  if(!profile.setup_done) showOnboarding();
-  maybeShowPin();
-  startReminderTicker();
-}
-
-/* ===== UI helpers ===== */
-const id = s=>document.getElementById(s);
-const q  = s=>document.querySelector(s);
-const qAll = s=>document.querySelectorAll(s);
+/* UI helpers */
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
-function setText(s,v){const e=id(s);if(e)e.textContent=v}
-function openModal(w){id('modal'+w).classList.add('on')}
-function closeModal(w){id('modal'+w).classList.remove('on')}
-function toggleSeg(idp,btn){const p=id(idp);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-function segValue(idp){return id(idp).querySelector('.active')?.dataset.val||''}
-function fmtNum(n){const x=Math.round(n*100)/100; if(profile.num_format==='us'){return x.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})} return x.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:2})}
-function todayISO(){return new Date().toISOString().slice(0,10)}
-function isThisMonthISO(iso){const d=new Date(iso+'T00:00:00'),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
-function isTodayISO(iso){const d=new Date(iso+'T00:00:00'),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
-function fmtDate(iso){const d=new Date(iso+'T00:00:00');return d.toLocaleDateString(profile.locale||'sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
-function currencySymbol(code){return ({ALL:'L',EUR:'€',USD:'$',TRY:'₺'})[code]||code}
-
-/* ===== Gate / App ===== */
-function showGate(){id('gate').style.display='grid';id('app').style.display='none';id('navbar').style.display='none'}
-function showApp(){id('gate').style.display='none';id('app').style.display='block';id('navbar').style.display='grid';id('who').textContent=emailShort(sessionUser?.email);id('userInfo').textContent=emailShort(sessionUser?.email);applyCurrency()}
-
-/* ===== Onboarding ===== */
-function showOnboarding(){
-  id('onb').style.display='block';
-  // defaults
-  id('onbCurrency').value=profile.currency||'ALL';
-  resetSeg('onbWeek', String(profile.week_start||1));
-  resetSeg('onbNum', profile.num_format||'eu');
-  qAll('#onbWeek button').forEach(b=>b.onclick=()=>toggleSeg('onbWeek',b));
-  qAll('#onbNum button').forEach(b=>b.onclick=()=>toggleSeg('onbNum',b));
-}
-function resetSeg(seg,val){const p=id(seg);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active', String(x.dataset.val)===String(val)))}
-async function finishOnboarding(){
-  profile.currency=id('onbCurrency').value;
-  profile.week_start=Number(segValue('onbWeek'));
-  profile.num_format=segValue('onbNum');
-  profile.setup_done=true;
-  await supabase.from('profiles').upsert({user_id:sessionUser.id, ...profile}).select();
-  id('onb').style.display='none';
-  applyCurrency(); refreshHeader(); drawAll(); drawHome();
-}
-
-/* ===== PIN (opsiyonel) ===== */
-function maybeShowPin(){ if(profile.pin_hash){ id('pinGate').style.display='grid'; } }
-async function savePin(){
-  const p1=id('pinNew').value.trim(), p2=id('pinAgain').value.trim();
-  const box=id('pinSaveMsg'); box.textContent='';
-  if(!p1 || p1!==p2 || p1.length<4){ box.textContent='PIN ≥ 4 dhe i njëjtë në të dy fushat.'; return; }
-  const hash=await sha256(p1); const {error}=await supabase.from('profiles').update({pin_hash:hash}).eq('user_id',sessionUser.id);
-  box.textContent=error?('Gabim: '+error.message):'U ruajt.';
-  if(!error){ profile.pin_hash=hash; id('pinNew').value=''; id('pinAgain').value=''; }
-}
-async function removePin(){ await supabase.from('profiles').update({pin_hash:null}).eq('user_id',sessionUser.id); profile.pin_hash=null; id('pinSaveMsg').textContent='PIN u hoq.' }
-async function checkPin(){
-  const v=id('pinInput').value.trim(); const box=id('pinMsg');
-  if(!v){box.textContent='Shkruaj PIN.';return;}
-  const ok = (await sha256(v))===profile.pin_hash;
-  if(ok){ id('pinGate').style.display='none'; id('pinInput').value=''; box.textContent=''; }
-  else { box.textContent='PIN i pasaktë.'; }
-}
-async function sha256(s){const buf=new TextEncoder().encode(s);const dig=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(dig)).map(b=>b.toString(16).padStart(2,'0')).join('')}
-
-/* ===== Auth ===== */
-async function registerUser(){const email=id('regEmail').value.trim(), pass=id('regPass').value;const box=id('regMsg');box.textContent=''; if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;} const {error}=await supabase.auth.signUp({email,password:pass,options:{emailRedirectTo:location.origin+location.pathname}}); box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.'}
-async function login(){const email=id('loginEmail').value.trim(), pass=id('loginPass').value;const box=id('authMsg');box.textContent=''; const {error}=await supabase.auth.signInWithPassword({email,password:pass}); if(error) box.textContent='Gabim: '+error.message}
+function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none'}
+function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=emailShort(sessionUser?.email);refreshHeader();drawHome();drawDebts()}
+function swapAuth(w){document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');document.getElementById('authLogin').style.display=(w==='login')?'block':'none';document.getElementById('authReg').style.display=(w==='reg')?'block':'none'}
+async function registerUser(){const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPass').value;const box=document.getElementById('regMsg');box.textContent='';if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}const {error}=await supabase.auth.signUp({email,password:pass});box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.'}
+async function login(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const box=document.getElementById('authMsg');box.textContent='';const {error}=await supabase.auth.signInWithPassword({email,password:pass});if(error) box.textContent='Gabim: '+error.message}
 async function logout(){await supabase.auth.signOut()}
+function switchTab(t){activeTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));document.querySelector(`.btn[data-tab="${t}"]`)?.classList.add('active');refreshHeader();if(t==='list')drawAll();if(t==='debts')drawDebts();}
 
-/* ===== Profile & Prefs ===== */
-async function loadProfile(){
-  const {data,error}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();
-  if(error && error.code!=='PGRST116'){ /* not found */ }
-  profile = data || profile;
-  // defaults
-  id('balInput').value=profile.balance??0;
-  id('prefCurrency').value=profile.currency||'ALL';
-  id('prefWeek').value=String(profile.week_start??1);
-  id('prefNum').value=profile.num_format||'eu';
-  id('prefLang').value=profile.locale||'sq-AL';
-  applyCurrency();
+/* Profil (balance) */
+async function ensureProfile(){
+  try{const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();profile=data||{balance:0}}
+  catch{try{const {data}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:0}).select().single();profile=data||{balance:0}}catch{}}
+  document.getElementById('balInput').value=profile.balance??0;refreshHeader();
 }
-function applyCurrency(){ currSymbol=currencySymbol(profile.currency||'ALL'); ['currSym','currSym1','currSym2','currSym3'].forEach(s=>setText(s,currSymbol)); refreshHeader(); }
-async function saveBalance(){const v=parseFloat(id('balInput').value);const b=isNaN(v)?0:v;const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();id('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.'; if(!error){profile=data; refreshHeader();}}
-async function savePrefs(){
-  profile.currency=id('prefCurrency').value;
-  profile.week_start=Number(id('prefWeek').value);
-  profile.num_format=id('prefNum').value;
-  profile.locale=id('prefLang').value;
-  const {error}=await supabase.from('profiles').upsert({user_id:sessionUser.id, ...profile});
-  id('prefMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
-  applyCurrency(); drawHome(); drawAll(); drawDebts();
-}
-async function changeEmail(){const e=(id('newEmail').value||'').trim();const box=id('acctMsg');box.textContent=''; if(!e||!e.includes('@')){box.textContent='Email i pavlefshëm.';return;} const {error}=await supabase.auth.updateUser({email:e}); box.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.'}
-async function changePassword(){const p1=id('newPass').value,p2=id('newPass2').value,box=id('acctMsg');box.textContent=''; if(!p1||p1.length<6){box.textContent='Fjalëkalimi ≥ 6.';return;} if(p1!==p2){box.textContent='Nuk përputhen.';return;} const {error}=await supabase.auth.updateUser({password:p1}); box.textContent=error?('Gabim: '+error.message):'U përditësua.'; if(!error){id('newPass').value='';id('newPass2').value='';}}
+async function saveBalance(){const v=parseFloat(document.getElementById('balInput').value);const b=isNaN(v)?0:v;const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:b}).select().single();document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';if(!error){profile=data;refreshHeader();}}
+async function changeEmail(){const e=(document.getElementById('newEmail').value||'').trim();const m=document.getElementById('emailMsg');m.textContent='';if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}const {error}=await supabase.auth.updateUser({email:e});m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.'}
+async function changePassword(){const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');m.textContent='';if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}const {error}=await supabase.auth.updateUser({password:p1});m.textContent=error?('Gabim: '+error.message):'Fjalëkalimi u përditësua.';if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}}
 
-/* ===== Kategoriler ===== */
-async function seedCategories(){
+/* Kategoritë */
+async function ensureCategoriesSeed(){
   const {data}=await supabase.from('categories').select('id').eq('user_id',sessionUser.id).limit(1);
   if(!data || data.length===0){
-    await supabase.from('categories').insert([
-      ...DEF_EXP.map(x=>({...x,kind:'expense',user_id:sessionUser.id})),
-      ...DEF_INC.map(x=>({...x,kind:'income',user_id:sessionUser.id}))
-    ]);
+    await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
   }
 }
 async function loadCategories(){
-  const {data}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
-  cats=data||[]; renderCatList(); refreshCategorySelects();
+  const {data,error}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
+  if(!error && data){cats=data.map(r=>({name:r.name,emoji:r.emoji,id:r.id}))}
+  renderCatList(); refreshCategorySelects(); drawAll();
 }
 function renderCatList(){
-  const box=id('catList'); box.innerHTML='';
-  const groups=[['Kategori shpenzimesh','expense'],['Kategori të ardhurash','income']];
-  groups.forEach(([title,k])=>{
-    const head=document.createElement('div'); head.className='item'; head.innerHTML=`<div class="ic">📂</div><div class="meta"><div class="t">${title}</div><div class="s muted">Personale</div></div>`; box.appendChild(head);
-    cats.filter(c=>c.kind===k).forEach(c=>{
-      const el=document.createElement('div'); el.className='item';
-      const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'•';
-      const meta=document.createElement('div'); meta.className='meta'; meta.innerHTML=`<div class="t">${c.name}</div><div class="s muted">${k==='expense'?'Shpenzim':'Të ardhura'}</div>`;
-      const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>deleteCategory(c.id);
-      el.append(ic,meta,del); box.appendChild(el);
-    });
+  const box=document.getElementById('catList'); box.innerHTML='';
+  cats.forEach(c=>{
+    const el=document.createElement('div'); el.className='item';
+    const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'🧾';
+    const meta=document.createElement('div'); meta.className='meta';
+    const t=document.createElement('div'); t.className='t'; t.textContent=c.name;
+    const s=document.createElement('div'); s.className='s'; s.textContent='Kategori personale';
+    meta.appendChild(t); meta.appendChild(s);
+    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️';
+    del.onclick=()=>deleteCategory(c.id);
+    el.append(ic,meta,del); box.appendChild(el);
   });
 }
 function refreshCategorySelects(){
-  const mCat=id('mCat'), iCat=id('iCat'), fCat=id('fCat');
-  mCat.innerHTML=''; iCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
+  const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
+  mCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
   cats.forEach(c=>{
-    if(c.kind==='expense'){ const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'')+' '+c.name; mCat.appendChild(o); fCat.appendChild(o.cloneNode(true)); }
-    if(c.kind==='income'){ const o2=document.createElement('option'); o2.value=c.name; o2.textContent=(c.emoji||'')+' '+c.name; iCat.appendChild(o2); }
+    const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'•')+' '+c.name;
+    mCat.appendChild(o.cloneNode(true));
+    const o2=document.createElement('option'); o2.value=c.name; o2.textContent=c.name; fCat.appendChild(o2);
   });
 }
 async function addCategory(){
-  const name=(id('newCatName').value||'').trim();
-  const emoji=(id('newCatEmoji').value||'').trim()||'•';
-  const kind=id('newCatKind').value;
-  const msg=id('catMsg'); msg.textContent='';
-  if(!name){msg.textContent='Emri i kategorisë?';return;}
-  const {data,error}=await supabase.from('categories').insert({user_id:sessionUser.id,name,emoji,kind}).select().single();
+  const name=(document.getElementById('newCatName').value||'').trim();
+  const emoji=(document.getElementById('newCatEmoji').value||'').trim() || '🧾';
+  const msg=document.getElementById('catMsg'); msg.textContent='';
+  if(!name){msg.textContent='Shkruaj emrin e kategorisë.';return;}
+  const {data,error}=await supabase.from('categories').insert({user_id:sessionUser.id,name,emoji}).select().single();
   if(error){msg.textContent='Gabim: '+error.message;return;}
-  cats.push(data); id('newCatName').value=''; renderCatList(); refreshCategorySelects(); msg.textContent='U shtua.';
+  cats.push({name:data.name,emoji:data.emoji,id:data.id}); document.getElementById('newCatName').value=''; renderCatList(); refreshCategorySelects();
+  msg.textContent='U shtua.';
 }
-async function deleteCategory(idc){
-  if(!confirm('Fshije këtë kategori?'))return;
-  const {error}=await supabase.from('categories').delete().eq('id',idc).eq('user_id',sessionUser.id);
+async function deleteCategory(id){
+  if(!confirm('Fshije këtë kategori?')) return;
+  const {error}=await supabase.from('categories').delete().eq('id',id).eq('user_id',sessionUser.id);
   if(error){alert('Gabim: '+error.message);return;}
-  cats=cats.filter(x=>x.id!==idc); renderCatList(); refreshCategorySelects(); drawAll();
+  cats=cats.filter(c=>c.id!==id); renderCatList(); refreshCategorySelects(); drawAll();
+}
+function emojiFor(catName){
+  const hit=cats.find(c=>c.name===catName);
+  if(hit) return hit.emoji||'🧾';
+  const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'🏠','Argëtim':'🎟️','Fatura':'💡','Të tjera':'🧾'};
+  return m[catName]||'💸';
 }
 
-/* ===== Veriler ===== */
-async function loadAllData(){
-  const [e,i,d,r]=await Promise.all([
-    supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000),
-    supabase.from('incomes').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000),
-    supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000),
-    supabase.from('reminders').select('*').eq('user_id',sessionUser.id).order('at',{ascending:true}).limit(2000),
-  ]);
-  expenses=e.data||[]; incomes=i.data||[]; debts=d.data||[]; reminders=r.data||[];
-  drawAll(); drawHome(); drawDebts(); renderReminders(); refreshHeader();
-}
-
-/* ===== Header & özet ===== */
+/* Başlık/istatistikler */
 function refreshHeader(){
-  const expMonth= sum(expenses.filter(x=>isThisMonthISO(x.d)).map(x=>Number(x.amount||0)));
-  const incMonth= sum(incomes .filter(x=>isThisMonthISO(x.d)).map(x=>Number(x.amount||0)));
-  const todayNet = sum(incomes.filter(x=>isTodayISO(x.d)).map(x=>+x.amount)) - sum(expenses.filter(x=>isTodayISO(x.d)).map(x=>+x.amount));
-  const totalExp = sum(expenses.map(x=>+x.amount));
-  const totalInc = sum(incomes.map(x=>+x.amount));
-  const balance   = Number(profile.balance||0) + totalInc - totalExp;
-
-  setText('hdrTotal', fmtNum(balance));
-  setText('statExpMonth', fmtNum(expMonth));
-  setText('statIncMonth', fmtNum(incMonth));
-  setText('statTodayNet', fmtNum(todayNet));
-}
-
-/* ===== Ekle (Expense/Income) ===== */
-function openAddSheet(){
-  id('mDate').value = todayISO();
-  id('iDate').value = todayISO();
-  openModal('Add');
-}
-async function saveAdd(){
-  const mode = segValue('segAdd'); // expense | income
-  if(mode==='expense'){
-    const name=id('mName').value.trim(), amt=parseFloat(id('mAmt').value), cat=id('mCat').value, d=id('mDate').value;
-    if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni fushat.');return;}
-    const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
-    if(error){alert('Gabim: '+error.message);return;}
-    expenses.unshift(data);
+  const icon=document.getElementById('hdrIcon'), text=document.getElementById('hdrText'), sub=document.getElementById('hdrSub');
+  const s1=document.getElementById('s1name'), s2=document.getElementById('s2name'), s3=document.getElementById('s3name');
+  if(activeTab==='debts'){
+    icon.textContent='💳'; text.textContent='Borxhet'; sub.textContent='Detyrimet & Më detyrohen';
+    const borrowOpen=sum(debts.filter(x=>x.kind==='borrow' && x.status!=='paid').map(n=>Number(n.amount||0)));
+    const lendOpen=sum(debts.filter(x=>x.kind==='lend' && x.status!=='paid').map(n=>Number(n.amount||0)));
+    setText('hdrTotal',fmt(borrowOpen));
+    s1.textContent='Gjithsej'; s2.textContent='Detyrime'; s3.textContent='Më detyrohen';
+    const total=sum(debts.map(n=>Number(n.amount||0)));
+    setText('stat1',fmt(total)); setText('stat2',fmt(borrowOpen)); setText('stat3',fmt(lendOpen));
   }else{
-    const name=id('iName').value.trim(), amt=parseFloat(id('iAmt').value), cat=id('iCat').value, d=id('iDate').value;
-    if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni fushat.');return;}
-    const {data,error}=await supabase.from('incomes').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
-    if(error){alert('Gabim: '+error.message);return;}
-    incomes.unshift(data);
+    icon.textContent='💰'; text.textContent='Bilanci'; sub.textContent='Gjendja − Shpenzimet (totale)';
+    const total=sum(items.map(x=>Number(x.amount||0)));
+    const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
+    const month=sum(items.filter(isThisMonth).map(x=>Number(x.amount||0)));
+    const remain=Number(profile?.balance||0) - total;
+    setText('hdrTotal',fmt(remain));
+    s1.textContent='Totale'; s2.textContent='Sot'; s3.textContent='Muaj';
+    setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
   }
-  closeModal('Add'); clearAddInputs(); drawHome(); drawAll(); refreshHeader();
 }
-function clearAddInputs(){['mName','mAmt','iName','iAmt'].forEach(k=>{const e=id(k); if(e) e.value='';})}
 
-/* ===== Çizimler ===== */
-function drawHome(){
-  const merged=[
-    ...expenses.map(x=>({type:'exp',d:x.d,name:x.name,category:x.category,amount:+x.amount})),
-    ...incomes .map(x=>({type:'inc',d:x.d,name:x.name,category:x.category,amount:+x.amount}))
-  ].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,10);
+/* Shpenzimet */
+async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
+async function saveExpense(){const name=document.getElementById('mName').value.trim();const amt=parseFloat(document.getElementById('mAmt').value);const cat=document.getElementById('mCat').value;const d=document.getElementById('mDate').value;if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();if(error){alert('Gabim: '+error.message);return;}items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();}
+async function delExpense(id){if(!confirm('Fshini këtë shpenzim?'))return;const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();}
+function drawHome(){const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);const list=document.getElementById('recentList');list.innerHTML='';document.getElementById('emptyHome').style.display=recent.length?'none':'block';recent.forEach(x=>list.appendChild(rowExpense(x)))}
+function drawAll(){const q=(document.getElementById('q').value||'').trim().toLowerCase();const cat=document.getElementById('fCat').value;let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));if(cat)arr=arr.filter(x=>x.category===cat);const box=document.getElementById('allList');box.innerHTML='';arr.forEach(x=>box.appendChild(rowExpense(x)))}
+function rowExpense(x){const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');meta.appendChild(t);meta.appendChild(s);const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount)+' L';const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);el.append(ic,meta,amt,del);return el}
 
-  const list=id('recentList'); list.innerHTML='';
-  id('emptyHome').style.display = merged.length?'none':'block';
-  merged.forEach(x=>{
-    const el=document.createElement('div'); el.className='item';
-    const ic=document.createElement('div'); ic.className='ic'; ic.textContent= x.type==='exp' ? emojiFor(x.category) : '💰';
-    const meta=document.createElement('div'); meta.className='meta';
-    const t=document.createElement('div'); t.className='t'; t.textContent = x.name;
-    const s=document.createElement('div'); s.className='s'; s.textContent = (x.type==='exp'?'Shpenzim':'Të ardhura')+' • '+(x.category||'')+' • '+fmtDate(x.d);
-    meta.append(t,s);
-    const amt=document.createElement('div'); amt.className='amt'; amt.textContent=(x.type==='exp'?'-':'+')+fmtNum(x.amount)+' '+currSymbol;
-    el.append(ic,meta,amt); list.appendChild(el);
-  });
+/* Borxhet */
+async function loadDebts(){const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (borxhe): '+error.message);return;}debts=data||[];drawDebts();refreshHeader();}
+async function saveDebt(){
+  const party=document.getElementById('dParty').value.trim();
+  const name=(document.getElementById('dName').value||'').trim();
+  const amt=parseFloat(document.getElementById('dAmt').value);
+  const kind=segValue('segType');
+  const due=document.getElementById('dDate').value||null;
+  if(!party||!amt||isNaN(amt)){alert('Shkruaj Palën (Emri) dhe shumën.');return;}
+  const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'};
+  const {data,error}=await supabase.from('debts').insert(payload).select().single();
+  if(error){alert('Gabim: '+error.message);return;}
+  debts.unshift(data);
+  document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');
+  closeModal('Debt');drawDebts();refreshHeader();
 }
-function drawAll(){
-  const qv=(id('q').value||'').trim().toLowerCase(); const cat=id('fCat').value;
-  let arr=[...expenses].sort((a,b)=>b.d.localeCompare(a.d));
-  if(qv) arr=arr.filter(x=>x.name.toLowerCase().includes(qv)||(x.category||'').toLowerCase().includes(qv));
-  if(cat) arr=arr.filter(x=>x.category===cat);
-  const box=id('allList'); box.innerHTML='';
-  arr.forEach(x=>{
-    const el=document.createElement('div'); el.className='item';
-    const ic=document.createElement('div'); ic.className='ic'; ic.textContent=emojiFor(x.category);
-    const meta=document.createElement('div'); meta.className='meta'; meta.innerHTML=`<div class="t">${x.name}</div><div class="s">${x.category} • ${fmtDate(x.d)}</div>`;
-    const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmtNum(x.amount)+' '+currSymbol;
-    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delExpense(x.id);
-    el.append(ic,meta,amt,del); box.appendChild(el);
-  });
+async function delDebt(id){if(!confirm('Fshini këtë borxh?'))return;const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();}
+async function payDebt(id){
+  if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
+  const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
+  if(error){alert('Gabim: '+error.message);return;}
+  debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
 }
-async function delExpense(idRow){ if(!confirm('Fshini këtë shpenzim?')) return; const {error}=await supabase.from('expenses').delete().eq('id',idRow).eq('user_id',sessionUser.id); if(!error){ expenses=expenses.filter(x=>x.id!==idRow); drawAll(); drawHome(); refreshHeader(); } else alert('Gabim: '+error.message); }
-
-/* ===== Debts ===== */
 function drawDebts(){
-  const qv=(id('dq').value||'').trim().toLowerCase(); const k=segValue('dSegFilter');
-  let arr=[...debts]; if(qv) arr=arr.filter(x=>(x.party||'').toLowerCase().includes(qv)||(x.name||'').toLowerCase().includes(qv)); if(k) arr=arr.filter(x=>x.kind===k);
-  const box=id('debtList'); box.innerHTML=''; id('emptyDebts').style.display=arr.length?'none':'block';
+  const q=(document.getElementById('dq').value||'').trim().toLowerCase();
+  const kindFilter=segValue('dSegFilter');
+  let arr=[...debts];
+  if(q)arr=arr.filter(x=>(x.party||'').toLowerCase().includes(q)||(x.name||'').toLowerCase().includes(q));
+  if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
+
+  const box=document.getElementById('debtList'); box.innerHTML='';
+  document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
+
   arr.forEach(x=>{
     const el=document.createElement('div'); el.className='item';
     const ic=document.createElement('div'); ic.className='ic'; ic.textContent=(x.status==='paid')?'✅':'💳';
     const meta=document.createElement('div'); meta.className='meta';
-    meta.innerHTML=`<div class="t">${x.party||'(pa emër)'}</div><div class="s">${x.kind==='borrow'?'Mora hua':'Dhash hua'}${x.name?(' • '+x.name):''}${x.due?(' • Afati: '+fmtDate(x.due)):''}</div>`;
+    const t=document.createElement('div'); t.className='t'; t.textContent=x.party || '(pa emër)';
+    const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua']; if(x.name) bits.push(x.name); if(x.due) bits.push('Afati: '+fmtDate(x.due));
+    const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
+    meta.appendChild(t); meta.appendChild(s);
+
     const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
-    const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmtNum(x.amount)+' '+currSymbol; right.appendChild(amt);
-    if(x.status==='open'){ const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye'; pay.onclick=()=>payDebt(x.id); right.appendChild(pay); }
-    else { const badge=document.createElement('span'); badge.className='chip'; badge.textContent='Paguar'; right.appendChild(badge); }
+    const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount)+' L';
+    right.appendChild(amt);
+
+    if(x.status==='open'){
+      const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';
+      pay.onclick=()=>payDebt(x.id); right.appendChild(pay);
+    }else{
+      const badge=document.createElement('span'); badge.className='chip'; badge.textContent='Paguar'; right.appendChild(badge);
+    }
+
     const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
     el.append(ic,meta,right,del); box.appendChild(el);
   });
 }
-async function payDebt(idRow){ if(!confirm('Borxhi u pagua. Je i sigurt?')) return; const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',idRow).eq('user_id',sessionUser.id).select().single(); if(!error){ debts=debts.map(x=>x.id===idRow?data:x); drawDebts(); } else alert('Gabim: '+error.message); }
-async function delDebt(idRow){ if(!confirm('Fshini këtë borxh?')) return; const {error}=await supabase.from('debts').delete().eq('id',idRow).eq('user_id',sessionUser.id); if(!error){ debts=debts.filter(x=>x.id!==idRow); drawDebts(); } else alert('Gabim: '+error.message); }
 
-/* ===== Emoji yardımcıları ===== */
-function emojiFor(catName){
-  const hit=cats.find(c=>c.name===catName);
-  if(hit) return hit.emoji||'•';
-  const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'🏠','Argëtim':'🎟️','Fatura':'💡','Të tjera':'🧾'};
-  return m[catName]||'💸';
-}
-function openEmojiPicker(){openModal('Emoji')}
-
-/* ===== Reminders (in-app ticker) ===== */
-function renderReminders(){
-  const box=id('remList'); box.innerHTML='';
-  reminders.forEach(r=>{
-    const el=document.createElement('div'); el.className='item';
-    el.innerHTML=`<div class="ic">⏰</div><div class="meta"><div class="t">${r.text}</div><div class="s">${new Date(r.at).toLocaleString(profile.locale||'sq-AL')}</div></div>`;
-    const btn=document.createElement('button'); btn.className='btnMini'; btn.textContent=r.is_done?'✔️':'Done'; btn.onclick=()=>toggleRem(r.id,!r.is_done);
-    el.appendChild(btn); box.appendChild(el);
-  });
-}
-async function addReminder(){
-  const text=(id('remText').value||'').trim(); const at=id('remAt').value;
-  if(!text||!at){alert('Plotëso tekstin & kohën');return;}
-  const {data,error}=await supabase.from('reminders').insert({user_id:sessionUser.id,text,at}).select().single();
-  if(!error){reminders.push(data); renderReminders(); id('remText').value='';}
-}
-async function toggleRem(idr,val){
-  const {data,error}=await supabase.from('reminders').update({is_done:val}).eq('id',idr).eq('user_id',sessionUser.id).select().single();
-  if(!error){reminders=reminders.map(r=>r.id===idr?data:r); renderReminders();}
-}
-function startReminderTicker(){ setInterval(()=>{ const now=Date.now(); reminders.filter(r=>!r.is_done && new Date(r.at).getTime()<=now).forEach(r=>{ alert('⏰ '+r.text); toggleRem(r.id,true); }); }, 30000); }
-
-/* ===== Backup ===== */
-async function exportData(){
-  const blob=new Blob([JSON.stringify({profile,expenses,incomes,debts,categories:cats,reminders},null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click(); URL.revokeObjectURL(a.href);
-}
-async function importData(e){
-  const file=e.target.files[0]; if(!file) return;
-  const txt=await file.text(); let data={}; try{data=JSON.parse(txt)}catch{ id('backupMsg').textContent='JSON i pavlefshëm.'; return; }
-  // çok basit: sadece insert (mevcutları silmeden). İstersen önce temizleyebilirsin.
-  if(data.categories) await supabase.from('categories').insert(data.categories.map(x=>({user_id:sessionUser.id,name:x.name,emoji:x.emoji,kind:x.kind||'expense'}))).then(()=>loadCategories());
-  if(data.expenses)   await supabase.from('expenses').insert(data.expenses.map(x=>({user_id:sessionUser.id,name:x.name,amount:x.amount,category:x.category,d:x.d}))).then(()=>loadAllData());
-  if(data.incomes)    await supabase.from('incomes').insert(data.incomes.map(x=>({user_id:sessionUser.id,name:x.name,amount:x.amount,category:x.category,d:x.d}))).then(()=>loadAllData());
-  if(data.debts)      await supabase.from('debts').insert(data.debts.map(x=>({user_id:sessionUser.id,party:x.party,name:x.name,amount:x.amount,kind:x.kind,status:x.status,due:x.due}))).then(()=>loadAllData());
-  if(data.profile){ await supabase.from('profiles').upsert({user_id:sessionUser.id,...data.profile}); await loadProfile(); }
-  if(data.reminders)  await supabase.from('reminders').insert(data.reminders.map(x=>({user_id:sessionUser.id,text:x.text,at:x.at,is_done:!!x.is_done}))).then(()=>loadAllData());
-  id('backupMsg').textContent='Import u krye.';
-}
-
-/* ===== Misc ===== */
-function switchTab(t){
-  activeTab=t;
-  qAll('.tab').forEach(x=>x.classList.remove('active'));
-  id('tab-'+t).classList.add('active');
-  qAll('.btn').forEach(x=>x.classList.remove('active'));
-  q(`.btn[data-tab="${t}"]`)?.classList.add('active');
-  // Ayarlar ekranında üstteki kartları sakla
-  q('.stats').style.display = (t==='settings') ? 'none' : 'flex';
-  refreshHeader();
-}
-
-/* ===== Data helpers ===== */
+/* Helpers */
+function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
+function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
+function openModal(w){document.getElementById('modal'+w).classList.add('on')}
+function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
+function fmt(n){return (Math.round(n*100)/100).toLocaleString('sq-AL')}
+function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
+function isThisMonth(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
+function fmtDate(iso){const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
 </script>
 </body>
 </html>
