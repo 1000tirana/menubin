@@ -2,7 +2,7 @@
 <html lang="sq">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Normal Holding</title>
 <meta name="theme-color" content="#0d1117">
 <style>
@@ -13,7 +13,7 @@
   --blue:#1f6feb; --danger:#f85149;
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  --nav-h:86px;
+  --nav-h:92px;
 }
 *{box-sizing:border-box}
 html,body{height:100%;background:var(--bg);overflow-x:hidden;overscroll-behavior:none}
@@ -37,7 +37,6 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .meta .t{font-weight:900;color:#e6edf3}
 .meta .s{font-size:12px;color:var(--muted)}
 .amt{font-weight:900}
-.kbd{font:600 12px ui-monospace,monospace;background:#0b1620;border:1px solid #0e2238;border-radius:6px;padding:2px 6px}
 
 /* header */
 header{
@@ -50,7 +49,7 @@ header .big{font-size:34px;font-weight:900;margin-top:6px}
 .stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-10px)}
 .stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
 
-/* quick currency switch (geçici görüntüleme) */
+/* quick currency switch (geçici görünüm) */
 .switch{display:flex;gap:6px;margin-top:6px}
 .switch select{max-width:140px}
 
@@ -61,14 +60,16 @@ main{padding:0 12px 16px}
 /* bottom nav */
 nav.nav{
   position:fixed;left:0;right:0;bottom:0;height:var(--nav-h);
-  padding:10px 16px calc(10px + var(--safe-bottom));background:var(--card);
+  padding:10px 16px calc(14px + var(--safe-bottom));background:var(--card);
   border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
   border-top-left-radius:16px;border-top-right-radius:16px;display:grid;
-  grid-template-columns:1fr 1fr 70px 1fr 1fr;align-items:center;z-index:2000
+  grid-template-columns:1fr 1fr 68px 1fr 1fr;align-items:end;z-index:2000
 }
-.nav a{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none}
+.nav a{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);text-decoration:none;padding-bottom:8px}
+.nav a small{font-size:12px}
 .nav a.active{color:#79c0ff}
-.nav .fab{position:absolute;left:50%;transform:translateX(-50%);top:-24px;width:64px;height:64px;border-radius:999px;background:#39d353;color:#0b2211;border:2px solid #2ea043;display:grid;place-items:center;font-size:32px;cursor:pointer;box-shadow:0 18px 30px rgba(0,0,0,.45)}
+.nav .fab{position:absolute;left:50%;transform:translateX(-50%);top:-20px;width:60px;height:60px;border-radius:999px;background:#39d353;color:#0b2211;border:2px solid #2ea043;display:grid;place-items:center;font-size:30px;cursor:pointer;box-shadow:0 18px 30px rgba(0,0,0,.45);z-index:2100}
+
 /* modal */
 .modal{position:fixed;inset:0;display:none;place-items:end;padding:14px;background:rgba(0,0,0,.45);z-index:3000}
 .modal.on{display:grid}
@@ -130,15 +131,15 @@ nav.nav{
   </header>
 
   <div class="stats">
-    <div class="stat"><div class="muted">📊 Totale</div><div style="font-weight:900"><span id="stTotal">0</span> <span id="stCCY1">ALL</span></div></div>
-    <div class="stat"><div class="muted">📅 Sot</div><div style="font-weight:900"><span id="stToday">0</span> <span id="stCCY2">ALL</span></div></div>
-    <div class="stat"><div class="muted">🗓️ Muaj</div><div style="font-weight:900"><span id="stMonth">0</span> <span id="stCCY3">ALL</span></div></div>
+    <div class="stat"><div class="muted" id="lblTot">📊 Totale</div><div style="font-weight:900"><span id="stTotal">0</span> <span id="stCCY1">ALL</span></div></div>
+    <div class="stat"><div class="muted" id="lblToday">📅 Sot</div><div style="font-weight:900"><span id="stToday">0</span> <span id="stCCY2">ALL</span></div></div>
+    <div class="stat"><div class="muted" id="lblMonth">🗓️ Muaj</div><div style="font-weight:900"><span id="stMonth">0</span> <span id="stCCY3">ALL</span></div></div>
   </div>
 
   <main>
     <!-- HOME -->
     <section id="tab-home" class="tab active">
-      <h3>🕒 Të fundit</h3>
+      <h3 id="lblRecent">🕒 Të fundit</h3>
       <div id="recent" class="list"></div>
       <div id="emptyHome" class="muted" style="text-align:center;margin-top:10px">Asnjë hyrje deri tani.</div>
     </section>
@@ -186,13 +187,13 @@ nav.nav{
         <h4>💱 Monedha & format</h4>
         <div class="row" style="margin-top:6px">
           <div style="flex:1">
-            <label>Monedha aktuale (për hyrjet e reja)</label>
+            <label id="lblPrefCurr">Monedha aktuale (për hyrjet e reja)</label>
             <select id="prefCurr">
               <option>ALL</option><option>EUR</option><option>TRY</option><option>USD</option>
             </select>
           </div>
           <div style="flex:1">
-            <label>Formati i numrave</label>
+            <label id="lblPrefFmt">Formati i numrave</label>
             <select id="prefFmt">
               <option value="eu">23.456,78</option>
               <option value="us">23,456.78</option>
@@ -201,7 +202,7 @@ nav.nav{
         </div>
         <div class="row" style="margin-top:8px">
           <div style="flex:1">
-            <label>Gjuha / Dil</label>
+            <label id="lblLang">Gjuha / Dil</label>
             <select id="prefLang">
               <option value="sq">Shqip</option>
               <option value="tr">Türkçe</option>
@@ -246,11 +247,11 @@ nav.nav{
 
 <!-- NAV -->
 <nav class="nav" id="navbar" style="display:none">
-  <a class="active" data-tab="home" onclick="switchTab('home')">🏠<small>Kreu</small></a>
-  <a data-tab="list" onclick="switchTab('list')">📋<small>Lista</small></a>
+  <a class="active" data-tab="home" onclick="switchTab('home')">🏠<small id="nHome">Kreu</small></a>
+  <a data-tab="list" onclick="switchTab('list')">📋<small id="nList">Lista</small></a>
   <button class="fab" id="openAdd" aria-label="Shto">+</button>
-  <a data-tab="debts" onclick="switchTab('debts')">💳<small>Borxhet</small></a>
-  <a data-tab="settings" onclick="switchTab('settings')">⚙️<small>Cilësime</small></a>
+  <a data-tab="debts" onclick="switchTab('debts')">💳<small id="nDebts">Borxhet</small></a>
+  <a data-tab="settings" onclick="switchTab('settings')">⚙️<small id="nSet">Cilësime</small></a>
 </nav>
 
 <!-- MODALS -->
@@ -289,23 +290,27 @@ let me=null, profile={default_currency:'ALL',num_format:'eu',lang:'sq',balances:
 let cats=[], items=[], debts=[];
 let viewCurr='ALL', debtFilter='';
 
-/*** I18N (kısaltılmış) ***/
+/*** I18N ***/
 const I18N={
-  sq:{Balance:'Bilanci',Recent:'Të fundit',Expenses:'Shpenzim',Income:'Të ardhura',Save:'Ruaj'},
-  tr:{Balance:'Bilanço',Recent:'Son işlemler',Expenses:'Gider',Income:'Gelir',Save:'Kaydet'},
-  en:{Balance:'Balance',Recent:'Recent',Expenses:'Expense',Income:'Income',Save:'Save'},
-  it:{Balance:'Saldo',Recent:'Recenti',Expenses:'Spesa',Income:'Entrata',Save:'Salva'}
+  sq:{Balance:'Bilanci',Recent:'Të fundit',Save:'Ruaj',Home:'Kreu',List:'Lista',Debts:'Borxhet',Settings:'Cilësime',Tot:'Totale',Today:'Sot',Month:'Muaj'},
+  tr:{Balance:'Bilanço',Recent:'Son işlemler',Save:'Kaydet',Home:'Ana',List:'Liste',Debts:'Borçlar',Settings:'Ayarlar',Tot:'Toplam',Today:'Bugün',Month:'Ay'},
+  en:{Balance:'Balance',Recent:'Recent',Save:'Save',Home:'Home',List:'List',Debts:'Debts',Settings:'Settings',Tot:'Total',Today:'Today',Month:'Month'},
+  it:{Balance:'Saldo',Recent:'Recenti',Save:'Salva',Home:'Home',List:'Lista',Debts:'Debiti',Settings:'Impostazioni',Tot:'Totale',Today:'Oggi',Month:'Mese'}
 };
 const t=(k)=> (I18N[profile.lang||'sq']||I18N.sq)[k]||k;
+function applyLang(){
+  document.documentElement.lang=profile.lang||'sq';
+  byId('hdrTitle').textContent='💰 '+t('Balance');
+  byId('lblRecent').textContent='🕒 '+t('Recent');
+  byId('nHome').textContent=t('Home'); byId('nList').textContent=t('List'); byId('nDebts').textContent=t('Debts'); byId('nSet').textContent=t('Settings');
+  byId('lblTot').innerHTML='📊 '+t('Tot'); byId('lblToday').innerHTML='📅 '+t('Today'); byId('lblMonth').innerHTML='🗓️ '+t('Month');
+}
 
 /*** INIT ***/
 document.addEventListener('DOMContentLoaded', async ()=>{
-  document.getElementById('eDate').value=new Date().toISOString().slice(0,10);
-  document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
-
-  document.getElementById('openAdd').addEventListener('click', () => {
-    if(activeTab==='debts') openModal('mDebt'); else openModal('mExp');
-  });
+  byId('eDate').value=new Date().toISOString().slice(0,10);
+  byId('dDate').value=new Date().toISOString().slice(0,10);
+  byId('openAdd').addEventListener('click', () => { if(activeTab==='debts') openModal('mDebt'); else openModal('mExp'); });
 
   const { data:{session} } = await sb.auth.getSession();
   if(session?.user){ me=session.user; await boot(); } else showGate();
@@ -320,6 +325,7 @@ async function boot(){
   byId('gate').style.display='none'; byId('app').style.display='block'; byId('navbar').style.display='grid';
   byId('who').textContent=(me.email||'').split('@')[0];
   byId('userMail').textContent=me.email||'';
+  await ensureRates(); // önce kurlar
   await Promise.all([ensureProfile(),ensureDefaultCats(),loadCats(),loadItems(),loadDebts()]);
   viewCurr = profile.default_currency || 'ALL';
   byId('viewCurr').value=viewCurr;
@@ -328,6 +334,7 @@ async function boot(){
   byId('prefLang').value=profile.lang||'sq';
   byId('balCurrLbl').textContent=profile.default_currency||'ALL';
   byId('balInput').value = Number(profile.balances?.[profile.default_currency]||0);
+  applyLang();
   refreshHeader(); drawHome(); drawAll(); drawDebts(); renderCatList(); refreshCatSelect();
 }
 
@@ -365,7 +372,7 @@ async function savePrefs(){
   const dc=val('prefCurr')||'ALL', fmt=val('prefFmt')||'eu', lng=val('prefLang')||'sq';
   const {data,error}=await sb.from('profiles').update({default_currency:dc,num_format:fmt,lang:lng}).eq('user_id',me.id).select().single();
   byId('prefsMsg').textContent = error?('Gabim: '+error.message):'U ruajt.';
-  if(!error){ profile=data; viewCurr=profile.default_currency; byId('viewCurr').value=viewCurr; byId('balCurrLbl').textContent=viewCurr; refreshHeader(); }
+  if(!error){ profile=data; viewCurr=profile.default_currency; byId('viewCurr').value=viewCurr; byId('balCurrLbl').textContent=viewCurr; applyLang(); refreshHeader(); }
 }
 async function saveBalance(){
   const v=parseFloat(val('balInput'))||0;
@@ -435,7 +442,7 @@ async function delItem(id){
 function itemRow(x){
   const el=div('item');
   el.innerHTML=`<div class="ic">${emoFor(x.category)}</div>
-  <div class="meta"><div class="t">${esc(x.name)}</div><div class="s">${esc(x.category||'•')} • ${fmtDate(x.d)} • ${x.kind==='inc'?t('Income'):t('Expenses')}</div></div>
+  <div class="meta"><div class="t">${esc(x.name)}</div><div class="s">${esc(x.category||'•')} • ${fmtDate(x.d)} • ${x.kind==='inc'?'Të ardhura':'Shpenzim'}</div></div>
   <div class="amt">${fmt(x.amount,x.curr)} ${x.curr}</div>`;
   const del=btn('🗑️','btn s'); del.onclick=()=>delItem(x.id); el.appendChild(del); return el;
 }
@@ -493,61 +500,64 @@ function drawDebts(){
   });
 }
 
-/*** HEADER & RATES ***/
-let rates={}; // ör: {ALL:{EUR:0.0096,...}, EUR:{ALL:104.3,...}}
+/*** RATES ***/
+let rates={};
+const fallbackRates={ALL:{ALL:1,EUR:0.009,TRY:0.32,USD:0.0095},
+                     EUR:{EUR:1,ALL:110,TRY:35,USD:1.07},
+                     TRY:{TRY:1,ALL:3.1,EUR:0.028,USD:0.031},
+                     USD:{USD:1,ALL:104,EUR:0.93,TRY:32}};
 async function ensureRates(){
   const syms=['ALL','EUR','TRY','USD'];
   try{
-    // exchangerate.host – ücretsiz
-    const base='https://api.exchangerate.host/latest';
-    // hepsi için döngü
+    rates={};
     for(const b of syms){
-      const res = await fetch(`${base}?base=${b}&symbols=${syms.join(',')}`);
+      const res = await fetch(`https://api.exchangerate.host/latest?base=${b}&symbols=${syms.join(',')}`);
       const js = await res.json();
-      rates[b]=js.rates||{};
+      rates[b]=(js && js.rates) ? js.rates : fallbackRates[b];
       rates[b][b]=1;
     }
-  }catch{ /* çevrim başarısızsa sabit fallback */ 
-    rates={ALL:{ALL:1,EUR:0.009,TRY:0.32,USD:0.0095},
-           EUR:{EUR:1,ALL:110,TRY:35,USD:1.07},
-           TRY:{TRY:1,ALL:3.1,EUR:0.028,USD:0.031},
-           USD:{USD:1,ALL:104,EUR:0.93,TRY:32}};
+  }catch{
+    rates = JSON.parse(JSON.stringify(fallbackRates));
   }
 }
+function conv(amount,from,to){
+  if(from===to) return Number(amount||0);
+  const r = (rates[from] && rates[from][to]) ? rates[from][to]
+           : (rates[to] && rates[to][from]) ? (1/ rates[to][from]) : null;
+  if(!r) return Number(amount||0); // en kötü ihtimal dönüşümsüz
+  return Number(amount||0) * r;
+}
+
+/*** HEADER ***/
 function setViewCurr(c){ viewCurr=c; refreshHeader(); }
-function sumArr(a){return a.reduce((s,n)=>s+Number(n||0),0)}
+function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
 function fmt(n,ccy){ const loc=(profile.num_format||'eu')==='eu'?'sq-AL':'en-US'; return new Intl.NumberFormat(loc,{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n||0)); }
 function fmtDate(iso){ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'}) }
 function emoFor(cat){ const hit=cats.find(c=>c.name===cat); return hit?(hit.emoji||'•'):'💸'; }
 
-async function refreshHeader(){
-  byId('hdrTitle').textContent='💰 '+t('Balance');
+function refreshHeader(){
   byId('hdrCCY').textContent=viewCurr;
   byId('stCCY1').textContent=viewCurr; byId('stCCY2').textContent=viewCurr; byId('stCCY3').textContent=viewCurr;
 
-  if(!rates.EUR) await ensureRates();
-
-  // cüzdan bakiyesi
+  // cüzdan bakiyesi (seçili para)
   const bal = Number(profile.balances?.[viewCurr]||0);
 
   // bu para birimindeki hareketler (inc - exp)
-  const totalExp = sumArr(items.filter(x=>x.curr===viewCurr && x.kind==='exp').map(x=>x.amount));
-  const totalInc = sumArr(items.filter(x=>x.curr===viewCurr && x.kind==='inc').map(x=>x.amount));
-  const remain = bal + totalInc - totalExp;
+  const totExp = sum(items.filter(x=>x.curr===viewCurr && x.kind==='exp').map(x=>x.amount));
+  const totInc = sum(items.filter(x=>x.curr===viewCurr && x.kind==='inc').map(x=>x.amount));
+  const remain = bal + totInc - totExp;
 
   byId('hdrAmount').textContent=fmt(remain,viewCurr);
-  byId('stTotal').textContent=fmt(totalExp,viewCurr);
-  const today = items.filter(x=>x.curr===viewCurr && x.kind==='exp' && isToday(x.d))
-                     .reduce((s,x)=>s+x.amount,0);
+  byId('stTotal').textContent=fmt(totExp,viewCurr);
+  const today = items.filter(x=>x.curr===viewCurr && x.kind==='exp' && isToday(x.d)).reduce((s,x)=>s+x.amount,0);
   byId('stToday').textContent=fmt(today,viewCurr);
-  const month = items.filter(x=>x.curr===viewCurr && x.kind==='exp' && isThisMonth(x.d))
-                     .reduce((s,x)=>s+x.amount,0);
+  const month = items.filter(x=>x.curr===viewCurr && x.kind==='exp' && isThisMonth(x.d)).reduce((s,x)=>s+x.amount,0);
   byId('stMonth').textContent=fmt(month,viewCurr);
 
-  // Net worth (tüm cüzdanları seçili görüntü para birimine çevir)
+  // Net varlık: tüm cüzdanları seçili görünüme çevir
   let net=0;
   for(const [ccy,amount] of Object.entries(profile.balances||{})){
-    net += Number(amount||0) * (rates[ccy]?.[viewCurr]||1);
+    net += conv(amount, ccy, viewCurr);
   }
   byId('netLine').textContent='Net: '+fmt(net,viewCurr)+' '+viewCurr;
 }
@@ -567,87 +577,38 @@ function btn(txt,cls){const b=document.createElement('button'); b.className=cls;
 </script>
 
 <!--
-========================================================
-                    SUPABASE  SQL
-========================================================
-Aşağıyı Supabase SQL editor'da 1 kez çalıştırın.
-Mevcut tablo/politikalar varsa otomatik atlar.
--->
-<!--
--- SCHEMA
-create table if not exists public.profiles(
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  default_currency text not null default 'ALL',
-  num_format text not null default 'eu',
-  lang text not null default 'sq',
-  balances jsonb not null default '{}'::jsonb
-);
+======================== SUPABASE  SQL YAMASI ========================
+BUNU SQL editor'da 1 kez çalıştırın (mevcut tablo/politika varsa atlar)
+----------------------------------------------------------------------
+-- Kolon eklemeleri (idempotent)
+alter table public.profiles add column if not exists lang text not null default 'sq';
+alter table public.profiles add column if not exists balances jsonb not null default '{}'::jsonb;
 
-create table if not exists public.categories(
-  id bigserial primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
-  name text not null,
-  emoji text not null default '🧾',
-  created_at timestamp with time zone default now()
-);
+-- expense/debt tabloları için para birimi alanı (varsa eklemez)
+alter table public.expenses add column if not exists curr text not null default 'ALL';
+alter table public.expenses add column if not exists kind text not null default 'exp';
+alter table public.debts    add column if not exists curr text not null default 'ALL';
+alter table public.debts    add column if not exists kind text not null default 'borrow';
 
-create table if not exists public.expenses(
-  id bigserial primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
-  name text not null,
-  amount numeric not null,
-  curr text not null default 'ALL',
-  kind text not null default 'exp', -- 'exp' | 'inc'
-  category text,
-  d date not null default (now() at time zone 'utc')::date,
-  created_at timestamp with time zone default now()
-);
-
-create table if not exists public.debts(
-  id bigserial primary key,
-  user_id uuid not null references auth.users(id) on delete cascade,
-  party text,
-  amount numeric not null,
-  curr text not null default 'ALL',
-  kind text not null default 'borrow', -- 'borrow' | 'lend'
-  due date,
-  name text,
-  status text not null default 'open',
-  created_at timestamp with time zone default now()
-);
-
--- INDEXES
-create index if not exists idx_expenses_user on public.expenses(user_id);
-create index if not exists idx_debts_user on public.debts(user_id);
-create index if not exists idx_cats_user on public.categories(user_id);
-
--- RLS
-alter table public.profiles enable row level security;
+-- RLS (zaten varsa atlıyor)
+alter table public.profiles   enable row level security;
 alter table public.categories enable row level security;
-alter table public.expenses enable row level security;
-alter table public.debts enable row level security;
+alter table public.expenses   enable row level security;
+alter table public.debts      enable row level security;
 
--- policies (idempotent)
 do $$
 begin
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles' and policyname='profiles own') then
-    create policy "profiles own" on public.profiles
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='profiles'   and policyname='profiles own') then
+    create policy "profiles own"   on public.profiles   using (auth.uid()=user_id) with check (auth.uid()=user_id);
   end if;
-
   if not exists (select 1 from pg_policies where schemaname='public' and tablename='categories' and policyname='categories own') then
-    create policy "categories own" on public.categories
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
+    create policy "categories own" on public.categories using (auth.uid()=user_id) with check (auth.uid()=user_id);
   end if;
-
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='expenses' and policyname='expenses own') then
-    create policy "expenses own" on public.expenses
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='expenses'   and policyname='expenses own') then
+    create policy "expenses own"   on public.expenses   using (auth.uid()=user_id) with check (auth.uid()=user_id);
   end if;
-
-  if not exists (select 1 from pg_policies where schemaname='public' and tablename='debts' and policyname='debts own') then
-    create policy "debts own" on public.debts
-      using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='debts'      and policyname='debts own') then
+    create policy "debts own"      on public.debts      using (auth.uid()=user_id) with check (auth.uid()=user_id);
   end if;
 end$$;
 -->
