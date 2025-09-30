@@ -34,8 +34,6 @@ main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
-
-/* Yuvarlak ikon – dıştan içe yeşilden açığa */
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
@@ -57,7 +55,7 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* Alt NAV (orta boşluk sabit) */
+/* Alt NAV */
 nav.nav{
   --fab-gap: 110px;
   position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
@@ -75,7 +73,7 @@ nav.nav{
 .btn.active{color:#79c0ff}
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
 
-/* FAB (biraz küçük) */
+/* FAB */
 .nav .fab{
   position:absolute;left:50%;transform:translateX(-50%);
   top:-22px;width:56px;height:56px;border-radius:999px;
@@ -86,35 +84,37 @@ nav.nav{
 }
 .tab{display:none}.tab.active{display:block}
 
-/* Modal */
+/* Modal & Gate (fail-safe) */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
-
-/* Auth gate */
 .gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:4000}
 .panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
 .tabs{display:flex;gap:6px;margin-bottom:10px}
 .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
 .tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
-/* Segmentler */
+/* Segmentler & picker */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
 .seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
-
-/* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
 .picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
 #emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
+
+/* DEBUG BAR */
+#dbg{position:fixed;left:0;right:0;top:0;z-index:5000;background:#aa2222;color:#fff;padding:6px 10px;font:12px/1.4 system-ui;display:none}
+#dbg b{font-weight:800}
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
 </style>
 </head>
 <body>
 
+<div id="dbg"></div>
+
 <!-- ===== HYRJE / REGJISTRIM ===== -->
-<div id="gate" class="gate">
+<div id="gate" class="gate" style="display:none">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="font-weight:900;font-size:18px">Normal Holding</div>
@@ -130,7 +130,7 @@ nav.nav{
       <div class="row" style="margin-top:8px">
         <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       </div>
-      <div class="actions"><button class="btnP" onclick="login()">Hyr</button></div>
+      <div class="actions"><button class="btnP" id="btnLogin" onclick="login()">Hyr</button></div>
       <div id="authMsg" class="muted" style="margin-top:6px"></div>
     </div>
     <div id="authReg" style="display:none">
@@ -139,7 +139,7 @@ nav.nav{
       <div class="row" style="margin-top:8px">
         <div style="flex:1"><label>Fjalëkalimi</label><input id="regPass" type="password" autocomplete="new-password" placeholder="min. 6"></div>
       </div>
-      <div class="actions"><button class="btnS" onclick="swapAuth('login')">Kthehu</button><button class="btnP" onclick="registerUser()">Krijo llogari</button></div>
+      <div class="actions"><button class="btnS" onclick="swapAuth('login')">Kthehu</button><button class="btnP" id="btnSignup" onclick="registerUser()">Krijo llogari</button></div>
       <div id="regMsg" class="muted" style="margin-top:6px"></div>
     </div>
   </div>
@@ -179,21 +179,8 @@ nav.nav{
       <div id="allList" class="list"></div>
     </section>
 
-    <section id="tab-debts" class="tab">
-      <h3 class="sec">💳 Borxhet</h3>
-      <div class="row" style="margin:8px 0 10px"><input id="dq" placeholder="Kërko borxhe..." oninput="drawDebts()"></div>
-      <div class="seg three" id="dSegFilter" style="margin-bottom:8px">
-        <button type="button" class="active" data-val="">Të gjitha</button>
-        <button type="button" data-val="borrow">Mora hua</button>
-        <button type="button" data-val="lend">Dhash hua</button>
-      </div>
-      <div id="debtList" class="list"></div>
-      <div id="emptyDebts" class="muted" style="text-align:center;margin-top:16px">Asnjë borxh deri tani.</div>
-    </section>
-
     <section id="tab-settings" class="tab">
       <h3 class="sec">⚙️ Cilësime</h3>
-
       <div class="item">
         <div class="ic">👤</div>
         <div class="meta"><div class="t">Përdoruesi</div><div class="s muted" id="userInfo">—</div></div>
@@ -207,23 +194,12 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KONVERTUES (ONLINE) -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">💱 Konvertues (online)</h4>
         <div class="row">
           <div style="flex:1"><label>Shuma</label><input id="convAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
-          <div style="width:120px">
-            <label>Prej</label>
-            <select id="convFrom">
-              <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
-            </select>
-          </div>
-          <div style="width:120px">
-            <label>Në</label>
-            <select id="convTo">
-              <option>EUR</option><option>ALL</option><option>USD</option><option>TRY</option>
-            </select>
-          </div>
+          <div style="width:120px"><label>Prej</label><select id="convFrom"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select></div>
+          <div style="width:120px"><label>Në</label><select id="convTo"><option>EUR</option><option>ALL</option><option>USD</option><option>TRY</option></select></div>
         </div>
         <div class="actions">
           <button class="btnS" onclick="swapFromTo()">↔️ Ndërro</button>
@@ -238,7 +214,6 @@ nav.nav{
         <div id="fxMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KATEGORI (emoji seçici modalı başka yerde) -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -279,7 +254,6 @@ nav.nav{
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span><span>Kreu</span></a>
   <a class="btn" data-tab="list" onclick="switchTab('list')"><span class="ico">📋</span><span>Lista</span></a>
-  <a class="btn" data-tab="debts" onclick="switchTab('debts')"><span class="ico">💳</span><span>Borxhet</span></a>
   <a class="btn" data-tab="settings" onclick="switchTab('settings')"><span class="ico">⚙️</span><span>Cilësime</span></a>
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
@@ -300,78 +274,108 @@ nav.nav{
 </div></div>
 
 <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script>
-// ======= KONFIG =======
+/* ====== DEBUG ====== */
+const dbgEl = (()=>document.getElementById('dbg'))();
+function debug(msg){
+  if(!dbgEl) return;
+  dbgEl.style.display='block';
+  dbgEl.innerHTML = '<b>DEBUG:</b> '+ String(msg);
+}
+window.addEventListener('error', e=> debug(e.message||e));
+window.addEventListener('unhandledrejection', e=> debug((e.reason&&e.reason.message)||e.reason||e));
+
+/* ====== KONFIG ====== */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let supabase;
 
-// API – live rates (no key): https://api.exchangerate.host
-// ref: supports ALL (Albanian Lek), TRY, USD, EUR; endpoints latest/convert.  [oai_citation:3‡exchangerate.host](https://exchangerate.host/currencies)
-const FX_ENDPOINT = 'https://api.exchangerate.host/latest?base=EUR&symbols=ALL,USD,TRY';
-
-const DEFAULT_CATS=[
-  {name:'Ushqime',emoji:'🍔'},
-  {name:'Transport',emoji:'⛽'},
-  {name:'Shtëpia',emoji:'🏠'},
-  {name:'Argëtim',emoji:'🎟️'},
-  {name:'Fatura',emoji:'💡'},
-  {name:'Të tjera',emoji:'🧾'}
-];
-
+/* ====== STATE ====== */
+const DEFAULT_CATS=[{name:'Ushqime',emoji:'🍔'},{name:'Transport',emoji:'⛽'},{name:'Shtëpia',emoji:'🏠'},{name:'Argëtim',emoji:'🎟️'},{name:'Fatura',emoji:'💡'},{name:'Të tjera',emoji:'🧾'}];
 let sessionUser=null, items=[], cats=[...DEFAULT_CATS], profile={balance:0, fxeur:null}, activeTab='home';
 
-// ======= APP BOOT =======
+/* ====== BOOT ====== */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Emoji listesi
-  const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 🪙 💳 🎓 📚 🔌 🔋 🧥 👟'.split(' ');
-  const grid=document.getElementById('emojiGrid');
-  picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiBtn').innerText=''+e+' Zgjidhur';closeModal('Emoji')};grid.appendChild(b)});
+  try{
+    // Fail-safe: tüm modal/gate kapalı başlasın
+    document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));
+    document.getElementById('gate').style.display='none';
+    document.getElementById('app').style.display='none';
+    document.getElementById('navbar').style.display='none';
 
-  document.getElementById('loginEmail').placeholder='emri@gmail.com';
-  document.getElementById('regEmail').placeholder='emri@gmail.com';
-  document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
+    // Supabase hazır
+    if(!window.supabase){ debug('Supabase skripti yüklenemedi. İnterneti kontrol et.'); return; }
+    supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-  const fab=document.getElementById('openAdd');
-  const fabOpen=()=>openModal('Exp');
-  ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
+    // Emoji ızgarası
+    const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 🪙 💳 🎓 📚 🔌 🔋 🧥 👟'.split(' ');
+    const grid=document.getElementById('emojiGrid');
+    picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.addEventListener('click',()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiBtn').innerText=e+' Zgjidhur';closeModal('Emoji')});grid.appendChild(b)});
 
-  const {data:{session}}=await supabase.auth.getSession();
-  if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses()]);}
-  else showGate();
+    // Tarih
+    const mDate=document.getElementById('mDate'); if(mDate) mDate.value=new Date().toISOString().slice(0,10);
 
-  supabase.auth.onAuthStateChange(async (_e,session)=>{
-    if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses()]);}
-    else{sessionUser=null; showGate();}
-  });
+    // FAB emniyetli dinleyiciler
+    const fab=document.getElementById('openAdd');
+    const fabOpen=()=>openModal('Exp');
+    ['click','pointerup','touchend'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
 
-  // Konvertör select varsayılanları
-  document.getElementById('convFrom').value='ALL';
-  document.getElementById('convTo').value='EUR';
+    // Nav butonlarına ek güvence (inline yanında)
+    document.querySelectorAll('nav.nav .btn').forEach(a=>{
+      a.addEventListener('click', (ev)=>{ const t=a.dataset.tab; if(t) switchTab(t); });
+    });
+
+    // Session
+    const {data:{session}}=await supabase.auth.getSession();
+    if(session?.user){ sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses()]); }
+    else showGate();
+
+    supabase.auth.onAuthStateChange(async (_e,session)=>{
+      if(session?.user){sessionUser=session.user; showApp(); await Promise.all([ensureProfile(), ensureCategoriesSeed(), loadCategories(), loadExpenses()]);}
+      else{sessionUser=null; showGate();}
+    });
+  }catch(err){ debug(err.message||err); }
 });
 
-// ======= UI UTILS =======
+/* ====== UI UTILS ====== */
 function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
 function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none'}
-function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=emailShort(sessionUser?.email);refreshHeader();drawHome()}
+function showApp(){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';document.getElementById('navbar').style.display='grid';setText('who',emailShort(sessionUser?.email));setText('userInfo',emailShort(sessionUser?.email));refreshHeader();drawHome()}
 function swapAuth(w){document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');document.getElementById('authLogin').style.display=(w==='login')?'block':'none';document.getElementById('authReg').style.display=(w==='reg')?'block':'none'}
 
-// ======= AUTH =======
-async function registerUser(){const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPass').value;const box=document.getElementById('regMsg');box.textContent='';if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}const {error}=await supabase.auth.signUp({email,password:pass});box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.'}
-async function login(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const box=document.getElementById('authMsg');box.textContent='';const {error}=await supabase.auth.signInWithPassword({email,password:pass});if(error) box.textContent='Gabim: '+error.message}
-async function logout(){await supabase.auth.signOut()}
+/* ====== AUTH ====== */
+async function registerUser(){
+  try{
+    const email=document.getElementById('regEmail').value.trim();
+    const pass=document.getElementById('regPass').value;
+    const box=document.getElementById('regMsg'); box.textContent='';
+    if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
+    const {error}=await supabase.auth.signUp({email,password:pass});
+    box.textContent= error?('Gabim: '+error.message) : 'Llogaria u krijua. Kontrollo email-in.';
+  }catch(e){ debug(e.message||e); }
+}
+async function login(){
+  try{
+    const email=document.getElementById('loginEmail').value.trim();
+    const pass=document.getElementById('loginPass').value;
+    const box=document.getElementById('authMsg'); box.textContent='';
+    const {error}=await supabase.auth.signInWithPassword({email,password:pass});
+    if(error) box.textContent='Gabim: '+error.message;
+  }catch(e){ debug(e.message||e); }
+}
+async function logout(){ try{await supabase.auth.signOut();}catch(e){ debug(e.message||e); } }
 
-// ======= PROFILE (balance + FX) =======
+/* ====== PROFILE ====== */
 async function ensureProfile(){
   try{
     const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();
-    if(data){profile=data; if(!profile.fxeur) profile.fxeur=null;}
-    else{const {data:ins}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:0,fxeur:null}).select().single();profile=ins||{balance:0,fxeur:null}}
+    profile = data || {balance:0,fxeur:null};
   }catch{
-    try{const {data:ins}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:0,fxeur:null}).select().single();profile=ins||{balance:0,fxeur:null}}catch{}
+    const {data}=await supabase.from('profiles').upsert({user_id:sessionUser.id,balance:0,fxeur:null}).select().single();
+    profile = data || {balance:0,fxeur:null};
   }
-  document.getElementById('balInput').value=profile.balance??0;
+  const bi=document.getElementById('balInput'); if(bi) bi.value=profile.balance??0;
   refreshHeader();
 }
 async function saveBalance(){
@@ -382,40 +386,30 @@ async function saveBalance(){
   if(!error){profile=data;refreshHeader();}
 }
 
-// FX online – kaydet & göster
+/* ====== FX (opsiyonel, offline kalsa da UI tıklar) ====== */
+const FX_ENDPOINT='https://api.exchangerate.host/latest?base=EUR&symbols=ALL,USD,TRY';
 async function refreshRatesOnline(){
   const msg=document.getElementById('fxMsg'); msg.textContent='Duke marrë kurset...';
   try{
-    const r=await fetch(FX_ENDPOINT, {mode:'cors'});
-    const j=await r.json();
-    if(j && j.rates){
-      // EUR baz: rates.ALL, rates.USD, rates.TRY
+    const r=await fetch(FX_ENDPOINT); const j=await r.json();
+    if(j&&j.rates){
       const fx = { EUR:1, ALL:j.rates.ALL, USD:j.rates.USD, TRY:j.rates.TRY, updated:j.date||new Date().toISOString().slice(0,10) };
       const {data,error}=await supabase.from('profiles').upsert({user_id:sessionUser.id, balance:profile.balance||0, fxeur:fx}).select().single();
       if(error) throw error;
-      profile=data;
-      msg.textContent=`U rifreskua: 1 EUR = ${fmt(fx.ALL)} ALL • ${fmt(fx.USD)} USD • ${fmt(fx.TRY)} TRY (data: ${fx.updated})`;
-    }else{
-      msg.textContent='S’u morën kurset. Provo përsëri.';
-    }
-  }catch(e){
-    msg.textContent='Gabim gjatë lidhjes. Je online?';
-  }
+      profile=data; msg.textContent=`U rifreskua: 1 EUR = ${fmt(fx.ALL)} ALL • ${fmt(fx.USD)} USD • ${fmt(fx.TRY)} TRY (data: ${fx.updated})`;
+    }else msg.textContent='S’u morën kurset. Provo përsëri.';
+  }catch(e){ msg.textContent='Gabim gjatë lidhjes.'; debug(e.message||e); }
 }
 function showSavedRates(){
-  const fx=profile?.fxeur;
-  const msg=document.getElementById('fxMsg');
+  const fx=profile?.fxeur, msg=document.getElementById('fxMsg');
   if(!fx){ msg.textContent='S’ka kurs të ruajtur. Kliko “Rifresko kurset (online)”.'; return; }
   msg.textContent=`Kurs i ruajtur: 1 EUR = ${fmt(fx.ALL)} ALL • ${fmt(fx.USD)} USD • ${fmt(fx.TRY)} TRY (data: ${fx.updated||'-'})`;
 }
 function eurCross(amount, from, to){
-  // EUR bazlı çapraz (profile.fxeur kullanır)
   const fx=profile?.fxeur; if(!fx||!fx[from]||!fx[to]) return null;
   if(from===to) return amount;
-  // from -> EUR -> to
   const inEur = (from==='EUR') ? amount : amount / fx[from];
-  const out = (to==='EUR') ? inEur : inEur * fx[to];
-  return out;
+  return (to==='EUR') ? inEur : inEur * fx[to];
 }
 function convertNow(){
   const amt=parseFloat(document.getElementById('convAmt').value||'0');
@@ -424,20 +418,15 @@ function convertNow(){
   const out=document.getElementById('convOut');
   if(isNaN(amt) || amt<=0){ out.textContent='Shkruaj një shumë > 0.'; return; }
   const v = eurCross(amt, from, to);
-  if(v==null){ out.textContent='S’ka kurs të ruajtur. Rifresko online dhe provo përsëri.'; return; }
-  out.textContent = `${fmt(amt)} ${from} ≈ ${fmt(v)} ${to} (bazuar në kursin EUR të ruajtur)`;
+  if(v==null){ out.textContent='S’ka kurs të ruajtur. Rifresko online.'; return; }
+  out.textContent = `${fmt(amt)} ${from} ≈ ${fmt(v)} ${to}`;
 }
-function swapFromTo(){
-  const a=document.getElementById('convFrom'), b=document.getElementById('convTo');
-  const tmp=a.value; a.value=b.value; b.value=tmp;
-}
+function swapFromTo(){const a=document.getElementById('convFrom'), b=document.getElementById('convTo');const t=a.value;a.value=b.value;b.value=t}
 
-// ======= CATEGORIES =======
+/* ====== CATEGORIES ====== */
 async function ensureCategoriesSeed(){
   const {data}=await supabase.from('categories').select('id').eq('user_id',sessionUser.id).limit(1);
-  if(!data || data.length===0){
-    await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
-  }
+  if(!data || data.length===0){ await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id}))); }
 }
 async function loadCategories(){
   const {data,error}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
@@ -445,7 +434,7 @@ async function loadCategories(){
   renderCatList(); refreshCategorySelects(); drawAll();
 }
 function renderCatList(){
-  const box=document.getElementById('catList'); box.innerHTML='';
+  const box=document.getElementById('catList'); if(!box) return; box.innerHTML='';
   cats.forEach(c=>{
     const el=document.createElement('div'); el.className='item';
     const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'🧾';
@@ -453,13 +442,13 @@ function renderCatList(){
     const t=document.createElement('div'); t.className='t'; t.textContent=c.name;
     const s=document.createElement('div'); s.className='s'; s.textContent='Kategori personale';
     meta.appendChild(t); meta.appendChild(s);
-    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️';
-    del.onclick=()=>deleteCategory(c.id);
+    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.addEventListener('click',()=>deleteCategory(c.id));
     el.append(ic,meta,del); box.appendChild(el);
   });
 }
 function refreshCategorySelects(){
   const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
+  if(!mCat||!fCat) return;
   mCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
   cats.forEach(c=>{
     const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'•')+' '+c.name;
@@ -484,16 +473,16 @@ async function deleteCategory(id){
   cats=cats.filter(c=>c.id!==id); renderCatList(); refreshCategorySelects(); drawAll();
 }
 
-// ======= EXPENSES =======
-async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}items=data||[];drawHome();drawAll();refreshHeader();}
+/* ====== EXPENSES ====== */
+async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);if(error){debug('Shpenzime: '+error.message);}items=data||[];drawHome();drawAll();refreshHeader();}
 async function saveExpense(){const name=document.getElementById('mName').value.trim();const amt=parseFloat(document.getElementById('mAmt').value);const cat=document.getElementById('mCat').value;const d=document.getElementById('mDate').value;if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();if(error){alert('Gabim: '+error.message);return;}items.unshift(data);document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();}
 async function delExpense(id){if(!confirm('Fshini këtë shpenzim?'))return;const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);if(error){alert('Gabim: '+error.message);return;}items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();}
-function drawHome(){const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);const list=document.getElementById('recentList');list.innerHTML='';document.getElementById('emptyHome').style.display=recent.length?'none':'block';recent.forEach(x=>list.appendChild(rowExpense(x)))}
-function drawAll(){const q=(document.getElementById('q').value||'').trim().toLowerCase();const cat=document.getElementById('fCat').value;let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));if(cat)arr=arr.filter(x=>x.category===cat);const box=document.getElementById('allList');box.innerHTML='';arr.forEach(x=>box.appendChild(rowExpense(x)))}
-function rowExpense(x){const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');meta.appendChild(t);meta.appendChild(s);const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount);const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);el.append(ic,meta,amt,del);return el}
+function drawHome(){const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);const list=document.getElementById('recentList');if(!list) return;list.innerHTML='';document.getElementById('emptyHome').style.display=recent.length?'none':'block';recent.forEach(x=>list.appendChild(rowExpense(x)))}
+function drawAll(){const q=(document.getElementById('q').value||'').trim().toLowerCase();const cat=document.getElementById('fCat').value;let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));if(cat)arr=arr.filter(x=>x.category===cat);const box=document.getElementById('allList');if(!box) return;box.innerHTML='';arr.forEach(x=>box.appendChild(rowExpense(x)))}
+function rowExpense(x){const el=document.createElement('div');el.className='item';const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);const meta=document.createElement('div');meta.className='meta';const t=document.createElement('div');t.className='t';t.textContent=x.name;const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');meta.appendChild(t);meta.appendChild(s);const amt=document.createElement('div');amt.className='amt';amt.textContent=fmt(x.amount);const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.addEventListener('click',()=>delExpense(x.id));el.append(ic,meta,amt,del);return el}
 function emojiFor(catName){const hit=cats.find(c=>c.name===catName);if(hit) return hit.emoji||'🧾';const m={'Ushqime':'🍔','Transport':'⛽','Shtëpia':'🏠','Argëtim':'🎟️','Fatura':'💡','Të tjera':'🧾'};return m[catName]||'💸'}
 
-// ======= HEADER STATS =======
+/* ====== HEADER STATS ====== */
 function refreshHeader(){
   const total=sum(items.map(x=>Number(x.amount||0)));
   const today=sum(items.filter(isToday).map(x=>Number(x.amount||0)));
@@ -503,9 +492,9 @@ function refreshHeader(){
   setText('stat1',fmt(total)); setText('stat2',fmt(today)); setText('stat3',fmt(month));
 }
 
-// ======= HELPERS =======
-function openModal(w){document.getElementById('modal'+w).classList.add('on')}
-function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
+/* ====== HELPERS ====== */
+function openModal(w){const m=document.getElementById('modal'+w); if(m) m.classList.add('on')}
+function closeModal(w){const m=document.getElementById('modal'+w); if(m) m.classList.remove('on')}
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
 function fmt(n){return (Math.round(n*100)/100).toLocaleString('sq-AL')}
