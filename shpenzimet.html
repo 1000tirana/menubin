@@ -114,10 +114,75 @@ nav.nav{
 </head>
 <body>
 
-<!-- Boot Perdesi + Hata yakalayıcı -->
-<div id="boot" style="position:fixed;inset:0;display:grid;place-items:center;background:#0d1117;color:#c9d1d9;font:600 16px system-ui;z-index:99999">
-  <div style="opacity:.85">🚀 Yükleniyor…</div>
-</div>
+/* === HATA YAKALAYICI & DEBUG === */
+const DEBUG = location.search.includes('debug');
+function overlay(msg){
+  if(!DEBUG) return;
+  let o = document.getElementById('debugOverlay');
+  if(!o){
+    o = document.createElement('pre');
+    o.id='debugOverlay';
+    Object.assign(o.style,{
+      position:'fixed',inset:'12px',background:'rgba(0,0,0,.85)',
+      color:'#9fe',padding:'12px',zIndex:99999,overflow:'auto',
+      border:'1px solid #355',borderRadius:'8px',fontSize:'12px'
+    });
+    document.body.appendChild(o);
+  }
+  o.textContent = String(msg);
+}
+window.addEventListener('error', e=>overlay(e.error?.stack||e.message));
+window.addEventListener('unhandledrejection', e=>overlay(e.reason?.stack||e.reason));
+
+/* === AÇILIŞ === */
+document.addEventListener('DOMContentLoaded', init);
+
+async function init(){
+  // Loader görünür
+  const loader = document.getElementById('gate') || document.body;
+  try{
+    // 1) Oturum durumunu al
+    const {data:{session}} = await supabase.auth.getSession();
+
+    // 2) Ekranı göster – veri yüklemeyi BEKLEMEDEN
+    if(session?.user){
+      sessionUser = session.user;
+      showApp();
+    }else{
+      showGate();
+    }
+
+    // 3) Veri yükleme: kilitlenmesin diye allSettled
+    const jobs = [
+      ensureProfile(),
+      ensureCategoriesSeed(),
+      loadCategories(),
+      loadExpenses(),
+      loadDebts()
+    ];
+    Promise.allSettled(jobs).then(()=>refreshHeader());
+
+    // 4) Oturum değişirse yine çalışsın
+    supabase.auth.onAuthStateChange(async (_e,s)=>{
+      if(s?.user){
+        sessionUser = s.user;
+        showApp();
+        Promise.allSettled([ensureProfile(),ensureCategoriesSeed(),loadCategories(),loadExpenses(),loadDebts()])
+          .then(()=>refreshHeader());
+      }else{
+        sessionUser = null;
+        showGate();
+      }
+    });
+
+    // 5) 8 sn’de oturum yoksa kapatma – loaderda kalmasın
+    setTimeout(()=>{ if(!sessionUser){ showGate(); } }, 8000);
+
+  }catch(err){
+    overlay(err?.stack||err);
+    showGate(); // en azından arayüz açılsın
+  }
+}
 
 <!-- GATE -->
 <div id="gate" class="wrap hide">
