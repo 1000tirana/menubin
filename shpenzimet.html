@@ -6,6 +6,30 @@
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
 <style>
+/* ... dosyandaki mevcut kodların arasına ekle ... */
+
+/* ==== TAB GEÇİŞİ (eksik olan kısım) ==== */
+window.switchTab = function(name){
+  // Sekmeleri göster/gizle
+  document.querySelectorAll('.tab').forEach(sec=>{
+    const id = sec.id || '';
+    sec.classList.toggle('active', id === 'tab-' + name);
+  });
+
+  // Alt menüde aktif butonu vurgula
+  document.querySelectorAll('nav.nav .btn').forEach(btn=>{
+    const isActive = (btn.dataset.tab === name);
+    btn.classList.toggle('active', isActive);
+  });
+
+  // Durumu tut
+  try { window.activeTab = name; } catch(_) {}
+
+  // Kullanıcı deneyimi: üstte başla
+  try { window.scrollTo({top: 0, behavior: 'smooth'}); } catch (_) {}
+};
+/* ==== /TAB GEÇİŞİ ==== */
+
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e;
