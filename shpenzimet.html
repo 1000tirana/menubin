@@ -1,467 +1,755 @@
 <!DOCTYPE html>
-<html lang="sq">
+<html lang="sq" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@1,0;wght@400..700" rel="stylesheet">
+
+<!-- Google Icons (Material Symbols Rounded) -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet">
+
 <style>
 :root{
-  --bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--muted:#8b949e;
-  --primary:#2ea043;--primary2:#238636;--blue:#1f6feb;--danger:#f85149;
-  --navh:86px; --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e;
+  --primary:#2ea043; --primary2:#238636;
+  --blue:#1f6feb; --danger:#f85149;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --nav-h:88px;
 }
-*{box-sizing:border-box} html,body{height:100%;background:var(--bg);color:var(--text);margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
-.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(var(--navh)+var(--safe-bottom))}
-header{background:linear-gradient(135deg,var(--primary2),var(--primary));color:#fff;padding:calc(12px+var(--safe-top)) 14px 12px;border-bottom-left-radius:20px;border-bottom-right-radius:20px}
-header .row{display:flex;justify-content:space-between;align-items:center}
-header .title{display:flex;gap:8px;font-size:20px;font-weight:900;margin-top:6px}
-header .big{font-size:30px;font-weight:900;margin-top:8px}
-header .muted{opacity:.9}
-.stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-10px)}
-.card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg);overscroll-behavior-y:none;overflow-x:hidden}
+body{margin:0;color:var(--text);font:400 16px ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
+.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(var(--nav-h) + var(--safe-bottom))}
+header{
+  background:linear-gradient(135deg,var(--primary2) 0%, var(--primary) 100%);
+  color:#fff;border-bottom-left-radius:22px;border-bottom-right-radius:22px;
+  padding:calc(10px + var(--safe-top)) 16px 12px; box-shadow:0 10px 28px rgba(35,134,54,.35)
+}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+header .title{display:flex;align-items:center;gap:10px;margin-top:6px}
+header .title .t{font-size:22px;font-weight:900}
+header .big{font-size:34px;font-weight:900;margin-top:8px}
+header .muted{color:#e6edf3;opacity:.8}
+header .seg{display:flex;gap:6px}
+header .seg button{border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.15);color:#fff;padding:6px 10px;border-radius:999px;font-weight:700}
+header .seg button.active{background:#fff;color:#0d1117}
+
+.stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
+.card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 8px;font-size:14px;color:#e6edf3}
 main{padding:0 12px 20px}
+h3.sec{margin:0 0 8px}
 
-.msr{font-family:"Material Symbols Rounded";font-weight:400;font-style:normal;font-size:24px;line-height:1;display:inline-block}
-.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#21262d;color:#e6edf3;padding:6px 10px;border-radius:999px;font-weight:800;cursor:pointer}
-.chip.active{background:#1f6feb;color:#fff;border-color:#1f6feb}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
 
-h3.sec{margin:0 0 10px}
-.list{display:flex;flex-direction:column;gap:10px}
-.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
-.ic{width:44px;height:44px;display:grid;place-items:center;font-size:26px}
-.meta{flex:1;min-width:0}.meta .t{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta .s{font-size:12px;color:var(--muted)}
-.amt{font-weight:900}
-.badge{font-size:12px;padding:2px 6px;border-radius:999px;background:#21262d;border:1px solid var(--border);margin-left:6px}
+.ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
+  background:#101418;border:1px solid #1f2328;box-shadow:inset 0 1px 2px rgba(255,255,255,.04), 0 10px 22px rgba(0,0,0,.45);font-size:26px}
+.meta{flex:1}
+.meta .t{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e6edf3}
+.meta .s{font-size:12px;color:var(--muted)}
+.amt{font-weight:900;color:#e6edf3}
+.del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
 
-input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:16px;-webkit-appearance:none}
+.row{display:flex;gap:10px}
 label{font-size:13px;color:var(--muted)}
-.rowf{display:flex;gap:10px}
-.btnP,.btnS{padding:12px 16px;border-radius:12px;border:1px solid var(--border);font-weight:800;cursor:pointer}
-.btnP{flex:1;background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:#2ea043;color:#fff}
-.btnS{flex:1;background:#21262d;color:#e6edf3}
+input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;
+  font-size:16px;background:var(--card);color:var(--text);-webkit-appearance:none}
+select{padding-right:30px}
+.actions{display:flex;gap:10px;margin-top:10px}
+.btnP,.btnS,.btnMini{font-size:16px;-webkit-tap-highlight-color:transparent; user-select:none}
+.btnP{flex:1;background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);color:#fff;border:1px solid #2ea043;padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
+.btnS{flex:1;background:#21262d;color:#e6edf3;border:1px solid var(--border);padding:12px 16px;border-radius:12px;font-weight:800;cursor:pointer}
+.btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
+.chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-details.box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
-details.box>summary{cursor:pointer;font-weight:800;color:#e6edf3;list-style:none}
-details.box>summary::-webkit-details-marker{display:none}
-
+/* Alt NAV */
 nav.nav{
-  --fab-gap:110px; position:fixed;left:0;right:0;bottom:0;height:calc(var(--navh)+var(--safe-bottom));
-  padding:0 12px var(--safe-bottom);background:var(--card);border-top:1px solid var(--border);
-  display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;z-index:2000
+  position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
+  height:var(--nav-h);padding:10px 12px calc(10px + var(--safe-bottom));
+  background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
+  border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
+  display:grid;grid-template-columns:1fr 1fr 90px 1fr 1fr;align-items:center;
 }
-.nav .btn{justify-self:center;display:flex;flex-direction:column;align-items:center;color:var(--muted);gap:4px;cursor:pointer}
-.nav .btn.active{color:#79c0ff}
-.nav .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#21262d;border:1px solid var(--border)}
-.nav .fab{position:absolute;left:50%;transform:translateX(-50%);top:-24px;width:64px;height:64px;border-radius:999px;display:grid;place-items:center;font-size:32px;border:1px solid rgba(255,255,255,.06);background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%)}
+.btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
+.btn .ms{font-family:"Material Symbols Rounded";font-size:24px;line-height:24px}
+.btn .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:#101418;border:1px solid #1f2328;box-shadow:inset 0 1px 2px rgba(255,255,255,.04), 0 10px 22px rgba(0,0,0,.45)}
+.btn.active{color:#79c0ff}
+.btn.active .ico{outline:2px solid #79c0ff33}
 
+.nav .fab{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:-22px;width:58px;height:58px;border-radius:999px;
+  background:#1a7f37;border:1px solid #36c270;color:#fff;font-size:30px;
+  display:grid;place-items:center;box-shadow:0 14px 26px rgba(0,0,0,.5), inset 0 1px 4px rgba(255,255,255,.15);
+  cursor:pointer;z-index:2100;pointer-events:auto
+}
+@supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
 
+/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
-.sheet{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 14px 18px;width:100%}
+.sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
 
-.gate{position:fixed;inset:0;display:none;place-items:center;background:var(--bg);padding:18px;z-index:4000}
-.panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px}
-.tabs{display:flex;gap:6px;margin-bottom:10px}
-.tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
-.tabs button.active{background:linear-gradient(180deg,var(--primary),var(--primary2));border-color:#2ea043;color:#fff}
+/* Collapsible */
+.cHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#0f141a}
+.cBody{margin-top:10px}
+
+/* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
 .picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
+#emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
+#emojiPreview{font-size:28px;width:44px;height:44px;display:grid;place-items:center}
 
+/* Helper */
+.hide{display:none!important}
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
 </style>
 </head>
 <body>
 
-<!-- GİRİŞ -->
-<div id="gate" class="gate">
-  <div class="panel">
-    <div class="tabs">
-      <button id="tabLoginBtn" class="active" onclick="swapAuth('login')">Hyr</button>
-      <button id="tabRegBtn" onclick="swapAuth('reg')">Regjistrohu</button>
-    </div>
-    <div id="authLogin">
-      <label>Email</label><input id="loginEmail" placeholder="user@email.com" autocomplete="username">
-      <div class="rowf" style="margin-top:8px"><div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••"></div></div>
-      <div class="rowf" style="margin-top:8px"><button class="btnP" onclick="login()">Hyr</button></div>
+<!-- Boot Perdesi + Hata yakalayıcı -->
+<div id="boot" style="position:fixed;inset:0;display:grid;place-items:center;background:#0d1117;color:#c9d1d9;font:600 16px system-ui;z-index:99999">
+  <div style="opacity:.85">🚀 Yükleniyor…</div>
+</div>
+
+<!-- GATE -->
+<div id="gate" class="wrap hide">
+  <main style="display:grid;place-items:center;min-height:100vh;padding-bottom:0">
+    <div class="card" style="width:min(560px,92vw);padding:16px;border-radius:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:900;font-size:18px">Normal Holding</div>
+        <div class="muted">Shpenzimet • Cloud</div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div style="flex:1"><label>Email</label><input id="loginEmail" placeholder="emri@gmail.com" autocomplete="username"></div>
+        <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="•••••••"></div>
+      </div>
+      <div class="actions"><button class="btnS" id="btnReg">Regjistrohu</button><button class="btnP" id="btnLogin">Hyr</button></div>
       <div id="authMsg" class="muted" style="margin-top:6px"></div>
     </div>
-    <div id="authReg" style="display:none">
-      <label>Email</label><input id="regEmail" placeholder="user@email.com" autocomplete="username">
-      <div class="rowf" style="margin-top:8px"><div style="flex:1"><label>Fjalëkalimi</label><input id="regPass" type="password" autocomplete="new-password" placeholder="min. 6"></div></div>
-      <div class="rowf" style="margin-top:8px"><button class="btnS" onclick="swapAuth('login')">Kthehu</button><button class="btnP" onclick="registerUser()">Krijo</button></div>
-      <div id="regMsg" class="muted" style="margin-top:6px"></div>
-    </div>
-  </div>
+  </main>
 </div>
 
 <!-- APP -->
-<div class="wrap" id="app" style="display:none">
+<div class="wrap hide" id="app">
   <header>
-    <div class="row"><div style="font-weight:900">Normal Holding</div><div class="muted" id="who">@user</div></div>
-    <div class="title"><span class="msr">savings</span><span id="hdrText">Bilanci</span></div>
-    <div class="big" id="hdrVal">0</div>
-    <div class="muted" id="hdrSub">Gjendja − shpenzimet (cüzdan)</div>
-    <!-- GEÇİCİ CÜZDAN SEÇİMİ -->
-    <div class="chips" id="walletChips"></div>
-    <!-- Toplam Net (kurla) -->
-    <div class="muted" style="margin-top:8px">🌐 Toplam net (seçili PB): <b id="totalNet">0</b> — Kur: <span id="fxTime">—</span></div>
+    <div class="top">
+      <div style="font-weight:800">Normal Holding</div>
+      <div class="muted" id="who">@user</div>
+    </div>
+    <div class="title">
+      <span class="ms" style="font-family:'Material Symbols Rounded';">account_balance_wallet</span>
+      <span class="t" id="hdrText">Bilanci</span>
+      <div style="flex:1"></div>
+      <!-- Görünüm Cüzdanı (geçici) -->
+      <div class="seg" id="viewCurrSeg"></div>
+    </div>
+    <div class="big"><span id="hdrTotal">0,00</span> <span id="hdrCurr">ALL</span></div>
+    <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
   </header>
 
-  <div class="stats">
-    <div class="card"><div class="muted" id="s1name">📊 Totale</div><div style="font-weight:800" id="stat1">0</div></div>
-    <div class="card"><div class="muted" id="s2name">📅 Sot</div><div style="font-weight:800" id="stat2">0</div></div>
-    <div class="card"><div class="muted" id="s3name">🗓️ Muaj</div><div style="font-weight:800" id="stat3">0</div></div>
+  <div class="stats" id="statsRow">
+    <div class="card"><h4 id="s1name">📊 Totale</h4><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0,00</span> <span id="sCurr1">ALL</span></div></div>
+    <div class="card"><h4 id="s2name">📅 Sot</h4><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0,00</span> <span id="sCurr2">ALL</span></div></div>
+    <div class="card"><h4 id="s3name">🗓️ Muaj</h4><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0,00</span> <span id="sCurr3">ALL</span></div></div>
   </div>
 
   <main>
-    <!-- HOME -->
     <section id="tab-home" class="tab active">
-      <h3 class="sec">👛 Cüzdanlar</h3>
-      <div id="wallets" class="list"></div>
-
-      <h3 class="sec" style="margin-top:14px">🕒 Të fundit</h3>
+      <h3 class="sec">🕒 Të fundit</h3>
       <div id="recentList" class="list"></div>
-      <div id="emptyHome" class="muted" style="text-align:center;margin-top:12px">Asnjë hyrje.</div>
+      <div id="emptyHome" class="muted" style="text-align:center;margin-top:16px">Asnjë hyrje deri tani.</div>
     </section>
 
-    <!-- LİSTE -->
     <section id="tab-list" class="tab">
-      <h3 class="sec">📋 Lista</h3>
-      <div class="rowf" style="margin-bottom:8px">
+      <h3 class="sec">📚 Lista</h3>
+      <div class="row" style="margin:8px 0 10px">
         <input id="q" placeholder="Kërko..." oninput="drawAll()">
         <select id="fCat" onchange="drawAll()"><option value="">Të gjitha</option></select>
       </div>
       <div id="allList" class="list"></div>
     </section>
 
-    <!-- BORÇ -->
     <section id="tab-debts" class="tab">
       <h3 class="sec">💳 Borxhet</h3>
-      <div class="rowf" style="margin-bottom:8px"><input id="dq" placeholder="Kërko..." oninput="drawDebts()"></div>
-      <div class="list" id="debtList"></div>
-      <div id="emptyDebts" class="muted" style="text-align:center;margin-top:12px">Asnjë borxh.</div>
+      <div class="row" style="margin:8px 0 10px"><input id="dq" placeholder="Kërko borxhe..." oninput="drawDebts()"></div>
+      <div class="row" style="gap:6px;margin-bottom:6px">
+        <button class="btnMini" id="dAll">Të gjitha</button>
+        <button class="btnMini" id="dBorrow">Mora hua</button>
+        <button class="btnMini" id="dLend">Dhash hua</button>
+      </div>
+      <div id="debtList" class="list"></div>
+      <div id="emptyDebts" class="muted" style="text-align:center;margin-top:16px">Asnjë borxh deri tani.</div>
     </section>
 
-    <!-- AYARLAR -->
     <section id="tab-settings" class="tab">
       <h3 class="sec">⚙️ Cilësime</h3>
+
       <div class="item">
-        <div class="ic">👤</div>
-        <div class="meta"><div class="t">Përdoruesi</div><div class="s" id="userInfo">—</div></div>
-        <button class="btnS" onclick="logout()"><span class="msr">logout</span>&nbsp;Dil</button>
+        <div class="ic"><span class="ms">person</span></div>
+        <div class="meta"><div class="t">Përdoruesi</div><div class="s muted" id="userInfo">—</div></div>
+        <button class="btnMini" onclick="logout()">Dil</button>
       </div>
 
+      <!-- Preferenca -->
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px">💱 Varsayılan cüzdan & format</h4>
-        <div class="rowf">
-          <div style="flex:1"><label>Varsayılan para birimi</label>
-            <select id="prefCurrency"><option>ALL</option><option>EUR</option><option>TRY</option><option>USD</option></select></div>
-          <div style="flex:1"><label>Format</label>
-            <select id="prefFormat"><option value="eu">23.456,78</option><option value="us">23,456.78</option></select></div>
+        <div class="cHead" onclick="toggleBox('prefBox')">
+          <div><span class="ms">payments</span> <b>Monedha & format</b></div>
+          <span class="ms">expand_more</span>
         </div>
-        <div class="rowf" style="margin-top:10px"><button class="btnP" onclick="savePrefs()">Kaydet</button></div>
-        <div class="muted" style="margin-top:6px">Not: Başlıkta yaptığın seçim <b>geçici</b>dir; yenileyince yine buradaki seçim geçerli olur.</div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px">🏦 Cüzdan bakiyesi (seçili PB: <span id="currTag">ALL</span>)</h4>
-        <input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="p.sh. 5000">
-        <div class="rowf" style="margin-top:10px"><button class="btnP" onclick="saveBalance()">Bakiyeyi kaydet</button></div>
-        <div id="balMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-      </div>
-
-      <details class="box" style="margin-top:12px">
-        <summary>📂 Kategoriler</summary>
-        <div id="catList" class="list" style="margin-top:8px"></div>
-        <div style="border-top:1px solid var(--border);margin:10px 0"></div>
-        <div class="rowf">
-          <div style="width:120px">
-            <label>Emoji</label>
-            <button class="btnS" id="emojiBtn" onclick="openEmojiPicker()"> <span id="emojiPreview" style="font-size:22px">🍔</span> &nbsp;Seç</button>
-            <input id="newCatEmoji" value="🍔" hidden>
+        <div id="prefBox" class="cBody">
+          <div class="row" style="margin-top:10px">
+            <div style="flex:1">
+              <label>Monedha aktuale (për hyrjet e reja)</label>
+              <select id="prefCurr">
+                <option value="ALL">ALL — Albania Lek</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="TRY">TRY — Turkish Lira</option>
+                <option value="USD">USD — US Dollar</option>
+              </select>
+            </div>
+            <div style="flex:1">
+              <label>Formati i numrave</label>
+              <select id="prefFmt">
+                <option value="eu">23.456,78</option>
+                <option value="us">23,456.78</option>
+              </select>
+            </div>
           </div>
-          <div style="flex:1"><label>Ad</label><input id="newCatName" placeholder="p.sh. Ushqime"></div>
+          <div class="actions"><button class="btnP" onclick="savePrefs()">Ruaj preferencat</button></div>
+          <div id="prefMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
         </div>
-        <div class="rowf" style="margin-top:10px"><button class="btnP" onclick="addCategory()">Ekle</button></div>
-        <div id="catMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-      </details>
+      </div>
+
+      <!-- Gjendja e monedhës aktive -->
+      <div class="card" style="margin-top:12px">
+        <div class="cHead" onclick="toggleBox('balBox')">
+          <div><span class="ms">account_balance</span> <b>Gjendja e monedhës aktuale (<span id="balCurrLbl">ALL</span>)</b></div>
+          <span class="ms">expand_more</span>
+        </div>
+        <div id="balBox" class="cBody">
+          <div class="row" style="margin-top:10px"><input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="p.sh. 5000"></div>
+          <div class="actions"><button class="btnP" onclick="saveBalance()">Ruaj gjendjen</button></div>
+          <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
+        </div>
+      </div>
+
+      <!-- Kategoriat -->
+      <div class="card" style="margin-top:12px">
+        <div class="cHead" onclick="toggleBox('catBox')">
+          <div><span class="ms">label</span> <b>Kategoritë</b></div>
+          <span class="ms">expand_more</span>
+        </div>
+        <div id="catBox" class="cBody">
+          <div id="catList" class="list" style="margin-top:8px"></div>
+          <div style="border-top:1px solid var(--border);margin:12px 0"></div>
+          <div class="row">
+            <div style="width:140px">
+              <label>Emoji</label>
+              <button class="btnS" id="emojiBtn" onclick="openEmojiPicker()"><span id="emojiPreview">🍔</span> Zgjidh emoji</button>
+              <input id="newCatEmoji" value="🍔" hidden>
+            </div>
+            <div style="flex:1">
+              <label>Emri i kategorisë</label>
+              <input id="newCatName" placeholder="p.sh. Ushqime">
+            </div>
+          </div>
+          <div class="actions"><button class="btnP" onclick="addCategory()">Shto kategori</button></div>
+          <div id="catMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+        </div>
+      </div>
+
+      <!-- Ndrysho email / fjalëkalim -->
+      <div class="card" style="margin-top:12px">
+        <div class="cHead" onclick="toggleBox('accBox')">
+          <div><span class="ms">manage_accounts</span> <b>Llogaria</b></div>
+          <span class="ms">expand_more</span>
+        </div>
+        <div id="accBox" class="cBody">
+          <div class="row" style="margin-top:10px"><input id="newEmail" placeholder="email i ri p.sh. user@domain.com"></div>
+          <div class="actions"><button class="btnP" onclick="changeEmail()">Ruaj email</button></div>
+          <div id="emailMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+
+          <div style="height:10px"></div>
+          <div class="row">
+            <input id="newPass" type="password" placeholder="Fjalëkalimi i ri (min. 6)">
+            <input id="newPass2" type="password" placeholder="Përsërit fjalëkalimin">
+          </div>
+          <div class="actions"><button class="btnP" onclick="changePassword()">Ruaj fjalëkalimin</button></div>
+          <div id="passMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+        </div>
+      </div>
     </section>
   </main>
 </div>
 
-<!-- NAV -->
-<nav class="nav" id="navbar" style="display:none">
-  <div class="btn active" data-tab="home" onclick="switchTab('home')"><div class="ico"><span class="msr">home</span></div><small>Kreu</small></div>
-  <div class="btn" data-tab="list" onclick="switchTab('list')"><div class="ico"><span class="msr">list</span></div><small>Lista</small></div>
-  <div class="btn" data-tab="debts" onclick="switchTab('debts')"><div class="ico"><span class="msr">credit_card</span></div><small>Borxhet</small></div>
-  <div class="btn" data-tab="settings" onclick="switchTab('settings')"><div class="ico"><span class="msr">settings</span></div><small>Cilësime</small></div>
-  <button class="fab" id="openAdd">＋</button>
+<!-- Alt menü + FAB -->
+<nav class="nav hide" id="navbar">
+  <a class="btn active" data-tab="home" onclick="switchTab('home')"><div class="ico"><span class="ms">home</span></div><span>Kreu</span></a>
+  <a class="btn" data-tab="list" onclick="switchTab('list')"><div class="ico"><span class="ms">task</span></div><span>Lista</span></a>
+  <a class="btn" data-tab="debts" onclick="switchTab('debts')"><div class="ico"><span class="ms">credit_card</span></div><span>Borxhet</span></a>
+  <a class="btn" data-tab="settings" onclick="switchTab('settings')"><div class="ico"><span class="ms">settings</span></div><span>Cilësime</span></a>
+  <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
-<!-- MODAL: harcama -->
+<!-- Modal: Shpenzim -->
 <div class="modal" id="modalExp"><div class="sheet">
-  <h3 style="margin:4px 0 10px">➕ Shpenzim i ri</h3>
-  <div class="rowf"><div style="flex:2"><label>Ad</label><input id="mName" placeholder="Karburant"></div><div style="flex:1"><label>Tutar</label><input id="mAmt" type="number" step="0.01" inputmode="decimal"></div></div>
-  <div class="rowf" style="margin-top:8px"><div style="flex:1"><label>Kategori</label><select id="mCat"></select></div><div style="flex:1"><label>Tarih</label><input id="mDate" type="date"></div></div>
-  <div class="rowf" style="margin-top:10px"><button class="btnS" onclick="closeModal('Exp')">Kapat</button><button class="btnP" onclick="saveExpense()">Kaydet</button></div>
+  <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
+  <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div></div>
+  <div class="row" style="margin-top:8px"><div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Exp')">Mbyll</button><button class="btnP" onclick="saveExpense()">Ruaj</button></div>
 </div></div>
 
-<!-- MODAL: borç -->
+<!-- Modal: Borxh -->
 <div class="modal" id="modalDebt"><div class="sheet">
-  <h3 style="margin:4px 0 10px">➕ Borxh i ri</h3>
-  <div class="rowf"><div style="flex:1"><label>Taraf</label><input id="dParty" placeholder="Arben"></div><div style="flex:1"><label>Tutar</label><input id="dAmt" type="number" step="0.01" inputmode="decimal"></div></div>
-  <div class="rowf" style="margin-top:8px"><div style="flex:1"><label>Açıklama</label><input id="dName" placeholder="opsionale"></div><div style="flex:1"><label>Vade</label><input id="dDate" type="date"></div></div>
-  <div class="rowf" style="margin-top:10px"><button class="btnS" onclick="closeModal('Debt')">Kapat</button><button class="btnP" onclick="saveDebt()">Kaydet</button></div>
+  <h3 style="margin:4px 0 10px">➕ Shto borxh</h3>
+  <div class="row">
+    <div style="flex:1"><label>Palë (Emri)</label><input id="dParty" placeholder="p.sh. Arben / ACME sh.p.k."></div>
+    <div style="flex:1"><label>Shuma</label><input id="dAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Lloji</label>
+      <select id="dKind">
+        <option value="borrow">Mora hua</option>
+        <option value="lend">Dhash hua</option>
+      </select>
+    </div>
+    <div style="flex:1"><label>Afati (opsionale)</label><input id="dDate" type="date"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Përshkrimi (opsionale)</label><input id="dName" placeholder="p.sh. Telefon i ri"></div>
+  </div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
 </div></div>
 
-<!-- MODAL: emoji -->
+<!-- Modal: Emoji seçici -->
 <div class="modal" id="modalEmoji"><div class="sheet">
-  <h3 style="margin:4px 0 10px">🙂 Emoji seç</h3>
+  <h3 style="margin:4px 0 10px">🙂 Zgjidh një emoji</h3>
   <div id="emojiGrid" class="picker-grid"></div>
-  <div class="rowf" style="margin-top:8px"><button class="btnS" onclick="closeModal('Emoji')">Kapat</button></div>
+  <div class="actions"><button class="btnS" onclick="closeModal('Emoji')">Mbyll</button></div>
 </div></div>
 
 <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
 <script>
-/* Supabase — kendi URL/Anon anahtarını yaz */
-const SUPABASE_URL  = 'https://nvpjqvggaiipwziolend.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+/* ---------- Boot & hata yakalayıcı ---------- */
+(function(){
+  const boot = document.getElementById('boot');
+  function showError(msg){
+    if(!boot) return;
+    boot.innerHTML =
+      '<div style="max-width:560px;padding:16px;border:1px solid #30363d;border-radius:12px;background:#161b22;box-shadow:0 10px 30px rgba(0,0,0,.35)">' +
+      '<div style="font-weight:800;margin-bottom:8px">⚠️ Hata</div>' +
+      '<div style="white-space:pre-wrap;word-break:break-word;color:#f85149">' + (msg||'Bilinmeyen hata') + '</div>' +
+      '<div style="margin-top:10px;color:#8b949e">Sayfayı yenileyin. Devam ederse, SQL şemasını uyguladığınızdan emin olun.</div>' +
+      '</div>';
+  }
+  window.addEventListener('error', e=>showError(e.message||String(e)));
+  window.addEventListener('unhandledrejection', e=>showError((e.reason&&e.reason.message)||String(e.reason)));
+})();
 
-/* Uygulama durumu */
-let sessionUser=null, items=[], debts=[], cats=[];
-let profile={default_currency:'ALL', num_format:'eu', balances:{}};
-let tempCurr=null;                       // başlıktaki geçici seçim
-const ALLCURR=['ALL','EUR','TRY','USD'];
-let ratesBaseUSD=null, ratesTime='—';    // canlı kur (USD bazlı)
+/* ---------- App State ---------- */
+const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 
-/* Yardımcılar */
-function nf(){return new Intl.NumberFormat(profile.num_format==='us'?'en-US':'de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function money(n,c){return nf().format(Number(n||0))+' '+(c??currentCurr());}
-function currentCurr(){return tempCurr || profile.default_currency || 'ALL';}
-function emailShort(e){return e?e.split('@')[0]:'@user'}
-function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
-function isThisMonth(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
-function convert(amount,from,to){ if(from===to) return Number(amount||0); if(!ratesBaseUSD) return Number(amount||0); return Number(amount||0) * (ratesBaseUSD[to]/ratesBaseUSD[from]); }
+let supabase;            // client
+let sessionUser=null;    // auth user
+let profile={default_currency:'ALL', num_format:'eu', balances:{}}; // balances: {ALL: 0, EUR: 0, ...}
+let cats=[];             // categories
+let items=[], debts=[];  // expenses, debts
+let activeTab='home';
+let viewCurr='ALL';      // header quick view currency (non-persistent)
+let rates={EUR:{ALL:100,TRY:36.0,USD:1.07,EUR:1},  // will be normalized
+          ALL:{EUR:0.01,TRY:0.36,USD:0.0107,ALL:1},
+          TRY:{EUR:0.0278,ALL:2.77,USD:0.0298,TRY:1},
+          USD:{EUR:0.93,ALL:93.0,TRY:33.5,USD:1}};
 
-/* Kur çekme */
-async function loadFx(){
-  try{
-    const r=await fetch('https://api.exchangerate.host/latest?base=USD&symbols=ALL,EUR,TRY,USD');
-    const j=await r.json(); ratesBaseUSD=j.rates; ratesTime=new Date(j.date+'T00:00:00').toLocaleDateString();
-    document.getElementById('fxTime').textContent=ratesTime;
-    refreshHeader();
-  }catch(e){console.warn('FX error',e)}
+function fmtNum(n){ const f=profile?.num_format==='us' ? {m:',', d:'.'} : {m:'.', d:','};
+  const s=(Math.round(n*100)/100).toFixed(2);
+  const [A,B]=s.split('.');
+  return A.replace(/\B(?=(\d{3})+(?!\d))/g,f.m)+f.d+B;
+}
+function setText(id,v){const e=document.getElementById(id); if(e) e.textContent=v;}
+function toggleBox(id){document.getElementById(id)?.classList.toggle('hide')}
+function openModal(w){document.getElementById('modal'+w).classList.add('on')}
+function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
+function emailShort(e){return e?e.split('@')[0]:''}
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function sum(a){return a.reduce((s,n)=>s+Number(n||0),0)}
+function toCurr(amount, from, to){
+  if(!from||!to||from===to) return amount;
+  const r=(rates[from]&&rates[from][to])||1;
+  return amount*r;
 }
 
-/* Auth */
-async function registerUser(){const email=document.getElementById('regEmail').value.trim(), pass=document.getElementById('regPass').value;
-  const box=document.getElementById('regMsg'); box.textContent='';
-  if(!email||pass.length<6){box.textContent='Email / şifre (min.6)';return;}
-  const {error}=await supabase.auth.signUp({email,password:pass}); box.textContent=error?('Hata: '+error.message):'Mail onayı gönderildi.';}
-async function login(){const email=document.getElementById('loginEmail').value.trim(), pass=document.getElementById('loginPass').value;
-  const box=document.getElementById('authMsg'); const {error}=await supabase.auth.signInWithPassword({email,password:pass});
-  if(error) box.textContent='Hata: '+error.message;}
+/* ---------- UI wiring ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!window.supabase) throw new Error('Supabase JS yüklenmedi');
+  supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+  // Emoji grid
+  '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 🪙 💳 💎 🎓 📚 🔌 🔋 🧥 👟 🍼 🧻 🧴'.split(' ').forEach(e=>{
+    const b=document.createElement('button'); b.textContent=e; b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};
+    document.getElementById('emojiGrid').appendChild(b);
+  });
+
+  document.getElementById('mDate').value=todayISO();
+  document.getElementById('dDate').value=todayISO();
+
+  // Auth buttons
+  document.getElementById('btnLogin').onclick=login;
+  document.getElementById('btnReg').onclick=registerUser;
+
+  // FAB – tab göre modallar
+  const fab=document.getElementById('openAdd');
+  const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
+  ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
+
+  // Debt quick filter
+  document.getElementById('dAll').onclick=()=>{drawDebts('');};
+  document.getElementById('dBorrow').onclick=()=>{drawDebts('borrow');};
+  document.getElementById('dLend').onclick=()=>{drawDebts('lend');};
+
+  // Auth session
+  const {data:{session}}=await supabase.auth.getSession();
+  if(session?.user){sessionUser=session.user; await bootApp();}
+  else showGate();
+
+  supabase.auth.onAuthStateChange(async (_e,session)=>{
+    if(session?.user){sessionUser=session.user; await bootApp();}
+    else{sessionUser=null; showGate();}
+  });
+
+  // Kur oranlarını çek (cache 12s)
+  try{
+    const cache=JSON.parse(localStorage.getItem('nh_rates')||'{}');
+    if(cache.t && Date.now()-cache.t<12*60*60*1000 && cache.r){rates=cache.r;}
+    else{
+      const r=await fetch('https://api.exchangerate.host/latest?base=EUR').then(r=>r.json()).catch(()=>null);
+      if(r && r.rates){
+        // normalize couple we need
+        const R=r.rates;
+        rates.EUR={EUR:1, USD:R.USD, TRY:R.TRY, ALL:R.ALL};
+        rates.USD={EUR:1/R.USD, USD:1, TRY:R.TRY/R.USD, ALL:R.ALL/R.USD};
+        rates.TRY={EUR:1/R.TRY, USD:R.USD/R.TRY, TRY:1, ALL:R.ALL/R.TRY};
+        rates.ALL={EUR:1/R.ALL, USD:R.USD/R.ALL, TRY:R.TRY/R.ALL, ALL:1};
+        localStorage.setItem('nh_rates',JSON.stringify({t:Date.now(), r:rates}));
+      }
+    }
+  }catch{}
+});
+
+async function bootApp(){
+  try{
+    await Promise.all([ensureProfile(), ensureCategoriesSeed()]);
+    await Promise.all([loadCategories(), loadExpenses(), loadDebts()]);
+    viewCurr = profile.default_currency || 'ALL';
+    buildViewCurrSeg();
+    showApp();
+  }finally{
+    document.getElementById('boot')?.remove();
+  }
+}
+
+function showGate(){document.getElementById('boot')?.remove();document.getElementById('gate').classList.remove('hide');document.getElementById('app').classList.add('hide');document.getElementById('navbar').classList.add('hide')}
+function showApp(){document.getElementById('gate').classList.add('hide');document.getElementById('app').classList.remove('hide');document.getElementById('navbar').classList.remove('hide');document.getElementById('who').textContent=emailShort(sessionUser?.email);document.getElementById('userInfo').textContent=sessionUser?.email||'';refreshHeader();drawHome();drawDebts();}
+
+/* ---------- Auth ---------- */
+async function registerUser(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const box=document.getElementById('authMsg'); box.textContent='';
+  if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
+  const {error}=await supabase.auth.signUp({email,password:pass});
+  box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
+}
+async function login(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const box=document.getElementById('authMsg'); box.textContent='';
+  const {error}=await supabase.auth.signInWithPassword({email,password:pass});
+  if(error) box.textContent='Gabim: '+error.message;
+}
 async function logout(){await supabase.auth.signOut()}
 
-/* Profil / tercih */
+/* ---------- Profile & Prefs ---------- */
 async function ensureProfile(){
-  let {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).maybeSingle();
-  if(!data){
-    const ins={user_id:sessionUser.id, default_currency:'ALL', num_format:'eu', balances:{}};
-    const {data:created}=await supabase.from('profiles').insert(ins).select().single();
-    data=created;
-  }
-  profile=data||profile; tempCurr=null;
-  document.getElementById('prefCurrency').value=profile.default_currency;
-  document.getElementById('prefFormat').value=profile.num_format;
-  document.getElementById('balInput').value=Number(profile.balances[currentCurr()]||0);
-  document.getElementById('currTag').textContent=currentCurr();
-  drawWalletChips();
-  refreshHeader();
+  try{
+    const {data} = await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).maybeSingle();
+    if(data){ profile=data; }
+    else{
+      const fresh={user_id:sessionUser.id, default_currency:'ALL', num_format:'eu', balances:{}};
+      const {data:ins}=await supabase.from('profiles').insert(fresh).select().single();
+      profile=ins||fresh;
+    }
+  }catch(err){ console.warn('profile err',err); }
+  document.getElementById('prefCurr').value=profile.default_currency||'ALL';
+  document.getElementById('prefFmt').value=profile.num_format||'eu';
+  document.getElementById('balCurrLbl').textContent=profile.default_currency||'ALL';
+  document.getElementById('balInput').value=(profile.balances?.[profile.default_currency]||0);
 }
 async function savePrefs(){
-  const c=document.getElementById('prefCurrency').value, f=document.getElementById('prefFormat').value;
-  const {data,error}=await supabase.from('profiles').update({default_currency:c,num_format:f}).eq('user_id',sessionUser.id).select().single();
-  if(error){alert('Hata: '+error.message);return;}
-  profile=data; tempCurr=null; drawWalletChips(); document.getElementById('balInput').value=Number(profile.balances[currentCurr()]||0); refreshHeader(); drawAll(); drawDebts(); drawWallets();
+  const curr=document.getElementById('prefCurr').value;
+  const fmt=document.getElementById('prefFmt').value;
+  const {data,error}=await supabase.from('profiles').update({default_currency:curr,num_format:fmt}).eq('user_id',sessionUser.id).select().single();
+  document.getElementById('prefMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
+  if(!error){profile=data; viewCurr=profile.default_currency; buildViewCurrSeg(); refreshHeader();}
 }
 async function saveBalance(){
-  const v=parseFloat(document.getElementById('balInput').value||'0')||0;
-  const b={...(profile.balances||{})}; b[currentCurr()]=v;
-  const {data,error}=await supabase.from('profiles').update({balances:b}).eq('user_id',sessionUser.id).select().single();
-  const box=document.getElementById('balMsg'); if(error){box.textContent='Hata: '+error.message;return;}
-  profile=data; box.textContent='Kaydedildi.'; refreshHeader(); drawWallets();
+  const v=parseFloat(document.getElementById('balInput').value)||0;
+  const c=profile.default_currency||'ALL';
+  const balances={...(profile.balances||{})}; balances[c]=v;
+  const {data,error}=await supabase.from('profiles').update({balances}).eq('user_id',sessionUser.id).select().single();
+  document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
+  if(!error){profile=data; refreshHeader();}
+}
+async function changeEmail(){
+  const e=(document.getElementById('newEmail').value||'').trim();
+  const m=document.getElementById('emailMsg'); m.textContent='';
+  if(!e||!e.includes('@')){m.textContent='Shkruaj një email të vlefshëm.';return;}
+  const {error}=await supabase.auth.updateUser({email:e});
+  m.textContent=error?('Gabim: '+error.message):'U dërgua linku i konfirmimit.';
+}
+async function changePassword(){
+  const p1=document.getElementById('newPass').value,p2=document.getElementById('newPass2').value,m=document.getElementById('passMsg');
+  m.textContent='';
+  if(!p1||p1.length<6){m.textContent='Fjalëkalimi ≥ 6.';return;}
+  if(p1!==p2){m.textContent='Fjalëkalimet nuk përputhen.';return;}
+  const {error}=await supabase.auth.updateUser({password:p1});
+  m.textContent=error?('Gabim: '+error.message):'U përditësua.';
+  if(!error){document.getElementById('newPass').value='';document.getElementById('newPass2').value='';}
 }
 
-/* Kategoriler */
+/* ---------- Categories ---------- */
 const DEFAULT_CATS=[{name:'Ushqime',emoji:'🍔'},{name:'Transport',emoji:'⛽'},{name:'Shtëpia',emoji:'🏠'},{name:'Argëtim',emoji:'🎟️'},{name:'Fatura',emoji:'💡'},{name:'Të tjera',emoji:'🧾'}];
 async function ensureCategoriesSeed(){
   const {data}=await supabase.from('categories').select('id').eq('user_id',sessionUser.id).limit(1);
-  if(!data||!data.length) await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
+  if(!data||data.length===0){
+    await supabase.from('categories').insert(DEFAULT_CATS.map(c=>({...c,user_id:sessionUser.id})));
+  }
 }
 async function loadCategories(){
-  const {data}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
-  cats=(data||[]).map(r=>({id:r.id,name:r.name,emoji:r.emoji}));
-  const list=document.getElementById('catList'); list.innerHTML='';
-  cats.forEach(c=>{const el=document.createElement('div');el.className='item';
-    el.innerHTML=<div class="ic">${c.emoji||'•'}</div><div class="meta"><div class="t">${c.name}</div><div class="s">Kişisel</div></div><button class="btnS" onclick="delCat('${c.id}')">Sil</button>;
-    list.appendChild(el);
+  const {data,error}=await supabase.from('categories').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:true});
+  cats=(error?DEFAULT_CATS:(data||[]));
+  renderCatList(); refreshCategorySelects(); drawAll();
+}
+function renderCatList(){
+  const box=document.getElementById('catList'); box.innerHTML='';
+  cats.forEach(c=>{
+    const el=document.createElement('div'); el.className='item';
+    const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'🧾';
+    const meta=document.createElement('div'); meta.className='meta';
+    const t=document.createElement('div'); t.className='t'; t.textContent=c.name;
+    const s=document.createElement('div'); s.className='s'; s.textContent='Kategori personale';
+    meta.appendChild(t); meta.appendChild(s);
+    const del=document.createElement('button'); del.className='btnMini'; del.textContent='Fshi';
+    del.onclick=()=>deleteCategory(c.id);
+    el.append(ic,meta,del); box.appendChild(el);
   });
-  // seçimler
-  const m=document.getElementById('mCat'), f=document.getElementById('fCat'); if(m) m.innerHTML=''; if(f) f.innerHTML='<option value="">Të gjitha</option>';
-  cats.forEach(c=>{const o=new Option(${c.emoji||'•'} ${c.name},c.name); m?.appendChild(o); f?.appendChild(new Option(c.name,c.name));});
+}
+function refreshCategorySelects(){
+  const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
+  mCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
+  (Array.isArray(cats)?cats:DEFAULT_CATS).forEach(c=>{
+    const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'•')+' '+c.name;
+    mCat.appendChild(o.cloneNode(true));
+    const o2=document.createElement('option'); o2.value=c.name; o2.textContent=c.name; fCat.appendChild(o2);
+  });
 }
 async function addCategory(){
-  const name=(document.getElementById('newCatName').value||'').trim(), emoji=document.getElementById('newCatEmoji').value||'🧾';
+  const name=(document.getElementById('newCatName').value||'').trim();
+  const emoji=(document.getElementById('newCatEmoji').value||'').trim()||'🧾';
   const msg=document.getElementById('catMsg'); msg.textContent='';
-  if(!name){msg.textContent='Ad gerekli.';return;}
+  if(!name){msg.textContent='Shkruaj emrin e kategorisë.';return;}
   const {data,error}=await supabase.from('categories').insert({user_id:sessionUser.id,name,emoji}).select().single();
-  if(error){msg.textContent='Hata: '+error.message;return;}
-  document.getElementById('newCatName').value=''; await loadCategories(); msg.textContent='Eklendi.';
+  if(error){msg.textContent='Gabim: '+error.message;return;}
+  cats.push({name:data.name,emoji:data.emoji,id:data.id}); document.getElementById('newCatName').value=''; renderCatList(); refreshCategorySelects();
+  msg.textContent='U shtua.';
 }
-async function delCat(id){if(!confirm('Silinsin mi?')) return; await supabase.from('categories').delete().eq('id',id).eq('user_id',sessionUser.id); loadCategories();}
-function openEmojiPicker(){openModal('Emoji')}
-function drawEmojiGrid(){const picks='🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 ⚽ 🧾 💊 ✈️ 🚗 🪙 💳 🎓 📚 🔌 🔋 👟 🍼 🧻 🧴'.split(' ');
-  const grid=document.getElementById('emojiGrid'); picks.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};grid.appendChild(b)});}
+async function deleteCategory(id){
+  if(!confirm('Fshije këtë kategori?')) return;
+  const {error}=await supabase.from('categories').delete().eq('id',id).eq('user_id',sessionUser.id);
+  if(error){alert('Gabim: '+error.message);return;}
+  cats=cats.filter(c=>c.id!==id); renderCatList(); refreshCategorySelects(); drawAll();
+}
+function emojiFor(catName){
+  const hit=(Array.isArray(cats)?cats:DEFAULT_CATS).find(c=>c.name===catName);
+  return (hit?hit.emoji:null) || '💸';
+}
 
-/* Harcamalar */
-function emojiFor(cat){const f=cats.find(c=>c.name===cat);return f?f.emoji:'💸';}
-async function loadExpenses(){const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000); if(error){alert('Hata (expenses): '+error.message);return;} items=data||[]; drawHome(); drawAll(); refreshHeader(); drawWallets();}
-async function saveExpense(){
-  const name=document.getElementById('mName').value.trim(), amt=parseFloat(document.getElementById('mAmt').value), cat=document.getElementById('mCat').value, d=document.getElementById('mDate').value;
-  if(!name||!amt||!d){alert('Ad, tutar, tarih gerekir.');return;}
-  const curr=currentCurr(); const {data,error}=await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d,curr}).select().single();
-  if(error){alert('Hata: '+error.message);return;}
-  items.unshift(data); closeModal('Exp'); document.getElementById('mName').value=''; document.getElementById('mAmt').value=''; drawHome(); drawAll(); refreshHeader(); drawWallets();
+/* ---------- Header & Stats ---------- */
+function buildViewCurrSeg(){
+  const seg=document.getElementById('viewCurrSeg'); seg.innerHTML='';
+  ['ALL','EUR','TRY','USD'].forEach(c=>{
+    const b=document.createElement('button'); b.textContent=c; b.className=c===viewCurr?'active':''; b.onclick=()=>{viewCurr=c;refreshHeader();drawHome();drawAll();drawDebts();};
+    seg.appendChild(b);
+  });
+  setText('hdrCurr',viewCurr); setText('sCurr1',viewCurr); setText('sCurr2',viewCurr); setText('sCurr3',viewCurr);
+  document.getElementById('balCurrLbl').textContent=profile.default_currency||'ALL';
 }
-async function delExpense(id){if(!confirm('Silinsin mi?'))return; await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id); items=items.filter(x=>x.id!==id); drawHome(); drawAll(); refreshHeader(); drawWallets();}
-function rowExpense(x){const el=document.createElement('div');el.className='item';
-  el.innerHTML=`<div class="ic">${emojiFor(x.category)}</div>
-  <div class="meta"><div class="t">${x.name}<span class="badge">${x.curr||'ALL'}</span></div><div class="s">${x.category||'—'} • ${new Date(x.d+'T00:00:00').toLocaleDateString('sq-AL')}</div></div>
-  <div class="amt">${money(x.amount,x.curr)}</div>
-  <button class="btnS" onclick="delExpense('${x.id}')">Sil</button>`;
-  return el;}
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));
+  document.querySelector(.btn[data-tab="${t}"])?.classList.add('active');
+  document.getElementById('statsRow').style.display=(t==='settings')?'none':'flex';
+  refreshHeader();
+  if(t==='list')drawAll();
+  if(t==='debts')drawDebts();
+}
+function refreshHeader(){
+  const total=sum(items.map(x=>toCurr(Number(x.amount||0), x.curr||'ALL', viewCurr)));
+  const today=sum(items.filter(isToday).map(x=>toCurr(Number(x.amount||0),(x.curr||'ALL'),viewCurr)));
+  const month=sum(items.filter(isThisMonth).map(x=>toCurr(Number(x.amount||0),(x.curr||'ALL'),viewCurr)));
+  const bal=Number(profile.balances?.[viewCurr]||0);
+  const remain=bal - total;
+  setText('hdrText', activeTab==='debts'?'Borxhet':'Bilanci');
+  setText('hdrTotal', fmtNum(remain));
+  setText('hdrCurr', viewCurr);
+  setText('s1name', activeTab==='debts'?'📊 Gjithsej':'📊 Totale');
+  setText('stat1', fmtNum(total));
+  setText('stat2', fmtNum(today));
+  setText('stat3', fmtNum(month));
+}
+
+/* ---------- Expenses ---------- */
+async function loadExpenses(){
+  const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
+  if(error){console.warn(error);items=[];} else items=data||[];
+  drawHome(); drawAll(); refreshHeader();
+}
+async function saveExpense(){
+  const name=document.getElementById('mName').value.trim();
+  const amt=parseFloat(document.getElementById('mAmt').value);
+  const cat=document.getElementById('mCat').value;
+  const d=document.getElementById('mDate').value;
+  if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}
+  const payload={user_id:sessionUser.id,name,amount:amt,category:cat,d,curr:profile.default_currency||'ALL'};
+  // Eski şema için fallback (curr sütunu yoksa)
+  let resp=await supabase.from('expenses').insert(payload).select().single();
+  if(resp.error && /column .*curr/.test(resp.error.message||'')){
+    const {curr, ...noCurr}=payload; resp=await supabase.from('expenses').insert(noCurr).select().single();
+  }
+  if(resp.error){alert('Gabim: '+resp.error.message);return;}
+  items.unshift(resp.data);
+  document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');
+  drawHome(); drawAll(); refreshHeader();
+}
+async function delExpense(id){
+  if(!confirm('Fshini këtë shpenzim?'))return;
+  const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);
+  if(error){alert('Gabim: '+error.message);return;}
+  items=items.filter(x=>x.id!==id); drawHome(); drawAll(); refreshHeader();
+}
 function drawHome(){
+  const recent=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
   const list=document.getElementById('recentList'); list.innerHTML='';
-  const rec=[...items].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,8);
-  rec.forEach(x=>list.appendChild(rowExpense(x)));
-  document.getElementById('emptyHome').style.display=rec.length?'none':'block';
+  document.getElementById('emptyHome').style.display=recent.length?'none':'block';
+  recent.forEach(x=>list.appendChild(rowExpense(x)));
 }
 function drawAll(){
-  const q=(document.getElementById('q')?.value||'').toLowerCase(), cat=document.getElementById('fCat')?.value||'';
-  let arr=[...items]; if(q) arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q)); if(cat) arr=arr.filter(x=>x.category===cat);
-  const box=document.getElementById('allList'); box.innerHTML=''; arr.forEach(x=>box.appendChild(rowExpense(x)));
+  const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  const cat=document.getElementById('fCat').value;
+  let arr=[...items].sort((a,b)=>b.d.localeCompare(a.d));
+  if(q)arr=arr.filter(x=>x.name.toLowerCase().includes(q)||(x.category||'').toLowerCase().includes(q));
+  if(cat)arr=arr.filter(x=>x.category===cat);
+  const box=document.getElementById('allList'); box.innerHTML='';
+  arr.forEach(x=>box.appendChild(rowExpense(x)));
+}
+function rowExpense(x){
+  const el=document.createElement('div'); el.className='item';
+  const ic=document.createElement('div'); ic.className='ic'; ic.textContent=emojiFor(x.category);
+  const meta=document.createElement('div'); meta.className='meta';
+  const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
+  const s=document.createElement('div'); s.className='s'; s.textContent=[x.category, fmtDate(x.d)].filter(Boolean).join(' • ');
+  meta.appendChild(t); meta.appendChild(s);
+  const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmtNum(toCurr(x.amount, x.curr||'ALL', viewCurr))+' '+viewCurr;
+  const del=document.createElement('button'); del.className='del'; del.innerHTML='🗑️'; del.onclick=()=>delExpense(x.id);
+  el.append(ic,meta,amt,del); return el;
 }
 
-/* Borçlar */
-async function loadDebts(){const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}); if(error){alert('Hata (debts): '+error.message);return;} debts=data||[]; drawDebts(); refreshHeader(); drawWallets();}
-async function saveDebt(){const party=document.getElementById('dParty').value.trim(), name=document.getElementById('dName').value.trim(), amt=parseFloat(document.getElementById('dAmt').value), due=document.getElementById('dDate').value||null;
-  if(!party||!amt){alert('Taraf ve tutar gerekir');return;} const curr=currentCurr(); const row={user_id:sessionUser.id,party,name,amount:amt,kind:'borrow',due,status:'open',curr};
-  const {data,error}=await supabase.from('debts').insert(row).select().single(); if(error){alert('Hata: '+error.message);return;} debts.unshift(data); closeModal('Debt'); drawDebts(); refreshHeader(); drawWallets();}
-async function delDebt(id){if(!confirm('Silinsin mi?'))return; await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id); debts=debts.filter(x=>x.id!==id); drawDebts(); refreshHeader(); drawWallets();}
-async function payDebt(id){if(!confirm('Ödendi işaretlensin?'))return; const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single(); if(!error){debts=debts.map(x=>x.id===id?data:x); drawDebts(); refreshHeader();}}
-function drawDebts(){
-  const box=document.getElementById('debtList'); box.innerHTML='';
-  debts.forEach(x=>{
-    const el=document.createElement('div'); el.className='item';
-    el.innerHTML=`<div class="ic">${x.status==='paid'?'✅':'💳'}</div>
-      <div class="meta"><div class="t">${x.party}<span class="badge">${x.curr||'ALL'}</span></div>
-      <div class="s">${x.name||''} ${x.due?('• Afat: '+new Date(x.due+'T00:00:00').toLocaleDateString('sq-AL')):''}</div></div>
-      <div class="amt">${money(x.amount,x.curr)}</div>
-      ${x.status==='open'
-        ? <button class="btnS" onclick="payDebt('${x.id}')">Paguaj</button>
-        : <span class="badge">Paguar</span>}
-      <button class="btnS" onclick="delDebt('${x.id}')">Sil</button>`;
-    box.appendChild(el);
-  });
-  document.getElementById('emptyDebts').style.display=debts.length?'none':'block';
+/* ---------- Debts ---------- */
+async function loadDebts(){
+  const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
+  debts=error?[]:(data||[]); drawDebts(); refreshHeader();
 }
-
-/* Cüzdanlar & özetler */
-function spentByCurrency(){
-  const map={}; items.forEach(x=>{const c=x.curr||'ALL'; map[c]=(map[c]||0)+Number(x.amount||0)}); return map;
-}
-function walletValue(currency){ // bakiye - gider
-  const bal=Number((profile.balances||{})[currency]||0);
-  const sp =Number(spentByCurrency()[currency]||0);
-  return bal - sp;
-}
-function drawWallets(){
-  const box=document.getElementById('wallets'); box.innerHTML='';
-  const sp=spentByCurrency();
-  ALLCURR.forEach(c=>{
-    const el=document.createElement('div'); el.className='item';
-    const bal=Number((profile.balances||{})[c]||0);
-    const rem=walletValue(c);
-    el.innerHTML=`<div class="ic">👛</div>
-      <div class="meta"><div class="t">${c} cüzdanı</div><div class="s">Bakiye: ${nf().format(bal)} • Harcama: ${nf().format(sp[c]||0)}</div></div>
-      <div class="amt">${nf().format(rem)} ${c}</div>`;
-    box.appendChild(el);
-  });
-}
-function drawWalletChips(){
-  const row=document.getElementById('walletChips'); row.innerHTML='';
-  ALLCURR.forEach(c=>{const b=document.createElement('button');b.className='chip'; if(currentCurr()===c) b.classList.add('active');
-    b.innerHTML=<span class="msr">account_balance_wallet</span>${c};
-    b.onclick=()=>{tempCurr=c; document.getElementById('balInput').value=Number((profile.balances||{})[currentCurr()]||0); document.getElementById('currTag').textContent=currentCurr(); drawWalletChips(); refreshHeader();};
-    row.appendChild(b);
-  });
-}
-
-/* Başlık ve istatistikler */
-function refreshHeader(){
-  const curr=currentCurr();
-  // ana başlık net = bakiye(curr) - harcamalar(curr)
-  const net=walletValue(curr);
-  document.getElementById('hdrVal').textContent = nf().format(net)+' '+curr;
-  document.getElementById('hdrSub').textContent = 'Cüzdan: '+curr+' • format '+(profile.num_format==='us'?'23,456.78':'23.456,78');
-  document.getElementById('who').textContent = emailShort(sessionUser?.email);
-  // istatistikler (sadece curr'e ait)
-  const today=items.filter(x=>x.curr===curr && isToday(x)).reduce((s,a)=>s+Number(a.amount||0),0);
-  const month=items.filter(x=>x.curr===curr && isThisMonth(x)).reduce((s,a)=>s+Number(a.amount||0),0);
-  const total=items.filter(x=>x.curr===curr).reduce((s,a)=>s+Number(a.amount||0),0);
-  document.getElementById('stat1').textContent=money(total,curr);
-  document.getElementById('stat2').textContent=money(today,curr);
-  document.getElementById('stat3').textContent=money(month,curr);
-  // toplam net (tüm cüzdanların seçili PB'ye çevrilip toplanması)
-  let tot=0; ALLCURR.forEach(c=>{tot += convert(walletValue(c), c, curr);});
-  document.getElementById('totalNet').textContent=nf().format(tot)+' '+curr;
-}
-
-/* Modal yardımcıları */
-function openModal(tag){document.getElementById('modal'+tag).classList.add('on')}
-function closeModal(tag){document.getElementById('modal'+tag).classList.remove('on')}
-function switchTab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); document.querySelectorAll('.nav .btn').forEach(x=>x.classList.remove('active')); document.querySelector(.nav .btn[data-tab="${t}"]).classList.add('active');}
-
-/* Başlangıç */
-document.addEventListener('DOMContentLoaded', async () => {
-  // Emoji grid
-  drawEmojiGrid();
-  // FAB: home→harcama, debts→borç
-  document.getElementById('openAdd').addEventListener('click',()=>{const t=document.querySelector('.nav .btn.active').dataset.tab; if(t==='debts') openModal('Debt'); else openModal('Exp');});
-  // Tarih default
-  document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
-  document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
-
-  // Auth session
-  const s=await supabase.auth.getSession(); if(s.data.session?.user){sessionUser=s.data.session.user; showApp();} else showGate();
-  supabase.auth.onAuthStateChange(async (_e,session)=>{if(session?.user){sessionUser=session.user; showApp();} else showGate();});
-
-  async function showApp(){
-    document.getElementById('gate').style.display='none';
-    document.getElementById('app').style.display='block';
-    document.getElementById('navbar').style.display='grid';
-    await ensureProfile(); await ensureCategoriesSeed(); await loadCategories(); await loadExpenses(); await loadDebts(); await loadFx();
+async function saveDebt(){
+  const party=document.getElementById('dParty').value.trim();
+  const name=(document.getElementById('dName').value||'').trim();
+  const amt=parseFloat(document.getElementById('dAmt').value);
+  const kind=document.getElementById('dKind').value;
+  const due=document.getElementById('dDate').value||null;
+  if(!party||!amt||isNaN(amt)){alert('Shkruaj Palën (Emri) dhe shumën.');return;}
+  const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open',curr:profile.default_currency||'ALL'};
+  let resp=await supabase.from('debts').insert(payload).select().single();
+  if(resp.error && /column .*curr/.test(resp.error.message||'')){
+    const {curr, ...noCurr}=payload; resp=await supabase.from('debts').insert(noCurr).select().single();
   }
-  function showGate(){document.getElementById('gate').style.display='grid';document.getElementById('app').style.display='none';document.getElementById('navbar').style.display='none';}
-});
-function swapAuth(w){document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');document.getElementById('authLogin').style.display=w==='login'?'block':'none';document.getElementById('authReg').style.display=w==='reg'?'block':'none';}
+  if(resp.error){alert('Gabim: '+resp.error.message);return;}
+  debts.unshift(resp.data);
+  document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';document.getElementById('dKind').value='borrow';
+  closeModal('Debt'); drawDebts(); refreshHeader();
+}
+async function delDebt(id){
+  if(!confirm('Fshini këtë borxh?'))return;
+  const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
+  if(error){alert('Gabim: '+error.message);return;}
+  debts=debts.filter(x=>x.id!==id); drawDebts(); refreshHeader();
+}
+async function payDebt(id){
+  if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
+  const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
+  if(error){alert('Gabim: '+error.message);return;}
+  debts=debts.map(x=>x.id===id?data:x); drawDebts(); refreshHeader();
+}
+function drawDebts(kindFilter=''){
+  const q=(document.getElementById('dq').value||'').trim().toLowerCase();
+  let arr=[...debts];
+  if(q)arr=arr.filter(x=>(x.party||'').toLowerCase().includes(q)||(x.name||'').toLowerCase().includes(q));
+  if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
+
+  const box=document.getElementById('debtList'); box.innerHTML='';
+  document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
+
+  arr.forEach(x=>{
+    const el=document.createElement('div'); el.className='item';
+    const ic=document.createElement('div'); ic.className='ic'; ic.innerHTML=(x.status==='paid')?'✅':'💳';
+    const meta=document.createElement('div'); meta.className='meta';
+    const t=document.createElement('div'); t.className='t'; t.textContent=x.party || '(pa emër)';
+    const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua']; if(x.name) bits.push(x.name); if(x.due) bits.push('Afati: '+fmtDate(x.due));
+    const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
+    meta.appendChild(t); meta.appendChild(s);
+    const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
+    const amt=document.createElement('div'); amt.className='amt';
+    amt.textContent=fmtNum(toCurr(x.amount, x.curr||'ALL', viewCurr))+' '+viewCurr;
+    right.appendChild(amt);
+    if(x.status==='open'){
+      const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';
+      pay.onclick=()=>payDebt(x.id); right.appendChild(pay);
+    }else{
+      const badge=document.createElement('span'); badge.className='chip'; badge.textContent='Paguar'; right.appendChild(badge);
+    }
+    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
+    el.append(ic,meta,right,del); box.appendChild(el);
+  });
+}
+
+/* ---------- Helpers ---------- */
+function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
+function isThisMonth(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
+function fmtDate(iso){const d=new Date((iso||todayISO())+'T00:00:00');return d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
+
+/* ---------- End ---------- */
 </script>
+
 </body>
 </html>
