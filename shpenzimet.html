@@ -165,6 +165,10 @@ nav.nav{
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
     <div class="big"><span id="hdrTotal">0</span></div>
     <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
+    <!-- YENİ: tüm bakiyelerin toplamı -->
+    <div class="muted" style="margin-top:2px" id="hdrAll">
+      Bilanci i të gjitha monedhave në <b id="hdrAllC">ALL</b>: <span id="hdrAllV">0</span>
+    </div>
 
     <!-- Para birimi şeridi (anlık görüntüleme) -->
     <div id="currStrip" class="curr-strip"></div>
@@ -329,11 +333,11 @@ const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ========= GLOBAL STATE ========= */
+/* ========= GLOBAL ========= */
 let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
-let rates = {ALL:1};                        // kurlar
+let rates = {ALL:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
-let viewCurrency = null;                    // anlık görüntüleme
+let viewCurrency = null;
 
 /* ========= DOM READY ========= */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -341,8 +345,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 💳 💎 🎓 📚 🔌 🔋 👟 🍼 🧻 🧴 🐶 🐱'.split(' ')
     .forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};document.getElementById('emojiGrid').appendChild(b)});
 
-  document.getElementById('loginEmail').placeholder='emri@gmail.com';
-  document.getElementById('regEmail').placeholder='emri@gmail.com';
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
@@ -368,7 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadRates();
 });
 
-/* ========= BOOTSTRAP AFTER LOGIN ========= */
+/* ========= BOOTSTRAP ========= */
 async function bootstrap(){
   await ensureProfile();
   await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
@@ -385,13 +387,12 @@ async function registerUser(){const email=document.getElementById('regEmail').va
 async function login(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;const box=document.getElementById('authMsg');box.textContent='';const {error}=await supabase.auth.signInWithPassword({email,password:pass});if(error) box.textContent='Gabim: '+error.message}
 async function logout(){await supabase.auth.signOut()}
 
-/* ========= NAV: global switchTab ========= */
+/* ========= NAV ========= */
 window.activeTab = 'home';
 window.switchTab = function(name){
   document.querySelectorAll('.tab').forEach(sec=>sec.classList.toggle('active', sec.id === 'tab-'+name));
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab === name));
   activeTab = name;
-  // Ayarlarda istatistik gizle
   document.getElementById('statsRow').style.display = (name==='settings')?'none':'flex';
   window.scrollTo({top:0,behavior:'smooth'});
 };
@@ -421,7 +422,7 @@ async function ensureProfile(){
   refreshHeader();
 }
 async function savePrefs(){
-  const sel=document.getElementById('setCurr').value.split(' — ')[0]; // "ALL — Albania Lek" -> "ALL"
+  const sel=document.getElementById('setCurr').value.split(' — ')[0];
   const fmt=document.getElementById('setFmt').value;
   const {data,error}=await supabase.from('profiles').update({default_currency:sel,num_format:fmt}).eq('user_id',sessionUser.id).select().single();
   document.getElementById('prefsMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
@@ -500,7 +501,7 @@ function emojiFor(catName){
   return (hit?hit.emoji:'💸');
 }
 
-/* ========= Kurlar & şerit ========= */
+/* ========= Kurlar ========= */
 async function loadRates(){
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
@@ -541,16 +542,29 @@ function doConvert(){
 /* ========= Başlık/istatistikler ========= */
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
+
+  // Toplam harcama (seçili para birimine çevrilmiş)
   const total = (items||[]).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
   const today = (items||[]).filter(isToday).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
   const month = (items||[]).filter(isThisMonth).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
-  const balMap = profile?.balances || {}; const balInTo = Number(balMap[to]||0);
-  const remain = balInTo - total;
+
+  // YENİ: tüm bakiyeleri seçili para birimine çevirip topla
+  const balMap = profile?.balances || {};
+  const allBalTo = Object.entries(balMap).reduce((s,[c,a]) => s + fx(Number(a||0), c, to), 0);
+
+  const remain = allBalTo - total;
+
   setText('hdrTotal', `${fmt(remain)} ${to}`);
   setText('stat1', `${fmt(total)} ${to}`); setText('stat2', `${fmt(today)} ${to}`); setText('stat3', `${fmt(month)} ${to}`);
+
   document.getElementById('hdrIcon').textContent = (activeTab==='debts')?'💳':'💰';
   document.getElementById('hdrText').textContent = (activeTab==='debts')?'Borxhet':'Bilanci';
   document.getElementById('hdrSub').textContent  = (activeTab==='debts')?'Detyrimet & Më detyrohen':'Gjendja − Shpenzimet (totale)';
+
+  // Ekrandaki bilgilendirme satırı
+  setText('hdrAllC', to);
+  setText('hdrAllV', `${fmt(allBalTo)} ${to}`);
+
   renderCurrStrip();
 }
 
@@ -567,7 +581,6 @@ async function saveExpense(){
   const d=document.getElementById('mDate').value;
   if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}
   const curr = profile?.default_currency || 'ALL';
-  // Kolon yoksa fallback için iki deneme
   let resp = await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d,curr}).select().single();
   if(resp.error && /column.*curr/i.test(resp.error.message)){
     resp = await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
