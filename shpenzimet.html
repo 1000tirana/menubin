@@ -1,380 +1,501 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Normal Holding • Portofoli</title>
-<meta name="theme-color" content="#0d1117">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cüzdanlar (ALL/EUR/USD/TRY)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d1117; --card:#161b22; --border:#30363d;
-  --text:#c9d1d9; --muted:#8b949e; --ok:#2ea043; --ok2:#238636;
-  --chip:#21262d; --blue:#1f6feb; --danger:#f85149;
-  --shadow:0 10px 30px rgba(0,0,0,.35);
-  --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
-}
-*{box-sizing:border-box} html,body{height:100%;background:var(--bg);overflow-x:hidden}
-body{margin:0;color:var(--text);font-family:ui-rounded,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial}
-
-.wrap{display:flex;flex-direction:column;min-height:100vh;padding-bottom:calc(100px + var(--safe-bottom))}
-header{background:linear-gradient(135deg,var(--ok2) 0%, var(--ok) 100%);color:#fff;
-  border-bottom-left-radius:22px;border-bottom-right-radius:22px;
-  padding:calc(10px + var(--safe-top)) 16px 12px; box-shadow:0 10px 28px rgba(35,134,54,.35)}
-header .top{display:flex;justify-content:space-between;align-items:center}
-header .big{font-size:36px;font-weight:900;margin-top:8px}
-header .sub{opacity:.85}
-.row{display:flex;gap:10px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:12px}
-.stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
-.stat{flex:1} .muted{color:var(--muted)}
-main{padding:0 12px 18px}
-h3{margin:10px 0}
-
-.list{display:flex;flex-direction:column;gap:10px}
-.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:12px}
-.ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:26px;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
-  color:#0d1117;border:1px solid rgba(255,255,255,.06);box-shadow:inset 0 1px 4px rgba(0,0,0,.6),0 6px 14px rgba(0,0,0,.4)}
-.meta{flex:1} .meta .t{font-weight:800;color:#e6edf3} .meta .s{font-size:12px;color:var(--muted)}
-.amt{font-weight:900}
-.del{border:none;background:transparent;color:var(--danger);font-size:20px;cursor:pointer}
-
-.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--chip);color:#e6edf3;font-weight:800;cursor:pointer}
-.btnP{background:linear-gradient(180deg,var(--ok) 0%, var(--ok2) 100%);border-color:#2ea043;color:#fff}
-input,select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);font-size:16px}
-
-.chips{display:flex;gap:8px;margin:8px 0}
-.chips button{border:1px solid var(--border);background:var(--chip);color:#e6edf3;border-radius:999px;padding:8px 14px;font-weight:900;cursor:pointer}
-.chips button.active{background:#1f6feb}
-
-nav.nav{
-  --fab-gap: 110px;
-  position:fixed;left:0;right:0;bottom:0;height:calc(80px + var(--safe-bottom));
-  padding:0 12px var(--safe-bottom);background:var(--card);border-top:1px solid var(--border);
-  box-shadow:0 -10px 30px rgba(0,0,0,.35);display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;z-index:2000
-}
-.nav .btnTab{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none}
-.nav .btnTab.active{color:#79c0ff}
-.nav .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);color:#0d1117;border:1px solid rgba(255,255,255,.06)}
-.fab{position:absolute;left:50%;transform:translateX(-50%);top:-26px;width:64px;height:64px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);border:1px solid rgba(255,255,255,.06);display:grid;place-items:center;font-size:32px;box-shadow:0 14px 26px rgba(0,0,0,.5)}
-
-.tab{display:none}.tab.active{display:block}
-
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
-.modal.on{display:grid}
-.sheet{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%}
-@media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
+  body{background:#0b0e13;color:#e8f0ff}
+  .card{background:#121826;border-color:#1f2a44}
+  .nav-pills .nav-link.active{background:#2b3a67}
+  .sticky-top-blur{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,14,19,.85)}
+  .small-muted{opacity:.8;font-size:.9rem}
+  .table td,.table th{color:#e8f0ff;border-color:#223}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="top"><div style="font-weight:900">Normal Holding</div><div id="who" class="sub">@user</div></div>
-    <div style="font-size:22px;font-weight:900">💼 Portofoli</div>
-    <div class="big"><span id="hdrTotal">0</span> <span id="hdrCurr">ALL</span></div>
-    <div id="rateLine" class="sub">—</div>
-    <div class="chips">
-      <button class="chip" data-curr="ALL">ALL</button>
-      <button class="chip" data-curr="EUR">EUR</button>
-      <button class="chip" data-curr="USD">USD</button>
-      <button class="chip" data-curr="TRY">TRY</button>
+<div class="container py-3">
+  <div class="sticky-top-blur">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h1 class="h5 my-2">💼 Cüzdanlar</h1>
+      <div>
+        <select id="langSel" class="form-select form-select-sm d-inline-block" style="width:auto;">
+          <option value="sq">Shqip</option><option value="tr">Türkçe</option><option value="en">English</option><option value="it">Italiano</option>
+        </select>
+        <button id="btnLogout" class="btn btn-sm btn-outline-light ms-2" style="display:none">Çıkış</button>
+      </div>
     </div>
-  </header>
 
-  <div class="stats">
-    <div class="card stat"><div class="muted">Shpenzime totale</div><div style="font-weight:900;font-size:18px" id="kpiTotal">0</div></div>
-    <div class="card stat"><div class="muted">Sot</div><div style="font-weight:900;font-size:18px" id="kpiToday">0</div></div>
-    <div class="card stat"><div class="muted">Këtë muaj</div><div style="font-weight:900;font-size:18px" id="kpiMonth">0</div></div>
+    <div class="card mb-2">
+      <div class="card-body py-2 d-flex flex-wrap align-items-center justify-content-between">
+        <div>
+          <span class="small-muted">Varsayılan Kur:</span>
+          <span id="baseCur" class="badge bg-primary ms-1">ALL</span>
+          <span class="ms-3 small-muted">Kurlar:</span>
+          <span id="fxSpan">—</span>
+        </div>
+        <div class="fw-bold">
+          Toplam: <span id="grandTotal">—</span>
+        </div>
+      </div>
+    </div>
+
+    <ul class="nav nav-pills gap-2 mb-3" id="quickWallets"></ul>
   </div>
 
-  <main>
-    <section id="tab-home" class="tab active">
-      <h3>🕒 Të fundit</h3>
-      <div id="recentList" class="list"></div>
-      <div class="muted" id="emptyHome" style="text-align:center;margin-top:10px">Asgjë ende.</div>
-    </section>
-
-    <section id="tab-settings" class="tab">
-      <h3>⚙️ Cilësime</h3>
-      <div class="card">
-        <div class="row">
-          <div style="flex:1">
-            <label>Gjuha</label>
-            <select id="prefLang">
-              <option value="sq">Shqip</option><option value="tr">Türkçe</option><option value="en">English</option><option value="it">Italiano</option>
-            </select>
-          </div>
-          <div style="flex:1">
-            <label>Monedha default</label>
-            <select id="prefCurr">
-              <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
-            </select>
-          </div>
-          <div style="flex:1">
-            <label>Formati i numrave</label>
-            <select id="prefFmt"><option value="eu">23.456,78</option><option value="us">23,456.78</option></select>
+  <!-- AUTH -->
+  <div id="authView" class="my-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card"><div class="card-header"><b>Giriş</b></div>
+          <div class="card-body">
+            <input id="loginEmail" class="form-control mb-2" type="email" placeholder="email@example.com">
+            <input id="loginPass" class="form-control mb-3" type="password" placeholder="••••••••">
+            <button id="btnLogin" class="btn btn-primary w-100">Giriş</button>
           </div>
         </div>
-        <div class="row" style="margin-top:10px"><button class="btn btnP" id="savePrefs">Ruaj</button></div>
-        <div id="prefMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      </div>
+      <div class="col-md-6">
+        <div class="card"><div class="card-header"><b>Kayıt Ol</b></div>
+          <div class="card-body">
+            <input id="regEmail" class="form-control mb-2" type="email" placeholder="email@example.com">
+            <input id="regPass" class="form-control mb-3" type="password" placeholder="••••••••">
+            <button id="btnRegister" class="btn btn-success w-100">Kayıt Ol</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="appView" style="display:none;">
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabDash">Özet</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabTx">Hareketler</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabDebt">Borç</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabCats">Kategoriler</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabSettings">Ayarlar</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- DASH -->
+      <div id="tabDash" class="tab-pane fade show active">
+        <div class="row g-3">
+          <div class="col-md-3"><div class="card"><div class="card-body"><div class="small-muted">ALL</div><div id="balALL" class="h5">—</div></div></div></div>
+          <div class="col-md-3"><div class="card"><div class="card-body"><div class="small-muted">EUR</div><div id="balEUR" class="h5">—</div></div></div></div>
+          <div class="col-md-3"><div class="card"><div class="card-body"><div class="small-muted">USD</div><div id="balUSD" class="h5">—</div></div></div></div>
+          <div class="col-md-3"><div class="card"><div class="card-body"><div class="small-muted">TRY</div><div id="balTRY" class="h5">—</div></div></div></div>
+        </div>
       </div>
 
-      <div class="card" style="margin-top:12px">
-        <label>Gjendja e kuletës (ALL/EUR/USD/TRY sipas zgjedhjes poshtë)</label>
-        <div class="row" style="margin-top:6px">
-          <select id="balCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
-          <input id="balAmt" type="number" inputmode="decimal" placeholder="p.sh. 5000">
-        </div>
-        <div class="row" style="margin-top:8px"><button class="btn btnP" id="saveBalance">Ruaj gjendjen</button></div>
-        <div id="balMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      <!-- TRANSACTIONS (expenses) -->
+      <div id="tabTx" class="tab-pane fade">
+        <div class="card mb-3"><div class="card-body">
+          <div class="row g-2">
+            <div class="col-md-3">
+              <select id="txType" class="form-select">
+                <option value="expense" selected>Gider</option>
+                <option value="income">Gelir</option>
+              </select>
+            </div>
+            <div class="col-md-3"><input id="txAmount" class="form-control" type="number" step="0.01" placeholder="0.00"></div>
+            <div class="col-md-2">
+              <select id="txCur" class="form-select"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
+            </div>
+            <div class="col-md-4"><input id="txName" class="form-control" placeholder="Açıklama"></div>
+            <div class="col-md-3"><input id="txDate" class="form-control" type="date"></div>
+            <div class="col-md-3"><button id="btnAddTx" class="btn btn-primary w-100">Ekle</button></div>
+          </div>
+        </div></div>
+
+        <div class="card"><div class="card-body">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>Tarih</th><th>Açıklama</th><th>Tutar</th><th></th></tr></thead>
+            <tbody id="txTable"></tbody>
+          </table>
+        </div></div>
       </div>
-    </section>
-  </main>
+
+      <!-- DEBTS -->
+      <div id="tabDebt" class="tab-pane fade">
+        <div class="card mb-3"><div class="card-body">
+          <div class="row g-2">
+            <div class="col-md-3">
+              <select id="debtDir" class="form-select"><option value="lend">Borç verdim</option><option value="borrow">Borç aldım</option></select>
+            </div>
+            <div class="col-md-3"><input id="debtPerson" class="form-control" placeholder="Ad Soyad"></div>
+            <div class="col-md-2"><input id="debtAmt" class="form-control" type="number" step="0.01" placeholder="0.00"></div>
+            <div class="col-md-2">
+              <select id="debtCur" class="form-select"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
+            </div>
+            <div class="col-md-2"><button id="btnAddDebt" class="btn btn-warning w-100">Ekle</button></div>
+            <div class="col-12"><input id="debtNote" class="form-control" placeholder="Not"></div>
+          </div>
+        </div></div>
+
+        <div class="row g-3">
+          <div class="col-md-6"><div class="card"><div class="card-header"><b>Açık Borçlar</b></div><div class="card-body"><div id="openDebts"></div></div></div></div>
+          <div class="col-md-6"><div class="card"><div class="card-header"><b>Kapanan Borçlar</b></div><div class="card-body"><div id="closedDebts"></div></div></div></div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div id="tabCats" class="tab-pane fade">
+        <div class="card mb-3"><div class="card-body row g-2">
+          <div class="col-md-6"><input id="catName" class="form-control" placeholder="Kategori adı"></div>
+          <div class="col-md-3">
+            <select id="catKind" class="form-select"><option value="expense">Gider</option><option value="income">Gelir</option></select>
+          </div>
+          <div class="col-md-3"><button id="btnAddCat" class="btn btn-primary w-100">Ekle</button></div>
+          <div class="col-md-3 mt-2"><button id="btnSeedCats" class="btn btn-outline-info w-100">156 Yükle</button></div>
+        </div></div>
+        <div class="card"><div class="card-body">
+          <table class="table table-sm"><thead><tr><th>Ad</th><th>Tür</th><th></th></tr></thead><tbody id="catsTable"></tbody></table>
+        </div></div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="tabSettings" class="tab-pane fade">
+        <div class="card"><div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Varsayılan Dil</label>
+              <select id="setLang" class="form-select">
+                <option value="sq">Shqip</option><option value="tr">Türkçe</option><option value="en">English</option><option value="it">Italiano</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Varsayılan Para Birimi</label>
+              <select id="setCur" class="form-select">
+                <option value="ALL">ALL</option><option value="EUR">EUR</option><option value="USD">USD</option><option value="TRY">TRY</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Sayı Biçimi</label>
+              <select id="setNumFmt" class="form-select">
+                <option value="eu">1.234,56</option><option value="us">1,234.56</option>
+              </select>
+            </div>
+            <div class="col-12 d-grid"><button id="btnSaveSettings" class="btn btn-success">Kaydet</button></div>
+          </div>
+          <div class="mt-2 small-muted">Üstteki hızlı cüzdan sekmeleri kalıcı değil; kalıcı olan burada seçtiklerin.</div>
+        </div></div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<nav class="nav">
-  <a class="btnTab active" data-go="home"><span class="ico">🏠</span><span>Kreu</span></a>
-  <a class="btnTab" data-go="settings"><span class="ico">⚙️</span><span>Cilësime</span></a>
-  <button class="fab" id="openAdd">＋</button>
-  <a class="btnTab" data-go="debts" id="goDebts"><span class="ico">💳</span><span>Borxhet</span></a>
-  <a class="btnTab" data-go="list"><span class="ico">📋</span><span>Lista</span></a>
-</nav>
-
-<!-- Modal: Shpenzim (kısa) -->
-<div class="modal" id="mExp"><div class="sheet">
-  <h3>➕ Shto shpenzim</h3>
-  <div class="row"><input id="eName" placeholder="p.sh. Karburant"><input id="eAmt" type="number" inputmode="decimal" placeholder="0"></div>
-  <div class="row" style="margin-top:8px">
-    <select id="eCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
-    <input id="eDate" type="date">
-  </div>
-  <div class="row" style="margin-top:8px"><button class="btn" onclick="closeM('mExp')">Mbyll</button><button class="btn btnP" id="btnSaveExp">Ruaj</button></div>
-</div></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-/*** 0) Supabase ***/
-const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
-const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+/* ================= CONFIG ================= */
+const SUPABASE_URL = 'https://<senin-projen>.supabase.co';
+const SUPABASE_ANON_KEY = '<senin-anon-key>';
+const supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/*** 1) Durum ***/
-let me=null, profile={default_currency:'ALL', num_format:'eu', lang:'sq', balances:{}};
-let items=[]; // expenses
-let viewCurr=null; // ALL/EUR/USD/TRY – üstteki çiplerle geçici görünüm
-let rates={ALL:1, EUR:1, USD:1, TRY:1}; // ALL bazlı oranlar (ALL=1)
+const CURS = ["ALL","EUR","USD","TRY"];
+let session=null, profile=null; // profile = public.profiles row
+let expenses=[], cats=[], debtsOpen=[], debtsClosed=[];
+let settings = { default_currency:"ALL", lang:"sq", num_format:"eu" };
+let fx = { base:"ALL", rates:{ALL:1,EUR:1,USD:1,TRY:1}, t:0 };
 
-/*** 2) Yardımcılar ***/
-const $=s=>document.querySelector(s);
-const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v}
-const fmt=(n, curr)=> {
-  const nf = profile.num_format==='us' ? 'en-US' : 'de-DE';
-  return Number(n||0).toLocaleString(nf,{minimumFractionDigits:2,maximumFractionDigits:2}) + (curr?(' '+curr):'');
+/* ================= HELPERS ================= */
+const nf = (n, c, fmt) => new Intl.NumberFormat(undefined, { style:'currency', currency:c }).format(Number(n||0));
+const asDate = d => (d||new Date().toISOString().slice(0,10));
+
+function toBase(amt, cur, base){
+  if(cur===base) return amt;
+  const rate = fx.rates[cur]; // 1 base = rate cur
+  return amt / (rate || 1);   // cur → base
 }
-const isToday = iso => { const d=new Date(iso), t=new Date(); return d.getFullYear()==t.getFullYear() && d.getMonth()==t.getMonth() && d.getDate()==t.getDate() }
-const isThisMonth = iso => { const d=new Date(iso), t=new Date(); return d.getFullYear()==t.getFullYear() && d.getMonth()==t.getMonth() }
-
-/*** 3) Kur – frankfurter.app (ücretsiz, anahtarsız). ALL bazlı çekeriz. ***/
-async function loadRates(){
-  // Cache (1 saat)
-  const cache=JSON.parse(localStorage.getItem('rates_cache')||'{}');
-  if(cache.t && (Date.now()-cache.t)<3600*1000){ rates=cache.r; drawHeader(); return }
-  // ALL -> EUR,USD,TRY oranlarını çek
-  // Frankfurter baz para birimini desteklemiyorsa zincirleme hesaplarız:
-  // EUR tabanını çek -> ALL, USD, TRY oranları; sonra ALL bazına çeviririz.
-  const res = await fetch('https://api.frankfurter.app/latest?from=EUR&to=ALL,USD,TRY').then(r=>r.json()).catch(()=>null);
-  if(res && res.rates){
-    // EUR->ALL = x, EUR->USD = y, EUR->TRY = z
-    // ALL bazına çevirmek için: 1 ALL = 1/(EUR->ALL) EUR; 1 ALL = (USD/EUR) / (ALL/EUR) USD vb.
-    const eur_all = res.rates.ALL;              // 1 EUR = eur_all ALL
-    const eur_usd = res.rates.USD;              // 1 EUR = eur_usd USD
-    const eur_try = res.rates.TRY;              // 1 EUR = eur_try TRY
-    rates.ALL = 1;
-    rates.EUR = 1/eur_all;                      // 1 ALL = ? EUR
-    rates.USD = (eur_usd/eur_all);              // 1 ALL = ? USD
-    rates.TRY = (eur_try/eur_all);              // 1 ALL = ? TRY
-    localStorage.setItem('rates_cache', JSON.stringify({t:Date.now(), r:rates}));
-  }
-  drawHeader();
-}
-
-/*** 4) Auth & yüklemeler ***/
-document.addEventListener('DOMContentLoaded', async ()=>{
-  const {data:{session}} = await db.auth.getSession();
-  if(!session){ await db.auth.signInWithPassword({email:'demo@demo.com', password:'demodemo'}).catch(()=>{}); }
-  const s2 = (await db.auth.getSession()).data.session;
-  me = s2?.user || null;
-  $('#who').textContent = me?.email?.split('@')[0] || '@user';
-
-  await ensureProfile();
-  await Promise.all([loadExpenses(), loadRates()]);
-  bindUI();
-});
 
 async function ensureProfile(){
-  let {data, error} = await db.from('profiles').select('*').eq('user_id', me.id).single();
-  if(!data){
-    const ins = await db.from('profiles').insert({user_id:me.id}).select().single();
-    data = ins.data;
+  // profiles satırın yoksa oluştur
+  const { data:prof } = await supa.from('profiles').select('*').eq('user_id', session.user.id).maybeSingle();
+  if(!prof){
+    await supa.from('profiles').insert({
+      user_id: session.user.id, default_currency:'ALL', lang:'sq', num_format:'eu', balances: {}
+    });
+    settings = { default_currency:'ALL', lang:'sq', num_format:'eu' };
+  } else {
+    settings = {
+      default_currency: prof.default_currency || 'ALL',
+      lang: prof.lang || 'sq',
+      num_format: prof.num_format || 'eu'
+    };
   }
-  if(data) profile=data;
-  // UI
-  $('#prefCurr').value = profile.default_currency||'ALL';
-  $('#prefFmt').value  = profile.num_format||'eu';
-  $('#prefLang').value = profile.lang||'sq';
-  $('#balCurr').value  = 'ALL';
+  profile = prof || { user_id: session.user.id, ...settings };
 }
 
-async function loadExpenses(){
-  const q = await db.from('expenses').select('*').eq('user_id', me.id).order('d',{ascending:false}).limit(500);
-  items = q.data||[];
-  drawHome();
+async function loadAll(){
+  // expenses
+  const { data:ex } = await supa.from('expenses').select('*').eq('user_id', session.user.id).order('d',{ascending:false}).limit(1000);
+  expenses = ex || [];
+  // categories (opsiyonel)
+  const { data:cs } = await supa.from('categories').select('*').eq('user_id', session.user.id).order('name');
+  cats = cs || [];
+  // debts (opsiyonel)
+  const { data:d1 } = await supa.from('debts').select('*').eq('user_id', session.user.id).eq('status','open').order('created_at',{ascending:false});
+  const { data:d2 } = await supa.from('debts').select('*').eq('user_id', session.user.id).eq('status','settled').order('settled_at',{ascending:false});
+  debtsOpen = d1 || []; debtsClosed = d2 || [];
 }
 
-/*** 5) Hesaplamalar ***/
-function convertFromALL(vALL, to){ return vALL * (rates[to]||1) }
-function convert(v, from, to){
-  if(from===to) return v;
-  // önce ALL'e, sonra hedefe
-  const all = v / (rates[from]||1);
-  return all * (rates[to]||1);
+async function fetchFX(base){
+  const now = Date.now();
+  if(fx.base===base && (now - fx.t) < 3600_000) return fx; // saatlik
+  const symbols = CURS.filter(c=>c!==base).join(',');
+  const url = `https://api.frankfurter.app/latest?from=${base}&to=${symbols}`;
+  const res = await fetch(url);
+  if(!res.ok){ console.warn('FX fetch failed'); return fx; }
+  const data = await res.json();
+  fx = { base, rates: { ...data.rates, [base]:1 }, t: now };
+  // cachele
+  await supa.from('fx_rates').upsert({
+    user_id: session.user.id,
+    base_currency: base,
+    rates: fx.rates,
+    fetched_at: new Date().toISOString()
+  });
+  renderFX();
+  return fx;
 }
 
-function totalsIn(curr){
-  // harcamalar (yalnız expenses) – seçili curr'de
-  const total = items.reduce((s,x)=> s + convert(Number(x.amount||0), x.curr||'ALL', curr), 0);
-  const today = items.filter(x=>isToday(x.d)).reduce((s,x)=> s + convert(Number(x.amount||0), x.curr||'ALL', curr), 0);
-  const month = items.filter(x=>isThisMonth(x.d)).reduce((s,x)=> s + convert(Number(x.amount||0), x.curr||'ALL', curr), 0);
-  return {total, today, month};
+/* ================= RENDER ================= */
+function renderFX(){
+  document.getElementById('baseCur').textContent = settings.default_currency;
+  const other = CURS.filter(c=>c!==settings.default_currency);
+  document.getElementById('fxSpan').textContent =
+    other.map(t=>`1 ${settings.default_currency} → ${fx.rates[t]?.toFixed(4)} ${t}`).join(' | ');
 }
 
-function portfolioIn(curr){
-  // kullanıcı cüzdan bakiyeleri (profile.balances) {"ALL":5000,"EUR":120,...}
-  const b = profile.balances||{};
-  const sumALL =
-    (Number(b.ALL||0))
-    + convert(Number(b.EUR||0),'EUR','ALL')
-    + convert(Number(b.USD||0),'USD','ALL')
-    + convert(Number(b.TRY||0),'TRY','ALL');
-  return convertFromALL(sumALL, curr);
-}
-
-/*** 6) Çizimler ***/
-function drawHeader(){
-  const curr = viewCurr || (profile.default_currency||'ALL');
-  const k = totalsIn(curr);
-  set('hdrCurr', curr);
-  set('hdrTotal', fmt(portfolioIn(curr) - k.total, null));    // Portföy - harcama
-  set('kpiTotal', fmt(k.total, curr));
-  set('kpiToday', fmt(k.today, curr));
-  set('kpiMonth', fmt(k.month, curr));
-
-  // 1 ALL = ? EUR / USD / TRY satırı
-  const line = `1 ALL = ${fmt(rates.EUR, 'EUR')} • 1 ALL = ${fmt(rates.USD,'USD')} • 1 ALL = ${fmt(rates.TRY,'TRY')}`;
-  $('#rateLine').textContent = line;
-
-  // chips aktiflik
-  document.querySelectorAll('.chips .chip, .chips button').forEach(b=>{
-    const c=b.dataset.curr; b.classList.toggle('active', c===curr);
+function renderQuickPills(){
+  const ul = document.getElementById('quickWallets');
+  ul.innerHTML='';
+  CURS.forEach(cur=>{
+    const a=document.createElement('a');
+    a.className='nav-link'; a.href='#'; a.textContent=cur;
+    a.onclick=(e)=>{ e.preventDefault(); ul.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active')); a.classList.add('active'); };
+    ul.appendChild(a);
   });
 }
 
-function drawHome(){
-  const list=$('#recentList'); list.innerHTML='';
-  const recent=[...items].slice(0,8);
-  $('#emptyHome').style.display= recent.length?'none':'block';
-  const curr = viewCurr || (profile.default_currency||'ALL');
-  recent.forEach(x=>{
-    const el=document.createElement('div'); el.className='item';
-    const ic=document.createElement('div'); ic.className='ic'; ic.textContent='🍔';
-    const meta=document.createElement('div'); meta.className='meta';
-    const t=document.createElement('div'); t.className='t'; t.textContent=x.name;
-    const s=document.createElement('div'); s.className='s'; s.textContent=new Date(x.d).toLocaleDateString();
-    meta.append(t,s);
-    const amt=document.createElement('div'); amt.className='amt';
-    amt.textContent = fmt(convert(Number(x.amount||0), x.curr||'ALL', curr), curr);
-    const del=document.createElement('button'); del.className='del'; del.textContent='🗑️';
-    del.onclick=()=>delExpense(x.id);
-    el.append(ic,meta,amt,del); list.append(el);
+function renderBalances(){
+  const sums={ALL:0,EUR:0,USD:0,TRY:0};
+  for(const ex of expenses){
+    const sign = (ex.name?.startsWith('+') || ex.amount>=0) ? 1 : 1; // gelir/gideri txType ile ayırmadığımız için işaret: negatif girersen gider kabul.
+    sums[ex.curr] += Number(ex.amount)*sign;
+  }
+  document.getElementById('balALL').textContent=nf(sums.ALL,'ALL');
+  document.getElementById('balEUR').textContent=nf(sums.EUR,'EUR');
+  document.getElementById('balUSD').textContent=nf(sums.USD,'USD');
+  document.getElementById('balTRY').textContent=nf(sums.TRY,'TRY');
+
+  const b=settings.default_currency;
+  const grand = toBase(sums.ALL,'ALL',b)+toBase(sums.EUR,'EUR',b)+toBase(sums.USD,'USD',b)+toBase(sums.TRY,'TRY',b);
+  document.getElementById('grandTotal').textContent = nf(grand, b);
+}
+
+function renderTx(){
+  const tb=document.getElementById('txTable'); tb.innerHTML='';
+  expenses.forEach(ex=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${ex.d}</td>
+      <td>${ex.name||''}</td>
+      <td>${nf(ex.amount, ex.curr)}</td>
+      <td><button class="btn btn-sm btn-outline-danger">×</button></td>
+    `;
+    tr.querySelector('button').onclick=async ()=>{
+      await supa.from('expenses').delete().eq('id', ex.id);
+      await reload();
+    };
+    tb.appendChild(tr);
   });
-  drawHeader();
 }
 
-/*** 7) UI ***/
-function bindUI(){
-  // chips
-  document.querySelectorAll('.chips button,.chips .chip').forEach(b=>{
-    b.onclick=()=>{ viewCurr=b.dataset.curr; drawHome(); }
+function renderCats(){
+  const tb=document.getElementById('catsTable'); tb.innerHTML='';
+  cats.forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${c.name}</td><td>${c.kind}</td><td><button class="btn btn-sm btn-outline-danger">×</button></td>`;
+    tr.querySelector('button').onclick=async ()=>{
+      await supa.from('categories').delete().eq('id', c.id);
+      await reload();
+    };
+    tb.appendChild(tr);
   });
+}
 
-  // alt menü
-  document.querySelectorAll('.btnTab').forEach(b=>{
-    b.onclick=()=>{
-      document.querySelectorAll('.btnTab').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      const go=b.dataset.go;
-      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-      document.getElementById('tab-'+go)?.classList.add('active');
-    }
+function debtCard(d){
+  const wrap=document.createElement('div'); wrap.className='card mb-2';
+  wrap.innerHTML=`
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <div><b>${d.person}</b> • ${d.direction==='lend'?'Borç verdim':'Borç aldım'}</div>
+        <div>${nf(d.principal, d.currency)}</div>
+        ${d.note?`<div class="small-muted">${d.note}</div>`:''}
+      </div>
+      <div>
+        ${d.status==='open'?`<button class="btn btn-sm btn-success me-2" data-act="settle">Kapat</button>`:''}
+        <button class="btn btn-sm btn-outline-danger" data-act="del">×</button>
+      </div>
+    </div>
+  `;
+  wrap.querySelectorAll('button').forEach(btn=>{
+    const act=btn.getAttribute('data-act');
+    btn.onclick=async ()=>{
+      if(act==='settle'){
+        if(!confirm('Bu borcu kapattığına emin misin?')) return;
+        await supa.from('debts').update({ status:'settled', settled_at:new Date().toISOString() }).eq('id', d.id);
+        await supa.from('debt_events').insert({ debt_id:d.id, user_id:session.user.id, event:'settled' });
+      } else if(act==='del'){
+        await supa.from('debts').delete().eq('id', d.id);
+      }
+      await reload();
+    };
   });
-
-  // fab
-  ['click','touchend','pointerup'].forEach(ev=>$('#openAdd').addEventListener(ev,()=>openM('mExp'),{passive:true}));
-
-  // modal kaydet
-  $('#btnSaveExp').onclick=saveExpense;
-
-  // ayarlar
-  $('#savePrefs').onclick=savePrefs;
-  $('#saveBalance').onclick=saveBalance;
-
-  // tarih inputları
-  $('#eDate').value=new Date().toISOString().slice(0,10);
+  return wrap;
 }
 
-function openM(id){ document.getElementById(id).classList.add('on') }
-function closeM(id){ document.getElementById(id).classList.remove('on') }
-
-/*** 8) CRUD ***/
-async function saveExpense(){
-  const name=$('#eName').value.trim();
-  const amt=parseFloat($('#eAmt').value);
-  const curr=$('#eCurr').value;
-  const d=$('#eDate').value;
-  if(!name||!amt||!d||isNaN(amt)){ alert('Plotëso fushat.'); return }
-  const {data,error}=await db.from('expenses').insert({user_id:me.id,name,amount:amt,curr,d}).select().single();
-  if(error){ alert('Gabim: '+error.message); return }
-  items.unshift(data);
-  $('#eName').value=''; $('#eAmt').value='';
-  closeM('mExp'); drawHome();
+function renderDebts(){
+  const o=document.getElementById('openDebts'); o.innerHTML='';
+  debtsOpen.forEach(d=>o.appendChild(debtCard(d)));
+  const c=document.getElementById('closedDebts'); c.innerHTML='';
+  debtsClosed.forEach(d=>c.appendChild(debtCard(d)));
 }
 
-async function delExpense(id){
-  if(!confirm('Fshini këtë hyrje?')) return;
-  const {error}=await db.from('expenses').delete().eq('id',id).eq('user_id',me.id);
-  if(!error){ items=items.filter(x=>x.id!==id); drawHome(); }
+/* ================= EVENTS ================= */
+document.getElementById('btnRegister').onclick=async ()=>{
+  const email=document.getElementById('regEmail').value.trim();
+  const pass=document.getElementById('regPass').value.trim();
+  const { error } = await supa.auth.signUp({ email, password: pass });
+  if(error) return alert(error.message);
+  alert('E-posta doğrulamasını kontrol et.');
+};
+
+document.getElementById('btnLogin').onclick=async ()=>{
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value.trim();
+  const { data, error } = await supa.auth.signInWithPassword({ email, password: pass });
+  if(error) return alert(error.message);
+  session=data.session; await afterLogin();
+};
+
+document.getElementById('btnLogout').onclick=async ()=>{
+  await supa.auth.signOut(); session=null; profile=null;
+  document.getElementById('authView').style.display='';
+  document.getElementById('appView').style.display='none';
+  document.getElementById('btnLogout').style.display='none';
+};
+
+document.getElementById('btnAddTx').onclick=async ()=>{
+  const name=document.getElementById('txName').value||'-';
+  const amount=Number(document.getElementById('txAmount').value||0);
+  const curr=document.getElementById('txCur').value;
+  const type=document.getElementById('txType').value; // sadece işaret için
+  const d=document.getElementById('txDate').value || new Date().toISOString().slice(0,10);
+  if(!amount) return alert('Tutar?');
+
+  // type = expense ise negatife çevirmek istiyorsan: (şu an pozitif girsen bile hesap “pozitif” toplar)
+  // Amount'ı aynen saklıyoruz; istersen burada (type==='expense' ? -Math.abs(amount) : Math.abs(amount)) yapabilirsin.
+  await supa.from('expenses').insert({ user_id: session.user.id, name, amount, curr, d });
+  document.getElementById('txAmount').value=''; document.getElementById('txName').value='';
+  await reload();
+};
+
+document.getElementById('btnAddDebt').onclick=async ()=>{
+  const direction=document.getElementById('debtDir').value;
+  const person=document.getElementById('debtPerson').value.trim();
+  const principal=Number(document.getElementById('debtAmt').value||0);
+  const currency=document.getElementById('debtCur').value;
+  const note=document.getElementById('debtNote').value||null;
+  if(!person||!principal) return alert('Eksik!');
+  await supa.from('debts').insert({ user_id: session.user.id, direction, person, principal, currency, note });
+  document.getElementById('debtPerson').value=''; document.getElementById('debtAmt').value=''; document.getElementById('debtNote').value='';
+  await reload();
+};
+
+document.getElementById('btnAddCat').onclick=async ()=>{
+  const name=document.getElementById('catName').value.trim();
+  const kind=document.getElementById('catKind').value;
+  if(!name) return;
+  await supa.from('categories').insert({ user_id: session.user.id, name, kind });
+  document.getElementById('catName').value='';
+  await reload();
+};
+
+document.getElementById('btnSeedCats').onclick=async ()=>{
+  const names=[
+    'Qira','Ujë','Drita','Internet','Telefon','Karburant','Parkim','Servis','Sigurim','Market',
+    'Restorant','Kafe','Rroba','Këpucë','Kozmetikë','Shëndet','Barnatore','Dhëmbë','Gym',
+    'Argëtim','Filma/Muzikë','Udhëtim','Hotel','Bileta','Taksi','Transport Publik','Arsim',
+    'Libra','Zyra','Printer','Letra','Dhërata','Bamirësi','Tjetër-Gider','Rrogë','Shitje','Komision',
+    'Interes','Qira e Marrë','Tjetër-Gelir'
+  ];
+  const rows=names.map(n=>({ user_id: session.user.id, name:n, kind: ['Rrogë','Shitje','Komision','Interes','Qira e Marrë','Tjetër-Gelir'].includes(n)?'income':'expense' }));
+  await supa.from('categories').insert(rows);
+  await reload();
+};
+
+document.getElementById('btnSaveSettings').onclick=async ()=>{
+  const lang=document.getElementById('setLang').value;
+  const default_currency=document.getElementById('setCur').value;
+  const num_format=document.getElementById('setNumFmt').value;
+  await supa.from('profiles').upsert({ user_id: session.user.id, lang, default_currency, num_format });
+  settings={ lang, default_currency, num_format };
+  document.getElementById('langSel').value=lang;
+  await fetchFX(settings.default_currency);
+  await reload(false);
+};
+
+document.getElementById('langSel').onchange=()=>{
+  // Şimdilik sadece görüntüde tutuyoruz; kalıcı olan Ayarlar’daki seçim
+};
+
+/* ================= FLOW ================= */
+async function afterLogin(){
+  document.getElementById('authView').style.display='none';
+  document.getElementById('appView').style.display='';
+  document.getElementById('btnLogout').style.display='';
+
+  await ensureProfile();
+  document.getElementById('langSel').value=settings.lang;
+  document.getElementById('setLang').value=settings.lang;
+  document.getElementById('setCur').value=settings.default_currency;
+  document.getElementById('setNumFmt').value=settings.num_format;
+  renderQuickPills();
+
+  // önbellekte varsa oku
+  const { data:fxRow } = await supa.from('fx_rates').select('*')
+    .eq('user_id', session.user.id).eq('base_currency', settings.default_currency).maybeSingle();
+  if(fxRow){ fx={ base: settings.default_currency, rates: fxRow.rates, t: Date.parse(fxRow.fetched_at)||0 }; }
+
+  await fetchFX(settings.default_currency);
+  await reload();
 }
 
-async function savePrefs(){
-  const payload={
-    default_currency: $('#prefCurr').value,
-    num_format: $('#prefFmt').value,
-    lang: $('#prefLang').value
-  };
-  const {data,error}=await db.from('profiles').upsert({user_id:me.id, ...payload}).select().single();
-  $('#prefMsg').textContent = error ? ('Gabim: '+error.message) : 'U ruajt.';
-  if(!error){ profile={...profile,...data}; drawHome(); }
+async function reload(refetchFX=true){
+  await loadAll();
+  if(refetchFX) await fetchFX(settings.default_currency);
+  renderFX();
+  renderBalances();
+  renderTx();
+  renderCats();
+  renderDebts();
 }
 
-async function saveBalance(){
-  const c=$('#balCurr').value; const v=parseFloat($('#balAmt').value||'0');
-  const newBal={...(profile.balances||{})}; newBal[c]=v;
-  const {data,error}=await db.from('profiles').upsert({user_id:me.id, balances:newBal}).select().single();
-  $('#balMsg').textContent = error ? ('Gabim: '+error.message) : 'U ruajt.';
-  if(!error){ profile.balances=data.balances; drawHome(); }
-}
+supa.auth.getSession().then(async ({data})=>{
+  if(data.session){ session=data.session; await afterLogin(); }
+  else{
+    document.getElementById('authView').style.display='';
+    document.getElementById('appView').style.display='none';
+  }
+});
+supa.auth.onAuthStateChange((_e,s)=>{ session=s; });
+
+document.getElementById('txDate').value = new Date().toISOString().slice(0,10);
 </script>
 </body>
 </html>
