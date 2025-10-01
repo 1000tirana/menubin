@@ -34,6 +34,7 @@ main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:12px}
+
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
   box-shadow:inset 0 1px 4px rgba(0,0,0,.6), 0 6px 14px rgba(0,0,0,.4);
@@ -165,7 +166,7 @@ nav.nav{
     <div class="big"><span id="hdrTotal">0</span></div>
     <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
 
-    <!-- Para birimi şeridi (anlık görüntüleme) -->
+    <!-- Para birimi şeridi -->
     <div id="currStrip" class="curr-strip"></div>
   </header>
 
@@ -275,6 +276,14 @@ nav.nav{
         <div class="actions"><button class="btnS" onclick="doConvert()">Konverto</button></div>
         <div id="cvRes" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
+
+      <!-- Cache temizleme -->
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 8px;color:#e6edf3">🧹 Cache & reset</h4>
+        <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle ve sıfırla</button></div>
+        <div id="cacheMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      </div>
+
     </section>
   </main>
 </div>
@@ -328,17 +337,20 @@ const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ========= GLOBAL ========= */
-let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[];
-let viewCurrency = null;
+/* ========= GLOBAL STATE ========= */
+let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
+let rates = {ALL:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
+let viewCurrency = null;
 
-/* ========= READY ========= */
+/* ========= DOM READY ========= */
 document.addEventListener('DOMContentLoaded', async () => {
   // Emoji grid
   '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 💳 💎 🎓 📚 🔌 🔋 👟 🍼 🧻 🧴 🐶 🐱'.split(' ')
     .forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};document.getElementById('emojiGrid').appendChild(b)});
 
+  document.getElementById('loginEmail').placeholder='emri@gmail.com';
+  document.getElementById('regEmail').placeholder='emri@gmail.com';
   document.getElementById('mDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('dDate').value=new Date().toISOString().slice(0,10);
 
@@ -360,11 +372,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     else{sessionUser=null; showGate();}
   });
 
-  // Kurlar
+  // Kurları yükle
   loadRates();
 });
 
-/* ========= BOOTSTRAP ========= */
+/* ========= BOOTSTRAP AFTER LOGIN ========= */
 async function bootstrap(){
   await ensureProfile();
   await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
@@ -393,7 +405,6 @@ window.switchTab = function(name){
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.addEventListener('click', ()=>window.switchTab(btn.dataset.tab)));
 });
-function openEmojiPicker(){openModal('Emoji')}
 
 /* ========= Profil ========= */
 async function ensureProfile(){
@@ -493,61 +504,24 @@ function emojiFor(catName){
   return (hit?hit.emoji:'💸');
 }
 
-/* ========= KURLAR (3 kaynaklı, cache'li) ========= */
-let rates = { ALL: 1 };
+/* ========= Kurlar ========= */
 async function loadRates(){
-  // cache
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
-    if (cache.t && (Date.now()-cache.t) < 6*60*60*1000) {
-      rates = cache.rates; renderCurrStrip(); refreshHeader(); return;
-    }
-  }catch(_){}
-  // 1) Open ER-API
-  try{
-    const r1 = await fetch('https://open.er-api.com/v6/latest/ALL');
-    if (r1.ok){
-      const j = await r1.json();
-      if (j?.result==='success' && j?.rates){
-        rates = {ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY};
-        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
-      }
-    }
-  }catch(_){}
-  // 2) Frankfurter
-  try{
-    const r2 = await fetch('https://api.frankfurter.app/latest?from=ALL&to=EUR,USD,TRY');
-    if (r2.ok){
-      const j = await r2.json();
-      if (j?.rates){
-        rates = {ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY};
-        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
-      }
-    }
-  }catch(_){}
-  // 3) Exchangerate.host
-  try{
-    const r3 = await fetch('https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY');
-    if (r3.ok){
-      const j = await r3.json();
-      if (j?.rates){
-        rates = {ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY};
-        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
-      }
-    }
-  }catch(_){}
-  console.warn('Kur servisleri ulaşılamadı; 1:1 yedek kullanılıyor.');
-  renderCurrStrip(); refreshHeader();
+    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
+    const url = 'https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY';
+    const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
+    rates = {ALL:1, EUR:js?.rates?.EUR||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
+    localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
+    renderCurrStrip(); refreshHeader();
+  }catch(e){ renderCurrStrip(); refreshHeader(); }
 }
-function saveRatesCache(){
-  try{ localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates})); }catch(_){}
-}
-function fx(amount, from='ALL', to='ALL'){
-  const a = Number(amount)||0;
-  if (from===to) return a;
+function fx(amount, from, to){
+  from = from||'ALL'; to = to||'ALL';
+  if(from===to) return amount;
   const rFrom = rates[from] ?? 1;
   const rTo   = rates[to]   ?? 1;
-  return a * (rTo / rFrom);
+  return amount * (rTo / rFrom);
 }
 function renderCurrStrip(){
   const box = document.getElementById('currStrip');
@@ -563,10 +537,9 @@ function renderCurrStrip(){
   box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===want));
 }
 function doConvert(){
-  const a=parseFloat(document.getElementById('cvAmt').value||'0');
+  const a=parseFloat(document.getElementById('cvAmt').value||'0'); if(!a){document.getElementById('cvRes').textContent='—';return;}
   const f=document.getElementById('cvFrom').value, t=document.getElementById('cvTo').value;
-  if (!a){ document.getElementById('cvRes').textContent='—'; return; }
-  const res=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(res)} ${t}`;
+  const r=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(r)} ${t}`;
 }
 
 /* ========= Başlık/istatistikler ========= */
@@ -587,9 +560,13 @@ function refreshHeader(){
 
 /* ========= Shpenzimet ========= */
 async function loadExpenses(){
-  const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
-  if(error){alert('Gabim ngarkimi (shpenzime): '+error.message);return;}
-  items=data||[]; drawHome(); drawAll(); refreshHeader();
+  try{
+    const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
+    if(error) throw error;
+    items=data||[]; drawHome(); drawAll(); refreshHeader();
+  }catch(e){
+    alert('Gabim ngarkimi (shpenzime): '+(e?.message||'Load failed'));
+  }
 }
 async function saveExpense(){
   const name=document.getElementById('mName').value.trim();
@@ -640,9 +617,13 @@ function rowExpense(x){
 
 /* ========= Borxhet ========= */
 async function loadDebts(){
-  const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
-  if(error){alert('Gabim ngarkimi (borxhe): '+error.message);return;}
-  debts=data||[]; drawDebts(); refreshHeader();
+  try{
+    const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
+    if(error) throw error;
+    debts=data||[]; drawDebts(); refreshHeader();
+  }catch(e){
+    alert('Gabim ngarkimi (borxhe): '+(e?.message||'Load failed'));
+  }
 }
 async function saveDebt(){
   const party=document.getElementById('dParty').value.trim();
@@ -714,12 +695,38 @@ function closeModal(w){document.getElementById('modal'+w).classList.remove('on')
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
 function isThisMonth(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
-function fmtDate(iso){const d=new Date(iso+'T00:00:00');return d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
+function fmtDate(iso){const d=new Date((iso||'')+'T00:00:00');return isNaN(d)?'':d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
 function fmt(n){
   const f=profile?.num_format||'eu';
-  const v=(Math.round(n*100)/100);
+  const v=(Math.round((Number(n)||0)*100)/100);
   return f==='us' ? v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
                   : v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+/* ========= Cache temizleme ========= */
+async function clearAppCache(){
+  try{
+    localStorage.removeItem('nh_rates_cache');
+    // tüm localStorage’ı temizlemek istersen:
+    // localStorage.clear();
+
+    // IndexedDB (tarayıcı destekliyorsa)
+    if (indexedDB && indexedDB.databases) {
+      const dbs = await indexedDB.databases();
+      await Promise.all((dbs||[]).map(d=> new Promise(res=>{
+        try{ const req = indexedDB.deleteDatabase(d.name); req.onsuccess=req.onerror=req.onblocked=()=>res(); }
+        catch{ res(); }
+      })));
+    }
+    // Supabase session’dan da çık
+    await supabase.auth.signOut();
+
+    document.getElementById('cacheMsg').textContent='Cache temizlendi. Uygulama sıfırlandı.';
+    // küçük bir bekleme sonra yenile
+    setTimeout(()=>location.reload(),600);
+  }catch(e){
+    document.getElementById('cacheMsg').textContent='Temizleme sırasında sorun oluştu: '+(e?.message||e);
+  }
 }
 </script>
 </body>
