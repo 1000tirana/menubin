@@ -58,140 +58,101 @@ nav.nav{
 .modal.on{display:grid}
 .sheet{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%}
 @media(min-width:720px){.wrap{max-width:520px;margin:0 auto}}
-/* Auth */
-.auth{padding:16px}
-.auth .card{max-width:520px;margin:0 auto 12px}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <div class="top"><div style="font-weight:900">Normal Holding</div><div id="who" class="sub">@user</div></div>
+    <div id="t-title" style="font-size:22px;font-weight:900">💼 Portofoli</div>
+    <div class="big"><span id="hdrTotal">0</span> <span id="hdrCurr">ALL</span></div>
+    <div id="rateLine" class="sub">—</div>
+    <div class="chips">
+      <button class="chip" data-curr="ALL">ALL</button>
+      <button class="chip" data-curr="EUR">EUR</button>
+      <button class="chip" data-curr="USD">USD</button>
+      <button class="chip" data-curr="TRY">TRY</button>
+    </div>
+  </header>
 
-<!-- AUTH VIEW -->
-<div id="authView" class="auth" style="display:none">
-  <div class="card">
-    <h3 style="margin:0 0 8px">🔐 Giriş</h3>
-    <div class="row">
-      <input id="loginEmail" placeholder="email@example.com" type="email">
-      <input id="loginPass" placeholder="••••••••" type="password">
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn btnP" id="btnLogin">Giriş</button>
-    </div>
+  <div class="stats">
+    <div class="card stat"><div class="muted" id="t-total-spend">Shpenzime totale</div><div style="font-weight:900;font-size:18px" id="kpiTotal">0</div></div>
+    <div class="card stat"><div class="muted" id="t-today">Sot</div><div style="font-weight:900;font-size:18px" id="kpiToday">0</div></div>
+    <div class="card stat"><div class="muted" id="t-month">Këtë muaj</div><div style="font-weight:900;font-size:18px" id="kpiMonth">0</div></div>
   </div>
-  <div class="card">
-    <h3 style="margin:0 0 8px">🆕 Kayıt Ol</h3>
-    <div class="row">
-      <input id="regEmail" placeholder="email@example.com" type="email">
-      <input id="regPass" placeholder="En az 6 karakter" type="password">
-    </div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" id="btnRegister">Kayıt Ol</button>
-    </div>
-    <div class="muted" style="margin-top:6px;font-size:12px">E-posta doğrulaması açıksa Supabase onay maili gönderir.</div>
-  </div>
+
+  <main>
+    <section id="tab-home" class="tab active">
+      <h3 id="t-recent">🕒 Të fundit</h3>
+      <div id="recentList" class="list"></div>
+      <div class="muted" id="emptyHome" style="text-align:center;margin-top:10px">Asgjë ende.</div>
+    </section>
+
+    <section id="tab-settings" class="tab">
+      <h3>⚙️ <span id="t-settings">Cilësime</span></h3>
+      <div class="card">
+        <div class="row">
+          <div style="flex:1">
+            <label id="t-lang">Gjuha</label>
+            <select id="prefLang">
+              <option value="sq">Shqip</option><option value="tr">Türkçe</option><option value="en">English</option><option value="it">Italiano</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <label id="t-defcurr">Monedha default</label>
+            <select id="prefCurr">
+              <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <label id="t-numfmt">Formati i numrave</label>
+            <select id="prefFmt"><option value="eu">23.456,78</option><option value="us">23,456.78</option></select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px"><button class="btn btnP" id="savePrefs">Ruaj</button></div>
+        <div id="prefMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <label id="t-wallet">Gjendja e kuletës (ALL/EUR/USD/TRY sipas zgjedhjes poshtë)</label>
+        <div class="row" style="margin-top:6px">
+          <select id="balCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
+          <input id="balAmt" type="number" inputmode="decimal" placeholder="p.sh. 5000">
+        </div>
+        <div class="row" style="margin-top:8px"><button class="btn btnP" id="saveBalance">Ruaj gjendjen</button></div>
+        <div id="balMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
+      </div>
+    </section>
+  </main>
 </div>
 
-<!-- APP VIEW -->
-<div id="appView" style="display:none">
-  <div class="wrap">
-    <header>
-      <div class="top">
-        <div style="font-weight:900">Normal Holding</div>
-        <div id="who" class="sub">@user</div>
-      </div>
-      <div id="t-title" style="font-size:22px;font-weight:900">💼 Portofoli</div>
-      <div class="big"><span id="hdrTotal">0</span> <span id="hdrCurr">ALL</span></div>
-      <div id="rateLine" class="sub">—</div>
-      <div class="chips">
-        <button class="chip" data-curr="ALL">ALL</button>
-        <button class="chip" data-curr="EUR">EUR</button>
-        <button class="chip" data-curr="USD">USD</button>
-        <button class="chip" data-curr="TRY">TRY</button>
-      </div>
-    </header>
+<nav class="nav">
+  <a class="btnTab active" data-go="home"><span class="ico">🏠</span><span id="t-home">Kreu</span></a>
+  <a class="btnTab" data-go="settings"><span class="ico">⚙️</span><span id="t-st">Cilësime</span></a>
+  <button class="fab" id="openAdd">＋</button>
+  <a class="btnTab" data-go="debts" id="goDebts"><span class="ico">💳</span><span id="t-debts">Borxhet</span></a>
+  <a class="btnTab" data-go="list"><span class="ico">📋</span><span id="t-list">Lista</span></a>
+</nav>
 
-    <div class="stats">
-      <div class="card stat"><div class="muted" id="t-total-spend">Shpenzime totale</div><div style="font-weight:900;font-size:18px" id="kpiTotal">0</div></div>
-      <div class="card stat"><div class="muted" id="t-today">Sot</div><div style="font-weight:900;font-size:18px" id="kpiToday">0</div></div>
-      <div class="card stat"><div class="muted" id="t-month">Këtë muaj</div><div style="font-weight:900;font-size:18px" id="kpiMonth">0</div></div>
-    </div>
-
-    <main>
-      <section id="tab-home" class="tab active">
-        <h3 id="t-recent">🕒 Të fundit</h3>
-        <div id="recentList" class="list"></div>
-        <div class="muted" id="emptyHome" style="text-align:center;margin-top:10px">Asgjë ende.</div>
-      </section>
-
-      <section id="tab-settings" class="tab">
-        <h3>⚙️ <span id="t-settings">Cilësime</span></h3>
-        <div class="card">
-          <div class="row">
-            <div style="flex:1">
-              <label id="t-lang">Gjuha</label>
-              <select id="prefLang">
-                <option value="sq">Shqip</option><option value="tr">Türkçe</option><option value="en">English</option><option value="it">Italiano</option>
-              </select>
-            </div>
-            <div style="flex:1">
-              <label id="t-defcurr">Monedha default</label>
-              <select id="prefCurr">
-                <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
-              </select>
-            </div>
-            <div style="flex:1">
-              <label id="t-numfmt">Formati i numrave</label>
-              <select id="prefFmt"><option value="eu">23.456,78</option><option value="us">23,456.78</option></select>
-            </div>
-          </div>
-          <div class="row" style="margin-top:10px"><button class="btn btnP" id="savePrefs">Ruaj</button></div>
-          <div id="prefMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <label id="t-wallet">Gjendja e kuletës (ALL/EUR/USD/TRY sipas zgjedhjes poshtë)</label>
-          <div class="row" style="margin-top:6px">
-            <select id="balCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
-            <input id="balAmt" type="number" inputmode="decimal" placeholder="p.sh. 5000">
-          </div>
-          <div class="row" style="margin-top:8px"><button class="btn btnP" id="saveBalance">Ruaj gjendjen</button></div>
-          <div id="balMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <button class="btn" id="btnLogout">Çıkış</button>
-        </div>
-      </section>
-    </main>
+<!-- Modal: Shpenzim -->
+<div class="modal" id="mExp"><div class="sheet">
+  <h3 id="t-addexp">➕ Shto shpenzim</h3>
+  <div class="row"><input id="eName" placeholder="p.sh. Karburant"><input id="eAmt" type="number" inputmode="decimal" placeholder="0"></div>
+  <div class="row" style="margin-top:8px">
+    <select id="eCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
+    <input id="eDate" type="date">
   </div>
-
-  <nav class="nav">
-    <a class="btnTab active" data-go="home"><span class="ico">🏠</span><span id="t-home">Kreu</span></a>
-    <a class="btnTab" data-go="settings"><span class="ico">⚙️</span><span id="t-st">Cilësime</span></a>
-    <button class="fab" id="openAdd">＋</button>
-    <a class="btnTab" data-go="debts" id="goDebts"><span class="ico">💳</span><span id="t-debts">Borxhet</span></a>
-    <a class="btnTab" data-go="list"><span class="ico">📋</span><span id="t-list">Lista</span></a>
-  </nav>
-
-  <!-- Modal: Shpenzim -->
-  <div class="modal" id="mExp"><div class="sheet">
-    <h3 id="t-addexp">➕ Shto shpenzim</h3>
-    <div class="row"><input id="eName" placeholder="p.sh. Karburant"><input id="eAmt" type="number" inputmode="decimal" placeholder="0"></div>
-    <div class="row" style="margin-top:8px">
-      <select id="eCurr"><option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option></select>
-      <input id="eDate" type="date">
-    </div>
-    <div class="row" style="margin-top:8px"><button class="btn" onclick="closeM('mExp')" id="t-close">Mbyll</button><button class="btn btnP" id="btnSaveExp">Ruaj</button></div>
-  </div></div>
-</div>
+  <div class="row" style="margin-top:8px"><button class="btn" onclick="closeM('mExp')" id="t-close">Mbyll</button><button class="btn btnP" id="btnSaveExp">Ruaj</button></div>
+</div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /*** 0) Supabase ***/
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';               // ← değiştir
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const db = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/*** 1) i18n ***/
+/*** 1) i18n (çok kısa) ***/
 const I18N={
   sq:{title:'💼 Portofoli',totalSpend:'Shpenzime totale',today:'Sot',month:'Këtë muaj',recent:'🕒 Të fundit',settings:'Cilësime',
       lang:'Gjuha',defcurr:'Monedha default',numfmt:'Formati i numrave',home:'Kreu',st:'Cilësime',debts:'Borxhet',list:'Lista',
@@ -226,11 +187,10 @@ function applyTexts(){
   document.getElementById('t-wallet').textContent=t('wallet');
 }
 
-/*** 2) State ***/
-let session=null, me=null;
-let profile={default_currency:'ALL', num_format:'eu', lang:'sq', balances:{}};
+/*** 2) Durum ***/
+let me=null, profile={default_currency:'ALL', num_format:'eu', lang:'sq', balances:{}};
 let items=[]; // expenses
-let viewCurr=null; // ALL/EUR/USD/TRY – chips ile geçici bakış
+let viewCurr=null; // ALL/EUR/USD/TRY – üstteki çiplerle geçici görünüm
 let rates={EUR:0,USD:0,TRY:0,ALL:1}; // 1 ALL = ? EUR/USD/TRY
 
 const $=s=>document.querySelector(s);
@@ -245,76 +205,49 @@ const isThisMonth = iso => { const d=new Date(iso), t=new Date(); return d.getFu
 
 /*** 3) Kur – exchangerate.host (ALL destekli) ***/
 async function loadRates(){
+  // 1 ALL baz alınacak -> EUR,USD,TRY
   const cache=JSON.parse(localStorage.getItem('rates_cache_v2')||'{}');
   if(cache.t && (Date.now()-cache.t)<3600*1000){ rates=cache.r; drawHeader(); return }
   try{
     const r = await fetch('https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY');
     const j = await r.json();
     if(j && j.rates){
-      rates.EUR = j.rates.EUR;
-      rates.USD = j.rates.USD;
-      rates.TRY = j.rates.TRY;
+      rates.EUR = j.rates.EUR; // 1 ALL = ? EUR
+      rates.USD = j.rates.USD; // 1 ALL = ? USD
+      rates.TRY = j.rates.TRY; // 1 ALL = ? TRY
       localStorage.setItem('rates_cache_v2', JSON.stringify({t:Date.now(), r:rates}));
     }
   }catch(e){ console.warn('rate err',e) }
   drawHeader();
 }
-function convALLto(vALL,to){ if(to==='ALL') return vALL; return vALL * (rates[to]||0); }
+
+function convALLto(vALL,to){
+  if(to==='ALL') return vALL;
+  return vALL * (rates[to]||0);
+}
 function convert(v, from, to){
   if(from===to) return v;
+  // hepsini ALL bazına indir, sonra hedefe
   let inALL = from==='ALL' ? v : (v / (rates[from]||1e-9));
   return convALLto(inALL, to);
 }
 
-/*** 4) Auth boot ***/
+/*** 4) Auth & yük ***/
 document.addEventListener('DOMContentLoaded', async ()=>{
-  const sess = (await db.auth.getSession()).data.session;
-  if(!sess){
-    // Oturum yok: login ekranını göster
-    document.getElementById('authView').style.display='';
-    document.getElementById('appView').style.display='none';
-    bindAuthUI();
-  }else{
-    session=sess; me=sess.user;
-    startApp();
-  }
-});
-function bindAuthUI(){
-  document.getElementById('btnLogin').onclick = async ()=>{
-    const email=$('#loginEmail').value.trim();
-    const password=$('#loginPass').value.trim();
-    const {data,error}=await db.auth.signInWithPassword({email,password});
-    if(error) return alert(error.message);
-    session=data.session; me=session.user; startApp();
-  };
-  document.getElementById('btnRegister').onclick = async ()=>{
-    const email=$('#regEmail').value.trim();
-    const password=$('#regPass').value.trim();
-    const {data,error}=await db.auth.signUp({email,password});
-    if(error) return alert(error.message);
-    alert('Kayıt oluşturuldu. E-postayı doğrulaman gerekebilir.');
-  };
-}
-
-/*** 5) App init ***/
-async function startApp(){
-  document.getElementById('authView').style.display='none';
-  document.getElementById('appView').style.display='';
-  document.getElementById('btnLogout').onclick = async ()=>{
-    await db.auth.signOut(); location.reload();
-  };
-  me = (await db.auth.getSession()).data.session.user;
+  const {data:{session}} = await db.auth.getSession();
+  if(!session){ await db.auth.signInWithPassword({email:'demo@demo.com', password:'demodemo'}).catch(()=>{}); }
+  const s2 = (await db.auth.getSession()).data.session;
+  me = s2?.user || null;
   $('#who').textContent = me?.email?.split('@')[0] || '@user';
 
   await ensureProfile();
   applyTexts();
   await Promise.all([loadExpenses(), loadRates()]);
   bindUI();
-}
+});
 
 async function ensureProfile(){
-  let {data, error} = await db.from('profiles').select('*').eq('user_id', me.id).single();
-  if(error && error.code==='PGRST116'){ data=null } // not found
+  let {data} = await db.from('profiles').select('*').eq('user_id', me.id).single();
   if(!data){
     const ins = await db.from('profiles').insert({user_id:me.id}).select().single();
     data = ins.data;
@@ -332,7 +265,7 @@ async function loadExpenses(){
   drawHome();
 }
 
-/*** 6) Hesaplamalar ***/
+/*** 5) Hesaplamalar ***/
 function totalsIn(curr){
   const total = items.reduce((s,x)=> s + convert(Number(x.amount||0), x.curr||'ALL', curr), 0);
   const today = items.filter(x=>isToday(x.d)).reduce((s,x)=> s + convert(Number(x.amount||0), x.curr||'ALL', curr), 0);
@@ -349,7 +282,7 @@ function portfolioIn(curr){
   return convALLto(sumALL, curr);
 }
 
-/*** 7) Render ***/
+/*** 6) Çizimler ***/
 function drawHeader(){
   const curr = viewCurr || (profile.default_currency||'ALL');
   const k = totalsIn(curr);
@@ -359,6 +292,7 @@ function drawHeader(){
   set('kpiToday', fmt(k.today, curr));
   set('kpiMonth', fmt(k.month, curr));
 
+  // küçük değerlerde 4 ondalık göster
   const eurTxt = (rates.EUR<0.1? fmtNum(rates.EUR,4):fmtNum(rates.EUR,2))+' EUR';
   const usdTxt = (rates.USD<0.1? fmtNum(rates.USD,4):fmtNum(rates.USD,2))+' USD';
   const tryTxt = (rates.TRY<0.1? fmtNum(rates.TRY,4):fmtNum(rates.TRY,2))+' TRY';
@@ -390,7 +324,7 @@ function drawHome(){
   drawHeader();
 }
 
-/*** 8) UI ***/
+/*** 7) UI ***/
 function bindUI(){
   document.querySelectorAll('.chips button,.chips .chip').forEach(b=>{
     b.onclick=()=>{ viewCurr=b.dataset.curr; drawHome(); }
@@ -404,26 +338,26 @@ function bindUI(){
       document.getElementById('tab-'+go)?.classList.add('active');
     }
   });
-  ['click','touchend','pointerup'].forEach(ev=>document.getElementById('openAdd').addEventListener(ev,()=>openM('mExp'),{passive:true}));
-  document.getElementById('btnSaveExp').onclick=saveExpense;
-  document.getElementById('savePrefs').onclick=savePrefs;
-  document.getElementById('saveBalance').onclick=saveBalance;
-  document.getElementById('eDate').value=new Date().toISOString().slice(0,10);
+  ['click','touchend','pointerup'].forEach(ev=>$('#openAdd').addEventListener(ev,()=>openM('mExp'),{passive:true}));
+  $('#btnSaveExp').onclick=saveExpense;
+  $('#savePrefs').onclick=savePrefs;
+  $('#saveBalance').onclick=saveBalance;
+  $('#eDate').value=new Date().toISOString().slice(0,10);
 }
 function openM(id){ document.getElementById(id).classList.add('on') }
 function closeM(id){ document.getElementById(id).classList.remove('on') }
 
-/*** 9) CRUD ***/
+/*** 8) CRUD ***/
 async function saveExpense(){
-  const name=document.getElementById('eName').value.trim();
-  const amt=parseFloat(document.getElementById('eAmt').value);
-  const curr=document.getElementById('eCurr').value;
-  const d=document.getElementById('eDate').value;
+  const name=$('#eName').value.trim();
+  const amt=parseFloat($('#eAmt').value);
+  const curr=$('#eCurr').value;
+  const d=$('#eDate').value;
   if(!name||!amt||!d||isNaN(amt)){ alert('Lutemi plotësoni fushat / Alanlar boş.'); return }
   const {data,error}=await db.from('expenses').insert({user_id:me.id,name,amount:amt,curr,d}).select().single();
   if(error){ alert('Hata: '+error.message); return }
   items.unshift(data);
-  document.getElementById('eName').value=''; document.getElementById('eAmt').value='';
+  $('#eName').value=''; $('#eAmt').value='';
   closeM('mExp'); drawHome();
 }
 async function delExpense(id){
@@ -432,22 +366,22 @@ async function delExpense(id){
   if(!error){ items=items.filter(x=>x.id!==id); drawHome(); }
 }
 
-/*** 10) Prefs & Balance ***/
+/*** 9) Prefs & Balance ***/
 async function savePrefs(){
   const payload={
-    default_currency: document.getElementById('prefCurr').value,
-    num_format: document.getElementById('prefFmt').value,
-    lang: document.getElementById('prefLang').value
+    default_currency: $('#prefCurr').value,
+    num_format: $('#prefFmt').value,
+    lang: $('#prefLang').value
   };
   const {data,error}=await db.from('profiles').upsert({user_id:me.id, ...payload}).select().single();
-  document.getElementById('prefMsg').textContent = error ? ('Hata: '+error.message) : 'U ruajt. / Kaydedildi.';
+  $('#prefMsg').textContent = error ? ('Hata: '+error.message) : 'U ruajt. / Kaydedildi.';
   if(!error){ profile={...profile,...data}; applyTexts(); drawHome(); }
 }
 async function saveBalance(){
-  const c=document.getElementById('balCurr').value; const v=parseFloat(document.getElementById('balAmt').value||'0');
+  const c=$('#balCurr').value; const v=parseFloat($('#balAmt').value||'0');
   const newBal={...(profile.balances||{})}; newBal[c]=v;
   const {data,error}=await db.from('profiles').upsert({user_id:me.id, balances:newBal}).select().single();
-  document.getElementById('balMsg').textContent = error ? ('Hata: '+error.message) : 'U ruajt. / Kaydedildi.';
+  $('#balMsg').textContent = error ? ('Hata: '+error.message) : 'U ruajt. / Kaydedildi.';
   if(!error){ profile.balances=data.balances; drawHome(); }
 }
 </script>
