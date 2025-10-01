@@ -501,45 +501,108 @@ function emojiFor(catName){
   return (hit?hit.emoji:'💸');
 }
 
-/* ========= Kurlar ========= */
+
+// ========= Kurlar & şerit (yedekli, cache'li) =========
+let rates = { ALL: 1 };
+const SUPPORTED = ['ALL','EUR','USD','TRY'];
+let viewCurrency = null;
+
 async function loadRates(){
+  // 6 saatlik cache
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
-    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
-    const url = 'https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY';
-    const res = await fetch(url); const js = await res.json();
-    rates = {ALL:1, EUR:js?.rates?.EUR||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
-    localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
-    renderCurrStrip(); refreshHeader();
-  }catch(e){ renderCurrStrip(); refreshHeader(); }
+    if (cache.t && (Date.now()-cache.t) < 6*60*60*1000) {
+      rates = cache.rates; renderCurrStrip(); refreshHeader(); return;
+    }
+  }catch(_){}
+
+  // 1) Open ER-API (geniş kapsama, CORS açık)
+  try{
+    const r1 = await fetch('https://open.er-api.com/v6/latest/ALL');  // base=ALL
+    if (r1.ok){
+      const j = await r1.json();
+      if (j?.result === 'success' && j?.rates){
+        rates = { ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY };
+        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
+      }
+    }
+  }catch(_){}
+
+  // 2) Frankfurter (yedek)
+  try{
+    const r2 = await fetch('https://api.frankfurter.app/latest?from=ALL&to=EUR,USD,TRY');
+    if (r2.ok){
+      const j = await r2.json();
+      if (j?.rates){
+        rates = { ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY };
+        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
+      }
+    }
+  }catch(_){}
+
+  // 3) Exchangerate.host (ikinci yedek)
+  try{
+    const r3 = await fetch('https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY');
+    if (r3.ok){
+      const j = await r3.json();
+      if (j?.rates){
+        rates = { ALL:1, EUR:j.rates.EUR, USD:j.rates.USD, TRY:j.rates.TRY };
+        saveRatesCache(); renderCurrStrip(); refreshHeader(); return;
+      }
+    }
+  }catch(_){}
+
+  // Hiçbiri çalışmazsa ALL=1, diğerleri 1:1 kalsın ama kullanıcı bilsin
+  console.warn('Kur servisleri ulaşılamadı; değerler 1:1 kalıyor.');
+  renderCurrStrip(); refreshHeader();
 }
-function fx(amount, from, to){
-  from = from||'ALL'; to = to||'ALL';
-  if(from===to) return amount;
+
+function saveRatesCache(){
+  try{
+    localStorage.setItem('nh_rates_cache', JSON.stringify({ t: Date.now(), rates }));
+  }catch(_){}
+}
+
+// Tüm dönüşümler tek yerden
+function fx(amount, from='ALL', to='ALL'){
+  const a = Number(amount)||0;
+  if (from === to) return a;
   const rFrom = rates[from] ?? 1;
   const rTo   = rates[to]   ?? 1;
-  return amount * (rTo / rFrom);
+  return a * (rTo / rFrom);
 }
+
 function renderCurrStrip(){
   const box = document.getElementById('currStrip');
   if(!box) return;
   box.innerHTML = '';
   SUPPORTED.forEach(code=>{
-    const b=document.createElement('button');
-    b.className='curr-pill'; b.dataset.c=code; b.textContent=code;
-    b.onclick=()=>{ viewCurrency=code; box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===code)); refreshHeader(); };
+    const b = document.createElement('button');
+    b.className = 'curr-pill';
+    b.dataset.c = code;
+    b.textContent = code;
+    b.onclick = () => {
+      viewCurrency = code;
+      box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===code));
+      refreshHeader();
+    };
     box.appendChild(b);
   });
   const want = viewCurrency || (profile?.default_currency || 'ALL');
   box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===want));
 }
-function doConvert(){
-  const a=parseFloat(document.getElementById('cvAmt').value||'0'); if(!a){document.getElementById('cvRes').textContent='—';return;}
-  const f=document.getElementById('cvFrom').value, t=document.getElementById('cvTo').value;
-  const r=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(r)} ${t}`;
-}
 
-/* ========= Başlık/istatistikler ========= */
+// Basit dönüştürücü (ayarlar)
+function doConvert(){
+  const a = parseFloat(document.getElementById('cvAmt').value||'0');
+  const f = document.getElementById('cvFrom').value;
+  const t = document.getElementById('cvTo').value;
+  if (!a){ document.getElementById('cvRes').textContent='—'; return; }
+  const res = fx(a, f, t);
+  document.getElementById('cvRes').textContent = `${fmt(res)} ${t}`;
+}
+  
+  /* ========= Başlık/istatistikler ========= */
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
 
