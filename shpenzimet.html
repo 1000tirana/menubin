@@ -75,7 +75,7 @@ nav.nav{
   display:grid;grid-template-columns:1fr 1fr var(--fab-gap) 1fr 1fr;align-items:center;
   backface-visibility:hidden;will-change:transform
 }
-.btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);text-decoration:none;cursor:pointer}
+.btn{justify-self:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:#muted;text-decoration:none;cursor:pointer}
 .btn:nth-of-type(1){grid-column:1}.btn:nth-of-type(2){grid-column:2}.btn:nth-of-type(3){grid-column:4}.btn:nth-of-type(4){grid-column:5}
 .btn .ico{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
@@ -165,6 +165,7 @@ nav.nav{
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
     <div class="big"><span id="hdrTotal">0</span></div>
     <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
+    <div id="rateStatus" class="muted" style="margin-top:4px;display:none">—</div>
 
     <!-- Para birimi şeridi -->
     <div id="currStrip" class="curr-strip"></div>
@@ -339,7 +340,7 @@ const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
 /* ========= GLOBAL STATE ========= */
 let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
-let rates = {ALL:1};
+let rates = null;                       // <-- önemli: kur yoksa null
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
 let viewCurrency = null;
 
@@ -372,7 +373,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     else{sessionUser=null; showGate();}
   });
 
-  // Kurları yükle
+  // Kurlar
   loadRates();
 });
 
@@ -504,24 +505,66 @@ function emojiFor(catName){
   return (hit?hit.emoji:'💸');
 }
 
-/* ========= Kurlar ========= */
+/* ========= KURLAR ========= */
+function setRateStatus(txt, show=true){
+  const el = document.getElementById('rateStatus');
+  if(!el) return;
+  el.textContent = txt || '';
+  el.style.display = show && txt ? 'block' : 'none';
+}
+
 async function loadRates(){
+  // cache (6 saat)
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
-    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
-    const url = 'https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY';
-    const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
-    rates = {ALL:1, EUR:js?.rates?.EUR||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
+    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000 && cache.rates){
+      rates = cache.rates;
+      setRateStatus('💾 Kurlar: cache');
+      renderCurrStrip(); refreshHeader();
+      return;
+    }
+  }catch{}
+
+  // 1) exchangerate.host (base=ALL)
+  try{
+    const r = await fetch('https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY',{cache:'no-store'});
+    if(r.ok){
+      const js = await r.json();
+      if(js && js.rates){
+        rates = { ALL:1, EUR:js.rates.EUR, USD:js.rates.USD, TRY:js.rates.TRY };
+      }
+    }
+  }catch{}
+
+  // 2) frankfurter.app (base=EUR) -> ALL tabanına dönüştür
+  if(!rates){
+    try{
+      const r2 = await fetch('https://api.frankfurter.app/latest?from=EUR&to=USD,TRY,ALL',{cache:'no-store'});
+      if(r2.ok){
+        const js2 = await r2.json();
+        const R_EUR = 1 / js2.rates.ALL;            // 1 ALL = ? EUR
+        const R_USD = js2.rates.USD / js2.rates.ALL;// 1 ALL = ? USD
+        const R_TRY = js2.rates.TRY / js2.rates.ALL;// 1 ALL = ? TRY
+        rates = { ALL:1, EUR:R_EUR, USD:R_USD, TRY:R_TRY };
+      }
+    }catch{}
+  }
+
+  if(rates){
     localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
-    renderCurrStrip(); refreshHeader();
-  }catch(e){ renderCurrStrip(); refreshHeader(); }
+    setRateStatus('✅ Kurlar güncel');
+  }else{
+    setRateStatus('⚠️ Kurlar yüklenemedi (offline?)');
+  }
+  renderCurrStrip(); refreshHeader();
 }
+
+// Güvenli dönüşüm: kur yoksa null
 function fx(amount, from, to){
   from = from||'ALL'; to = to||'ALL';
   if(from===to) return amount;
-  const rFrom = rates[from] ?? 1;
-  const rTo   = rates[to]   ?? 1;
-  return amount * (rTo / rFrom);
+  if(!rates || rates[from]==null || rates[to]==null) return null;
+  return amount * (rates[to] / rates[from]);
 }
 function renderCurrStrip(){
   const box = document.getElementById('currStrip');
@@ -537,17 +580,25 @@ function renderCurrStrip(){
   box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===want));
 }
 function doConvert(){
-  const a=parseFloat(document.getElementById('cvAmt').value||'0'); if(!a){document.getElementById('cvRes').textContent='—';return;}
+  const a=parseFloat(document.getElementById('cvAmt').value||'0'); 
+  if(!a){document.getElementById('cvRes').textContent='—';return;}
   const f=document.getElementById('cvFrom').value, t=document.getElementById('cvTo').value;
-  const r=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(r)} ${t}`;
+  const val=fx(a,f,t);
+  document.getElementById('cvRes').textContent = (val==null)
+    ? 'Kurlar yok. Ayarlardan cache temizleyip tekrar deneyin.'
+    : `${fmt(val)} ${t}`;
 }
 
 /* ========= Başlık/istatistikler ========= */
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
-  const total = (items||[]).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
-  const today = (items||[]).filter(isToday).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
-  const month = (items||[]).filter(isThisMonth).reduce((s,x)=> s + fx(Number(x.amount||0), x.curr||'ALL', to), 0);
+  const sum = (arr)=>arr.reduce((s,x)=>{
+    const v = fx(Number(x.amount||0), x.curr||'ALL', to);
+    return s + (v==null ? 0 : v);
+  },0);
+  const total = sum(items||[]);
+  const today = sum((items||[]).filter(isToday));
+  const month = sum((items||[]).filter(isThisMonth));
   const balMap = profile?.balances || {}; const balInTo = Number(balMap[to]||0);
   const remain = balInTo - total;
   setText('hdrTotal', `${fmt(remain)} ${to}`);
@@ -707,10 +758,8 @@ function fmt(n){
 async function clearAppCache(){
   try{
     localStorage.removeItem('nh_rates_cache');
-    // tüm localStorage’ı temizlemek istersen:
-    // localStorage.clear();
+    // localStorage.clear(); // hepsini silmek istersen
 
-    // IndexedDB (tarayıcı destekliyorsa)
     if (indexedDB && indexedDB.databases) {
       const dbs = await indexedDB.databases();
       await Promise.all((dbs||[]).map(d=> new Promise(res=>{
@@ -718,14 +767,12 @@ async function clearAppCache(){
         catch{ res(); }
       })));
     }
-    // Supabase session’dan da çık
     await supabase.auth.signOut();
 
     document.getElementById('cacheMsg').textContent='Cache temizlendi. Uygulama sıfırlandı.';
-    // küçük bir bekleme sonra yenile
     setTimeout(()=>location.reload(),600);
   }catch(e){
-    document.getElementById('cacheMsg').textContent='Temizleme sırasında sorun oluştu: '+(e?.message||e);
+    document.getElementById('cacheMsg').textContent='Temizleme sırasında sorun: '+(e?.message||e);
   }
 }
 </script>
