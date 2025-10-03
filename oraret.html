@@ -1,717 +1,506 @@
 <!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Regjistrim Orari • Aplikacioni</title>
-
-<!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-<!-- Bootstrap 5 CSS (CDN) -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
-
-<style>
-  body{background:#f7f8fb;color:#111}
-  .topbar{background:#1f6feb;color:white;padding:12px 16px}
-  .card{margin-bottom:12px}
-  .left-fixed {position:fixed; left:0; top:50%; transform:translateY(-50%); z-index:9999}
-  .chip {writing-mode:vertical-rl; text-orientation:mixed; background:#ff6b6b;color:#fff;padding:6px 8px;border-radius:0 8px 8px 0; cursor:pointer}
-  .admin-badge{background:#ffd43b;color:#111;padding:4px 8px;border-radius:8px;font-weight:600}
-  pre {white-space:pre-wrap}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Regjistrimi i Pranisë • Aplikacion</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{padding:20px;background:#f6f8fa;font-family:system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    .card {box-shadow:0 4px 18px rgba(0,0,0,.06)}
+    .small-muted{font-size:0.85rem;color:#6b7280}
+    .left-float {position:fixed; left:0; top:40%; transform:rotate(-90deg) translateY(-50%); transform-origin:left top; z-index:1000;}
+    .fab {position:fixed; right:1rem; bottom:1rem; z-index:1000}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 </head>
 <body>
-
-<div class="topbar d-flex justify-content-between align-items-center">
-  <div>
-    <strong>Regjistrim Orari</strong> • (Shqip)
+  <div class="left-float">
+    <button id="openAppBtn" class="btn btn-danger btn-lg">Rrotullo &nbsp; Fitoni</button>
   </div>
-  <div id="top-controls">
-    <span id="current-user-name" class="me-2"></span>
-    <button class="btn btn-sm btn-light" id="btn-logout" style="display:none">Dil</button>
-  </div>
-</div>
 
-<div class="container py-3">
+  <div class="container" id="app" style="max-width:980px">
+    <div class="card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="m-0">Aplikacioni i Pranisë</h4>
+        <div>
+          <span id="currentUserLabel" class="me-2 small-muted">Jo i identifikuar</span>
+          <button id="btnLogout" class="btn btn-outline-secondary btn-sm" style="display:none">Shkyçu</button>
+        </div>
+      </div>
+      <p class="small-muted mt-2 mb-0">Faqe në gjuhën shqipe • Vendosni të dhënat tuaja dhe regjistroni hyrjet/daljet.</p>
+    </div>
 
-  <div class="row">
+    <!-- Login / Choose user -->
+    <div class="card p-3 mb-3">
+      <div class="row g-2">
+        <div class="col-md-6">
+          <label class="form-label">Emri i punonjësit</label>
+          <select id="userSelect" class="form-select"></select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Fjalëkalimi (PIN)</label>
+          <input id="passwordInput" class="form-control" type="password" placeholder="Fjalëkalimi" />
+        </div>
+      </div>
 
-    <div class="col-lg-4">
-      <!-- Login / User panel -->
-      <div class="card p-3">
-        <h5>Hyr / Zgjidh përdoruesin</h5>
+      <div class="mt-3 d-flex gap-2">
+        <button id="btnLogin" class="btn btn-primary">Hyr (Fjalëkalim)</button>
+        <button id="btnOpenAsGuest" class="btn btn-outline-secondary">Hyr Pa Login (Vetëm Shikim)</button>
+        <div class="form-check ms-auto">
+          <input class="form-check-input" type="checkbox" id="noLocationCheckbox">
+          <label class="form-check-label" for="noLocationCheckbox">Dërgo pa lokacion (pa kërkesë)</label>
+        </div>
+      </div>
+    </div>
 
-        <div id="login-block">
+    <!-- Actions -->
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Regjistrimet</h5>
+          <div class="d-grid gap-2">
+            <button id="btnClockIn" class="btn btn-success">Kam ardhur në punë (RREND)</button>
+            <div class="input-group">
+              <input id="manualOutTime" type="time" class="form-control" />
+              <button id="btnManualOut" class="btn btn-warning">Sot në këtë orë dola</button>
+            </div>
+            <small class="small-muted">Nëse doni, mund të vendosni orën e daljes manualisht</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-3">
+          <h5>Shikoni Regjistrimet</h5>
           <div class="mb-2">
-            <label class="form-label">Zgjedh emrin</label>
-            <select id="user-select" class="form-select"></select>
+            <label class="form-label">Nga</label>
+            <input id="filterFrom" type="date" class="form-control" />
+            <label class="form-label mt-2">Deri</label>
+            <input id="filterTo" type="date" class="form-control" />
           </div>
-
-          <div class="mb-2">
-            <label class="form-label">Fjalëkalim</label>
-            <input id="password-input" class="form-control" placeholder="Vendos fjalëkalimin" type="password"/>
-          </div>
-
-          <div class="mb-2 form-check">
-            <input class="form-check-input" type="checkbox" id="opt-no-location"/>
-            <label class="form-check-label" for="opt-no-location">Dëshiron të dërgosh pa lokacion (lokacione të çaktivizuara)</label>
-          </div>
-
           <div class="d-flex gap-2">
-            <button id="btn-login" class="btn btn-primary">Hyr dhe Regjistro</button>
-            <button id="btn-create" class="btn btn-outline-secondary">Krijo Përdorues (nëse s'ekziston)</button>
+            <button id="btnLoadRecords" class="btn btn-outline-primary">Shiko</button>
+            <button id="btnShareWhatsApp" class="btn btn-success">Dërgo në WhatsApp</button>
+            <button id="btnExportCSV" class="btn btn-secondary">Eksporto CSV</button>
           </div>
-          <small class="text-muted d-block mt-2">Kur krijon, fjalëkalimi ruhet (hash SHA-256).</small>
+          <div id="recordsArea" class="mt-2 small" style="max-height:220px;overflow:auto"></div>
         </div>
-
-        <div id="user-actions" style="display:none">
-          <h6 id="welcome-title">Hej, <span id="display-name"></span></h6>
-          <div class="mb-2">
-            <button id="btn-checkin" class="btn btn-success w-100">Jam në punë (Regjistro hyrje)</button>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Sot shkova e dola — zgjedh kohën manual (opsionale)</label>
-            <input id="manual-time" type="time" class="form-control"/>
-            <button id="btn-manual-checkout" class="btn btn-warning w-100 mt-2">Sot - Kjo është koha që dola (Regjistro dalje)</button>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Shënim (opsional)</label>
-            <input id="note" class="form-control" placeholder="Përshkruaje shkurt"/>
-          </div>
-
-          <div class="mt-2">
-            <button id="btn-history" class="btn btn-outline-primary w-100">Shiko historinë time</button>
-          </div>
-        </div>
-
       </div>
-
-      <!-- Admin panel -->
-      <div id="admin-panel" class="card p-3 mt-3" style="display:none">
-        <h5>Panel Admin</h5>
-        <div class="mb-2">
-          <label class="form-label">Vendos lokacionin e punës (admin)</label>
-          <div class="input-group mb-2">
-            <input id="admin-lat" class="form-control" placeholder="Latitude"/>
-            <input id="admin-lng" class="form-control" placeholder="Longitude"/>
-          </div>
-          <div class="input-group mb-2">
-            <input id="allowed-radius" class="form-control" placeholder="Radius në metra (default 300)"/>
-            <button id="btn-save-location" class="btn btn-primary">Ruaj Lokacion</button>
-          </div>
-          <div><small class="text-muted">Admin-lokacioni përdoret për të kontrolluar nëse regjistrimi u bë brenda 300m.</small></div>
-        </div>
-
-        <hr/>
-
-        <h6>Menaxho Përdoruesit</h6>
-        <div class="mb-2">
-          <input id="new-username" class="form-control mb-1" placeholder="username (p.sh. punonjes4)"/>
-          <input id="new-display" class="form-control mb-1" placeholder="emri shfaqes (p.sh. Punonjës 4)"/>
-          <input id="new-password" class="form-control mb-1" placeholder="fjalëkalim"/>
-          <div class="form-check mb-1">
-            <input class="form-check-input" type="checkbox" id="new-is-admin"/>
-            <label class="form-check-label" for="new-is-admin">Lejo si admin</label>
-          </div>
-          <button id="btn-add-user" class="btn btn-success">Shto/Perditeso përdorues</button>
-        </div>
-
-        <div class="mb-2">
-          <h6>Lista e përdoruesve</h6>
-          <div id="user-list"></div>
-        </div>
-
-      </div>
-
     </div>
 
-    <div class="col-lg-8">
-      <!-- Reporting / history -->
-      <div class="card p-3">
-        <h5>Raporte & Eksport</h5>
-
-        <div class="row g-2">
-          <div class="col-md-4">
-            <label class="form-label">Zgjidh përdorues</label>
-            <select id="report-user" class="form-select"><option value="all">Të gjithë</option></select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Prej datës</label>
-            <input id="report-from" type="date" class="form-control"/>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Deri në datë</label>
-            <input id="report-to" type="date" class="form-control"/>
-          </div>
+    <!-- Admin panel -->
+    <div id="adminPanel" style="display:none" class="card p-3 mt-3">
+      <h5>Paneli i Adminit</h5>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input id="newName" class="form-control" placeholder="Emri i punonjësit" />
         </div>
-
-        <div class="mt-2 d-flex gap-2">
-          <button id="btn-generate" class="btn btn-primary">Gënero raport</button>
-          <button id="btn-copy-whatsapp" class="btn btn-success">Kopjo për WhatsApp</button>
-          <button id="btn-send-whatsapp" class="btn btn-outline-success">Dërgo në WhatsApp</button>
+        <div class="col-md-3">
+          <input id="newPassword" class="form-control" placeholder="PIN (shembull 1234)" />
         </div>
-
-        <div class="mt-3">
-          <h6>Rezultatet</h6>
-          <div id="report-results" style="max-height:420px; overflow:auto;"></div>
+        <div class="col-md-3">
+          <input id="newLat" class="form-control" placeholder="Lat (admin lokacion)" />
+        </div>
+        <div class="col-md-2">
+          <input id="newLng" class="form-control" placeholder="Lng" />
+        </div>
+      </div>
+      <div class="row g-2 mt-2">
+        <div class="col-md-2">
+          <input id="newRadius" type="number" class="form-control" placeholder="Radius (m)" value="300"/>
+        </div>
+        <div class="col-md-4">
+          <button id="btnAddUser" class="btn btn-primary">Shto / Ruaj Punonjës</button>
+          <button id="btnRefreshUsers" class="btn btn-outline-secondary">Rifresko</button>
         </div>
       </div>
 
-      <!-- Kalkulim ore -->
-      <div class="card p-3 mt-3">
-        <h5>Llogarit orët e punës (07:00 - 16:00 baza)</h5>
-        <div class="mb-2">
-          <small class="text-muted">Sekuenca: për çdo ditë, shënojmë hyrjet dhe daljet; llogaritim orën e brendshme (deri 16:00) + over-time pas 16:00.</small>
-        </div>
-        <div id="work-summary"></div>
-      </div>
-
+      <hr />
+      <div id="adminUsersList" style="max-height:220px;overflow:auto"></div>
     </div>
 
   </div>
 
-</div>
+  <script>
+  // ---------- Supabase init ----------
+  const SUPABASE_URL = "https://oqrukzyimkwacdniavya.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
+  const supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-<!-- Left vertical 'Çevir Kazan' style chip (but here it's 'Menu') -->
-<div class="left-fixed">
-  <div class="chip" id="open-menu" title="Menu">MENU</div>
-</div>
+  // ---------- Helpers ----------
+  function sha256hex(msg){
+    const enc = new TextEncoder();
+    const data = enc.encode(msg);
+    return crypto.subtle.digest("SHA-256", data).then(h=>{
+      return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    });
+  }
+  function nowISO(){ return new Date().toISOString(); }
+  function fmtDT(iso){ const d=new Date(iso); return d.toLocaleString('sq-AL'); }
+  function distanceMeters(lat1,lon1,lat2,lon2){
+    // haversine
+    const R=6371000;
+    const toRad = x => x*Math.PI/180;
+    const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+    const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    return R*c;
+  }
 
-<!-- Toast area -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index:12000">
-  <div id="toast-area"></div>
-</div>
-
-<script>
-/* ============================
-  KONFIGURIMI SUPABASE
-   Vendos supabaseUrl dhe supabaseAnonKey si dha përdoruesi
-   (emri i projektit: oqrukzyimkwacdniavya)
-   Kujdes: ky anon key është i përdoruesit (ju e shpëtuat) dhe përdoret këtu.
-============================ */
-const SUPABASE_URL = 'https://oqrukzyimkwacdniavya.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI';
-
-const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-/* HELPER: SHA-256 hashing per fjalëkalim (hex) */
-async function sha256hex(str){
-  const enc = new TextEncoder();
-  const data = enc.encode(str);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  const arr = Array.from(new Uint8Array(hash));
-  return arr.map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-/* UI helpers */
-function toast(msg, type='info'){
-  const id = 't'+Date.now();
-  const div = document.createElement('div');
-  div.className = 'toast align-items-center text-bg-'+(type==='error'?'danger':type)+' border-0';
-  div.role='alert'; div.ariaLive='assertive'; div.ariaAtomic='true';
-  div.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
-  document.getElementById('toast-area').appendChild(div);
-  const b = new bootstrap.Toast(div, {delay:4000});
-  b.show();
-}
-
-/* GLOBAL state */
-let currentUser = null; // {id, username, display_name, is_admin}
-let sessionPassword = null; // stored in sessionStorage optionally
-let settingsCache = { admin_location: '0|0', allowed_radius_m: '300' };
-
-/* Inicjalizimi: merr users, settings */
-async function init(){
-  await loadSettings();
-  await loadUsersToSelect();
-  await loadUserListAdmin();
-  wireEvents();
-  loadSession();
-}
-
-async function loadSettings(){
-  try{
-    const { data } = await supabase.from('app_settings').select('*');
-    if(data){
-      data.forEach(row => { settingsCache[row.key] = row.value; });
+  // Mesai hesap: normal 07:00-16:00
+  function calcShift(inISO,outISO){
+    const inD=new Date(inISO), outD=new Date(outISO);
+    if(outD<inD) return {regularMinutes:0,overtimeMinutes:0,totalMinutes:0};
+    const total = (outD - inD)/60000;
+    // create window for same day(s)
+    let regular=0;
+    // iterate minute windows per day (fast approach split by day)
+    let cur=new Date(inD);
+    while(cur < outD){
+      const dayStart = new Date(cur); dayStart.setHours(7,0,0,0);
+      const dayEnd = new Date(cur); dayEnd.setHours(16,0,0,0);
+      const segStart = new Date(Math.max(cur, dayStart));
+      const segEnd = new Date(Math.min(outD, dayEnd));
+      if(segEnd > segStart) regular += (segEnd - segStart)/60000;
+      // move to next day 00:00
+      cur = new Date(cur); cur.setDate(cur.getDate()+1); cur.setHours(0,0,0,0);
     }
-    document.getElementById('allowed-radius').value = settingsCache.allowed_radius_m || '300';
-    const [lat,lng] = (settingsCache.admin_location || '0|0').split('|');
-    document.getElementById('admin-lat').value = lat || '';
-    document.getElementById('admin-lng').value = lng || '';
-  }catch(e){
-    console.error('settings load',e);
+    const overtime = total - regular;
+    return {regularMinutes: Math.round(regular), overtimeMinutes: Math.round(overtime), totalMinutes: Math.round(total)};
   }
-}
 
-async function saveSetting(key,val){
-  // upsert via RPC-like approach
-  const existing = await supabase.from('app_settings').select('*').eq('key',key).maybeSingle();
-  if(existing.error) console.warn(existing.error);
-  if(existing.data){
-    await supabase.from('app_settings').update({value:val}).eq('key',key);
-  } else {
-    await supabase.from('app_settings').insert({key:key, value:val});
+  // ---------- UI binding ----------
+  const userSelect = document.getElementById('userSelect');
+  const passwordInput = document.getElementById('passwordInput');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnOpenAsGuest = document.getElementById('btnOpenAsGuest');
+  const btnClockIn = document.getElementById('btnClockIn');
+  const btnManualOut = document.getElementById('btnManualOut');
+  const manualOutTime = document.getElementById('manualOutTime');
+  const noLocationCheckbox = document.getElementById('noLocationCheckbox');
+  const currentUserLabel = document.getElementById('currentUserLabel');
+  const btnLogout = document.getElementById('btnLogout');
+  const btnLoadRecords = document.getElementById('btnLoadRecords');
+  const recordsArea = document.getElementById('recordsArea');
+  const filterFrom = document.getElementById('filterFrom');
+  const filterTo = document.getElementById('filterTo');
+  const btnShareWhatsApp = document.getElementById('btnShareWhatsApp');
+  const btnExportCSV = document.getElementById('btnExportCSV');
+
+  // admin
+  const adminPanel = document.getElementById('adminPanel');
+  const newName = document.getElementById('newName');
+  const newPassword = document.getElementById('newPassword');
+  const newLat = document.getElementById('newLat');
+  const newLng = document.getElementById('newLng');
+  const newRadius = document.getElementById('newRadius');
+  const btnAddUser = document.getElementById('btnAddUser');
+  const adminUsersList = document.getElementById('adminUsersList');
+  const btnRefreshUsers = document.getElementById('btnRefreshUsers');
+
+  let currentUser = null; // {id,name,role,...}
+
+  // Load users to select
+  async function loadUsers(){
+    userSelect.innerHTML = '';
+    const { data, error } = await supabase.from('users').select('*').order('name');
+    if(error){ console.error(error); return; }
+    data.forEach(u=>{
+      const o = document.createElement('option');
+      o.value = u.id;
+      o.textContent = u.name + (u.role==='admin' ? ' (Admin)' : '');
+      userSelect.appendChild(o);
+    });
+    refreshAdminList();
   }
-  settingsCache[key] = val;
-  toast('U ruajt '+key,'success');
-}
 
-async function loadUsersToSelect(){
-  const { data, error } = await supabase.from('users_app').select('id,username,display_name').order('display_name');
-  if(error) { console.error(error); return; }
-  const sel = document.getElementById('user-select');
-  const rep = document.getElementById('report-user');
-  sel.innerHTML = ''; rep.innerHTML = '<option value="all">Të gjithë</option>';
-  data.forEach(u=>{
-    const opt = document.createElement('option'); opt.value = u.id; opt.textContent = u.display_name || u.username;
-    sel.appendChild(opt);
-    const opt2 = opt.cloneNode(true);
-    rep.appendChild(opt2);
-  });
-}
-
-/* Admin list */
-async function loadUserListAdmin(){
-  const container = document.getElementById('user-list');
-  container.innerHTML = '';
-  const { data } = await supabase.from('users_app').select('*').order('created_at', {ascending:false});
-  if(data){
+  async function refreshAdminList(){
+    const { data } = await supabase.from('users').select('*').order('name');
+    adminUsersList.innerHTML = '';
     data.forEach(u=>{
       const div = document.createElement('div');
-      div.className = 'd-flex align-items-center gap-2 mb-1';
-      div.innerHTML = `<div style="flex:1">${u.display_name||u.username} <small class="text-muted">(${u.username})</small></div>
-        <div><button class="btn btn-sm btn-outline-primary btn-edit" data-id="${u.id}">Ndrysho</button></div>
-        <div><button class="btn btn-sm btn-outline-danger btn-del" data-id="${u.id}">Fshi</button></div>`;
-      container.appendChild(div);
+      div.className='d-flex align-items-center gap-2 py-2 border-bottom';
+      div.innerHTML = `
+        <div style="flex:1"><strong>${u.name}</strong><div class="small-muted">ID: ${u.id} • ${u.role}</div></div>
+        <div class="text-end">
+          <button class="btn btn-sm btn-outline-secondary btn-edit" data-id="${u.id}">Ndrysho</button>
+          <button class="btn btn-sm btn-danger btn-del" data-id="${u.id}">Fshi</button>
+        </div>
+      `;
+      adminUsersList.appendChild(div);
     });
-    container.querySelectorAll('.btn-edit').forEach(b=>{
-      b.addEventListener('click',async e=>{
-        const id = e.target.dataset.id;
-        const { data } = await supabase.from('users_app').select('*').eq('id',id).maybeSingle();
-        if(data){
-          document.getElementById('new-username').value = data.username;
-          document.getElementById('new-display').value = data.display_name;
-          document.getElementById('new-password').value = '';
-          document.getElementById('new-is-admin').checked = data.is_admin;
+    // attach
+    adminUsersList.querySelectorAll('.btn-del').forEach(b=>{
+      b.onclick = async ()=> {
+        const id=b.dataset.id;
+        if(!confirm('A jeni i sigurt që doni ta fshini?')) return;
+        await supabase.from('users').delete().eq('id',id);
+        await loadUsers();
+      }
+    });
+    adminUsersList.querySelectorAll('.btn-edit').forEach(b=>{
+      b.onclick = async ()=>{
+        const id=b.dataset.id;
+        const { data } = await supabase.from('users').select('*').eq('id',id).single();
+        if(!data) return alert('User not found');
+        newName.value = data.name;
+        newLat.value = data.allowed_lat || '';
+        newLng.value = data.allowed_lng || '';
+        newRadius.value = data.allowed_radius_meters || 300;
+        newPassword.value = ''; // leave blank
+        btnAddUser.dataset.editId = id;
+        window.scrollTo({top:0, behavior:'smooth'});
+      }
+    });
+  }
+
+  btnRefreshUsers.onclick = loadUsers;
+  btnAddUser.onclick = async ()=>{
+    const name = newName.value.trim();
+    if(!name) return alert('Vendosni emrin');
+    const password = newPassword.value.trim();
+    const lat = parseFloat(newLat.value) || null;
+    const lng = parseFloat(newLng.value) || null;
+    const radius = parseInt(newRadius.value || '300');
+
+    let payload = { name, allowed_lat: lat, allowed_lng: lng, allowed_radius_meters: radius, role:'worker' };
+    // set password hash if provided
+    if(password){
+      payload.password_hash = await sha256hex(password);
+    }
+    if(btnAddUser.dataset.editId){
+      const id=btnAddUser.dataset.editId;
+      // don't overwrite password when blank
+      if(!password) delete payload.password_hash;
+      const { error } = await supabase.from('users').update(payload).eq('id',id);
+      if(error) return alert('Gabim: ' + error.message);
+      delete btnAddUser.dataset.editId;
+    } else {
+      // create
+      if(!password) return alert('Vendos PIN për përdoruesin e ri');
+      payload.password_hash = await sha256hex(password);
+      const { error } = await supabase.from('users').insert([payload]);
+      if(error) return alert('Gabim: ' + error.message);
+    }
+    newName.value=''; newPassword.value=''; newLat.value=''; newLng.value=''; newRadius.value='300';
+    await loadUsers();
+  }
+
+  btnLogin.onclick = async ()=>{
+    const id = userSelect.value;
+    const pin = passwordInput.value.trim();
+    if(!id || !pin) return alert('Zgjidhni punonjës dhe vendosni fjalëkalimin');
+    const { data, error } = await supabase.from('users').select('*').eq('id',id).single();
+    if(error || !data) return alert('Përdoruesi nuk u gjet');
+    const hash = await sha256hex(pin);
+    if(hash !== data.password_hash) return alert('Fjalëkalimi gabim');
+    currentUser = data;
+    onLogin();
+  }
+
+  btnOpenAsGuest.onclick = async ()=>{
+    const id = userSelect.value;
+    if(!id) return alert('Zgjidhni punonjës');
+    const { data } = await supabase.from('users').select('*').eq('id',id).single();
+    currentUser = data;
+    currentUser.guest = true;
+    onLogin();
+  }
+
+  btnLogout.onclick = ()=>{
+    currentUser = null;
+    currentUserLabel.textContent = 'Jo i identifikuar';
+    btnLogout.style.display = 'none';
+    adminPanel.style.display = 'none';
+    document.getElementById('btnClockIn').disabled = false;
+  }
+
+  function onLogin(){
+    currentUserLabel.textContent = currentUser.name + (currentUser.role==='admin' ? ' (Admin)' : '');
+    btnLogout.style.display = 'inline-block';
+    if(currentUser.role==='admin') adminPanel.style.display = 'block'; else adminPanel.style.display = 'none';
+    document.getElementById('btnClockIn').disabled = false;
+  }
+
+  // Clock-in
+  btnClockIn.onclick = async ()=>{
+    if(!currentUser) return alert('Hyni me llogarinë tuaj ose zgjidhni si guest');
+    const wantNoLoc = noLocationCheckbox.checked;
+    let lat=null,lng=null, out_of_range=false;
+    if(!wantNoLoc && navigator.geolocation){
+      try{
+        const pos = await new Promise((res,rej)=> navigator.geolocation.getCurrentPosition(res,rej,{timeout:15000}));
+        lat = pos.coords.latitude; lng = pos.coords.longitude;
+        if(currentUser.allowed_lat && currentUser.allowed_lng){
+          const d = distanceMeters(currentUser.allowed_lat, currentUser.allowed_lng, lat, lng);
+          out_of_range = d > (currentUser.allowed_radius_meters || 300);
         }
-      });
-    });
-    container.querySelectorAll('.btn-del').forEach(b=>{
-      b.addEventListener('click', async e=>{
-        if(!confirm('Dëshiron ta fshish këtë përdorues?')) return;
-        const id = e.target.dataset.id;
-        await supabase.from('users_app').delete().eq('id',id);
-        toast('U fshi','success');
-        await loadUsersToSelect();
-        await loadUserListAdmin();
-      });
-    });
-  }
-}
-
-/* Event wiring */
-function wireEvents(){
-  document.getElementById('btn-login').addEventListener('click', onLogin);
-  document.getElementById('btn-create').addEventListener('click', onCreateUser);
-  document.getElementById('btn-logout').addEventListener('click', onLogout);
-  document.getElementById('btn-checkin').addEventListener('click', onCheckIn);
-  document.getElementById('btn-manual-checkout').addEventListener('click', onManualCheckout);
-  document.getElementById('btn-history').addEventListener('click', showMyHistory);
-  document.getElementById('btn-add-user').addEventListener('click', onAddUserAdmin);
-  document.getElementById('btn-save-location').addEventListener('click', onSaveAdminLocation);
-
-  document.getElementById('btn-generate').addEventListener('click', generateReport);
-  document.getElementById('btn-copy-whatsapp').addEventListener('click', copyWhatsAppText);
-  document.getElementById('btn-send-whatsapp').addEventListener('click', sendWhatsAppText);
-
-  document.getElementById('open-menu').addEventListener('click', ()=> {
-    window.scrollTo({top:0, behavior:'smooth'});
-    toast('Kliko në "Hyr" për të vazhduar','info');
-  });
-}
-
-/* Session: check if someone already logged (localStorage) */
-function loadSession(){
-  const id = localStorage.getItem('app_user_id');
-  const pw = sessionStorage.getItem('app_user_pw'); // hashed pw
-  if(id && pw){
-    // fetch user
-    supabase.from('users_app').select('*').eq('id',id).maybeSingle().then(res=>{
-      if(res.data){
-        currentUser = res.data;
-        sessionPassword = pw;
-        onLoggedIn();
-      } else {
-        localStorage.removeItem('app_user_id');
-        sessionStorage.removeItem('app_user_pw');
+      }catch(e){
+        console.warn('location err',e);
+        if(!confirm('Lokacioni nuk u mor. Dërgo pa lokacion?')) return;
       }
+    } else {
+      if(!wantNoLoc && !navigator.geolocation) alert('Shfletuesi juaj nuk mbështet geolocation.');
+    }
+
+    const payload = {
+      user_id: currentUser.id,
+      type: 'in',
+      timestamp: nowISO(),
+      lat, lng, out_of_range
+    };
+    const { error } = await supabase.from('attendances').insert([payload]);
+    if(error) return alert('Gabim në regjistrim: ' + error.message);
+    alert('Regjistrim hyrje u ruajt: ' + fmtDT(payload.timestamp) + (out_of_range ? ' (Jeni jashtë zonës)' : ''));
+  }
+
+  // Manual out
+  btnManualOut.onclick = async ()=>{
+    if(!currentUser) return alert('Hyni me llogarinë tuaj ose zgjidhni si guest');
+    const time = manualOutTime.value;
+    if(!time) return alert('Zgjidhni orën e daljes');
+    // Compose today's date + time
+    const today = new Date();
+    const [hh,mm] = time.split(':').map(x=>parseInt(x));
+    const outD = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hh, mm, 0);
+    const outISO = outD.toISOString();
+
+    let lat=null,lng=null,out_of_range=false;
+    const wantNoLoc = noLocationCheckbox.checked;
+    if(!wantNoLoc && navigator.geolocation){
+      try{
+        const pos = await new Promise((res,rej)=> navigator.geolocation.getCurrentPosition(res,rej,{timeout:15000}));
+        lat = pos.coords.latitude; lng = pos.coords.longitude;
+        if(currentUser.allowed_lat && currentUser.allowed_lng){
+          const d = distanceMeters(currentUser.allowed_lat, currentUser.allowed_lng, lat, lng);
+          out_of_range = d > (currentUser.allowed_radius_meters || 300);
+        }
+      }catch(e){
+        if(!confirm('Lokacioni nuk u mor. Dërgo pa lokacion?')) return;
+      }
+    }
+
+    const payload = { user_id: currentUser.id, type:'out', timestamp: outISO, lat, lng, out_of_range };
+    const { error } = await supabase.from('attendances').insert([payload]);
+    if(error) return alert('Gabim në regjistrim: ' + error.message);
+    alert('Regjistrim dalje u ruajt: ' + fmtDT(outISO) + (out_of_range ? ' (Jeni jashtë zonës)' : ''));
+  }
+
+  // Load records
+  btnLoadRecords.onclick = async ()=>{
+    if(!currentUser) return alert('Hyni me llogarinë tuaj ose zgjidhni si guest');
+    const from = filterFrom.value ? new Date(filterFrom.value).toISOString() : null;
+    const to = filterTo.value ? (new Date(filterTo.value).setHours(23,59,59,999), new Date(filterTo.value).toISOString()) : null;
+    let query = supabase.from('attendances').select('*,users(name)').order('timestamp', {ascending:false});
+    if(currentUser.role !== 'admin') query = query.eq('user_id', currentUser.id);
+    if(from) query = query.gte('timestamp', from);
+    if(to) query = query.lte('timestamp', new Date(filterTo.value + 'T23:59:59').toISOString());
+    const { data, error } = await query;
+    if(error) return alert('Gabim në marrjen e të dhënave: ' + error.message);
+    recordsArea.innerHTML = '';
+    if(!data || data.length===0){ recordsArea.textContent = 'Nuk ka regjistrime për periudhën.'; return; }
+    // Pair up in/out by sequencing per user per day - but for simplicity, just list items and compute pairs by matching the closest previous 'in'
+    // Build pairs
+    const byUser = {};
+    data.slice().reverse().forEach(r=>{ // chronological
+      if(!byUser[r.user_id]) byUser[r.user_id] = [];
+      byUser[r.user_id].push(r);
     });
-  }
-}
-
-/* Login: check username selected and password */
-async function onLogin(){
-  const sel = document.getElementById('user-select').value;
-  const pw = document.getElementById('password-input').value || '';
-  if(!sel || !pw){ toast('Ploteso username dhe fjalekalim','error'); return; }
-  const hash = await sha256hex(pw);
-  const { data, error } = await supabase.from('users_app').select('*').eq('id',sel).maybeSingle();
-  if(error) { console.error(error); toast('Gabim','error'); return; }
-  if(!data){ toast('Përdoruesi nuk u gjet','error'); return; }
-  if(data.password_hash !== hash){
-    toast('Fjalëkalim i gabuar','error'); return;
-  }
-  currentUser = data;
-  sessionPassword = hash;
-  // store session
-  localStorage.setItem('app_user_id', data.id);
-  sessionStorage.setItem('app_user_pw', hash);
-  onLoggedIn();
-}
-
-/* Create user (if not exists). Admin can also create via admin panel. */
-async function onCreateUser(){
-  const sel = document.getElementById('user-select');
-  const username = prompt('Vendos username të ri (pa hapësira)', '');
-  if(!username) return;
-  const display = prompt('Emri shfaqës', username);
-  const pw = prompt('Fjalekalim për përdoruesin', '');
-  if(!pw){ toast('Fjalëkalim i nevojshëm','error'); return; }
-  const hash = await sha256hex(pw);
-  // try insert
-  const { error } = await supabase.from('users_app').insert({
-    username: username,
-    display_name: display,
-    password_hash: hash,
-    is_admin: false
-  });
-  if(error){
-    toast('Gabim: '+error.message,'error');
-    return;
-  }
-  toast('Përdoruesi u krijua','success');
-  await loadUsersToSelect();
-}
-
-/* Add/update user from admin panel */
-async function onAddUserAdmin(){
-  const user = document.getElementById('new-username').value.trim();
-  if(!user) { toast('Vendos username','error'); return; }
-  const display = document.getElementById('new-display').value.trim() || user;
-  const pw = document.getElementById('new-password').value;
-  const isAdmin = document.getElementById('new-is-admin').checked;
-  let hash = null;
-  if(pw) hash = await sha256hex(pw);
-  // check exists
-  const existing = await supabase.from('users_app').select('*').eq('username', user).maybeSingle();
-  if(existing.data){
-    // update
-    const patch = { display_name: display, is_admin: isAdmin };
-    if(hash) patch.password_hash = hash;
-    await supabase.from('users_app').update(patch).eq('username', user);
-    toast('Përditësuar','success');
-  } else {
-    await supabase.from('users_app').insert({ username:user, display_name:display, password_hash: hash || await sha256hex('1234'), is_admin:isAdmin });
-    toast('Shtuar','success');
-  }
-  document.getElementById('new-username').value=''; document.getElementById('new-display').value=''; document.getElementById('new-password').value='';
-  await loadUsersToSelect(); await loadUserListAdmin();
-}
-
-/* Logout */
-function onLogout(){
-  currentUser = null;
-  sessionPassword = null;
-  localStorage.removeItem('app_user_id');
-  sessionStorage.removeItem('app_user_pw');
-  document.getElementById('user-actions').style.display = 'none';
-  document.getElementById('login-block').style.display = 'block';
-  document.getElementById('admin-panel').style.display = 'none';
-  document.getElementById('btn-logout').style.display = 'none';
-  document.getElementById('current-user-name').textContent='';
-  toast('U deconnectove','info');
-}
-
-/* After successful login */
-function onLoggedIn(){
-  document.getElementById('login-block').style.display='none';
-  document.getElementById('user-actions').style.display='block';
-  document.getElementById('display-name').textContent = currentUser.display_name || currentUser.username;
-  document.getElementById('btn-logout').style.display = 'inline-block';
-  document.getElementById('current-user-name').textContent = (currentUser.is_admin? '🛡️ ' : '') + (currentUser.display_name || currentUser.username);
-  if(currentUser.is_admin){
-    document.getElementById('admin-panel').style.display = 'block';
-  } else {
-    document.getElementById('admin-panel').style.display = 'none';
-  }
-}
-
-/* Save admin location */
-async function onSaveAdminLocation(){
-  const lat = document.getElementById('admin-lat').value.trim();
-  const lng = document.getElementById('admin-lng').value.trim();
-  const r = document.getElementById('allowed-radius').value.trim() || '300';
-  if(!lat || !lng){ toast('Vendos lat & lng','error'); return; }
-  await saveSetting('admin_location', `${lat}|${lng}`);
-  await saveSetting('allowed_radius_m', r);
-  toast('Lokacion admin ruajtur','success');
-}
-
-/* Register check-in event: use geolocation unless opted out */
-async function onCheckIn(){
-  if(!currentUser){ toast('Duhet të hysh me fjalëkalim','error'); return; }
-  const noLocation = document.getElementById('opt-no-location').checked;
-  let lat=null,lng=null,distance=null,allowed=true;
-  if(!noLocation && 'geolocation' in navigator){
-    try{
-      const pos = await new Promise((res,rej)=> navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy:true, timeout:10000 }));
-      lat = pos.coords.latitude; lng = pos.coords.longitude;
-      // compute distance from admin
-      const [alat,alng] = (settingsCache.admin_location || '0|0').split('|').map(Number);
-      if(alat && alng) {
-        distance = computeDistanceMeters(alat, alng, lat, lng);
-        const allowedRadius = Number(settingsCache.allowed_radius_m || '300');
-        allowed = distance <= allowedRadius;
+    // for each user, build pairs
+    let html = '';
+    for(const uid in byUser){
+      const arr = byUser[uid];
+      html += `<div class="mb-2"><strong>${arr[0].users.name}</strong><div class="small-muted">(${arr.length} regjistrime)</div></div>`;
+      for(let i=0;i<arr.length;i++){
+        const r = arr[i];
+        html += `<div class="border rounded p-2 mb-1"><div>${r.type.toUpperCase()}: ${fmtDT(r.timestamp)}</div>`;
+        html += `<div class="small-muted">Lokacion: ${r.lat? r.lat.toFixed(5)+', '+r.lng.toFixed(5): 'Pa lokacion'} ${r.out_of_range ? ' • JASHTË ZONËS' : ''}</div>`;
+        html += `</div>`;
       }
-    }catch(err){
-      console.warn('geo err',err);
-      toast('Gabim marrja e lokacionit ose u refuzua','error');
-      if(!confirm('Deshiron te dergosh pa lokacion?')) return;
     }
-  } else {
-    // no geolocation or opted out
+    recordsArea.innerHTML = html;
   }
 
-  // insert entry
-  const payload = {
-    user_id: currentUser.id,
-    event_type: 'checkin',
-    lat: lat,
-    lng: lng,
-    distance_meters: distance,
-    location_allowed: allowed,
-    note: document.getElementById('note').value || null
-  };
-  const { error } = await supabase.from('entries').insert(payload);
-  if(error) { console.error(error); toast('Gabim regjistrimi','error'); return; }
-  toast('Hyrja u regjistrua','success');
-}
+  // WhatsApp share/export
+  btnShareWhatsApp.onclick = async ()=>{
+    if(!currentUser) return alert('Hyni me llogarinë tuaj ose zgjidhni si guest');
+    const from = filterFrom.value ? new Date(filterFrom.value) : null;
+    const to = filterTo.value ? new Date(filterTo.value) : null;
+    // fetch attendances
+    let query = supabase.from('attendances').select('*').order('timestamp',{ascending:true});
+    if(currentUser.role !== 'admin') query = query.eq('user_id', currentUser.id);
+    if(from) query = query.gte('timestamp', from.toISOString());
+    if(to) query = query.lte('timestamp', new Date(to.getFullYear(),to.getMonth(),to.getDate(),23,59,59).toISOString());
+    const { data, error } = await query;
+    if(error) return alert('Gabim: ' + error.message);
+    if(!data || data.length===0) return alert('Nuk ka të dhëna për periudhën');
 
-/* Manual checkout using selected time (today + time) */
-async function onManualCheckout(){
-  if(!currentUser){ toast('Hyni per te regjistruar','error'); return; }
-  const t = document.getElementById('manual-time').value;
-  if(!t){ toast('Zgjidh kohen e daljes','error'); return; }
-  // build timestamp for today with chosen time
-  const today = new Date();
-  const [hh,mm] = t.split(':').map(Number);
-  today.setHours(hh,mm,0,0);
-  const manual_iso = today.toISOString();
-  // location logic as above (or allow no-loc)
-  const noLocation = document.getElementById('opt-no-location').checked;
-  let lat=null,lng=null,distance=null,allowed=true;
-  if(!noLocation && 'geolocation' in navigator){
-    try{
-      const pos = await new Promise((res,rej)=> navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy:true, timeout:10000 }));
-      lat = pos.coords.latitude; lng = pos.coords.longitude;
-      const [alat,alng] = (settingsCache.admin_location || '0|0').split('|').map(Number);
-      if(alat && alng) {
-        distance = computeDistanceMeters(alat, alng, lat, lng);
-        const allowedRadius = Number(settingsCache.allowed_radius_m || '300');
-        allowed = distance <= allowedRadius;
-      }
-    }catch(err){
-      if(!confirm('Deshiron te dergosh pa lokacion?')) return;
+    // Build readable text grouped by day and pairs
+    // We will pair ins and outs in chronological order for the user (simple algorithm)
+    const grouped = {};
+    for(const r of data){
+      const day = r.timestamp.slice(0,10);
+      if(!grouped[day]) grouped[day]=[];
+      grouped[day].push(r);
     }
-  }
-  const payload = {
-    user_id: currentUser.id,
-    event_type: 'checkout',
-    ts: manual_iso,
-    manual_time: manual_iso,
-    lat: lat, lng: lng, distance_meters: distance, location_allowed: allowed,
-    note: document.getElementById('note').value || null
-  };
-  const { error } = await supabase.from('entries').insert(payload);
-  if(error){ console.error(error); toast('Gabim regjistrimi','error'); return; }
-  toast('Dalja u regjistrua','success');
-}
-
-/* Show user's own history */
-async function showMyHistory(){
-  const { data } = await supabase.from('entries').select('*').eq('user_id', currentUser.id).order('ts', {ascending:false}).limit(200);
-  const cont = document.getElementById('report-results');
-  if(!data || data.length===0){ cont.innerHTML = '<div class="text-muted">S'+"'"+'ke regjistrime</div>'; return; }
-  let html = '<table class="table table-sm"><thead><tr><th>Data</th><th>Lloji</th><th>Kohë</th><th>Lokacion</th><th>Shënim</th></tr></thead><tbody>';
-  data.forEach(r=>{
-    const d = new Date(r.ts);
-    html += `<tr><td>${d.toLocaleDateString('sq-AL')}</td><td>${r.event_type}</td><td>${d.toLocaleTimeString('sq-AL')}</td><td>${r.lat? (r.distance_meters? Math.round(r.distance_meters)+'m':'brenda') : 'pa lok.'}</td><td>${r.note||''}</td></tr>`;
-  });
-  html += '</tbody></table>';
-  cont.innerHTML = html;
-}
-
-/* Generate report (selected user/date range) */
-let lastReportText = '';
-async function generateReport(){
-  const uid = document.getElementById('report-user').value;
-  const from = document.getElementById('report-from').value;
-  const to = document.getElementById('report-to').value;
-  let q = supabase.from('entries').select('*, users_app(username, display_name)').order('ts', {ascending:true});
-  if(uid && uid !== 'all') q = q.eq('user_id', uid);
-  if(from) q = q.gte('ts', new Date(from+'T00:00:00').toISOString());
-  if(to) q = q.lte('ts', new Date(to+'T23:59:59').toISOString());
-  const { data, error } = await q;
-  if(error) { console.error(error); toast('Gabim gjenerimi','error'); return; }
-  // Format: group by user -> date -> events
-  const grouped = {};
-  data.forEach(r=>{
-    const uid = r.user_id;
-    const d = new Date(r.ts);
-    const dateKey = d.toLocaleDateString('sq-AL');
-    grouped[uid] = grouped[uid] || { user: r.users_app?.display_name || r.users_app?.username || uid, dates: {} };
-    grouped[uid].dates[dateKey] = grouped[uid].dates[dateKey] || [];
-    grouped[uid].dates[dateKey].push(r);
-  });
-
-  let outHtml = '';
-  let textForWhats = '';
-  for(const uidKey in grouped){
-    outHtml += `<h6>${grouped[uidKey].user}</h6>`;
-    textForWhats += `${grouped[uidKey].user}\n`;
-    for(const dateKey in grouped[uidKey].dates){
-      outHtml += `<strong>${dateKey}</strong><ul>`;
-      textForWhats += `${dateKey}\n`;
-      grouped[uidKey].dates[dateKey].forEach(ev=>{
-        const t = new Date(ev.ts).toLocaleTimeString('sq-AL');
-        outHtml += `<li>${t} — ${ev.event_type} ${ev.location_allowed ? '' : '(lok. jashtë)'} ${ev.note? '- '+ev.note : ''}</li>`;
-        textForWhats += ` - ${t} ${ev.event_type} ${ev.location_allowed ? '' : '(lok. jashtë)'} ${ev.note? '- '+ev.note : ''}\n`;
-      });
-      outHtml += `</ul>`;
-      textForWhats += `\n`;
-    }
-    textForWhats += `\n----------------\n`;
-  }
-  document.getElementById('report-results').innerHTML = outHtml || '<div class="text-muted">Nuk u gjet asgjë.</div>';
-  lastReportText = textForWhats || 'Raporti bosh';
-}
-
-/* Copy WhatsApp text to clipboard */
-function copyWhatsAppText(){
-  if(!lastReportText){ toast('Gënero raportin parë','error'); return; }
-  navigator.clipboard.writeText(lastReportText).then(()=> toast('U kopjua tekbo p.sh. WhatsApp','success'));
-}
-
-/* Open WhatsApp send */
-function sendWhatsAppText(){
-  if(!lastReportText){ toast('Gënero raportin parë','error'); return; }
-  const encoded = encodeURIComponent(lastReportText);
-  // open web.whatsapp or mobile
-  const url = (navigator.userAgent.includes('Mobi')) ? `whatsapp://send?text=${encoded}` : `https://web.whatsapp.com/send?text=${encoded}`;
-  window.open(url,'_blank');
-}
-
-/* Compute distance between two lat/lng (meters) - Haversine */
-function computeDistanceMeters(lat1, lon1, lat2, lon2) {
-  function rad(x){return x*Math.PI/180;}
-  const R = 6378137; // Earth radius in meters
-  const dLat = rad(lat2 - lat1);
-  const dLon = rad(lon2 - lon1);
-  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  return R * c;
-}
-
-/* Work hours summary: read entries in date range and compute worked time between checkin-checkout pairs */
-async function computeWorkSummaryForRange(fromDate, toDate){
-  const { data } = await supabase.from('entries').select('*, users_app(username, display_name)').order('ts', {ascending:true});
-  if(!data) return;
-
-  // filter by date range if provided
-  let rows = data;
-  if(fromDate) rows = rows.filter(r => new Date(r.ts) >= new Date(fromDate+'T00:00:00'));
-  if(toDate) rows = rows.filter(r => new Date(r.ts) <= new Date(toDate+'T23:59:59'));
-
-  // group by user -> date
-  const groups = {};
-  rows.forEach(r=>{
-    const uid = r.user_id;
-    const dateKey = new Date(r.ts).toLocaleDateString('sq-AL');
-    groups[uid] = groups[uid] || { name: r.users_app?.display_name || r.users_app?.username || uid, dates: {} };
-    groups[uid].dates[dateKey] = groups[uid].dates[dateKey] || [];
-    groups[uid].dates[dateKey].push(r);
-  });
-
-  const results = [];
-  for(const uid in groups){
-    let totalRegular = 0; let totalOver = 0;
-    for(const dateKey in groups[uid].dates){
-      // sort events by time
-      const events = groups[uid].dates[dateKey].sort((a,b)=>new Date(a.ts)-new Date(b.ts));
-      // pair checkin->checkout sequentially
-      for(let i=0;i<events.length;i++){
-        if(events[i].event_type==='checkin'){
-          // find next checkout after this
-          let nextCheckout = null;
-          for(let j=i+1;j<events.length;j++){
-            if(events[j].event_type==='checkout'){ nextCheckout = events[j]; break; }
+    let text = `Raporti i pranisë për ${currentUser.name || 'përdorues'}\n`;
+    for(const day of Object.keys(grouped).sort()){
+      text += `\n📅 ${day}\n`;
+      const items = grouped[day];
+      // pair sequentially: find in then next out
+      for(let i=0;i<items.length;i++){
+        const a = items[i];
+        if(a.type==='in'){
+          // find next out after index i
+          let out = null;
+          for(let j=i+1;j<items.length;j++){
+            if(items[j].type==='out'){ out = items[j]; break; }
           }
-          if(nextCheckout){
-            const t1 = new Date(events[i].ts);
-            const t2 = new Date(nextCheckout.ts);
-            let seconds = (t2 - t1)/1000;
-            if(seconds < 0) continue;
-            // compute regular vs overtime (07:00-16:00 regular)
-            const baseStart = new Date(t1); baseStart.setHours(7,0,0,0);
-            const baseEnd = new Date(t1); baseEnd.setHours(16,0,0,0);
-            // overlap logic
-            const start = t1;
-            const end = t2;
-            const regStart = new Date(Math.max(start, baseStart));
-            const regEnd = new Date(Math.min(end, baseEnd));
-            let regSec = 0;
-            if(regEnd > regStart) regSec = (regEnd - regStart)/1000;
-            const overSec = seconds - regSec;
-            totalRegular += regSec;
-            if(overSec>0) totalOver += overSec;
+          if(out){
+            const c = calcShift(a.timestamp, out.timestamp);
+            text += ` - Hyrje: ${new Date(a.timestamp).toLocaleTimeString('sq-AL')} • Dalje: ${new Date(out.timestamp).toLocaleTimeString('sq-AL')}\n   Mesai: ${Math.floor(c.totalMinutes/60)}h ${c.totalMinutes%60}m (Rregull: ${Math.floor(c.regularMinutes/60)}h ${c.regularMinutes%60}m, Overtime: ${Math.floor(c.overtimeMinutes/60)}h ${c.overtimeMinutes%60}m)\n`;
+          } else {
+            text += ` - Hyrje: ${new Date(a.timestamp).toLocaleTimeString('sq-AL')} • Dalje: - (ende pa dalje)\n`;
           }
+        } else if(a.type==='out'){
+          // if no previous in, show out only
+          text += ` - Dalje: ${new Date(a.timestamp).toLocaleTimeString('sq-AL')} (pa hyrje të regjistruar)\n`;
         }
       }
     }
-    results.push({
-      user: groups[uid].name,
-      regular_hours: (totalRegular/3600),
-      overtime_hours: (totalOver/3600)
-    });
+
+    // prepare WhatsApp link
+    const encoded = encodeURIComponent(text);
+    const waLink = `https://wa.me/?text=${encoded}`;
+    window.open(waLink,'_blank');
   }
 
-  // render
-  const summaryDiv = document.getElementById('work-summary');
-  let html = '<table class="table table-sm"><thead><tr><th>Përdorues</th><th>Orë (07-16)</th><th>Orë mbipunesë</th></tr></thead><tbody>';
-  results.forEach(r=>{
-    html += `<tr><td>${r.user}</td><td>${r.regular_hours.toFixed(2)}</td><td>${r.overtime_hours.toFixed(2)}</td></tr>`;
-  });
-  html += '</tbody></table>';
-  summaryDiv.innerHTML = html;
-}
+  btnExportCSV.onclick = async ()=>{
+    if(!currentUser) return alert('Hyni me llogarinë tuaj');
+    const from = filterFrom.value ? new Date(filterFrom.value).toISOString() : null;
+    const to = filterTo.value ? new Date(filterTo.value + 'T23:59:59').toISOString() : null;
+    let query = supabase.from('attendances').select('*,users(name)').order('timestamp',{ascending:true});
+    if(currentUser.role!=='admin') query = query.eq('user_id', currentUser.id);
+    if(from) query = query.gte('timestamp', from);
+    if(to) query = query.lte('timestamp', to);
+    const { data } = await query;
+    if(!data) return alert('Nuk ka të dhëna');
+    let csv = 'user,name,type,timestamp,lat,lng,out_of_range\n';
+    data.forEach(r=>{
+      csv += `${r.user_id},"${r.users?.name||''}",${r.type},${r.timestamp},${r.lat||''},${r.lng||''},${r.out_of_range?1:0}\n`;
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download = 'attendances.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
 
-/* build periodic summary initially and every 30s */
-setInterval(()=> computeWorkSummaryForRange(document.getElementById('report-from').value, document.getElementById('report-to').value), 30000);
+  // initial load
+  loadUsers();
 
-/* copy last report text var helper functions for buttons */
-let lastReportTextGlobal = '';
-
-/* init app */
-init().then(()=> {
-  // compute initial summary
-  computeWorkSummaryForRange();
-  // attach change listeners for date filters to update summary
-  document.getElementById('report-from').addEventListener('change', ()=> computeWorkSummaryForRange(document.getElementById('report-from').value, document.getElementById('report-to').value));
-  document.getElementById('report-to').addEventListener('change', ()=> computeWorkSummaryForRange(document.getElementById('report-from').value, document.getElementById('report-to').value));
-});
-
-</script>
+  // openAppBtn scroll into view
+  document.getElementById('openAppBtn').onclick = ()=> window.scrollTo({top:0, behavior:'smooth'});
+  </script>
 </body>
 </html>
