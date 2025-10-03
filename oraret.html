@@ -2,12 +2,12 @@
 <html lang="sq">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Orari i Punës</title>
   <meta name="theme-color" content="#ffffff">
   <style>
     :root { --bg:#f7f7f9; --fg:#111; --muted:#6b7280; --pri:#2563eb; --ok:#16a34a; --warn:#f59e0b; --err:#dc2626; --card:#fff; --br:12px; }
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif}
     header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:10px 14px;z-index:10}
     #menuBtn{font-size:22px;background:transparent;border:0;cursor:pointer}
     #title{font-weight:600}
@@ -32,17 +32,21 @@
     .right{margin-left:auto}
     .toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
     .toast.show{opacity:1}
-    #drawer{position:fixed;inset:0 40% 0 0;max-width:360px;background:#fff;border-right:1px solid #e5e7eb;transform:translateX(-100%);transition:.25s;z-index:20;overflow:auto}
+    /* Drawer */
+    #drawer{position:fixed;inset:0 40% 0 0;max-width:420px;background:#fff;border-right:1px solid #e5e7eb;transform:translateX(-100%);transition:.25s;z-index:20;overflow:auto;padding-bottom:40px}
     #overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.25s;z-index:15}
     #drawer.open{transform:none} #overlay.show{opacity:1;pointer-events:auto}
     .section-title{font-weight:600;margin:10px 0 8px}
+    .danger{color:var(--err)}
     .hint{font-size:12px;color:var(--muted)}
     .sep{height:1px;background:#e5e7eb;margin:10px 0}
-    .badge{display:inline-block;padding:4px 8px;border-radius:8px;border:1px solid #e5e7eb;font-size:12px;margin-right:6px}
-    .danger{color:var(--err)}
-    .switch{display:flex;align-items:center;gap:8px}
+    .redrow{background:#fff0f0}
+    .totals{display:flex;gap:12px;margin-top:8px}
+    .totals div{padding:8px;border-radius:8px;background:#fbfbfb;border:1px solid #eee}
   </style>
+  <!-- Supabase client -->
   <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <!-- jsPDF for optional PDF export -->
   <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -65,7 +69,7 @@
         <button class="btn-pri" onclick="login()">Identifikohu</button>
         <button class="btn-ghost" onclick="logout()">Dil</button>
       </div>
-      <div class="hint">Hyr dhe regjistro orët e tua. Mund të dërgosh në WhatsApp ose të shkarkosh PDF.</div>
+      <div class="hint">Pasi të hysh, nuk do të kërkohet PIN përsëri për regjistrime gjatë sesionit.</div>
     </div>
   </div>
 
@@ -73,24 +77,42 @@
 
   <div class="card" id="adminBox" style="display:none">
     <div class="section-title">Përdoruesit &amp; Cilësimet (Admin)</div>
+
+    <!-- Kullanıcı ekleme / silme / düzenleme -->
     <div class="row">
-      <div><label>Emër i ri</label><input id="newName" placeholder="p.sh. Darti"></div>
-      <div><label>PIN i ri</label><input id="newPin" placeholder="1234"></div>
-    </div>
-    <div class="row">
-      <select id="newRole"><option value="user">Përdorues</option><option value="admin">Admin</option></select>
-      <button class="btn-ok" onclick="addUser()">Shto përdorues</button>
-    </div>
-    <div class="sep"></div>
-    <div>
-      <label>Zgjidh përdorues për ndryshim PIN</label>
-      <select id="editUser"></select>
-      <div class="row">
-        <input id="editPin" placeholder="PIN i ri">
-        <button onclick="changePin()">Ndrysho PIN</button>
+      <div>
+        <label>Emër i ri</label>
+        <input id="newName" placeholder="p.sh. Darti">
+      </div>
+      <div>
+        <label>PIN i ri</label>
+        <input id="newPin" placeholder="1234">
+      </div>
+      <div style="align-self:end">
+        <button class="btn-ok" onclick="addUser()">Shto</button>
       </div>
     </div>
+
     <div class="sep"></div>
+
+    <div>
+      <label>Menaxho përdorues</label>
+      <div class="row">
+        <select id="manageUser"></select>
+        <button onclick="loadManageUser()">Shiko</button>
+        <button onclick="deleteUser()">Fshij</button>
+      </div>
+      <div style="margin-top:8px">
+        <label>PIN i ri (menaxho)</label>
+        <div class="row">
+          <input id="managePin" placeholder="PIN e re">
+          <button onclick="manageChangePin()">Ndrysho PIN</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
     <div>
       <div class="section-title">Lokacioni i kompanisë</div>
       <div class="row">
@@ -102,78 +124,69 @@
         <button onclick="useMyLocation()">Vendos me lokacionin tim</button>
         <button class="btn-pri" onclick="saveSettings()">Ruaj</button>
       </div>
-      <div class="hint">Standard: 07:00–16:00 normal, pas 16:00 jashtë orarit.</div>
+      <div class="hint">Hyrje/Dalje do të pranohet si “brenda rrezes” vetëm nëse je brenda kësaj distance.</div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div id="adminViewer" style="display:none">
+      <div class="section-title">Shiko oraret e përdoruesit</div>
+      <div class="row">
+        <label>Nga</label><input type="date" id="adminFrom">
+        <label>Deri</label><input type="date" id="adminTo">
+        <div style="align-self:end"><button onclick="adminLoadUserPunches()">Shfaq</button></div>
+      </div>
+      <div id="adminTotals" style="margin-top:10px"></div>
+      <div id="adminHist" style="margin-top:8px"></div>
     </div>
   </div>
 </aside>
 
 <div class="container">
-  <!-- MESAI FORMU (yalnızca çıkış saati yazdırma) -->
   <div class="card">
-    <div class="section-title">Sot dola në orën… (vetëm DALJE)</div>
     <div class="row">
-      <div>
-        <label>Data</label>
-        <input type="date" id="manualDate">
-      </div>
-      <div>
-        <label>Ora</label>
-        <input type="time" id="manualTime" step="60">
-      </div>
+      <button class="btn-ok" onclick="punch('in')">Fillova punën</button>
+      <button class="btn-warn" onclick="punch('out')">Mbarova punën</button>
+      <button class="btn-ghost" onclick="manualPunch()">Sot jam dalë në orën...</button>
     </div>
-    <div class="row" style="margin-top:6px">
-      <div class="switch">
-        <input type="checkbox" id="noGeo" />
-        <label for="noGeo">Dërgo pa lokacion (nëse nuk jepet leja)</label>
-      </div>
-      <button class="btn-warn" onclick="manualOut()">Regjistro Daljen</button>
-    </div>
-    <div class="hint">Qëllim: punonjësi zakonisht ka hyrë më herët; këtu vetëm daljen shkruajmë.</div>
+    <div class="hint" style="margin-top:8px">Tarayıcı lokasyon istemezse sana "Dërgo pa lokacion" seçeneği sunulacak.</div>
   </div>
 
-  <!-- İSTEĞE BAĞLI eski hızlı butonlar -->
   <div class="card">
     <div class="row">
-      <button class="btn-ok" onclick="punch('in')">Fillova punën (opsionale)</button>
-      <button class="btn-warn" onclick="punch('out')">Mbarova punën (tani)</button>
-    </div>
-    <div class="row" style="margin-top:6px">
-      <div class="switch">
-        <input type="checkbox" id="forceNoGeoLive" />
-        <label for="forceNoGeoLive">Lokasyonsuz gönder (tani)</label>
+      <div>
+        <label>Nga data</label>
+        <input type="date" id="fromDate">
       </div>
-    </div>
-    <div class="hint">Bu düğmeler gerçek zamanı kullanır. Lokasyon izni yoksa işaretleyip gönder.</div>
-  </div>
-
-  <!-- FİLTRE + PAYLAŞIM -->
-  <div class="card">
-    <div class="row">
-      <div><label>Nga data</label><input type="date" id="fromDate"></div>
-      <div><label>Deri më</label><input type="date" id="toDate"></div>
-      <div style="align-self:end"><button onclick="refreshHistory()">Shfaq</button></div>
+      <div>
+        <label>Deri më</label>
+        <input type="date" id="toDate">
+      </div>
+      <div style="align-self:end">
+        <button onclick="refreshHistory()">Shfaq</button>
+      </div>
     </div>
     <div class="row" style="margin-top:8px">
       <button onclick="shareWhatsApp()">Dërgo në WhatsApp</button>
       <button onclick="downloadPDF()">Shkarko PDF</button>
     </div>
+
+    <div class="totals" id="userTotals"></div>
   </div>
 
-  <!-- ÖZET -->
-  <div class="card" id="summaryCard">
-    <div class="section-title">Përmbledhje Orësh</div>
-    <div id="summaryTotals" class="muted" style="margin-bottom:8px"></div>
-    <table id="summaryTable">
-      <thead><tr><th>Data</th><th>Dita</th><th>Orë pune (07–16)</th><th>Pas 16:00</th></tr></thead>
-      <tbody id="summaryBody"></tbody>
-    </table>
-  </div>
-
-  <!-- GEÇMİŞ -->
   <div class="card" id="historyCard">
     <div class="section-title">Hyrje / Dalje</div>
     <table id="histTable">
-      <thead><tr><th>Data</th><th>Dita</th><th>Ora</th><th>Lloji</th><th>Rrezja</th><th>Shënim</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Dita</th>
+          <th>Ora</th>
+          <th>Lloji</th>
+          <th>Rrezja</th>
+          <th>Shënim</th>
+        </tr>
+      </thead>
       <tbody id="histBody"></tbody>
     </table>
     <div class="muted" id="noData" style="display:none">Nuk ka të dhëna për periudhën e zgjedhur.</div>
@@ -183,217 +196,423 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/*** Supabase ***/
+/*** Supabase init (senin proje) ***/
 const SUPABASE_URL = "https://oqrukzyimkwacdniavya.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /*** State ***/
-const LS_SESSION="orari_session_v1";
-let session = JSON.parse(localStorage.getItem(LS_SESSION)||"null");
+const LS_SESSION = "orari_session_v1"; // {id,name,role}
+let session = JSON.parse(localStorage.getItem(LS_SESSION) || "null");
 let employees = [];
 let settings = { site_lat:null, site_lng:null, radius_m:300 };
 
 /*** UI helpers ***/
-const $$ = s=>document.querySelector(s);
-function toast(m){const t=$$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800);}
-function openDrawer(v){ $$('#drawer').classList.toggle('open',!!v); $$('#overlay').classList.toggle('show',!!v); }
+const $$ = sel => document.querySelector(sel);
+function toast(msg){ const t=$$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200); }
+function openDrawer(open){ $$('#drawer').classList.toggle('open', !!open); $$('#overlay').classList.toggle('show', !!open); }
 $$('#menuBtn').onclick=()=>openDrawer(true); $$('#overlay').onclick=()=>openDrawer(false);
+
 function fmtDate(ts){ return new Date(ts).toLocaleDateString('sq-AL'); }
 function fmtTime(ts){ return new Date(ts).toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'}); }
-function weekdayName(ts){ return new Date(ts).toLocaleDateString('sq-AL',{weekday:'long'}); }
-function mmToHHMM(min){const h=Math.floor(min/60),m=Math.round(min%60);return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
+function weekdayName(ts){ return new Date(ts).toLocaleDateString('sq-AL',{ weekday:'long'}); }
 
-/*** GEO – izin ve konum alma ***/
-async function getLocationInteractively(){
-  // iOS/Chrome: sadece kullanıcı etkileşimiyle çağrılırsa prompt çıkar.
-  if(!navigator.geolocation) throw new Error('Geolokacion nuk përkrahet');
-  return new Promise((res,rej)=>{
-    navigator.geolocation.getCurrentPosition(
-      p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),
-      err=>rej(err),
-      {enableHighAccuracy:true,timeout:10000}
-    );
-  });
+/*** Geolocation + distance ***/
+function getLocation(){ return new Promise((res,rej)=>{
+  if(!navigator.geolocation) return rej(new Error('Pa geolokacion'));
+  navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), err=>rej(err), {enableHighAccuracy:true, timeout:10000});
+});}
+
+function haversine(lat1, lon1, lat2, lon2){
+  function toRad(x){ return x*Math.PI/180; }
+  const R=6371000, dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
 }
 
-/*** Auth ***/
+/*** Auth (PIN via RPC) ***/
 async function fetchEmployees(){
   const { data, error } = await sb.from('employees').select('id,name,role,active').order('name');
-  if(error){ console.error(error); toast('Gabim employees'); return;}
+  if(error){ console.error(error); toast('Gabim employees'); return; }
   employees = data.filter(e=>e.active);
-  const sel=$$('#loginName'); sel.innerHTML = employees.map(e=>`<option value="${e.name}">${e.name} (${e.role})</option>`).join('');
-  const editSel=$$('#editUser'); if(editSel){ editSel.innerHTML = employees.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join(''); }
+  const sel = $$('#loginName');
+  sel.innerHTML = employees.map(e=>`<option value="${e.name}">${e.name} (${e.role})</option>`).join('');
+  // Admin edit / manage lists
+  const editSel = $$('#editUser'); if(editSel) editSel.innerHTML = employees.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join('');
+  const manage = $$('#manageUser'); if(manage) manage.innerHTML = employees.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join('');
+  const loginSel = $$('#loginName'); if(loginSel && session) loginSel.value = session.name;
+  // admin viewer select default
+  if(session?.role==='admin') $$('#adminViewer').style.display='';
 }
+
+/*** Login / logout ***/
 async function login(){
-  const name=$$('#loginName').value; const pin=$$('#loginPin').value.trim();
-  if(!name||!pin) return toast('Shkruaj emrin dhe PIN-in');
-  const { data, error } = await sb.rpc('verify_pin',{p_name:name,p_pin:pin});
+  const name = $$('#loginName').value;
+  const pin  = $$('#loginPin').value.trim();
+  if(!name || !pin) return toast('Shkruaj emrin dhe PIN-in');
+  const { data, error } = await sb.rpc('verify_pin', { p_name: name, p_pin: pin });
   if(error){ console.error(error); return toast('Gabim hyrje'); }
-  if(!data||!data.length){ return toast('PIN i pasaktë'); }
-  const row=data[0];
-  session={id:row.id,name:row.name,role:row.role};
-  localStorage.setItem(LS_SESSION,JSON.stringify(session));
-  $$('#who').textContent=session.name+(session.role==='admin'?' (admin)':'');
-  $$('#adminBox').style.display=session.role==='admin'?'':'none';
-  $$('#loginPin').value=''; openDrawer(false); refreshHistory(); toast('U fute');
+  if(!data){ return toast('PIN i pasaktë'); }
+  session = { id:data.id, name:data.name, role:data.role };
+  localStorage.setItem(LS_SESSION, JSON.stringify(session));
+  $$('#who').textContent = session ? (session.name + (session.role==='admin'?' (admin)':'') ) : '';
+  $$('#adminBox').style.display = session?.role === 'admin' ? '' : 'none';
+  $$('#loginPin').value = '';
+  openDrawer(false);
+  await fetchEmployees();
+  refreshHistory();
+  toast('U fute me sukses');
 }
-function logout(){ session=null; localStorage.removeItem(LS_SESSION); $$('#who').textContent=''; $$('#adminBox').style.display='none'; toast('Dole'); }
+
+function logout(){
+  session = null;
+  localStorage.removeItem(LS_SESSION);
+  $$('#who').textContent = '';
+  $$('#adminBox').style.display = 'none';
+  toast('Dole');
+}
 
 /*** Settings ***/
 async function loadSettings(){
-  const { data } = await sb.from('settings').select('*').eq('id',1).maybeSingle();
+  const { data, error } = await sb.from('settings').select('*').eq('id',1).maybeSingle();
+  if(error){ console.error(error); return; }
   settings = data || settings;
-  if($$('#siteLat')) $$('#siteLat').value = settings.site_lat ?? '';
-  if($$('#siteLng')) $$('#siteLng').value = settings.site_lng ?? '';
-  if($$('#siteRad')) $$('#siteRad').value = settings.radius_m ?? 300;
+  if($$('#siteLat')){ $$('#siteLat').value = settings.site_lat ?? ''; }
+  if($$('#siteLng')){ $$('#siteLng').value = settings.site_lng ?? ''; }
+  if($$('#siteRad')){ $$('#siteRad').value = settings.radius_m ?? 300; }
 }
+
 async function saveSettings(){
   if(session?.role!=='admin') return toast('Vetëm admin!');
-  const lat=parseFloat($$('#siteLat').value), lng=parseFloat($$('#siteLng').value), r=parseInt($$('#siteRad').value||'300',10);
-  const upd={id:1,site_lat:isFinite(lat)?lat:null,site_lng:isFinite(lng)?lng:null,radius_m:isFinite(r)?r:300,updated_at:new Date().toISOString()};
+  const lat = parseFloat($$('#siteLat').value);
+  const lng = parseFloat($$('#siteLng').value);
+  const r   = parseInt($$('#siteRad').value||'300',10);
+  const upd = { id:1, site_lat:isFinite(lat)?lat:null, site_lng:isFinite(lng)?lng:null, radius_m:isFinite(r)?r:300, updated_at: new Date().toISOString() };
   const { error } = await sb.from('settings').upsert(upd).eq('id',1);
   if(error){ console.error(error); return toast('Gabim ruajtje'); }
-  await loadSettings(); toast('U ruajt');
-}
-async function useMyLocation(){
-  try{ const pos=await getLocationInteractively(); $$('#siteLat').value=pos.lat.toFixed(6); $$('#siteLng').value=pos.lng.toFixed(6); }
-  catch(e){ toast('Lejo lokacionin nga shfletuesi'); }
+  await loadSettings();
+  toast('U ruajt');
 }
 
-/*** Admin: users ***/
+async function useMyLocation(){
+  try{
+    const pos = await getLocation();
+    $$('#siteLat').value = pos.lat.toFixed(6);
+    $$('#siteLng').value = pos.lng.toFixed(6);
+  }catch(e){ toast('Lejo lokacionin'); }
+}
+
+/*** Admin: add / delete / change pin for users ***/
 async function addUser(){
   if(session?.role!=='admin') return toast('Vetëm admin!');
-  const name=$$('#newName').value.trim(), pin=$$('#newPin').value.trim(), role=$$('#newRole').value;
-  if(!name||!pin) return toast('Emri & PIN');
-  const { error } = await sb.from('employees').insert({name, pin_hash:'x', role});
+  const name = $$('#newName').value.trim();
+  const pin  = $$('#newPin').value.trim();
+  if(!name) return toast('Shkruaj emrin');
+  // create skeleton row (set PIN later with set_pin)
+  const { error } = await sb.from('employees').insert({ name, pin_hash: 'x', role: 'user' });
   if(error){ console.error(error); return toast('Nuk u shtua'); }
-  await fetchEmployees(); $$('#newName').value=''; $$('#newPin').value=''; toast('U shtua. Vendos PIN-in me "Ndrysho PIN".');
+  await fetchEmployees();
+  $$('#newName').value=''; $$('#newPin').value='';
+  toast('U shtua. Vendos PIN me "Ndrysho PIN" për këtë përdorues.');
 }
-async function changePin(){
+
+async function deleteUser(){
   if(session?.role!=='admin') return toast('Vetëm admin!');
-  const uid=$$('#editUser').value, pin=$$('#editPin').value.trim();
-  if(!uid||!pin) return toast('Zgjidh & PIN i ri');
-  const { error } = await sb.rpc('set_pin',{p_user:uid,p_pin:pin});
-  if(error){ console.error(error); return toast('S’u ndryshua PIN'); }
-  $$('#editPin').value=''; toast('PIN u ndryshua');
+  const id = $$('#manageUser').value;
+  if(!id) return toast('Zgjidh përdorues');
+  if(!confirm('A je i sigurt që do ta fshish përdoruesin? Kjo do fshijë dhe oraret e tij.')) return;
+  const { error } = await sb.from('employees').delete().eq('id', id);
+  if(error){ console.error(error); return toast('S’u fshi'); }
+  await fetchEmployees();
+  toast('U fshi përdoruesi');
 }
 
-/*** Punch helpers ***/
-function haversine(lat1,lon1,lat2,lon2){function toRad(x){return x*Math.PI/180;}const R=6371000,dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1);const a=Math.sin(dLat/2)**2+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(a));}
-async function ensureSession(){ if(session) return; openDrawer(true); toast('Hyr me PIN-in tënd'); throw new Error('No session'); }
-async function getGeoOrAsk(noGeoChecked){
-  if(noGeoChecked) return {pos:null,within:null,note:'pa lokacion (me zgjedhje)'};
+async function loadManageUser(){
+  const id = $$('#manageUser').value;
+  if(!id) return toast('Zgjidh përdorues');
+  // show admin viewer
+  $$('#adminViewer').style.display='';
+  $$('#adminFrom').value = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0,10);
+  $$('#adminTo').value   = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).toISOString().slice(0,10);
+}
+
+async function manageChangePin(){
+  if(session?.role!=='admin') return toast('Vetëm admin!');
+  const id = $$('#manageUser').value;
+  const pin = $$('#managePin').value.trim();
+  if(!id || !pin) return toast('Zgjidh & PIN i ri');
   try{
-    const pos=await getLocationInteractively();
-    if(settings.site_lat && settings.site_lng){
-      const d=haversine(pos.lat,pos.lng,settings.site_lat,settings.site_lng);
-      return {pos,within:d <= (settings.radius_m||300),note: d <= (settings.radius_m||300)?'brenda rrezes':'jashtë rrezes'};
-    }
-    return {pos,within:null,note:'pa lokacion të kompanisë'};
+    const { error } = await sb.rpc('set_pin', { p_user: id, p_pin: pin });
+    if(error){ console.error(error); return toast('S’u ndryshua PIN'); }
+    $$('#managePin').value='';
+    toast('PIN u ndryshua');
   }catch(e){
-    if(!confirm('Leja e lokacionit u refuzua / dështoi. Dërgo pa lokacion?')) throw e;
-    return {pos:null,within:null,note:'pa lokacion (pa leje)'};
+    toast('Krijo RPC set_pin në Supabase');
   }
 }
 
-/*** Live punch (şimdi) ***/
+/*** Punch (in/out) + manual ***/
+async function ensureLogged(){
+  if(session) return true;
+  openDrawer(true);
+  toast('Hyr me PIN-in tënd');
+  return false;
+}
+
 async function punch(type){
-  try{ await ensureSession(); }catch{ return; }
-  const again = prompt('Shkruaj PIN-in:'); if(!again) return;
-  const { data } = await sb.rpc('verify_pin',{p_name:session.name,p_pin:again}); if(!data||!data.length){ toast('PIN i pasaktë'); return; }
-
-  const allowNoGeo = $$('#forceNoGeoLive').checked;
-  const geo = await getGeoOrAsk(allowNoGeo);
-
-  const ins={ employee_id:session.id, type, lat:geo.pos?geo.pos.lat:null, lng:geo.pos?geo.pos.lng:null, within_radius: geo.within===null?false:geo.within, note: geo.note };
-  const { error } = await sb.from('punches').insert(ins);
-  if(error){ console.error(error); return toast('Gabim regjistrimi'); }
-  toast((type==='in'?'Hyrje':'Dalje')+' u regjistrua'); refreshHistory();
-}
-
-/*** Manual OUT (tarih/saat seçerek) ***/
-async function manualOut(){
-  try{ await ensureSession(); }catch{ return; }
-  const d=$$('#manualDate').value, t=$$('#manualTime').value;
-  if(!d||!t) return toast('Zgjidh datën dhe orën');
-  const again = prompt('Shkruaj PIN-in:'); if(!again) return;
-  const { data } = await sb.rpc('verify_pin',{p_name:session.name,p_pin:again}); if(!data||!data.length){ toast('PIN i pasaktë'); return; }
-
-  const allowNoGeo = $$('#noGeo').checked;
-  const geo = await getGeoOrAsk(allowNoGeo);
-
-  const ts = new Date(`${d}T${t}:00`);
-  const ins={ employee_id:session.id, type:'out', ts:ts.toISOString(), lat:geo.pos?geo.pos.lat:null, lng:geo.pos?geo.pos.lng:null, within_radius: geo.within===null?false:geo.within, note: 'manual out • '+geo.note };
-  const { error } = await sb.from('punches').insert(ins);
-  if(error){ console.error(error); return toast('Gabim regjistrimi'); }
-  toast('Dalja u regjistrua (manual)'); refreshHistory();
-}
-
-/*** Özet hesap ***/
-function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
-function atTime(d,h,m=0){ const x=new Date(d); x.setHours(h,m,0,0); return x; }
-function overlapMs(a1,a2,b1,b2){ const s=Math.max(a1,b1), e=Math.min(a2,b2); return Math.max(0,e-s); }
-function pairIntervals(rowsAsc){ const pairs=[]; for(let i=0;i<rowsAsc.length-1;i++){ const a=rowsAsc[i],b=rowsAsc[i+1]; if(a.type==='in'&&b.type==='out'){ const s=new Date(a.ts).getTime(), e=new Date(b.ts).getTime(); if(e>s) pairs.push({start:s,end:e}); } } return pairs; }
-function computeDailyTotals(rows){
-  const iv=pairIntervals(rows);
-  const perDay={};
-  for(const it of iv){
-    const d=new Date(it.start);
-    const key=d.toISOString().slice(0,10);
-    const winStart=atTime(d,7,0).getTime(), winEnd=atTime(d,16,0).getTime();
-    const base=overlapMs(it.start,it.end,winStart,winEnd)/60000;
-    const after=overlapMs(it.start,it.end,winEnd,atTime(d,23,59).getTime())/60000;
-    if(!perDay[key]) perDay[key]={baseMin:0,after16Min:0,weekday:weekdayName(d)};
-    perDay[key].baseMin+=base; perDay[key].after16Min+=after;
+  if(!await ensureLogged()) return;
+  if(!settings.site_lat || !settings.site_lng){
+    toast('Lokacioni i kompanisë nuk është vendosur (admin).');
+    return;
   }
-  return perDay;
+
+  // try geolocation; if denied, ask user if they still want to send without location
+  let pos = {lat:null,lng:null}, within=false, dist=null;
+  try{
+    pos = await getLocation();
+    dist = haversine(pos.lat, pos.lng, settings.site_lat, settings.site_lng);
+    within = dist <= (settings.radius_m || 300);
+  }catch(e){
+    // ask user if they want to submit without location
+    const ok = confirm('Nuk u mor lokacioni (leja e shfletuesit mungon). Dëshiron ta dërgosh pa lokacion?');
+    if(!ok){ toast('Regjistrimi u anulua'); return; }
+  }
+
+  const ins = {
+    employee_id: session.id,
+    type,
+    lat: pos.lat, lng: pos.lng,
+    within_radius: within || false,
+    note: pos.lat ? (within ? 'brenda rrezes' : 'jashtë rrezes') : 'pa lokacion'
+  };
+  const { error } = await sb.from('punches').insert(ins);
+  if(error){ console.error(error); return toast('Gabim regjistrimi'); }
+  toast((type==='in'?'Hyrje':'Dalje') + ' u regjistrua');
+  refreshHistory();
 }
 
-/*** History & Summary ***/
+async function manualPunch(){
+  if(!await ensureLogged()) return;
+  const timeStr = prompt('Shkruaj orën në format 24:00, p.sh. 15:30 për dalje (ora e sotme):');
+  if(!timeStr) return toast('Anulohet');
+  // validate HH:MM
+  const m = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+  if(!m) return toast('Format i gabuar');
+  const hh = parseInt(m[1],10), mm = parseInt(m[2],10);
+  if(hh<0 || hh>23 || mm<0 || mm>59) return toast('Ora jo valide');
+  // ask in/out
+  const isOut = confirm('A është kjo një "dalje"? (OK = Dalje, Anulo = Hyrje)');
+  const now = new Date();
+  const ts = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0).toISOString();
+  // attempt getLocation but fallback allowed
+  let pos = {lat:null,lng:null}, within=false;
+  try{
+    pos = await getLocation();
+    const dist = haversine(pos.lat, pos.lng, settings.site_lat, settings.site_lng);
+    within = dist <= (settings.radius_m || 300);
+  }catch(e){
+    if(!confirm('Nuk u mor lokacioni. Dëshiron ta dërgosh pa lokacion?')) return toast('Anulohet');
+  }
+  const ins = {
+    employee_id: session.id,
+    type: isOut ? 'out' : 'in',
+    ts,
+    lat: pos.lat, lng: pos.lng,
+    within_radius: within || false,
+    note: pos.lat ? (within ? 'brenda rrezes' : 'jashtë rrezes') : 'pa lokacion (manual)'
+  };
+  const { error } = await sb.from('punches').insert(ins);
+  if(error){ console.error(error); return toast('Gabim regjistrimi'); }
+  toast('Regjistrim manual u shtua');
+  refreshHistory();
+}
+
+/*** History & totals ***/
+function selectedRange(){
+  const from = $$('#fromDate').value ? new Date($$('#fromDate').value) : null;
+  const to = $$('#toDate').value ? new Date($$('#toDate').value) : null;
+  if(to){ to.setHours(23,59,59,999); }
+  return { from, to };
+}
+
+// Compute totals: pair in/out by day; regular window: 07:00-16:00; overtime = time after 16:00
+function computeTotals(rows){
+  // rows sorted ascending by ts
+  // group by date
+  const days = {};
+  rows.forEach(r=>{
+    const d = new Date(r.ts);
+    const key = d.toISOString().slice(0,10);
+    if(!days[key]) days[key]=[];
+    days[key].push(r);
+  });
+  let totalRegularMs = 0;
+  let totalOvertimeMs = 0;
+  for(const day in days){
+    const list = days[day].sort((a,b)=> new Date(a.ts)-new Date(b.ts));
+    // pair sequentially: find in then next out
+    for(let i=0;i<list.length;i++){
+      const a = list[i];
+      if(a.type!=='in') continue;
+      // find next out after this in
+      let out = null;
+      for(let j=i+1;j<list.length;j++){
+        if(list[j].type==='out'){ out = list[j]; break; }
+      }
+      let start = new Date(a.ts);
+      let end = out ? new Date(out.ts) : null;
+      if(!end){
+        // if no matching out, consider end = same day at 23:59 or now if today
+        const todayStr = new Date().toISOString().slice(0,10);
+        if(day === todayStr) end = new Date(); else end = new Date(day + 'T23:59:59');
+      }
+      // regular window
+      const regStart = new Date(day + 'T07:00:00');
+      const regEnd   = new Date(day + 'T16:00:00');
+
+      // overlap between [start,end] and [regStart,regEnd] => regular
+      const regularStart = new Date(Math.max(start.getTime(), regStart.getTime()));
+      const regularEnd   = new Date(Math.min(end.getTime(), regEnd.getTime()));
+      if(regularEnd > regularStart){
+        totalRegularMs += (regularEnd - regularStart);
+      }
+      // overtime is portion after regEnd
+      const otStart = new Date(Math.max(start.getTime(), regEnd.getTime()));
+      const otEnd   = end;
+      if(otEnd > otStart){
+        totalOvertimeMs += (otEnd - otStart);
+      }
+      // move i to index of out (so we don't re-use this out)
+      if(out){
+        const outIndex = list.indexOf(out);
+        if(outIndex>i) i = outIndex;
+      }
+    }
+  }
+  return {
+    regularMs: totalRegularMs,
+    overtimeMs: totalOvertimeMs,
+    regularHours: (totalRegularMs/3600000),
+    overtimeHours: (totalOvertimeMs/3600000)
+  };
+}
+
 async function refreshHistory(){
-  if(!session){ $$('#histBody').innerHTML=''; $$('#noData').style.display=''; $$('#summaryBody').innerHTML=''; $$('#summaryTotals').textContent=''; return; }
-  const from=$$('#fromDate').value?new Date($$('#fromDate').value):null;
-  const to=$$('#toDate').value?new Date($$('#toDate').value):null; if(to) to.setHours(23,59,59,999);
+  if(!session){ $$('#histBody').innerHTML=''; $$('#noData').style.display=''; $$('#userTotals').innerHTML=''; return; }
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('*').eq('employee_id', session.id).order('ts',{ascending:true}).limit(1000);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data, error } = await q;
+  if(error){ console.error(error); toast('Gabim lexim'); return; }
 
-  let q=sb.from('punches').select('*').eq('employee_id',session.id).order('ts',{ascending:true}).limit(1000);
-  if(from) q=q.gte('ts',from.toISOString()); if(to) q=q.lte('ts',to.toISOString());
-  const { data, error } = await q; if(error){ console.error(error); toast('Gabim lexim'); return; }
+  const body = $$('#histBody'); body.innerHTML='';
+  if(!data || !data.length){ $$('#noData').style.display=''; $$('#userTotals').innerHTML=''; return; }
+  $$('#noData').style.display='none';
 
-  // history (desc)
-  const body=$$('#histBody'); body.innerHTML='';
-  const rowsDesc=(data||[]).slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts));
-  if(!rowsDesc.length){ $$('#noData').style.display=''; } else { $$('#noData').style.display='none'; }
-  for(const r of rowsDesc){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${fmtDate(r.ts)}</td><td>${weekdayName(r.ts)}</td><td>${fmtTime(r.ts)}</td>
+  for(const r of data.slice().reverse()){
+    const tr = document.createElement('tr');
+    if(r.within_radius===false) tr.classList.add('redrow');
+    tr.innerHTML = `
+      <td>${fmtDate(r.ts)}</td>
+      <td>${weekdayName(r.ts)}</td>
+      <td>${fmtTime(r.ts)}</td>
       <td><span class="pill ${r.type==='in'?'in':'out'}">${r.type==='in'?'Hyrje':'Dalje'}</span></td>
-      <td>${r.lat==null?'—':(r.within_radius?'Brenda':'Jashtë')}</td>
-      <td class="muted">${r.note||''}</td>`;
+      <td>${r.within_radius ? 'Brenda' : 'Jashtë'}</td>
+      <td class="muted">${r.note||''}</td>
+    `;
     body.appendChild(tr);
   }
 
-  // summary
-  const perDay=computeDailyTotals((data||[]));
-  const sBody=$$('#summaryBody'); sBody.innerHTML=''; let sumB=0,sumA=0;
-  Object.keys(perDay).sort().forEach(k=>{const r=perDay[k]; sumB+=r.baseMin; sumA+=r.after16Min;
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${new Date(k).toLocaleDateString('sq-AL')}</td><td>${r.weekday}</td><td>${mmToHHMM(r.baseMin)}</td><td>${mmToHHMM(r.after16Min)}</td>`;
-    sBody.appendChild(tr);
-  });
-  $$('#summaryTotals').innerHTML=`<span class="badge">Totali (07–16): <b>${mmToHHMM(sumB)}</b></span>
-  <span class="badge">Pas 16:00: <b>${mmToHHMM(sumA)}</b></span>`;
+  // totals
+  const totals = computeTotals(data);
+  $$('#userTotals').innerHTML = `
+    <div>Orë normale: <b>${totals.regularHours.toFixed(2)} h</b></div>
+    <div>Orë shtesë (pas 16:00): <b>${totals.overtimeHours.toFixed(2)} h</b></div>
+  `;
+}
+
+/*** Admin: load user punches and show totals ***/
+async function adminLoadUserPunches(){
+  if(session?.role!=='admin') return toast('Vetëm admin!');
+  const uid = $$('#manageUser').value;
+  if(!uid) return toast('Zgjidh përdorues');
+  const from = $$('#adminFrom').value ? new Date($$('#adminFrom').value) : null;
+  const to = $$('#adminTo').value ? new Date($$('#adminTo').value) : null;
+  if(to) to.setHours(23,59,59,999);
+  let q = sb.from('punches').select('*').eq('employee_id', uid).order('ts',{ascending:true}).limit(2000);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to) q = q.lte('ts', to.toISOString());
+  const { data, error } = await q;
+  if(error){ console.error(error); return toast('Gabim'); }
+  // show table
+  const container = $$('#adminHist');
+  container.innerHTML = `<table style="width:100%;border-collapse:collapse"><thead><tr><th>Data</th><th>Ora</th><th>Lloji</th><th>Rrezja</th><th>Shënim</th></tr></thead><tbody>${(data||[]).map(r=>`<tr ${r.within_radius===false?'style="background:#fff0f0"':''}><td>${fmtDate(r.ts)}</td><td>${fmtTime(r.ts)}</td><td>${r.type}</td><td>${r.within_radius?'Brenda':'Jashtë'}</td><td>${r.note||''}</td></tr>`).join('')}</tbody></table>`;
+  const totals = computeTotals(data||[]);
+  $$('#adminTotals').innerHTML = `Orë normale: <b>${totals.regularHours.toFixed(2)} h</b> — Orë shtesë: <b>${totals.overtimeHours.toFixed(2)} h</b>`;
+  // allow admin to share/pdf for that user
+  $$('#adminViewer').scrollIntoView({behavior:'smooth'});
+}
+
+/*** Export & share ***/
+function buildShareTextForRows(name, rows, from, to){
+  const lines = [];
+  lines.push(`Orari i punës - ${name}`);
+  if(from || to) lines.push(`Periudha: ${from?fmtDate(from):''} - ${to?fmtDate(to):''}`);
+  lines.push('');
+  for(const r of rows){
+    const dt = `${fmtDate(r.ts)} ${fmtTime(r.ts)}`;
+    lines.push(`${dt} - ${r.type==='in'?'Hyrje':'Dalje'} - ${r.within_radius?'Brenda':'Jashtë'}`);
+  }
+  return lines.join('\n');
+}
+
+async function shareWhatsApp(){
+  if(!session) return toast('Hyr fillimisht');
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('ts,type,within_radius').eq('employee_id', session.id).order('ts',{ascending:true}).limit(1000);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data } = await q;
+  const text = buildShareTextForRows(session.name, data||[], from, to);
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+
+async function downloadPDF(){
+  if(!session) return toast('Hyr fillimisht');
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('ts,type,within_radius').eq('employee_id', session.id).order('ts',{ascending:true}).limit(1000);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data } = await q;
+  const text = buildShareTextForRows(session.name, data||[], from, to);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const margin = 14;
+  let y = 20;
+  doc.setFontSize(14); doc.text(`Orari i punës - ${session.name}`, margin, y); y+=8;
+  doc.setFontSize(10);
+  if(from || to){ doc.text(`Periudha: ${from?fmtDate(from):''} - ${to?fmtDate(to):''}`, margin, y); y+=6; }
+  y+=4;
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, margin, y);
+  doc.save(`orari-${session.name}.pdf`);
 }
 
 /*** Boot ***/
-(function init(){
-  $$('#who').textContent=session?session.name+(session.role==='admin'?' (admin)':''):'';
-  const d=new Date(), y=d.getFullYear(), m=d.getMonth();
-  $$('#fromDate').value=new Date(y,m,1).toISOString().slice(0,10);
-  $$('#toDate').value=new Date(y,m+1,0).toISOString().slice(0,10);
-  $$('#manualDate').value=new Date().toISOString().slice(0,10);
-  $$('#manualTime').value=new Date().toTimeString().slice(0,5);
-  fetchEmployees().then(loadSettings).then(refreshHistory);
+(async function init(){
+  $$('#who').textContent = session ? (session.name + (session.role==='admin'?' (admin)':'') ) : '';
+  await fetchEmployees();
+  await loadSettings();
+  // default date range: this month
+  const d = new Date(); const y = d.getFullYear(); const m = d.getMonth();
+  $$('#fromDate').value = new Date(y,m,1).toISOString().slice(0,10);
+  $$('#toDate').value   = new Date(y,m+1,0).toISOString().slice(0,10);
+  // admin defaults
+  $$('#adminFrom').value = new Date(y,m,1).toISOString().slice(0,10);
+  $$('#adminTo').value   = new Date(y,m+1,0).toISOString().slice(0,10);
+  refreshHistory();
 })();
 </script>
 </body>
