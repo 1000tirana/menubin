@@ -2,31 +2,87 @@
 <html lang="sq">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 <title>Regjistrime Orari • sq-AL</title>
+<meta name="theme-color" content="#0d1117" />
 <style>
-body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;background:#0d1117;color:#c9d1d9;margin:0}
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#c9d1d9;
+  --muted:#8b949e; --ok:#2ea043; --ok2:#238636; --danger:#f85149; --blue:#1f6feb;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text)}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
 .container{max-width:920px;margin:0 auto;padding:16px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:14px;padding:16px;margin:12px 0}
-.input,select,button{padding:12px;border-radius:10px;border:1px solid #30363d;background:#0b0f14;color:#c9d1d9}
-button{cursor:pointer}
-.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 240px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px;margin:12px 0}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row > *{flex:1 1 240px}
+.btn{display:inline-block;border:1px solid var(--border);background:#22272e;color:var(--text);
+  padding:12px 14px;border-radius:10px;text-decoration:none;cursor:pointer}
+.btn:hover{border-color:#3a444e}
+.btn.ok{background:var(--ok);border-color:var(--ok2);color:#fff}
+.btn.danger{background:var(--danger);border-color:#c03b35;color:#fff}
+.btn.blue{background:var(--blue);border-color:#1c5fd1;color:#fff}
+.input, select, textarea{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0b0f14;color:var(--text)}
+label{display:block;margin:8px 0 6px 4px;color:var(--muted);font-size:14px}
+h1{font-size:22px;margin:10px 0 6px}
+h2{font-size:18px;margin:10px 0}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+.header{position:sticky;top:0;background:linear-gradient(#0d1117,#0d1117e0 60%,transparent);backdrop-filter:blur(6px);z-index:10;border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+.hamburger{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);display:grid;place-items:center;cursor:pointer}
+.hamburger span{width:18px;height:2px;background:var(--text);display:block;position:relative}
+.hamburger span:before,.hamburger span:after{content:"";position:absolute;left:0;width:18px;height:2px;background:var(--text)}
+.hamburger span:before{top:-6px}.hamburger span:after{top:6px}
+.drawer{position:fixed;inset:0 0 0 auto;width:320px;background:var(--card);border-left:1px solid var(--border);
+  transform:translateX(100%);transition:.25s ease;z-index:20;padding:14px;display:flex;flex-direction:column;gap:10px}
+.drawer.open{transform:translateX(0)}
+.drawer a{display:block;padding:10px 12px;border-radius:10px;border:1px solid var(--border);text-decoration:none;color:var(--text)}
+hr{border:0;border-top:1px solid var(--border);margin:12px 0}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border:1px solid var(--border);padding:8px 10px;text-align:left}
+.kpill{padding:2px 6px;border-radius:6px;border:1px solid var(--border);font-size:12px}
+.kpill.ok{color:#b3f5c3;border-color:#2ea043}
+.kpill.no{color:#ffd1d1;border-color:#f85149}
+.footer{color:var(--muted);font-size:12px;text-align:center;margin:18px}
+.small{font-size:12px;color:var(--muted)}
+code{background:#0b0f14;border:1px solid var(--border);padding:2px 6px;border-radius:6px}
 .hidden{display:none}
-.badge{display:inline-block;padding:4px 8px;border:1px solid #30363d;border-radius:999px;color:#8b949e}
 </style>
 </head>
 <body>
-<div class="container">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div class="badge" id="userBadge">Pa hyrje</div>
+<header class="header">
+  <div class="header-inner container">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="hamburger" id="btnMenu" title="Meny"><span></span></div>
+      <div>
+        <div class="badge" id="userBadge">Pa hyrje</div>
+        <div class="small" id="locBadge">Lokacioni: —</div>
+      </div>
     </div>
     <strong>Regjistrime Orari</strong>
   </div>
+</header>
 
+<aside class="drawer" id="drawer">
+  <a href="#" data-go="home">🏠 Kryefaqja</a>
+  <a href="#" data-go="mine">🗂 Regjistrimet e mia</a>
+  <a href="#" data-go="export">📤 Eksporto / WhatsApp</a>
+  <hr>
+  <div id="adminMenu" style="display:none">
+    <a href="#" data-go="users">👥 Përdoruesit (Shto/Redakto)</a>
+    <a href="#" data-go="location">📍 Vendos lokacionin</a>
+  </div>
+  <hr>
+  <a href="#" id="btnLogout">🚪 Dalje</a>
+</aside>
+
+<main class="container" id="app">
   <!-- LOGIN -->
   <section id="viewLogin" class="card">
-    <h2>Hyr</h2>
+    <h1>Hyr</h1>
+    <p class="small">Fut PIN-in tënd për t’u identifikuar. (PIN-i ruhet si <em>hash</em>.)</p>
     <div class="row">
       <div>
         <label>Përdoruesi</label>
@@ -34,54 +90,355 @@ button{cursor:pointer}
       </div>
       <div>
         <label>PIN</label>
-        <input id="loginPin" type="password" class="input" placeholder="••••" />
+        <input id="loginPin" type="password" class="input" placeholder="••••" autocomplete="one-time-code" />
       </div>
     </div>
-    <div class="row"><button id="btnDoLogin">Hyr</button></div>
+    <div class="row"><button class="btn ok" id="btnDoLogin">Hyr</button></div>
   </section>
 
   <!-- HOME -->
   <section id="viewHome" class="card hidden">
-    <h2>Kryefaqja</h2>
-    <p>Hyrje e suksesshme ✅</p>
+    <h1>Regjistrim i ri</h1>
+    <div class="row">
+      <div>
+        <label>Lloji</label>
+        <select id="kind" class="input">
+          <option value="IN">Hyrje</option>
+          <option value="OUT">Dalje</option>
+        </select>
+      </div>
+      <div>
+        <label>Data & Ora</label>
+        <input id="picked" type="datetime-local" class="input">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Shënim (opsionale)</label>
+        <input id="note" class="input" placeholder="p.sh. turni i mbrëmjes">
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn blue" id="btnAskLocation">Lejo Vendndodhjen</button>
+      <button class="btn ok" id="btnSave">Ruaj</button>
+    </div>
+    <p class="small" id="locInfo">Vendndodhja ende nuk është marrë.</p>
   </section>
-</div>
 
-<!-- JS CDN'ler ZORUNLU -->
+  <!-- MINE -->
+  <section id="viewMine" class="card hidden">
+    <h1>Regjistrimet e mia</h1>
+    <div class="row">
+      <div><label>Prej datës</label><input id="fromDate" type="date" class="input"></div>
+      <div><label>Deri më</label><input id="toDate" type="date" class="input"></div>
+      <div style="align-self:end"><button class="btn" id="btnLoadMine">Shfaq</button></div>
+    </div>
+    <div class="card" id="mineList"></div>
+  </section>
+
+  <!-- EXPORT -->
+  <section id="viewExport" class="card hidden">
+    <h1>Eksporto / WhatsApp</h1>
+    <div class="row">
+      <div><label>Prej datës</label><input id="exFrom" type="date" class="input"></div>
+      <div><label>Deri më</label><input id="exTo" type="date" class="input"></div>
+      <div style="align-self:end"><button class="btn" id="btnMakeText">Gjeno tekstin</button></div>
+    </div>
+    <div class="card">
+      <h2>Teksti</h2>
+      <textarea id="exportText" class="input" rows="8" readonly></textarea>
+      <div class="row" style="margin-top:10px">
+        <a class="btn ok" id="btnWhatsApp" href="#" target="_blank" rel="noopener">Dërgo në WhatsApp</a>
+        <button class="btn" id="btnCopy">Kopjo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- USERS (ADMIN) -->
+  <section id="viewUsers" class="card hidden">
+    <h1>Përdoruesit</h1>
+    <div class="row">
+      <div><label>Emri</label><input id="uName" class="input" placeholder="p.sh. Ardit D."></div>
+      <div><label>Roli</label><select id="uRole" class="input"><option value="user">user</option><option value="admin">admin</option></select></div>
+      <div><label>PIN i ri</label><input id="uPin" class="input" placeholder="(opsionale)"></div>
+    </div>
+    <div class="row">
+      <button class="btn ok" id="btnAddUser">Shto / Përditëso</button>
+      <button class="btn danger" id="btnDeactivate">Çaktivizo</button>
+    </div>
+    <div class="card" id="userList"></div>
+  </section>
+
+  <!-- LOCATION (ADMIN) -->
+  <section id="viewLocation" class="card hidden">
+    <h1>Vendos lokacionin</h1>
+    <p class="small">Përcakto pikën bazë ku lejohet regjistrimi (rreze standard 300 m).</p>
+    <div class="row">
+      <div><label>Gjerësi (lat)</label><input id="lat" class="input" placeholder="41.3275"></div>
+      <div><label>Gjatësi (lng)</label><input id="lng" class="input" placeholder="19.8187"></div>
+      <div><label>Rrezja (m)</label><input id="radius" class="input" type="number" value="300"></div>
+    </div>
+    <div class="row">
+      <button class="btn blue" id="btnUseMy">Përdor lokacionin tim</button>
+      <button class="btn ok" id="btnSaveLoc">Ruaj lokacionin</button>
+    </div>
+    <p class="small">Nëse përdoruesi është jashtë rrezes, shënohet “Jashtë zonës së lejuar”.</p>
+  </section>
+
+  <div class="footer">© <span id="yr"></span> Regjistrime Orari • sq-AL</div>
+</main>
+
+<!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
 <script>
+/*** Supabase ***/
 const sb = supabase.createClient(
   "https://oqrukzyimkwacdniavya.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qQ0mP1acqXJbI".replace("Q0m","Q")
-); // ufak kırpma: kopyala yapıştırda bozulmasın diye
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI"
+);
 
+/*** Helpers ***/
 const $ = (s)=>document.querySelector(s);
-function show(id){ ['viewLogin','viewHome'].forEach(x=>$('#'+x).classList.add('hidden')); $('#'+id).classList.remove('hidden'); }
-
-async function loadEmployees(){
-  const { data, error } = await sb.from('employees')
-    .select('id,name,role,active').eq('active',true).order('name',{ascending:true});
-  if(error){ alert('Employees SELECT error: '+error.message); return; }
-  const sel = $('#loginEmployee'); sel.innerHTML='';
-  (data||[]).forEach(u=>{ const o=document.createElement('option'); o.value=u.id; o.textContent=`${u.name} (${u.role})`; sel.appendChild(o); });
+const show = (name)=>{
+  ['viewLogin','viewHome','viewMine','viewExport','viewUsers','viewLocation'].forEach(id=>$('#'+id).classList.add('hidden'));
+  $('#'+name).classList.remove('hidden');
+};
+const nowLocalDatetime = ()=>{
+  const z=new Date(); const p=(n)=>String(n).padStart(2,'0');
+  return `${z.getFullYear()}-${p(z.getMonth()+1)}-${p(z.getDate())}T${p(z.getHours())}:${p(z.getMinutes())}`;
+};
+const fmtDate = (d)=> new Intl.DateTimeFormat('sq-AL',{year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
+const fmtTime = (d)=> new Intl.DateTimeFormat('sq-AL',{hour:'2-digit',minute:'2-digit'}).format(d);
+const weekdaySq = (d)=> new Intl.DateTimeFormat('sq-AL',{weekday:'long'}).format(d);
+const deg2rad=(x)=>x*Math.PI/180;
+function haversineMeters(lat1,lon1,lat2,lon2){
+  const R=6371000, dLat=deg2rad(lat2-lat1), dLon=deg2rad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
 }
-$('#btnDoLogin').onclick = async ()=>{
-  try{
-    const empId = $('#loginEmployee').value, pin = $('#loginPin').value.trim();
-    if(!empId || !pin){ alert('Përdoruesi dhe PIN kërkohen'); return; }
-    const { data, error } = await sb.from('employees').select('id,name,role,pin_hash,active').eq('id',empId).single();
-    if(error){ alert('Lexim gabim: '+error.message); return; }
-    if(!data || !data.active){ alert('Përdorues i pavlefshëm'); return; }
-    const ok = bcrypt.compareSync(pin, data.pin_hash||'');
-    if(!ok){ alert('PIN i pasaktë'); return; }
-    localStorage.setItem('emp', JSON.stringify({id:data.id,name:data.name,role:data.role}));
-    $('#userBadge').textContent = `${data.name} • ${data.role}`;
-    show('viewHome');
-  }catch(e){ alert('JS error: '+e.message); }
+function toast(msg, ok=true){ alert(msg); } // mobilde net görünür olsun diye alert
+
+/*** Session ***/
+const session = {
+  set(u){localStorage.setItem('emp', JSON.stringify(u));},
+  get(){try{return JSON.parse(localStorage.getItem('emp')||'null');}catch{return null;}},
+  clear(){localStorage.removeItem('emp');}
 };
 
-loadEmployees();
+/*** Drawer & header ***/
+const drawer = $('#drawer');
+$('#btnMenu').onclick=()=> drawer.classList.toggle('open');
+$('#drawer').addEventListener('click', (e)=>{
+  const link = e.target.closest('a'); if(!link) return; e.preventDefault();
+  if(link.id==='btnLogout'){ session.clear(); $('#userBadge').textContent='Pa hyrje'; show('viewLogin'); drawer.classList.remove('open'); return; }
+  const go = link.dataset.go;
+  if(go==='users'){ refreshUsers(); loadLocationIntoForm(); }
+  if(go==='location'){ loadLocationIntoForm(); }
+  show('view'+go.charAt(0).toUpperCase()+go.slice(1));
+  drawer.classList.remove('open');
+});
+
+/*** Init ***/
+(async function init(){
+  $('#yr').textContent = new Date().getFullYear();
+  $('#picked').value = nowLocalDatetime();
+  await fillEmployeeSelect();
+  const me = session.get();
+  if(me){ postLoginSetup(me); } else { show('viewLogin'); }
+})();
+
+async function fillEmployeeSelect(){
+  const { data, error } = await sb.from('employees').select('id,name,role,active').eq('active',true).order('name',{ascending:true});
+  if(error){ toast('Employees SELECT error: '+error.message,false); return; }
+  const sel=$('#loginEmployee'); sel.innerHTML='';
+  (data||[]).forEach(x=>{ const o=document.createElement('option'); o.value=x.id; o.textContent=`${x.name} (${x.role})`; sel.appendChild(o); });
+}
+
+/*** Login ***/
+$('#btnDoLogin').onclick = async ()=>{
+  try{
+    const empId = $('#loginEmployee').value;
+    const pin = $('#loginPin').value.trim();
+    if(!empId || !pin){ toast('Përdoruesi dhe PIN kërkohen', false); return; }
+
+    const { data, error } = await sb.from('employees')
+      .select('id,name,role,pin_hash,home_lat,home_lng,home_radius_m,active')
+      .eq('id', empId).single();
+    if(error){ toast('Gabim gjatë leximit: '+error.message,false); return; }
+    if(!data || !data.active){ toast('Përdorues i pavlefshëm', false); return; }
+
+    const ok = bcrypt.compareSync(pin, data.pin_hash || '');
+    if(!ok){ toast('PIN i pasaktë', false); return; }
+
+    const me = { id:data.id, name:data.name, role:data.role,
+                 home_lat:data.home_lat, home_lng:data.home_lng,
+                 home_radius_m: data.home_radius_m || 300 };
+    session.set(me);
+    $('#userBadge').textContent = `${me.name} • ${me.role}`;
+    $('#loginPin').value='';
+    postLoginSetup(me);
+  }catch(e){ toast('Gabim (JS): '+e.message, false); }
+};
+
+function postLoginSetup(me){
+  if(me.role==='admin') $('#adminMenu').style.display='block'; else $('#adminMenu').style.display='none';
+  $('#picked').value = nowLocalDatetime();
+  show('viewHome');
+}
+
+/*** Location ***/
+let lastLoc = null;
+$('#btnAskLocation').onclick = ()=>{
+  if(!navigator.geolocation){ toast('Geolokacioni nuk përkrahet', false); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    lastLoc = {lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy||0};
+    $('#locBadge').textContent = `Lokacioni: gati (±${Math.round(lastLoc.acc)}m)`;
+    $('#locInfo').textContent = `Lat: ${lastLoc.lat.toFixed(6)}, Lng: ${lastLoc.lng.toFixed(6)} • ±${Math.round(lastLoc.acc)}m`;
+    toast('Lokacioni u mor', true);
+  }, err=>{
+    lastLoc = {error:true, message:err.message};
+    $('#locBadge').textContent = 'Lokacioni: refuzuar';
+    $('#locInfo').textContent = `Lokacioni refuzuar: ${err.message}`;
+    toast('Lokacioni u refuzua', false);
+  }, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+};
+
+/*** Save time log ***/
+$('#btnSave').onclick = async ()=>{
+  const me = session.get(); if(!me){ toast('Duhet të hyni', false); return; }
+  const kind = $('#kind').value, picked = $('#picked').value;
+  if(!picked){ toast('Zgjidh datë & orë', false); return; }
+
+  const pickedDate = new Date(picked);
+  const weekday = weekdaySq(pickedDate);
+  let within=true, dist=null, note=$('#note').value.trim()||null;
+
+  if(lastLoc && !lastLoc.error && me.home_lat!=null && me.home_lng!=null){
+    dist = Math.round(haversineMeters(lastLoc.lat, lastLoc.lng, Number(me.home_lat), Number(me.home_lng)));
+    within = dist <= (Number(me.home_radius_m)||300);
+    if(!within){ note = (note? (note+' • '):'') + 'Jashtë zonës së lejuar'; }
+  } else if(!lastLoc){ note = (note? (note+' • '):'') + 'Lokacioni jo i marrë';
+  } else if(lastLoc && lastLoc.error){ note = (note? (note+' • '):'') + 'Lokacioni i refuzuar'; }
+
+  const payload = { employee_id: me.id, kind, at_ts: new Date().toISOString(), picked_time: picked,
+                    weekday_sq: weekday, distance_m: dist, within_zone: within, note };
+
+  const { error } = await sb.from('time_logs').insert(payload);
+  if(error){ toast('Gabim gjatë ruajtjes: '+error.message, false); return; }
+  toast('U ruajt me sukses', true); $('#note').value='';
+};
+
+/*** My logs ***/
+$('#btnLoadMine').onclick = async ()=>{
+  const me=session.get(); if(!me){ toast('Duhet të hyni', false); return; }
+  const f=$('#fromDate').value, t=$('#toDate').value; if(!f||!t){ toast('Zgjidh datat', false); return; }
+  const { data, error } = await sb.from('time_logs')
+    .select('id,kind,picked_time,weekday_sq,within_zone,distance_m,note,created_at')
+    .eq('employee_id', me.id).gte('picked_time', f).lte('picked_time', t+'T23:59')
+    .order('picked_time',{ascending:true});
+  if(error){ toast('Gabim gjatë leximit: '+error.message, false); return; }
+  const wrap=$('#mineList');
+  if(!data||data.length===0){ wrap.innerHTML='<p class="small">S’ka të dhëna.</p>'; return; }
+  let html='<table class="table"><thead><tr><th>Data</th><th>Dita</th><th>Lloji</th><th>Ora</th><th>Zona</th><th>Shënim</th></tr></thead><tbody>';
+  for(const r of data){
+    const d=new Date(r.picked_time);
+    html+=`<tr>
+      <td>${fmtDate(d)}</td><td>${r.weekday_sq}</td><td>${r.kind==='IN'?'Hyrje':'Dalje'}</td>
+      <td>${fmtTime(d)}</td>
+      <td><span class="kpill ${r.within_zone?'ok':'no'}">${r.within_zone?'brenda':'jashtë'} ${r.distance_m!=null?`(${r.distance_m}m)`:''}</span></td>
+      <td>${r.note? r.note.replaceAll('<','&lt;') : ''}</td>
+    </tr>`;
+  }
+  html+='</tbody></table>'; wrap.innerHTML=html;
+};
+
+/*** Export / WhatsApp ***/
+function qs(obj){return new URLSearchParams(obj).toString();}
+$('#btnMakeText').onclick = async ()=>{
+  const me=session.get(); if(!me){ toast('Duhet të hyni', false); return; }
+  const f=$('#exFrom').value, t=$('#exTo').value; if(!f||!t){ toast('Zgjidh datat', false); return; }
+  const { data, error } = await sb.from('time_logs')
+    .select('kind,picked_time,weekday_sq,within_zone')
+    .eq('employee_id', me.id).gte('picked_time', f).lte('picked_time', t+'T23:59')
+    .order('picked_time',{ascending:true});
+  if(error){ toast('Gabim gjatë leximit: '+error.message, false); return; }
+  if(!data||data.length===0){ $('#exportText').value='S’ka të dhëna.'; return; }
+
+  const groups = {};
+  for(const r of data){
+    const d = new Date(r.picked_time);
+    const key = fmtDate(d);
+    if(!groups[key]) groups[key] = {weekday: r.weekday_sq, ins:[], outs:[]};
+    (r.kind==='IN'? groups[key].ins : groups[key].outs).push(d);
+  }
+  const title = `Regjistrimet – ${me.name} – ${new Intl.DateTimeFormat('sq-AL').format(new Date(f))}–${new Intl.DateTimeFormat('sq-AL').format(new Date(t))}`;
+  let lines=[title];
+  for(const day of Object.keys(groups)){
+    const g=groups[day];
+    const ins=g.ins.map(d=>fmtTime(d)).join(', ')||'—';
+    const outs=g.outs.map(d=>fmtTime(d)).join(', ')||'—';
+    lines.push(`${g.weekday} ${day}: Hyrje ${ins} • Dalje ${outs}`);
+  }
+  const text=lines.join('\n'); $('#exportText').value=text;
+  $('#btnWhatsApp').href=`https://api.whatsapp.com/send?${qs({text})}`;
+};
+$('#btnCopy').onclick=()=>{ const ta=$('#exportText'); ta.select(); document.execCommand('copy'); toast('U kopjua', true); };
+
+/*** Admin: users ***/
+async function refreshUsers(){
+  const me=session.get(); if(!me||me.role!=='admin') return;
+  const { data, error } = await sb.from('employees').select('id,name,role,active').order('name',{ascending:true});
+  if(error){ console.error(error); return; }
+  const list=data||[];
+  let html='<table class="table"><thead><tr><th>Emri</th><th>Roli</th><th>Status</th></tr></thead><tbody>';
+  for(const u of list){ html+=`<tr><td>${u.name}</td><td>${u.role}</td><td>${u.active?'aktiv':'pasiv'}</td></tr>`; }
+  html+='</tbody></table>'; $('#userList').innerHTML=html;
+  const actives=list.filter(x=>x.active); const sel=$('#loginEmployee'); sel.innerHTML='';
+  actives.forEach(x=>{ const o=document.createElement('option'); o.value=x.id; o.textContent=`${x.name} (${x.role})`; sel.appendChild(o); });
+}
+$('#btnAddUser').onclick = async ()=>{
+  const me=session.get(); if(!me||me.role!=='admin'){ toast('Vetëm admini', false); return; }
+  const name=$('#uName').value.trim(), role=$('#uRole').value, pin=$('#uPin').value.trim();
+  if(!name){ toast('Emri bosh', false); return; }
+  let payload={name, role, active:true};
+  if(pin){ payload.pin_hash = await bcrypt.hash(pin, 10); }
+  const { error } = await sb.from('employees').upsert(payload,{onConflict:'name'});
+  if(error){ toast('Gabim tek ruajtja: '+error.message, false); return; }
+  toast('U ruajt përdoruesi', true); $('#uPin').value=''; $('#uName').value=''; refreshUsers();
+};
+$('#btnDeactivate').onclick = async ()=>{
+  const me=session.get(); if(!me||me.role!=='admin'){ toast('Vetëm admini', false); return; }
+  const name=$('#uName').value.trim(); if(!name){ toast('Shkruaj emrin', false); return; }
+  const { error } = await sb.from('employees').update({active:false}).eq('name', name);
+  if(error){ toast('Gabim', false); return; } toast('U çaktivizua', true); $('#uName').value=''; refreshUsers();
+};
+
+/*** Admin: location ***/
+async function loadLocationIntoForm(){
+  const me=session.get(); if(!me||me.role!=='admin') return;
+  if(me.home_lat!=null) $('#lat').value=me.home_lat;
+  if(me.home_lng!=null) $('#lng').value=me.home_lng;
+  if(me.home_radius_m!=null) $('#radius').value=me.home_radius_m;
+}
+$('#btnUseMy').onclick=()=>{
+  if(!navigator.geolocation){ toast('Geolokacioni nuk përkrahet', false); return; }
+  navigator.geolocation.getCurrentPosition(pos=>{
+    $('#lat').value=pos.coords.latitude.toFixed(6);
+    $('#lng').value=pos.coords.longitude.toFixed(6);
+    toast('U mor lokacioni', true);
+  }, _=> toast('S’u mor lokacioni', false), {enableHighAccuracy:true,timeout:8000});
+};
+$('#btnSaveLoc').onclick = async ()=>{
+  const me=session.get(); if(!me||me.role!=='admin'){ toast('Vetëm admini', false); return; }
+  const lat=parseFloat($('#lat').value), lng=parseFloat($('#lng').value);
+  const radius=parseInt($('#radius').value||'300',10);
+  if(Number.isNaN(lat)||Number.isNaN(lng)){ toast('Koordinata të pavlefshme', false); return; }
+  const { error } = await sb.from('employees').update({home_lat:lat, home_lng:lng, home_radius_m:radius}).eq('id', me.id);
+  if(error){ toast('Gabim', false); return; }
+  me.home_lat=lat; me.home_lng=lng; me.home_radius_m=radius; session.set(me);
+  toast('Lokacioni u ruajt', true);
+};
 </script>
 </body>
 </html>
