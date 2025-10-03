@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Orari i Punës</title>
+  <meta name="theme-color" content="#ffffff">
+  <style>
+    :root { --bg:#f7f7f9; --fg:#111; --muted:#6b7280; --pri:#2563eb; --ok:#16a34a; --warn:#f59e0b; --err:#dc2626; --card:#fff; --br:12px; }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif}
+    header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:12px;padding:10px 14px;z-index:10}
+    #menuBtn{font-size:22px;background:transparent;border:0;cursor:pointer}
+    #title{font-weight:600}
+    .container{max-width:980px;margin:14px auto;padding:0 14px}
+    .card{background:var(--card);border:1px solid #e5e7eb;border-radius:var(--br);padding:14px;margin-bottom:14px;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .row>*{flex:1 1 240px}
+    button{appearance:none;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;cursor:pointer;background:#fff}
+    .btn-pri{background:var(--pri);border-color:var(--pri);color:#fff}
+    .btn-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+    .btn-warn{background:var(--warn);border-color:var(--warn);color:#111}
+    .btn-ghost{background:#fff}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+    input,select{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px 10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+    th{font-weight:600;background:#fafafa}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #e5e7eb}
+    .pill.in{background:#ecfdf5;border-color:#bbf7d0}
+    .pill.out{background:#fff7ed;border-color:#fed7aa}
+    .muted{color:var(--muted)}
+    .right{margin-left:auto}
+    .toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+    .toast.show{opacity:1}
+    /* Drawer */
+    #drawer{position:fixed;inset:0 40% 0 0;max-width:360px;background:#fff;border-right:1px solid #e5e7eb;transform:translateX(-100%);transition:.25s;z-index:20;overflow:auto}
+    #overlay{position:fixed;inset:0;background:rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.25s;z-index:15}
+    #drawer.open{transform:none} #overlay.show{opacity:1;pointer-events:auto}
+    .section-title{font-weight:600;margin:10px 0 8px}
+    .danger{color:var(--err)}
+    .hint{font-size:12px;color:var(--muted)}
+    .sep{height:1px;background:#e5e7eb;margin:10px 0}
+    .badge{display:inline-block;padding:4px 8px;border-radius:8px;border:1px solid #e5e7eb;font-size:12px;margin-right:6px}
+  </style>
+  <!-- Supabase client -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <!-- jsPDF for optional PDF export -->
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <button id="menuBtn">☰</button>
+  <div id="title">Orari i Punës</div>
+  <div class="right muted" id="who"></div>
+</header>
+
+<div id="overlay"></div>
+<aside id="drawer">
+  <div class="card" style="border:0;border-radius:0;">
+    <div class="section-title">Llogaria</div>
+    <div id="loginBox">
+      <label>Emri</label>
+      <select id="loginName"></select>
+      <label>PIN</label>
+      <input id="loginPin" type="password" inputmode="numeric" placeholder="PIN">
+      <div class="row">
+        <button class="btn-pri" onclick="login()">Identifikohu</button>
+        <button class="btn-ghost" onclick="logout()">Dil</button>
+      </div>
+      <div class="hint">Pasi të hysh, do të shohësh hyrje/daljet e tua, të shkarkosh PDF ose të shpërndash në WhatsApp.</div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="card" id="adminBox" style="display:none">
+    <div class="section-title">Përdoruesit &amp; Cilësimet (Admin)</div>
+    <div class="row">
+      <div>
+        <label>Emër i ri</label>
+        <input id="newName" placeholder="p.sh. Darti">
+      </div>
+      <div>
+        <label>PIN i ri</label>
+        <input id="newPin" placeholder="1234">
+      </div>
+    </div>
+    <div class="row">
+      <select id="newRole">
+        <option value="user">Përdorues</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button class="btn-ok" onclick="addUser()">Shto përdorues</button>
+    </div>
+
+    <div class="sep"></div>
+
+    <div>
+      <label>Zgjidh përdorues për ndryshim PIN</label>
+      <select id="editUser"></select>
+      <div class="row">
+        <input id="editPin" placeholder="PIN i ri">
+        <button onclick="changePin()">Ndrysho PIN</button>
+      </div>
+    </div>
+
+    <div class="sep"></div>
+
+    <div>
+      <div class="section-title">Lokacioni i kompanisë</div>
+      <div class="row">
+        <div><label>Gjerësi (lat)</label><input id="siteLat" type="number" step="any"></div>
+        <div><label>Gjatësi (lng)</label><input id="siteLng" type="number" step="any"></div>
+        <div><label>Rrezja (m)</label><input id="siteRad" type="number" step="1" value="300"></div>
+      </div>
+      <div class="row">
+        <button onclick="useMyLocation()">Vendos me lokacionin tim</button>
+        <button class="btn-pri" onclick="saveSettings()">Ruaj</button>
+      </div>
+      <div class="hint">Orar standard: <b>07:00–16:00</b>. Orët pas 16:00 llogariten si jashtë orarit.</div>
+    </div>
+  </div>
+</aside>
+
+<div class="container">
+  <div class="card">
+    <div class="row">
+      <button class="btn-ok" onclick="punch('in')">Fillova punën</button>
+      <button class="btn-warn" onclick="punch('out')">Mbarova punën</button>
+    </div>
+    <div class="hint" style="margin-top:8px">Kur shtyp, do të kërkohet PIN-i yt dhe leja e lokacionit.</div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div>
+        <label>Nga data</label>
+        <input type="date" id="fromDate">
+      </div>
+      <div>
+        <label>Deri më</label>
+        <input type="date" id="toDate">
+      </div>
+      <div style="align-self:end">
+        <button onclick="refreshHistory()">Shfaq</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button onclick="shareWhatsApp()">Dërgo në WhatsApp</button>
+      <button onclick="downloadPDF()">Shkarko PDF</button>
+    </div>
+  </div>
+
+  <div class="card" id="summaryCard">
+    <div class="section-title">Përmbledhje Orësh</div>
+    <div id="summaryTotals" class="muted" style="margin-bottom:8px"></div>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Dita</th>
+          <th>Orë pune (07–16)</th>
+          <th>Pas 16:00</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="historyCard">
+    <div class="section-title">Hyrje / Dalje</div>
+    <table id="histTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Dita</th>
+          <th>Ora</th>
+          <th>Lloji</th>
+          <th>Rrezja</th>
+          <th>Shënim</th>
+        </tr>
+      </thead>
+      <tbody id="histBody"></tbody>
+    </table>
+    <div class="muted" id="noData" style="display:none">Nuk ka të dhëna për periudhën e zgjedhur.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/*** Supabase init (SENİN PROJEN) ***/
+const SUPABASE_URL = "https://oqrukzyimkwacdniavya.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/*** State ***/
+const LS_SESSION = "orari_session_v1"; // {id,name,role}
+let session = JSON.parse(localStorage.getItem(LS_SESSION) || "null");
+let employees = [];
+let settings = { site_lat:null, site_lng:null, radius_m:300 };
+
+/*** UI helpers ***/
+const $$ = sel => document.querySelector(sel);
+function toast(msg){ const t=$$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
+function openDrawer(open){ $$('#drawer').classList.toggle('open', !!open); $$('#overlay').classList.toggle('show', !!open); }
+$$('#menuBtn').onclick=()=>openDrawer(true); $$('#overlay').onclick=()=>openDrawer(false);
+
+function fmtDate(ts){ return new Date(ts).toLocaleDateString('sq-AL'); }
+function fmtTime(ts){ return new Date(ts).toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'}); }
+function weekdayName(ts){ return new Date(ts).toLocaleDateString('sq-AL',{ weekday:'long'}); }
+function mmToHHMM(min){
+  const h = Math.floor(min/60), m = Math.round(min%60);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+/*** Geolocation + distance ***/
+function getLocation(){ return new Promise((res,rej)=>{
+  if(!navigator.geolocation) return rej(new Error('Pa geolokacion'));
+  navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}), err=>rej(err), {enableHighAccuracy:true, timeout:10000});
+});}
+function haversine(lat1, lon1, lat2, lon2){
+  function toRad(x){ return x*Math.PI/180; }
+  const R=6371000, dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+/*** Auth (PIN via RPC) ***/
+async function fetchEmployees(){
+  const { data, error } = await sb.from('employees').select('id,name,role,active').order('name');
+  if(error){ console.error(error); toast('Gabim employees'); return; }
+  employees = data.filter(e=>e.active);
+  const sel = $$('#loginName');
+  sel.innerHTML = employees.map(e=>`<option value="${e.name}">${e.name} (${e.role})</option>`).join('');
+  const editSel = $$('#editUser');
+  if(editSel){ editSel.innerHTML = employees.map(e=>`<option value="${e.id}">${e.name} (${e.role})</option>`).join(''); }
+}
+async function login(){
+  const name = $$('#loginName').value;
+  const pin  = $$('#loginPin').value.trim();
+  if(!name || !pin) return toast('Shkruaj emrin dhe PIN-in');
+  const { data, error } = await sb.rpc('verify_pin', { p_name: name, p_pin: pin });
+  if(error){ console.error(error); return toast('Gabim hyrje'); }
+  if(!data){ return toast('PIN i pasaktë'); }
+  session = { id:data.id, name:data.name, role:data.role };
+  localStorage.setItem(LS_SESSION, JSON.stringify(session));
+  $$('#who').textContent = session ? (session.name + (session.role==='admin'?' (admin)':'') ) : '';
+  $$('#adminBox').style.display = session?.role === 'admin' ? '' : 'none';
+  $$('#loginPin').value = '';
+  openDrawer(false);
+  refreshHistory();
+  toast('U fute me sukses');
+}
+function logout(){
+  session = null;
+  localStorage.removeItem(LS_SESSION);
+  $$('#who').textContent = '';
+  $$('#adminBox').style.display = 'none';
+  toast('Dole');
+}
+
+/*** Settings ***/
+async function loadSettings(){
+  const { data, error } = await sb.from('settings').select('*').eq('id',1).maybeSingle();
+  if(error){ console.error(error); return; }
+  settings = data || settings;
+  if($$('#siteLat')){ $$('#siteLat').value = settings.site_lat ?? ''; }
+  if($$('#siteLng')){ $$('#siteLng').value = settings.site_lng ?? ''; }
+  if($$('#siteRad')){ $$('#siteRad').value = settings.radius_m ?? 300; }
+}
+async function saveSettings(){
+  if(session?.role!=='admin') return toast('Vetëm admin!');
+  const lat = parseFloat($$('#siteLat').value);
+  const lng = parseFloat($$('#siteLng').value);
+  const r   = parseInt($$('#siteRad').value||'300',10);
+  const upd = { id:1, site_lat:isFinite(lat)?lat:null, site_lng:isFinite(lng)?lng:null, radius_m:isFinite(r)?r:300, updated_at: new Date().toISOString() };
+  const { error } = await sb.from('settings').upsert(upd).eq('id',1);
+  if(error){ console.error(error); return toast('Gabim ruajtje'); }
+  await loadSettings();
+  toast('U ruajt');
+}
+async function useMyLocation(){
+  try{
+    const pos = await getLocation();
+    $$('#siteLat').value = pos.lat.toFixed(6);
+    $$('#siteLng').value = pos.lng.toFixed(6);
+  }catch(e){ toast('Lejo lokacionin'); }
+}
+
+/*** Admin: users ***/
+async function addUser(){
+  if(session?.role!=='admin') return toast('Vetëm admin!');
+  const name = $$('#newName').value.trim();
+  const pin  = $$('#newPin').value.trim();
+  const role = $$('#newRole').value;
+  if(!name || !pin) return toast('Emri & PIN');
+  const { error } = await sb.from('employees').insert({ name, pin_hash: 'x', role });
+  if(error){ console.error(error); return toast('Nuk u shtua'); }
+  await fetchEmployees();
+  $$('#newName').value=''; $$('#newPin').value='';
+  toast('U shtua. Vendos PIN-in me "Ndrysho PIN".');
+}
+async function changePin(){
+  if(session?.role!=='admin') return toast('Vetëm admin!');
+  const uid = $$('#editUser').value;
+  const pin = $$('#editPin').value.trim();
+  if(!uid || !pin) return toast('Zgjidh & PIN i ri');
+  try{
+    const { error } = await sb.rpc('set_pin', { p_user: uid, p_pin: pin });
+    if(error){ console.error(error); return toast('S’u ndryshua PIN'); }
+    $$('#editPin').value='';
+    toast('PIN u ndryshua');
+  }catch(e){ toast('Krijo RPC set_pin në Supabase'); }
+}
+
+/*** Punch (in/out) ***/
+async function ensureSessionViaPrompt(){
+  if(session) return session;
+  openDrawer(true);
+  toast('Hyr me PIN-in tënd');
+  throw new Error('No session');
+}
+async function punch(type){
+  try{ await ensureSessionViaPrompt(); }catch(e){ return; }
+  if(!settings.site_lat || !settings.site_lng){ toast('Lokacioni i kompanisë nuk është vendosur (admin).'); return; }
+  const again = prompt('Shkruaj PIN-in për të regjistruar ('+(type==='in'?'hyrje':'dalje')+')');
+  if(!again){ toast('U anulua'); return; }
+  const { data } = await sb.rpc('verify_pin', { p_name: session.name, p_pin: again });
+  if(!data){ toast('PIN i pasaktë'); return; }
+  let pos = {lat:null,lng:null}, dist=null, within=false;
+  try{
+    pos = await getLocation();
+    dist = haversine(pos.lat, pos.lng, settings.site_lat, settings.site_lng);
+    within = dist <= (settings.radius_m || 300);
+  }catch(e){ toast('Lejo lokacionin (mund të regjistrohet si jashtë rrezes).'); }
+  const ins = { employee_id: session.id, type, lat: pos.lat, lng: pos.lng, within_radius: within, note: within?'brenda rrezes':'jashtë rrezes' };
+  const { error } = await sb.from('punches').insert(ins);
+  if(error){ console.error(error); return toast('Gabim regjistrimi'); }
+  toast((type==='in'?'Hyrje':'Dalje') + ' u regjistrua ' + (within?'(brenda rrezes)':'(jashtë rrezes)'));
+  refreshHistory();
+}
+
+/*** History + Hours summary ***/
+function selectedRange(){
+  const from = $$('#fromDate').value ? new Date($$('#fromDate').value) : null;
+  const to = $$('#toDate').value ? new Date($$('#toDate').value) : null;
+  if(to){ to.setHours(23,59,59,999); }
+  return { from, to };
+}
+function overlapMs(a1,a2,b1,b2){
+  const start = Math.max(a1,b1), end = Math.min(a2,b2);
+  return Math.max(0, end - start);
+}
+function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function atTime(d, h, m=0){ const x=new Date(d); x.setHours(h,m,0,0); return x; }
+
+function pairIntervals(rowsAsc){
+  const pairs=[];
+  for(let i=0;i<rowsAsc.length-1;i++){
+    const a=rowsAsc[i], b=rowsAsc[i+1];
+    if(a.type==='in' && b.type==='out'){
+      const s=new Date(a.ts).getTime(), e=new Date(b.ts).getTime();
+      if(e>s) pairs.push({start:s,end:e});
+    }
+  }
+  return pairs;
+}
+
+function computeDailyTotals(rows){
+  // rows: ts,type ascending
+  const intervals = pairIntervals(rows);
+  const perDay = {}; // key: yyyy-mm-dd => {baseMin, after16Min}
+  for(const it of intervals){
+    const d = new Date(it.start);
+    const key = d.toISOString().slice(0,10);
+    const dayStart = startOfDay(d).getTime();
+    const winStart = atTime(d,7,0).getTime();   // 07:00
+    const winEnd   = atTime(d,16,0).getTime();  // 16:00
+    const aftStart = winEnd;                    // 16:00 sonrası
+
+    const totalBase = overlapMs(it.start, it.end, winStart, winEnd);
+    const totalAfter16 = overlapMs(it.start, it.end, aftStart, atTime(d,23,59).getTime());
+
+    if(!perDay[key]) perDay[key]={baseMin:0, after16Min:0, weekday: weekdayName(d)};
+    perDay[key].baseMin     += totalBase/60000;
+    perDay[key].after16Min  += totalAfter16/60000;
+  }
+  return perDay;
+}
+
+async function refreshHistory(){
+  if(!session){ 
+    $$('#histBody').innerHTML=''; 
+    $$('#noData').style.display=''; 
+    $$('#summaryBody').innerHTML=''; 
+    $$('#summaryTotals').textContent='';
+    return; 
+  }
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('*').eq('employee_id', session.id).order('ts',{ascending:true}).limit(1000);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data, error } = await q;
+  if(error){ console.error(error); toast('Gabim lexim'); return; }
+
+  // History table (descending)
+  const body = $$('#histBody'); body.innerHTML='';
+  const rowsDesc = (data||[]).slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+  if(!rowsDesc.length){ $$('#noData').style.display=''; } else { $$('#noData').style.display='none'; }
+  for(const r of rowsDesc){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${fmtDate(r.ts)}</td>
+      <td>${weekdayName(r.ts)}</td>
+      <td>${fmtTime(r.ts)}</td>
+      <td><span class="pill ${r.type==='in'?'in':'out'}">${r.type==='in'?'Hyrje':'Dalje'}</span></td>
+      <td>${r.within_radius ? 'Brenda' : 'Jashtë'}</td>
+      <td class="muted">${r.note||''}</td>
+    `;
+    body.appendChild(tr);
+  }
+
+  // Summary table
+  const perDay = computeDailyTotals((data||[]));
+  const sBody = $$('#summaryBody'); sBody.innerHTML='';
+  let sumBase=0, sumAfter=0;
+  Object.keys(perDay).sort().forEach(key=>{
+    const rec = perDay[key];
+    sumBase  += rec.baseMin;
+    sumAfter += rec.after16Min;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${new Date(key).toLocaleDateString('sq-AL')}</td>
+      <td>${rec.weekday}</td>
+      <td>${mmToHHMM(rec.baseMin)}</td>
+      <td>${mmToHHMM(rec.after16Min)}</td>
+    `;
+    sBody.appendChild(tr);
+  });
+  $$('#summaryTotals').innerHTML = `
+    <span class="badge">Totali (07–16): <b>${mmToHHMM(sumBase)}</b></span>
+    <span class="badge">Pas 16:00: <b>${mmToHHMM(sumAfter)}</b></span>
+  `;
+}
+
+/*** Export (WhatsApp / PDF) ***/
+function buildShareText(rows){
+  const lines = [];
+  lines.push(`Orari i punës - ${session.name}`);
+  const { from, to } = selectedRange();
+  if(from || to){ lines.push(`Periudha: ${from?fmtDate(from):''} - ${to?fmtDate(to):''}`); }
+  lines.push('');
+  for(const r of rows){
+    const dt = `${fmtDate(r.ts)} (${weekdayName(r.ts)}) ${fmtTime(r.ts)}`;
+    lines.push(`${dt} - ${r.type==='in'?'Hyrje':'Dalje'} - ${r.within_radius?'Brenda':'Jashtë'}`);
+  }
+  return lines.join('\n');
+}
+async function shareWhatsApp(){
+  if(!session) return toast('Hyr fillimisht');
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('ts,type,within_radius').eq('employee_id', session.id).order('ts',{ascending:true}).limit(500);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data } = await q;
+  const text = buildShareText(data||[]);
+  const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+  window.open(url, '_blank');
+}
+async function downloadPDF(){
+  if(!session) return toast('Hyr fillimisht');
+  const { from, to } = selectedRange();
+  let q = sb.from('punches').select('ts,type,within_radius').eq('employee_id', session.id).order('ts',{ascending:true}).limit(500);
+  if(from) q = q.gte('ts', from.toISOString());
+  if(to)   q = q.lte('ts', to.toISOString());
+  const { data } = await q;
+  const text = buildShareText(data||[]);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const margin = 14;
+  let y = 20;
+  doc.setFontSize(14); doc.text(`Orari i punës - ${session.name}`, margin, y); y+=8;
+  doc.setFontSize(10);
+  const { from: f, to: t } = selectedRange();
+  if(f || t){ doc.text(`Periudha: ${f?fmtDate(f):''} - ${t?fmtDate(t):''}`, margin, y); y+=6; }
+  y+=4;
+  const lines = doc.splitTextToSize(text, 180);
+  doc.text(lines, margin, y);
+  doc.save(`orari-${session.name}.pdf`);
+}
+
+/*** Boot ***/
+(async function init(){
+  $$('#who').textContent = session ? (session.name + (session.role==='admin'?' (admin)':'') ) : '';
+  await fetchEmployees();
+  await loadSettings();
+  const d = new Date(); const y = d.getFullYear(); const m = d.getMonth();
+  $$('#fromDate').value = new Date(y,m,1).toISOString().slice(0,10);
+  $$('#toDate').value   = new Date(y,m+1,0).toISOString().slice(0,10);
+  refreshHistory();
+})();
+</script>
+</body>
+</html>
