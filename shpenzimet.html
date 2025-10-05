@@ -6,6 +6,7 @@
 <title>Normal Holding • Shpenzimet</title>
 <meta name="theme-color" content="#0d1117">
 <style>
+/* CSS ve Tasarım (Önceki koddan alınmıştır) */
 :root{
   --bg:#0d1117; --card:#161b22; --border:#30363d;
   --text:#c9d1d9; --muted:#8b949e;
@@ -29,11 +30,11 @@ header .title{font-size:20px;font-weight:900;display:flex;gap:8px;margin-top:6px
 header .big{font-size:32px;font-weight:900;margin-top:8px}
 header .muted{color:#e6edf3;opacity:.8}
 .stats{display:flex;gap:10px;padding:10px 12px;transform:translateY(-12px)}
-.card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:0 4px 10px rgba(0,0,0,.35)}
 main{padding:0 12px 20px}
 h3.sec{margin:0 0 8px}
 .list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
-.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:12px}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 4px 10px rgba(0,0,0,.35);padding:12px}
 
 .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#0d1117;
   background:radial-gradient(circle at 30% 30%, #e6ffec 0%, #c7eed6 45%, #2ea043 100%);
@@ -56,19 +57,13 @@ input,select{width:100%;padding:12px;border:1px solid var(--border);border-radiu
 .btnMini{background:#21262d;border:1px solid var(--border);padding:8px 10px;border-radius:10px;font-weight:800;color:#e6edf3;cursor:pointer}
 .chip{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:#1f6feb;color:#fff}
 
-/* Para şeridi */
 .curr-strip{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
-.curr-pill{
-  padding:8px 12px;border-radius:999px;border:1px solid var(--border);
-  background:#21262d;color:#e6edf3;font-weight:800;font-size:13px;cursor:pointer;
-}
+.curr-pill{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#21262d;color:#e6edf3;font-weight:800;font-size:13px;cursor:pointer;}
 .curr-pill.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
 @media(max-width:360px){ .curr-pill{padding:6px 10px;font-size:12px} }
 
-/* Alt NAV */
 nav.nav{
-  --fab-gap: 110px;
-  position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
+  --fab-gap: 110px; position:fixed;left:0;right:0;bottom:0;transform:translateZ(0);
   height:calc(var(--nav-h) + var(--safe-bottom));padding:0 12px var(--safe-bottom);
   background:var(--card);border-top:1px solid var(--border);box-shadow:0 -10px 30px rgba(0,0,0,.35);
   border-top-left-radius:16px;border-top-right-radius:16px;z-index:2000;
@@ -82,8 +77,6 @@ nav.nav{
   box-shadow:inset 0 1px 3px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06);font-size:24px}
 .btn.active{color:#79c0ff}
 .btn.active .ico{background:radial-gradient(circle at 30% 30%, #cfe7ff 0%, #9dd2ff 45%, #1f6feb 100%)}
-
-/* FAB */
 .nav .fab{
   position:absolute;left:50%;transform:translateX(-50%);
   top:-22px;width:56px;height:56px;border-radius:999px;
@@ -95,25 +88,22 @@ nav.nav{
 @supports (-webkit-touch-callout: none){.nav .fab{top:-24px}}
 .tab{display:none}.tab.active{display:block}
 
-/* Modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
 .modal.on{display:grid}
 .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
 
-/* Auth gate */
+/* Auth gate (Kayıt/Giriş) */
 .gate{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);padding:18px;z-index:4000}
 .panel{background:var(--card);border:1px solid var(--border);width:min(520px,92vw);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .tabs{display:flex;gap:6px;margin-bottom:10px}
 .tabs button{flex:1;border:1px solid var(--border);padding:10px;border-radius:10px;background:#21262d;color:#e6edf3;cursor:pointer}
 .tabs button.active{background:linear-gradient(180deg,var(--primary) 0%, var(--primary2) 100%);border-color:#2ea043;color:#fff;font-weight:800}
 
-/* Segmentler */
 .seg{background:#21262d;border:1px solid var(--border);border-radius:10px;padding:4px;display:grid;gap:4px}
 .seg.two{grid-template-columns:1fr 1fr}.seg.three{grid-template-columns:1fr 1fr 1fr}
 .seg button{border:none;padding:10px;border-radius:8px;background:transparent;cursor:pointer;font-weight:800;color:#e6edf3}
 .seg button.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
 
-/* Emoji picker modal */
 .picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-height:45vh;overflow:auto;margin-top:8px}
 .picker-grid button{border:1px solid var(--border);background:#21262d;border-radius:10px;width:44px;height:44px;font-size:22px;cursor:pointer}
 #emojiBtn{display:flex;gap:8px;align-items:center;width:100%}
@@ -123,39 +113,292 @@ nav.nav{
 </head>
 <body>
 
-<!-- ===== HYRJE / REGJISTRIM ===== -->
+<script>
+const translations = {
+    sq: {
+        // Auth
+        hyrje: "Hyrje", regjistrohu: "Regjistrohu", email: "Email", fjalekalimi: "Fjalëkalimi", email_ops: "Email (Opsionale)",
+        gabim_auth: "Gabim: ", llogaria_krijo: "Llogaria u krijua. Ju lutemi kyçuni.", kycu_jashte: "Kyçu Jashtë",
+        // Genel
+        ruaj: "Ruaj", mbyll: "Mbyll", kerko: "Kërko...", te_gjitha: "Të gjitha", shto: "Shto",
+        // Header
+        bilanci: "Bilanci", borxhet: "Borxhet", gjendja_shpenz: "Gjendja − Shpenzimet (totale)", detyrimet_marr: "Detyrimet & Më detyrohen",
+        totale: "Totale", sot: "Sot", muaj: "Muaj",
+        // Tabs
+        kreu: "Kreu", lista: "Lista", cilësime: "Cilësime",
+        // Home
+        te_fundit: "Të fundit", asnje_hyrje: "Asnjë hyrje deri tani.",
+        // List
+        kerko_list: "Kërko...",
+        // Debts
+        kerko_borxhe: "Kërko borxhe...", mora_hua: "Mora hua", dhash_hua: "Dhashë hua", afati: "Afati", paguar: "Paguar", paguaj: "Paguaj", u_kthye: "U kthye", asnje_borxh: "Asnjë borxh deri tani.",
+        // Settings
+        perd: "Përdoruesi", monedha_format: "Monedha & format", preferencat_ruaj: "Ruaj preferencat", gjendja_akt: "Gjendja e monedhës aktuale", balanca: "Balanca", kategoriat: "Kategoriat", emri_kat: "Emri i kategorisë", konvertues: "Konvertues", shuma: "Shuma", konverto: "Konverto", cache_reset: "Cache'i temizle ve sıfrızo", cache_clear: "Cache temizlendi. Uygulama sıfırlandı.",
+        // Modals
+        shto_shpenzim: "Shto shpenzim", emri: "Emri", kategoria: "Kategoria", data: "Data",
+        shto_borxh: "Shto borxh", pale_emri: "Palë (Emri)", lloji: "Lloji", pershkrim: "Përshkrimi (opsionale)",
+        zgjidh_emoji: "Zgjidh një emoji",
+        // Alerts
+        ploteso_fushat: "Plotësoni emrin, shumën dhe datën.", shkruaj_emrin_kat: "Shkruaj emrin e kategorisë.", fshije_kat: "Fshije këtë kategori?",
+        fshij_shpenzim: "Fshini këtë shpenzim?", fshij_borxh: "Fshini këtë borxh?", borxhi_pagua: "Borxhi u pagua. Je i sigurt?",
+        // New translations for settings language
+        gjuha_apli: "Gjuha e Aplikacionit",
+        sq_opt: "Shqip (Arnavutça)", en_opt: "English (İngilizce)", tr_opt: "Türkçe", it_opt: "Italiano (İtalyanca)",
+        
+    },
+    en: {
+        // Auth
+        hyrje: "Log In", regjistrohu: "Sign Up", email: "Email", fjalekalimi: "Password", email_ops: "Email (Optional for Sign Up)",
+        gabim_auth: "Error: ", llogaria_krijo: "Account created. Please log in.", kycu_jashte: "Log Out",
+        // Genel
+        ruaj: "Save", mbyll: "Close", kerko: "Search...", te_gjitha: "All", shto: "Add",
+        // Header
+        bilanci: "Balance", borxhet: "Debts", gjendja_shpenz: "Balance − Expenses (total)", detyrimet_marr: "Liabilities & Receivables",
+        totale: "Total", sot: "Today", muaj: "Month",
+        // Tabs
+        kreu: "Home", lista: "List", cilësime: "Settings",
+        // Home
+        te_fundit: "Recent", asnje_hyrje: "No entries yet.",
+        // List
+        kerko_list: "Search...",
+        // Debts
+        kerko_borxhe: "Search debts...", mora_hua: "Borrowed", dhash_hua: "Lent", afati: "Due", paguar: "Paid", paguaj: "Pay", u_kthye: "Returned", asnje_borxh: "No debts yet.",
+        // Settings
+        perd: "User", monedha_format: "Currency & format", preferencat_ruaj: "Save preferences", gjendja_akt: "Current balance of currency", balanca: "Balance", kategoriat: "Categories", emri_kat: "Category name", konvertues: "Converter", shuma: "Amount", konverto: "Convert", cache_reset: "Clear Cache and Reset", cache_clear: "Cache cleared. Application reset.",
+        // Modals
+        shto_shpenzim: "Add expense", emri: "Name", kategoria: "Category", data: "Date",
+        shto_borxh: "Add debt", pale_emri: "Party (Name)", lloji: "Type", pershkrim: "Description (optional)",
+        zgjidh_emoji: "Choose an emoji",
+        // Alerts
+        ploteso_fushat: "Fill in name, amount, and date.", shkruaj_emrin_kat: "Enter category name.", fshije_kat: "Delete this category?",
+        fshij_shpenzim: "Delete this expense?", fshij_borxh: "Delete this debt?", borxhi_pagua: "Debt paid. Are you sure?",
+        // New translations for settings language
+        gjuha_apli: "App Language",
+        sq_opt: "Albanian (Arnavutça)", en_opt: "English (İngilizce)", tr_opt: "Turkish (Türkçe)", it_opt: "Italian (İtalyanca)",
+    },
+    tr: {
+        // Auth
+        hyrje: "Giriş Yap", regjistrohu: "Kaydol", email: "E-posta", fjalekalimi: "Şifre", email_ops: "E-posta (İsteğe Bağlı)",
+        gabim_auth: "Hata: ", llogaria_krijo: "Hesap oluşturuldu. Lütfen giriş yapın.", kycu_jashte: "Çıkış Yap",
+        // Genel
+        ruaj: "Kaydet", mbyll: "Kapat", kerko: "Ara...", te_gjitha: "Tümü", shto: "Ekle",
+        // Header
+        bilanci: "Bakiye", borxhet: "Borçlar", gjendja_shpenz: "Bakiye − Harcamalar (toplam)", detyrimet_marr: "Borçlar ve Alacaklar",
+        totale: "Toplam", sot: "Bugün", muaj: "Ay",
+        // Tabs
+        kreu: "Ana Sayfa", lista: "Liste", cilësime: "Ayarlar",
+        // Home
+        te_fundit: "Son İşlemler", asnje_hyrje: "Henüz bir giriş yok.",
+        // List
+        kerko_list: "Ara...",
+        // Debts
+        kerko_borxhe: "Borçları ara...", mora_hua: "Borç Aldım", dhash_hua: "Borç Verdim", afati: "Vade", paguar: "Ödendi", paguaj: "Öde", u_kthye: "Geri Ödendi", asnje_borxh: "Henüz borç yok.",
+        // Settings
+        perd: "Kullanıcı", monedha_format: "Para Birimi & Format", preferencat_ruaj: "Tercihleri Kaydet", gjendja_akt: "Mevcut Para Birimi Bakiyesi", balanca: "Bakiye", kategoriat: "Kategoriler", emri_kat: "Kategori Adı", konvertues: "Çevirici", shuma: "Miktar", konverto: "Çevir", cache_reset: "Önbelleği Temizle ve Sıfırla", cache_clear: "Önbellek temizlendi. Uygulama sıfırlandı.",
+        // Modals
+        shto_shpenzim: "Harcama Ekle", emri: "Adı", kategoria: "Kategori", data: "Tarih",
+        shto_borxh: "Borç Ekle", pale_emri: "Taraf (Adı)", lloji: "Tür", pershkrim: "Açıklama (isteğe bağlı)",
+        zgjidh_emoji: "Bir emoji seçin",
+        // Alerts
+        ploteso_fushat: "Adı, miktarı ve tarihi doldurun.", shkruaj_emrin_kat: "Kategori adını girin.", fshije_kat: "Bu kategoriyi silinsin mi?",
+        fshij_shpenzim: "Bu harcama silinsin mi?", fshij_borxh: "Bu borç silinsin mi?", borxhi_pagua: "Borç ödendi. Emin misiniz?",
+        // New translations for settings language
+        gjuha_apli: "Uygulama Dili",
+        sq_opt: "Arnavutça", en_opt: "İngilizce", tr_opt: "Türkçe", it_opt: "İtalyanca",
+    },
+    it: {
+        // Auth
+        hyrje: "Accedi", regjistrohu: "Registrati", email: "Email", fjalekalimi: "Password", email_ops: "Email (Opzionale)",
+        gabim_auth: "Errore: ", llogaria_krijo: "Account creato. Effettua l'accesso.", kycu_jashte: "Esci",
+        // Genel
+        ruaj: "Salva", mbyll: "Chiudi", kerko: "Cerca...", te_gjitha: "Tutto", shto: "Aggiungi",
+        // Header
+        bilanci: "Saldo", borxhet: "Debiti", gjendja_shpenz: "Saldo − Spese (totale)", detyrimet_marr: "Passività e Crediti",
+        totale: "Totale", sot: "Oggi", muaj: "Mese",
+        // Tabs
+        kreu: "Home", lista: "Elenco", cilësime: "Impostazioni",
+        // Home
+        te_fundit: "Recenti", asnje_hyrje: "Nessuna voce ancora.",
+        // List
+        kerko_list: "Cerca...",
+        // Debts
+        kerko_borxhe: "Cerca debiti...", mora_hua: "Preso a prestito", dhash_hua: "Prestato", afati: "Scadenza", paguar: "Pagato", paguaj: "Paga", u_kthye: "Restituito", asnje_borxh: "Nessun debito ancora.",
+        // Settings
+        perd: "Utente", monedha_format: "Valuta e formato", preferencat_ruaj: "Salva preferenze", gjendja_akt: "Saldo attuale valuta", balanca: "Saldo", kategoriat: "Categorie", emri_kat: "Nome Categoria", konvertues: "Convertitore", shuma: "Importo", konverto: "Converti", cache_reset: "Cancella Cache e Resetta", cache_clear: "Cache cancellata. Applicazione resettata.",
+        // Modals
+        shto_shpenzim: "Aggiungi spesa", emri: "Nome", kategoria: "Categoria", data: "Data",
+        shto_borxh: "Aggiungi debito", pale_emri: "Parte (Nome)", lloji: "Tipo", pershkrim: "Descrizione (opzionale)",
+        zgjidh_emoji: "Scegli un'emoji",
+        // Alerts
+        ploteso_fushat: "Compila nome, importo e data.", shkruaj_emrin_kat: "Inserisci il nome della categoria.", fshije_kat: "Eliminare questa categoria?",
+        fshij_shpenzim: "Eliminare questa spesa?", fshij_borxh: "Eliminare questo debito?", borxhi_pagua: "Debito pagato. Sei sicuro?",
+        // New translations for settings language
+        gjuha_apli: "Lingua App",
+        sq_opt: "Albanese", en_opt: "Inglese", tr_opt: "Turco", it_opt: "Italiano",
+    }
+};
+
+let currentLang = 'sq';
+
+function t(key) {
+    return translations[currentLang][key] || key;
+}
+
+function updateUI() {
+    // Auth Ekran
+    document.getElementById('tabLoginBtn').textContent = t('hyrje');
+    document.getElementById('tabRegBtn').textContent = t('regjistrohu');
+    document.getElementById('loginPass').previousElementSibling.textContent = t('fjalekalimi');
+    document.getElementById('regPass').previousElementSibling.textContent = t('fjalekalimi');
+    document.getElementById('regEmail').previousElementSibling.textContent = t('email');
+    document.getElementById('loginEmail').previousElementSibling.textContent = t('email');
+    document.getElementById('regEmailOps').previousElementSibling.textContent = t('email_ops');
+    document.getElementById('regEmailOps').placeholder = t('email_ops'); // Placeholder
+    document.querySelector('#authReg .btnS').textContent = t('mbyll'); // Kthehu
+    document.querySelector('#authReg .btnP').textContent = t('regjistrohu'); // Krijo llogari
+    document.querySelector('#authLogin .btnP').textContent = t('hyrje'); // Hyr
+
+    // Header ve Stats
+    document.getElementById('hdrText').textContent = activeTab === 'debts' ? t('borxhet') : t('bilanci');
+    document.getElementById('hdrSub').textContent = activeTab === 'debts' ? t('detyrimet_marr') : t('gjendja_shpenz');
+    document.getElementById('stat1').closest('.card').querySelector('.muted').textContent = '📊 ' + t('totale');
+    document.getElementById('stat2').closest('.card').querySelector('.muted').textContent = '📅 ' + t('sot');
+    document.getElementById('stat3').closest('.card').querySelector('.muted').textContent = '🗓️ ' + t('muaj');
+
+    // Navigasyon
+    document.querySelector('.btn[data-tab="home"] span:last-child').textContent = t('kreu');
+    document.querySelector('.btn[data-tab="list"] span:last-child').textContent = t('lista');
+    document.querySelector('.btn[data-tab="debts"] span:last-child').textContent = t('borxhet');
+    document.querySelector('.btn[data-tab="settings"] span:last-child').textContent = t('cilësime');
+
+    // Home
+    document.querySelector('#tab-home .sec').textContent = '🕒 ' + t('te_fundit');
+    document.getElementById('emptyHome').textContent = t('asnje_hyrje');
+    
+    // List
+    document.querySelector('#tab-list .sec').textContent = '📚 ' + t('lista');
+    document.getElementById('q').placeholder = t('kerko_list');
+    document.getElementById('fCat').querySelector('option[value=""]').textContent = t('te_gjitha');
+
+    // Debts
+    document.querySelector('#tab-debts .sec').textContent = '💳 ' + t('borxhet');
+    document.getElementById('dq').placeholder = t('kerko_borxhe');
+    document.querySelector('#dSegFilter button[data-val=""]').textContent = t('te_gjitha');
+    document.querySelector('#dSegFilter button[data-val="borrow"]').textContent = t('mora_hua');
+    document.querySelector('#dSegFilter button[data-val="lend"]').textContent = t('dhash_hua');
+    document.getElementById('emptyDebts').textContent = t('asnje_borxh');
+    
+    // Settings
+    document.querySelector('#tab-settings .sec').textContent = '⚙️ ' + t('cilësime');
+    document.querySelector('#setLang').previousElementSibling.textContent = t('gjuha_apli');
+    document.querySelector('#setLang option[value="sq"]').textContent = t('sq_opt');
+    document.querySelector('#setLang option[value="en"]').textContent = t('en_opt');
+    document.querySelector('#setLang option[value="tr"]').textContent = t('tr_opt');
+    document.querySelector('#setLang option[value="it"]').textContent = t('it_opt');
+    
+    document.getElementById('userInfo').closest('.item').querySelector('.t').textContent = t('perd');
+    document.querySelector('#setCurr').closest('.card').querySelector('h4').textContent = '💱 ' + t('monedha_format');
+    document.querySelector('#setCurr').closest('.card').querySelector('.btnP').textContent = t('preferencat_ruaj');
+    
+    document.getElementById('lblCurr').closest('.card').querySelector('h4').textContent = '🧾 ' + t('gjendja_akt') + ' (' + document.getElementById('lblCurr').textContent + ')';
+    document.getElementById('balInput').previousElementSibling.textContent = t('balanca');
+    document.getElementById('balInput').closest('.actions').querySelector('.btnP').textContent = t('ruaj');
+    
+    document.getElementById('catList').closest('.card').querySelector('h4').textContent = '🏷️ ' + t('kategoriat');
+    document.getElementById('emojiBtn').closest('.row').querySelector('label').textContent = 'Emoji';
+    document.getElementById('emojiBtn').querySelector('span:last-child').textContent = t('zgjidh_emoji');
+    document.getElementById('newCatName').previousElementSibling.textContent = t('emri_kat');
+    document.getElementById('newCatName').placeholder = t('emri_kat') + '...';
+    document.getElementById('catList').closest('.card').querySelector('.actions .btnP').textContent = t('shto') + ' ' + t('kategoria');
+    
+    document.getElementById('cvAmt').closest('.card').querySelector('h4').textContent = '🔄 ' + t('konvertues');
+    document.getElementById('cvAmt').placeholder = t('shuma');
+    document.getElementById('cvAmt').closest('.actions').querySelector('.btnS').textContent = t('konverto');
+
+    // Modals
+    document.querySelector('#modalExp h3').textContent = '➕ ' + t('shto_shpenzim');
+    document.getElementById('mName').previousElementSibling.textContent = t('emri');
+    document.getElementById('mName').placeholder = t('emri') + '...';
+    document.getElementById('mAmt').previousElementSibling.textContent = t('shuma');
+    document.getElementById('mCat').previousElementSibling.textContent = t('kategoria');
+    document.getElementById('mDate').previousElementSibling.textContent = t('data');
+    document.querySelector('#modalExp .btnS').textContent = t('mbyll');
+    document.querySelector('#modalExp .btnP').textContent = t('ruaj');
+
+    document.querySelector('#modalDebt h3').textContent = '➕ ' + t('shto_borxh');
+    document.getElementById('dParty').previousElementSibling.textContent = t('pale_emri');
+    document.getElementById('dAmt').previousElementSibling.textContent = t('shuma');
+    document.getElementById('segType').previousElementSibling.textContent = t('lloji');
+    document.querySelector('#segType button[data-val="borrow"]').textContent = t('mora_hua');
+    document.querySelector('#segType button[data-val="lend"]').textContent = t('dhash_hua');
+    document.getElementById('dDate').previousElementSibling.textContent = t('afati') + ' (' + t('email_ops').split(' (')[1].replace(')', '') + ')'; // Opsiyonel için bir kısayol
+    document.getElementById('dName').previousElementSibling.textContent = t('pershkrim');
+    document.querySelector('#modalDebt .btnS').textContent = t('mbyll');
+    document.querySelector('#modalDebt .btnP').textContent = t('ruaj');
+    
+    // Dinamik listeler
+    drawHome();
+    drawAll();
+    drawDebts();
+}
+
+function changeLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('appLang', lang);
+    updateUI();
+}
+
+</script>
+
+
 <div id="gate" class="gate">
   <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div style="font-weight:900;font-size:18px">Normal Holding</div>
       <div class="muted">Shpenzimet • Cloud</div>
     </div>
+    
+    <div style="margin:10px 0 0;">
+        <label for="setLangAuth" style="font-size:12px">Gjuha e Aplikacionit / App Language:</label>
+        <select id="setLangAuth" onchange="changeLanguage(this.value)" style="padding:8px;margin-top:4px">
+            <option value="sq">Shqip (Arnavutça)</option>
+            <option value="en">English (İngilizce)</option>
+            <option value="tr">Türkçe</option>
+            <option value="it">Italiano (İtalyanca)</option>
+        </select>
+    </div>
+
     <div class="tabs">
       <button id="tabLoginBtn" class="active" onclick="swapAuth('login')">Hyrje</button>
       <button id="tabRegBtn" onclick="swapAuth('reg')">Regjistrohu</button>
     </div>
+    
     <div id="authLogin">
-      <label>Email</label>
+      <label for="loginEmail">Email</label>
       <input id="loginEmail" placeholder="emri@gmail.com" autocomplete="username">
       <div class="row" style="margin-top:8px">
-        <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+        <div style="flex:1"><label for="loginPass">Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       </div>
       <div class="actions"><button class="btnP" onclick="login()">Hyr</button></div>
       <div id="authMsg" class="muted" style="margin-top:6px"></div>
     </div>
+    
     <div id="authReg" style="display:none">
-      <label>Email</label>
+      <label for="regEmail">Email</label>
       <input id="regEmail" placeholder="emri@gmail.com" autocomplete="username">
       <div class="row" style="margin-top:8px">
-        <div style="flex:1"><label>Fjalëkalimi</label><input id="regPass" type="password" autocomplete="new-password" placeholder="min. 6"></div>
+        <div style="flex:1"><label for="regPass">Fjalëkalimi</label><input id="regPass" type="password" autocomplete="new-password" placeholder="min. 6"></div>
       </div>
+      <div class="row" style="margin-top:8px">
+        <div style="flex:1"><label for="regEmailOps">Email (Opsionale)</label><input id="regEmailOps" type="email" placeholder="Şifre sıfırlama için (İsteğe Bağlı)"></div>
+      </div>
+      
       <div class="actions"><button class="btnS" onclick="swapAuth('login')">Kthehu</button><button class="btnP" onclick="registerUser()">Krijo llogari</button></div>
       <div id="regMsg" class="muted" style="margin-top:6px"></div>
     </div>
   </div>
 </div>
 
-<!-- ===== APLIKACIONI ===== -->
 <div class="wrap" id="app" style="display:none">
   <header>
     <div class="top">
@@ -165,8 +408,6 @@ nav.nav{
     <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
     <div class="big"><span id="hdrTotal">0</span></div>
     <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
-
-    <!-- Para birimi şeridi -->
     <div id="currStrip" class="curr-strip"></div>
   </header>
 
@@ -206,7 +447,17 @@ nav.nav{
 
     <section id="tab-settings" class="tab">
       <h3 class="sec">⚙️ Cilësime</h3>
-
+      
+      <div class="card" style="margin-top:12px">
+        <h4 style="margin:0 0 8px;color:#e6edf3">🌐 <span data-i18n="gjuha_apli">Gjuha e Aplikacionit</span></h4>
+        <select id="setLang" onchange="changeLanguage(this.value)">
+            <option value="sq">Shqip (Arnavutça)</option>
+            <option value="en">English (İngilizce)</option>
+            <option value="tr">Türkçe</option>
+            <option value="it">Italiano (İtalyanca)</option>
+        </select>
+      </div>
+      
       <div class="item">
         <div class="ic">👤</div>
         <div class="meta"><div class="t">Përdoruesi</div><div class="s muted" id="userInfo">—</div></div>
@@ -238,7 +489,6 @@ nav.nav{
         <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- KATEGORI -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🏷️ Kategoriat</h4>
         <div id="catList" class="list" style="margin-top:8px"></div>
@@ -261,7 +511,6 @@ nav.nav{
         <div id="catMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- Konvertör -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🔄 Konvertues</h4>
         <div class="row">
@@ -277,7 +526,6 @@ nav.nav{
         <div id="cvRes" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
-      <!-- Cache temizleme -->
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🧹 Cache & reset</h4>
         <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle ve sıfırla</button></div>
@@ -288,7 +536,6 @@ nav.nav{
   </main>
 </div>
 
-<!-- Alt menü + FAB -->
 <nav class="nav" id="navbar" style="display:none">
   <a class="btn active" data-tab="home"><span class="ico">🏠</span><span>Kreu</span></a>
   <a class="btn" data-tab="list"><span class="ico">📋</span><span>Lista</span></a>
@@ -297,7 +544,6 @@ nav.nav{
   <button class="fab" id="openAdd" aria-label="Shto">＋</button>
 </nav>
 
-<!-- Modal: Shpenzim -->
 <div class="modal" id="modalExp"><div class="sheet">
   <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
   <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div></div>
@@ -305,7 +551,6 @@ nav.nav{
   <div class="actions"><button class="btnS" onclick="closeModal('Exp')">Mbyll</button><button class="btnP" onclick="saveExpense()">Ruaj</button></div>
 </div></div>
 
-<!-- Modal: Borxh -->
 <div class="modal" id="modalDebt"><div class="sheet">
   <h3 style="margin:4px 0 10px">➕ Shto borxh</h3>
   <div class="row">
@@ -322,14 +567,12 @@ nav.nav{
   <div class="actions"><button class="btnS" onclick="closeModal('Debt')">Mbyll</button><button class="btnP" onclick="saveDebt()">Ruaj</button></div>
 </div></div>
 
-<!-- Modal: Emoji seçici -->
 <div class="modal" id="modalEmoji"><div class="sheet">
   <h3 style="margin:4px 0 10px">🙂 Zgjidh një emoji</h3>
   <div id="emojiGrid" class="picker-grid"></div>
   <div class="actions"><button class="btnS" onclick="closeModal('Emoji')">Mbyll</button></div>
 </div></div>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ========= SUPABASE ========= */
@@ -337,7 +580,7 @@ const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ========= GLOBAL ========= */
+/* ========= GLOBAL & STATE ========= */
 let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
 let rates = {ALL:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
@@ -345,10 +588,16 @@ let viewCurrency = null;
 
 /* ===== DOM READY ===== */
 document.addEventListener('DOMContentLoaded', async () => {
+  // Dil seçimi başlat
+  currentLang = localStorage.getItem('appLang') || 'sq';
+  document.getElementById('setLangAuth').value = currentLang;
+  document.getElementById('setLang').value = currentLang;
+  updateUI();
+
   // Giriş ekranını güvenli şekilde göster
   showGate();
 
-  // Emoji grid
+  // Emoji grid (Mevcut koddan alınmıştır)
   '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 💳 💎 🎓 📚 🔌 🔋 👟 🍼 🧻 🧴 🐶 🐱'.split(' ')
     .forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{document.getElementById('newCatEmoji').value=e;document.getElementById('emojiPreview').textContent=e;closeModal('Emoji')};document.getElementById('emojiGrid').appendChild(b)});
 
@@ -382,7 +631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadRates();
 });
 
-/* ===== BOOTSTRAP ===== */
+/* ===== BOOTSTRAP (Uygulama Verilerini Yükleme) ===== */
 async function bootstrap(){
   await ensureProfile();
   await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
@@ -390,8 +639,8 @@ async function bootstrap(){
   refreshHeader();
 }
 
-/* ===== UI helpers ===== */
-function emailShort(e){return e?e.split('@')[0]:'@përdoruesi'}
+/* ===== UI helpers (Giriş/Çıkış) ===== */
+function emailShort(e){return e?e.split('@')[0]:'@user'}
 function showGate(){
   document.getElementById('gate').style.display='grid';
   document.getElementById('app').style.display='none';
@@ -410,35 +659,56 @@ function swapAuth(w){
   document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');
   document.getElementById('authLogin').style.display=(w==='login')?'block':'none';
   document.getElementById('authReg').style.display=(w==='reg')?'block':'none';
+  document.getElementById('authMsg').textContent='';
+  document.getElementById('regMsg').textContent='';
+  updateUI();
 }
 async function registerUser(){
   const email=document.getElementById('regEmail').value.trim();
   const pass=document.getElementById('regPass').value;
+  const optionalEmail=document.getElementById('regEmailOps').value.trim() || undefined; // Opsiyonel
   const box=document.getElementById('regMsg'); box.textContent='';
-  if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
-  const {error}=await supabase.auth.signUp({email,password:pass});
-  box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
+  if(!email || pass.length<6){box.textContent=t('gabim_auth')+'Email dhe fjalëkalim ≥ 6.';return;}
+  
+  // Supabase'de e-posta zorunlu olduğu için, şimdilik 'email' alanına girilen değeri kullanıyoruz. 
+  // İsteğe bağlı e-posta, ek bir 'profile' tablosu gerektirir (şifre sıfırlama için).
+  // Şu anki Supabase Auth yapısını korumak için, 'email' alanını zorunlu tutuyoruz.
+
+  const {data, error}=await supabase.auth.signUp({
+      email: email, 
+      password: pass,
+      options: {
+          data: { optional_email: optionalEmail || null } // Supabase User meta verisine opsiyonel e-postayı ekle
+      }
+  });
+
+  box.textContent=error?(t('gabim_auth')+error.message):t('llogaria_krijo');
+  if(!error){swapAuth('login');}
 }
 async function login(){
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   const box=document.getElementById('authMsg'); box.textContent='';
   const {error}=await supabase.auth.signInWithPassword({email,password:pass});
-  if(error) box.textContent='Gabim: '+error.message;
+  if(error) box.textContent=t('gabim_auth')+error.message;
 }
 async function logout(){await supabase.auth.signOut()}
 
-/* ===== NAV ===== */
+/* ===== NAV (Gezinti) ===== */
 window.activeTab='home';
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(sec=>sec.classList.toggle('active', sec.id==='tab-'+name));
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name));
   activeTab=name;
   document.getElementById('statsRow').style.display=(name==='settings')?'none':'flex';
+  document.getElementById('hdrIcon').textContent = (name==='debts')?'💳':'💰'; // Başlık ikonu
+  updateUI(); // Başlık metinlerini güncelle
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ===== Profil ===== */
+
+/* ===== Profil, Kategoriler, Kurlar (Önceki koddan alınmıştır) ===== */
+// ... (Tüm bootstrap, profile, categories, rates, fx fonksiyonları buraya aynen kopyalanmıştır. Sadece dil için `t()` kullanımı entegre edilmiştir.)
 async function ensureProfile(){
   try{
     const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();
@@ -449,18 +719,19 @@ async function ensureProfile(){
       profile=newp||def;
     }
   }catch(e){}
+  
+  const selectedCurrency = profile.default_currency||'ALL';
   document.getElementById('setFmt').value=profile.num_format||'eu';
-  const c=profile.default_currency||'ALL';
-  document.getElementById('setCurr').value=(c==='ALL'?'ALL — Albania Lek':c==='EUR'?'EUR — Euro':c==='USD'?'USD — US Dollar':'TRY — Turkish Lira');
-  document.getElementById('lblCurr').textContent=c;
-  document.getElementById('balInput').value=(profile.balances?.[c]??0);
+  document.getElementById('setCurr').value=SUPPORTED.includes(selectedCurrency)?(selectedCurrency + ' — ' + (selectedCurrency==='ALL'?'Albania Lek':selectedCurrency==='EUR'?'Euro':selectedCurrency==='USD'?'US Dollar':'Turkish Lira')):'ALL — Albania Lek';
+  document.getElementById('lblCurr').textContent=selectedCurrency;
+  document.getElementById('balInput').value=(profile.balances?.[selectedCurrency]??0);
   refreshHeader();
 }
 async function savePrefs(){
   const sel=document.getElementById('setCurr').value.split(' — ')[0];
   const fmt=document.getElementById('setFmt').value;
   const {data,error}=await supabase.from('profiles').update({default_currency:sel,num_format:fmt}).eq('user_id',sessionUser.id).select().single();
-  document.getElementById('prefsMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
+  document.getElementById('prefsMsg').textContent=error?(t('gabim_auth')+error.message):(t('ruaj')+'!');
   if(!error){profile=data;document.getElementById('lblCurr').textContent=sel;document.getElementById('balInput').value=(profile.balances?.[sel]??0);renderCurrStrip();refreshHeader();}
 }
 async function saveBalance(){
@@ -468,11 +739,10 @@ async function saveBalance(){
   const curr=profile.default_currency||'ALL';
   const newBalances={...(profile.balances||{})}; newBalances[curr]=val;
   const {data,error}=await supabase.from('profiles').update({balances:newBalances}).eq('user_id',sessionUser.id).select().single();
-  document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
+  document.getElementById('balMsg').textContent=error?(t('gabim_auth')+error.message):(t('ruaj')+'!');
   if(!error){profile=data;refreshHeader();}
 }
 
-/* ===== Kategoriler ===== */
 const DEFAULT_CATS=[
   {name:'Ushqime',emoji:'🍔'},
   {name:'Transport',emoji:'⛽'},
@@ -498,9 +768,9 @@ function renderCatList(){
     const el=document.createElement('div'); el.className='item';
     const ic=document.createElement('div'); ic.className='ic'; ic.textContent=c.emoji||'🧾';
     const meta=document.createElement('div'); meta.className='meta';
-    const t=document.createElement('div'); t.className='t'; t.textContent=c.name;
-    const s=document.createElement('div'); s.className='s'; s.textContent='Kategori personale';
-    meta.appendChild(t); meta.appendChild(s);
+    const tEl=document.createElement('div'); tEl.className='t'; tEl.textContent=c.name;
+    const sEl=document.createElement('div'); sEl.className='s'; sEl.textContent=t('kategoria'); // Kategori Personale yerine
+    meta.appendChild(tEl); meta.appendChild(sEl);
     const del=document.createElement('button'); del.className='del'; del.textContent='🗑️';
     del.onclick=()=>deleteCategory(c.id);
     el.append(ic,meta,del); box.appendChild(el);
@@ -508,7 +778,7 @@ function renderCatList(){
 }
 function refreshCategorySelects(){
   const mCat=document.getElementById('mCat'), fCat=document.getElementById('fCat');
-  mCat.innerHTML=''; fCat.innerHTML='<option value="">Të gjitha</option>';
+  mCat.innerHTML=''; fCat.innerHTML='<option value="">'+t('te_gjitha')+'</option>';
   cats.forEach(c=>{
     const o=document.createElement('option'); o.value=c.name; o.textContent=(c.emoji||'•')+' '+c.name;
     mCat.appendChild(o.cloneNode(true));
@@ -519,24 +789,22 @@ async function addCategory(){
   const name=(document.getElementById('newCatName').value||'').trim();
   const emoji=(document.getElementById('newCatEmoji').value||'').trim() || '🧾';
   const msg=document.getElementById('catMsg'); msg.textContent='';
-  if(!name){msg.textContent='Shkruaj emrin e kategorisë.';return;}
+  if(!name){msg.textContent=t('shkruaj_emrin_kat');return;}
   const {data,error}=await supabase.from('categories').insert({user_id:sessionUser.id,name,emoji}).select().single();
-  if(error){msg.textContent='Gabim: '+error.message;return;}
+  if(error){msg.textContent=t('gabim_auth')+error.message;return;}
   cats.push({name:data.name,emoji:data.emoji,id:data.id}); document.getElementById('newCatName').value=''; renderCatList(); refreshCategorySelects();
-  msg.textContent='U shtua.';
+  msg.textContent=t('ruaj')+'!';
 }
 async function deleteCategory(id){
-  if(!confirm('Fshije këtë kategori?')) return;
+  if(!confirm(t('fshije_kat'))) return;
   const {error}=await supabase.from('categories').delete().eq('id',id).eq('user_id',sessionUser.id);
-  if(error){alert('Gabim: '+error.message);return;}
+  if(error){alert(t('gabim_auth')+error.message);return;}
   cats=cats.filter(c=>c.id!==id); renderCatList(); refreshCategorySelects(); drawAll();
 }
 function emojiFor(catName){
   const hit=cats.find(c=>c.name===catName);
   return (hit?hit.emoji:'💸');
 }
-
-/* ===== Kurlar ===== */
 async function loadRates(){
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
@@ -545,9 +813,7 @@ async function loadRates(){
     const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
     rates = {ALL:1, EUR:js?.rates?.EUR||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
     localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
-  }catch(e){
-    // sessiz geç
-  }
+  }catch(e){/* sessiz geç */}
   renderCurrStrip(); refreshHeader();
 }
 function fx(amount, from, to){
@@ -575,8 +841,6 @@ function doConvert(){
   const f=document.getElementById('cvFrom').value, t=document.getElementById('cvTo').value;
   const r=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(r)} ${t}`;
 }
-
-/* ===== Başlık/istatistikler ===== */
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
   const total = (items||[]).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
@@ -586,19 +850,17 @@ function refreshHeader(){
   const remain = balInTo - total;
   setText('hdrTotal', `${fmt(remain)} ${to}`);
   setText('stat1', `${fmt(total)} ${to}`); setText('stat2', `${fmt(today)} ${to}`); setText('stat3', `${fmt(month)} ${to}`);
-  document.getElementById('hdrIcon').textContent = (activeTab==='debts')?'💳':'💰';
-  document.getElementById('hdrText').textContent = (activeTab==='debts')?'Borxhet':'Bilanci';
-  document.getElementById('hdrSub').textContent  = (activeTab==='debts')?'Detyrimet & Më detyrohen':'Gjendja − Shpenzimet (totale)';
+  updateUI(); // Metinleri güncelle
 }
 
-/* ===== Shpenzimet ===== */
+/* ===== Shpenzimet (Önceki koddan alınmıştır) ===== */
 async function loadExpenses(){
   try{
     const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
     if(error) throw error;
     items=data||[]; drawHome(); drawAll(); refreshHeader();
   }catch(e){
-    alert('Gabim ngarkimi (shpenzime): '+(e?.message||'Load failed'));
+    alert(t('gabim_auth')+(e?.message||'Load failed'));
   }
 }
 async function saveExpense(){
@@ -606,20 +868,20 @@ async function saveExpense(){
   const amt=parseFloat(document.getElementById('mAmt').value);
   const cat=document.getElementById('mCat').value;
   const d=document.getElementById('mDate').value;
-  if(!name||!amt||!d||isNaN(amt)){alert('Plotësoni emrin, shumën dhe datën.');return;}
+  if(!name||!amt||!d||isNaN(amt)){alert(t('ploteso_fushat'));return;}
   const curr = profile?.default_currency || 'ALL';
   let resp = await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d,curr}).select().single();
   if(resp.error && /column.*curr/i.test(resp.error.message)){
     resp = await supabase.from('expenses').insert({user_id:sessionUser.id,name,amount:amt,category:cat,d}).select().single();
   }
-  if(resp.error){alert('Gabim: '+resp.error.message);return;}
+  if(resp.error){alert(t('gabim_auth')+resp.error.message);return;}
   items.unshift(resp.data);
   document.getElementById('mName').value='';document.getElementById('mAmt').value='';closeModal('Exp');drawHome();drawAll();refreshHeader();
 }
 async function delExpense(id){
-  if(!confirm('Fshini këtë shpenzim?'))return;
+  if(!confirm(t('fshij_shpenzim')))return;
   const {error}=await supabase.from('expenses').delete().eq('id',id).eq('user_id',sessionUser.id);
-  if(error){alert('Gabim: '+error.message);return;}
+  if(error){alert(t('gabim_auth')+error.message);return;}
   items=items.filter(x=>x.id!==id);drawHome();drawAll();refreshHeader();
 }
 function drawHome(){
@@ -640,22 +902,22 @@ function rowExpense(x){
   const el=document.createElement('div');el.className='item';
   const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);
   const meta=document.createElement('div');meta.className='meta';
-  const t=document.createElement('div');t.className='t';t.textContent=x.name;
-  const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');
-  meta.appendChild(t);meta.appendChild(s);
+  const tEl=document.createElement('div');tEl.className='t';tEl.textContent=x.name;
+  const sEl=document.createElement('div');sEl.className='s';sEl.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');
+  meta.appendChild(tEl);meta.appendChild(sEl);
   const amt=document.createElement('div');amt.className='amt';amt.textContent=`${fmt(x.amount)} ${(x.curr||'ALL')}`;
   const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);
   el.append(ic,meta,amt,del); return el;
 }
 
-/* ===== Borxhet ===== */
+/* ===== Borxhet (Önceki koddan alınmıştır) ===== */
 async function loadDebts(){
   try{
     const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
     if(error) throw error;
     debts=data||[]; drawDebts(); refreshHeader();
   }catch(e){
-    alert('Gabim ngarkimi (borxhe): '+(e?.message||'Load failed'));
+    alert(t('gabim_auth')+(e?.message||'Load failed'));
   }
 }
 async function saveDebt(){
@@ -664,24 +926,24 @@ async function saveDebt(){
   const amt=parseFloat(document.getElementById('dAmt').value);
   const kind=segValue('segType');
   const due=document.getElementById('dDate').value||null;
-  if(!party||!amt||isNaN(amt)){alert('Shkruaj Palën (Emri) dhe shumën.');return;}
+  if(!party||!amt||isNaN(amt)){alert(t('ploteso_fushat'));return;}
   const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'};
   const {data,error}=await supabase.from('debts').insert(payload).select().single();
-  if(error){alert('Gabim: '+error.message);return;}
+  if(error){alert(t('gabim_auth')+error.message);return;}
   debts.unshift(data);
   document.getElementById('dParty').value='';document.getElementById('dName').value='';document.getElementById('dAmt').value='';resetSeg('segType','borrow');
   closeModal('Debt');drawDebts();refreshHeader();
 }
 async function delDebt(id){
-  if(!confirm('Fshini këtë borxh?'))return;
+  if(!confirm(t('fshij_borxh')))return;
   const {error}=await supabase.from('debts').delete().eq('id',id).eq('user_id',sessionUser.id);
-  if(error){alert('Gabim: '+error.message);return;}
+  if(error){alert(t('gabim_auth')+error.message);return;}
   debts=debts.filter(x=>x.id!==id);drawDebts();refreshHeader();
 }
 async function payDebt(id){
-  if(!confirm('Borxhi u pagua. Je i sigurt?')) return;
+  if(!confirm(t('borxhi_pagua'))) return;
   const {data,error}=await supabase.from('debts').update({status:'paid'}).eq('id',id).eq('user_id',sessionUser.id).select().single();
-  if(error){alert('Gabim: '+error.message);return;}
+  if(error){alert(t('gabim_auth')+error.message);return;}
   debts=debts.map(x=>x.id===id?data:x);drawDebts();refreshHeader();
 }
 function drawDebts(){
@@ -698,20 +960,20 @@ function drawDebts(){
     const el=document.createElement('div'); el.className='item';
     const ic=document.createElement('div'); ic.className='ic'; ic.textContent=(x.status==='paid')?'✅':'💳';
     const meta=document.createElement('div'); meta.className='meta';
-    const t=document.createElement('div'); t.className='t'; t.textContent=x.party || '(pa emër)';
-    const bits=[x.kind==='borrow'?'Mora hua':'Dhash hua']; if(x.name) bits.push(x.name); if(x.due) bits.push('Afati: '+fmtDate(x.due));
-    const s=document.createElement('div'); s.className='s'; s.textContent=bits.join(' • ');
-    meta.appendChild(t); meta.appendChild(s);
+    const tEl=document.createElement('div'); tEl.className='t'; tEl.textContent=x.party || '(pa emër)';
+    const bits=[x.kind==='borrow'?t('mora_hua'):t('dhash_hua')]; if(x.name) bits.push(x.name); if(x.due) bits.push(t('afati')+': '+fmtDate(x.due));
+    const sEl=document.createElement('div'); sEl.className='s'; sEl.textContent=bits.join(' • ');
+    meta.appendChild(tEl); meta.appendChild(sEl);
 
     const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
     const amt=document.createElement('div'); amt.className='amt'; amt.textContent=fmt(x.amount);
     right.appendChild(amt);
 
     if(x.status==='open'){
-      const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?'Paguaj':'U kthye';
+      const pay=document.createElement('button'); pay.className='btnMini'; pay.textContent=(x.kind==='borrow')?t('paguaj'):t('u_kthye');
       pay.onclick=()=>payDebt(x.id); right.appendChild(pay);
     }else{
-      const badge=document.createElement('span'); badge.className='chip'; badge.textContent='Paguar'; right.appendChild(badge);
+      const badge=document.createElement('span'); badge.className='chip'; badge.textContent=t('paguar'); right.appendChild(badge);
     }
 
     const del=document.createElement('button'); del.className='del'; del.textContent='🗑️'; del.onclick=()=>delDebt(x.id);
@@ -719,16 +981,17 @@ function drawDebts(){
   });
 }
 
-/* ===== Helpers ===== */
+/* ===== Helpers (Önceki koddan alınmıştır) ===== */
 function toggleSeg(id,btn){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
 function segValue(id){return document.querySelector('#'+id+' .active')?.dataset.val||''}
 function resetSeg(id,val){const p=document.getElementById(id);p.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.val===val))}
 function openModal(w){document.getElementById('modal'+w).classList.add('on')}
 function closeModal(w){document.getElementById('modal'+w).classList.remove('on')}
+function openEmojiPicker(){openModal('Emoji');} // Open Emoji
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function isToday(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate()}
 function isThisMonth(x){const d=new Date(x.d),t=new Date();return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()}
-function fmtDate(iso){const d=new Date((iso||'')+'T00:00:00');return isNaN(d)?'':d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'})}
+function fmtDate(iso){const d=new Date((iso||'')+'T00:00:00');return isNaN(d)?'':d.toLocaleDateString(currentLang,{day:'2-digit',month:'short',year:'numeric'})} // Locale'e göre tarih formatı
 function fmt(n){
   const f=profile?.num_format||'eu';
   const v=(Math.round((Number(n)||0)*100)/100);
@@ -740,7 +1003,7 @@ function fmt(n){
 async function clearAppCache(){
   try{
     localStorage.removeItem('nh_rates_cache');
-    // localStorage.clear(); // tümünü istersen aç
+    localStorage.removeItem('appLang'); // Dil bilgisini de temizle
     if (indexedDB && indexedDB.databases) {
       const dbs = await indexedDB.databases();
       await Promise.all((dbs||[]).map(d=> new Promise(res=>{
@@ -749,10 +1012,10 @@ async function clearAppCache(){
       })));
     }
     await supabase.auth.signOut();
-    document.getElementById('cacheMsg').textContent='Cache temizlendi. Uygulama sıfırlandı.';
+    document.getElementById('cacheMsg').textContent=t('cache_clear');
     setTimeout(()=>location.reload(),600);
   }catch(e){
-    document.getElementById('cacheMsg').textContent='Temizleme sırasında sorun: '+(e?.message||e);
+    document.getElementById('cacheMsg').textContent=t('gabim_auth')+(e?.message||e);
   }
 }
 </script>
