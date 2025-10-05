@@ -117,7 +117,7 @@ nav.nav{
 const translations = {
     sq: {
         // Auth
-        hyrje: "Hyrje", regjistrohu: "Regjistrohu", email: "Email", fjalekalimi: "Fjalëkalimi", email_ops: "Email (Opsionale)",
+        hyrje: "Hyrje", regjistrohu: "Regjistrohu", email: "Kullanıcı Adı/Email", fjalekalimi: "Fjalëkalimi", email_ops: "Email (Şifre Sıfırlama için Opsionale)",
         gabim_auth: "Gabim: ", llogaria_krijo: "Llogaria u krijua. Ju lutemi kyçuni.", kycu_jashte: "Kyçu Jashtë",
         // Genel
         ruaj: "Ruaj", mbyll: "Mbyll", kerko: "Kërko...", te_gjitha: "Të gjitha", shto: "Shto",
@@ -148,7 +148,7 @@ const translations = {
     },
     en: {
         // Auth
-        hyrje: "Log In", regjistrohu: "Sign Up", email: "Email", fjalekalimi: "Password", email_ops: "Email (Optional for Sign Up)",
+        hyrje: "Log In", regjistrohu: "Sign Up", email: "Username/Email", fjalekalimi: "Password", email_ops: "Email (Optional for Password Reset)",
         gabim_auth: "Error: ", llogaria_krijo: "Account created. Please log in.", kycu_jashte: "Log Out",
         // Genel
         ruaj: "Save", mbyll: "Close", kerko: "Search...", te_gjitha: "All", shto: "Add",
@@ -164,7 +164,7 @@ const translations = {
         // Debts
         kerko_borxhe: "Search debts...", mora_hua: "Borrowed", dhash_hua: "Lent", afati: "Due", paguar: "Paid", paguaj: "Pay", u_kthye: "Returned", asnje_borxh: "No debts yet.",
         // Settings
-        perd: "User", monedha_format: "Currency & format", preferencat_ruaj: "Save preferences", gjendja_akt: "Current balance of currency", balanca: "Balance", kategoriat: "Categories", emri_kat: "Category name", konvertues: "Converter", shuma: "Amount", konverto: "Convert", cache_reset: "Clear Cache and Reset", cache_clear: "Cache cleared. Application reset.",
+        perd: "User", monedha_format: "Currency & format", preferencat_ruaj: "Save preferences", gjendja_akt: "Current balance of currency", balanca: "Balance", kategoriat: "Categories", konvertues: "Converter", shuma: "Amount", konverto: "Convert", cache_reset: "Clear Cache and Reset", cache_clear: "Cache cleared. Application reset.",
         // Modals
         shto_shpenzim: "Add expense", emri: "Name", kategoria: "Category", data: "Date",
         shto_borxh: "Add debt", pale_emri: "Party (Name)", lloji: "Type", pershkrim: "Description (optional)",
@@ -178,7 +178,7 @@ const translations = {
     },
     tr: {
         // Auth
-        hyrje: "Giriş Yap", regjistrohu: "Kaydol", email: "E-posta", fjalekalimi: "Şifre", email_ops: "E-posta (İsteğe Bağlı)",
+        hyrje: "Giriş Yap", regjistrohu: "Kaydol", email: "Kullanıcı Adı/E-posta", fjalekalimi: "Şifre", email_ops: "E-posta (Şifre Sıfırlama için İsteğe Bağlı)",
         gabim_auth: "Hata: ", llogaria_krijo: "Hesap oluşturuldu. Lütfen giriş yapın.", kycu_jashte: "Çıkış Yap",
         // Genel
         ruaj: "Kaydet", mbyll: "Kapat", kerko: "Ara...", te_gjitha: "Tümü", shto: "Ekle",
@@ -208,7 +208,7 @@ const translations = {
     },
     it: {
         // Auth
-        hyrje: "Accedi", regjistrohu: "Registrati", email: "Email", fjalekalimi: "Password", email_ops: "Email (Opzionale)",
+        hyrje: "Accedi", regjistrohu: "Registrati", email: "Nome Utente/Email", fjalekalimi: "Password", email_ops: "Email (Opzionale per Reset Password)",
         gabim_auth: "Errore: ", llogaria_krijo: "Account creato. Effettua l'accesso.", kycu_jashte: "Esci",
         // Genel
         ruaj: "Salva", mbyll: "Chiudi", kerko: "Cerca...", te_gjitha: "Tutto", shto: "Aggiungi",
@@ -248,12 +248,16 @@ function updateUI() {
     // Auth Ekran
     document.getElementById('tabLoginBtn').textContent = t('hyrje');
     document.getElementById('tabRegBtn').textContent = t('regjistrohu');
+    
+    // Güncellenmiş metinler
+    document.getElementById('loginEmail').previousElementSibling.textContent = t('email');
+    document.getElementById('regEmail').previousElementSibling.textContent = t('email');
+    
     document.getElementById('loginPass').previousElementSibling.textContent = t('fjalekalimi');
     document.getElementById('regPass').previousElementSibling.textContent = t('fjalekalimi');
-    document.getElementById('regEmail').previousElementSibling.textContent = t('email');
-    document.getElementById('loginEmail').previousElementSibling.textContent = t('email');
     document.getElementById('regEmailOps').previousElementSibling.textContent = t('email_ops');
     document.getElementById('regEmailOps').placeholder = t('email_ops'); // Placeholder
+    
     document.querySelector('#authReg .btnS').textContent = t('mbyll'); // Kthehu
     document.querySelector('#authReg .btnP').textContent = t('regjistrohu'); // Krijo llogari
     document.querySelector('#authLogin .btnP').textContent = t('hyrje'); // Hyr
@@ -374,8 +378,8 @@ function changeLanguage(lang) {
     </div>
     
     <div id="authLogin">
-      <label for="loginEmail">Email</label>
-      <input id="loginEmail" placeholder="emri@gmail.com" autocomplete="username">
+      <label for="loginEmail">Kullanıcı Adı/Email</label>
+      <input id="loginEmail" placeholder="Kullanıcı Adı veya Geçerli Email" autocomplete="username">
       <div class="row" style="margin-top:8px">
         <div style="flex:1"><label for="loginPass">Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       </div>
@@ -384,8 +388,8 @@ function changeLanguage(lang) {
     </div>
     
     <div id="authReg" style="display:none">
-      <label for="regEmail">Email</label>
-      <input id="regEmail" placeholder="emri@gmail.com" autocomplete="username">
+      <label for="regEmail">Kullanıcı Adı/Email</label>
+      <input id="regEmail" placeholder="Kullanıcı Adı (panzlife) veya Geçerli Email" autocomplete="username">
       <div class="row" style="margin-top:8px">
         <div style="flex:1"><label for="regPass">Fjalëkalimi</label><input id="regPass" type="password" autocomplete="new-password" placeholder="min. 6"></div>
       </div>
@@ -640,7 +644,11 @@ async function bootstrap(){
 }
 
 /* ===== UI helpers (Giriş/Çıkış) ===== */
-function emailShort(e){return e?e.split('@')[0]:'@user'}
+function emailShort(e){
+    const username = sessionUser?.user_metadata?.username;
+    if (username) return '@'+username;
+    return e?e.split('@')[0]:'@user';
+}
 function showGate(){
   document.getElementById('gate').style.display='grid';
   document.getElementById('app').style.display='none';
@@ -651,7 +659,7 @@ function showApp(){
   document.getElementById('app').style.display='block';
   document.getElementById('navbar').style.display='grid';
   document.getElementById('who').textContent=emailShort(sessionUser?.email);
-  document.getElementById('userInfo').textContent=sessionUser?.email||'-';
+  document.getElementById('userInfo').textContent=sessionUser?.user_metadata?.username || sessionUser?.email || t('perd');
   refreshHeader();drawHome();drawDebts();
 }
 function swapAuth(w){
@@ -663,35 +671,89 @@ function swapAuth(w){
   document.getElementById('regMsg').textContent='';
   updateUI();
 }
-async function registerUser(){
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  const optionalEmail=document.getElementById('regEmailOps').value.trim() || undefined; // Opsiyonel
-  const box=document.getElementById('regMsg'); box.textContent='';
-  if(!email || pass.length<6){box.textContent=t('gabim_auth')+'Email dhe fjalëkalim ≥ 6.';return;}
-  
-  // Supabase'de e-posta zorunlu olduğu için, şimdilik 'email' alanına girilen değeri kullanıyoruz. 
-  // İsteğe bağlı e-posta, ek bir 'profile' tablosu gerektirir (şifre sıfırlama için).
-  // Şu anki Supabase Auth yapısını korumak için, 'email' alanını zorunlu tutuyoruz.
 
-  const {data, error}=await supabase.auth.signUp({
-      email: email, 
+// Helper: E-posta formatı kontrolü
+function isValidEmail(e){ 
+    const re = /\S+@\S+\.\S+/;
+    return re.test(e);
+}
+
+// YENİ Kayıt Fonksiyonu (Kullanıcı Adı / Zorunlu Olmayan E-posta Desteği)
+async function registerUser(){
+  const inputId = document.getElementById('regEmail').value.trim(); // Kullanıcıdan gelen ID (Kullanıcı Adı veya E-posta)
+  const pass = document.getElementById('regPass').value;
+  const optionalEmail = document.getElementById('regEmailOps').value.trim() || null; // Şifre sıfırlama için gerçek e-posta
+  const box = document.getElementById('regMsg'); 
+  box.textContent = '';
+  
+  if(!inputId || pass.length < 6){
+      box.textContent = t('gabim_auth') + t('email') + ' ' + t('fjalekalimi') + ' (min. 6).';
+      return;
+  }
+  
+  let finalEmail = inputId;
+  let isDummy = false;
+
+  // 1. Eğer Kullanıcı Adı geçerli bir e-posta formatında DEĞİLSE
+  if (!isValidEmail(inputId)) {
+      // Supabase'i kandırmak için sahte bir e-posta oluştur
+      // Kullanıcı adını alfanümerik yapıp sonuna sahte domain ekle
+      finalEmail = `${inputId.replace(/[^a-zA-Z0-9]/g, '_')}@nh-anon.com`; 
+      isDummy = true;
+  }
+
+  // 2. Supabase Kayıt İşlemi
+  const {data, error} = await supabase.auth.signUp({
+      email: finalEmail, 
       password: pass,
       options: {
-          data: { optional_email: optionalEmail || null } // Supabase User meta verisine opsiyonel e-postayı ekle
+          data: { 
+              // Gerçek kullanıcı adını ve opsiyonel e-postayı sakla
+              username: inputId, 
+              optional_email: optionalEmail 
+          }
       }
   });
 
-  box.textContent=error?(t('gabim_auth')+error.message):t('llogaria_krijo');
-  if(!error){swapAuth('login');}
+  if (error) {
+      box.textContent = t('gabim_auth') + error.message;
+  } else {
+      let msg = t('llogaria_krijo');
+      if (isDummy) {
+          msg += " (Anonim hesap)";
+      }
+      box.textContent = msg;
+      swapAuth('login');
+  }
 }
+
+// YENİ Giriş Fonksiyonu (Kullanıcı Adı ile Giriş Desteği)
 async function login(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const box=document.getElementById('authMsg'); box.textContent='';
-  const {error}=await supabase.auth.signInWithPassword({email,password:pass});
-  if(error) box.textContent=t('gabim_auth')+error.message;
+  const inputId = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const box = document.getElementById('authMsg'); 
+  box.textContent = '';
+  
+  let finalEmail = inputId;
+
+  // Eğer girilen değer e-posta formatında değilse, dummy formatını dene
+  if (!isValidEmail(inputId)) {
+      finalEmail = `${inputId.replace(/[^a-zA-Z0-9]/g, '_')}@nh-anon.com`; 
+  }
+  
+  // Önce normal e-posta/kullanıcı adı (dummy e-posta) ile dene
+  let {error} = await supabase.auth.signInWithPassword({email: finalEmail, password: pass});
+
+  // Eğer başarısız olursa, tekrar orijinal inputu e-posta olarak dene (Eski kullanıcılar için)
+  if (error) {
+     ({error} = await supabase.auth.signInWithPassword({email: inputId, password: pass}));
+  }
+
+  if(error) {
+      box.textContent = t('gabim_auth') + error.message;
+  }
 }
+
 async function logout(){await supabase.auth.signOut()}
 
 /* ===== NAV (Gezinti) ===== */
@@ -708,7 +770,6 @@ function switchTab(name){
 
 
 /* ===== Profil, Kategoriler, Kurlar (Önceki koddan alınmıştır) ===== */
-// ... (Tüm bootstrap, profile, categories, rates, fx fonksiyonları buraya aynen kopyalanmıştır. Sadece dil için `t()` kullanımı entegre edilmiştir.)
 async function ensureProfile(){
   try{
     const {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).single();
