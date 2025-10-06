@@ -64,6 +64,27 @@
   }
   .curr-pill.active{background:linear-gradient(180deg,#1f6feb 0%, #1158c7 100%);color:#fff}
   @media(max-width:360px){ .curr-pill{padding:6px 10px;font-size:12px} }
+  
+  /* Yeni eklenen döviz toplamı alanı */
+  .header-fx-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 8px;
+  }
+  .header-fx-summary .fx-total {
+      text-align: right;
+      font-size: 16px;
+      font-weight: 800;
+      color: #e6edf3;
+      opacity: 0.9;
+  }
+  .header-fx-summary .fx-label {
+      font-size: 12px;
+      color: #e6edf3;
+      opacity: 0.7;
+      margin-bottom: 2px;
+  }
 
   /* Alt NAV */
   nav.nav{
@@ -160,16 +181,24 @@
       <div style="font-weight:800">Normal Holding</div>
       <div class="muted" id="who">@përdoruesi</div>
     </div>
-    <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
-    <div class="big"><span id="hdrTotal">0</span></div>
-    <div class="muted" id="hdrSub">Gjendja − Shpenzimet (totale)</div>
+    <div class="header-fx-summary">
+        <div style="flex:1">
+            <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
+            <div class="big"><span id="hdrTotal">0</span></div>
+            <div class="muted" id="hdrSub">Gjendja e monedhës aktuale − Shpenzimet (totale)</div>
+        </div>
+        <div style="flex-shrink: 0; text-align: right; display:flex; flex-direction: column; justify-content: flex-end;">
+            <div class="fx-label">Totali i Cüzdanëve</div>
+            <div class="fx-total"><span id="hdrTotalFX">0</span></div>
+        </div>
+    </div>
+
 
     <div id="currStrip" class="curr-strip"></div>
   </header>
 
   <div id="statsRow" class="stats">
-    <div class="card"><div class="muted">💰 Gj. Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat0">0</span></div></div>
-    <div class="card"><div class="muted">📊 Harxhuar</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span></div></div>
+    <div class="card"><div class="muted">📊 Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span></div></div>
     <div class="card"><div class="muted">📅 Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0</span></div></div>
     <div class="card"><div class="muted">🗓️ Muaj</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0</span></div></div>
   </div>
@@ -226,14 +255,19 @@
           </select>
         </div>
         <div class="actions"><button class="btnP" onclick="savePrefs()">Ruaj preferencat</button></div>
-        <div class="muted" id="prefsMsg" style="margin-top:6px;font-size:12px"></div>
+        <div id="prefsMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
       <div class="card" style="margin-top:12px">
-        <h4 style="margin:0 0 8px;color:#e6edf3">🧾 Gjendja e monedhës aktuale (<span id="lblCurr">ALL</span>)</h4>
-        <div class="row"><input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="p.sh. 5000"></div>
+        <h4 style="margin:0 0 8px;color:#e6edf3">🧾 Gjendja (Balanca)</h4>
+        <div class="row">
+            <select id="balCurrSelect" style="flex:1" onchange="updateBalInput()">
+                <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+            </select>
+            <input id="balInput" type="number" step="0.01" inputmode="decimal" placeholder="0.00" style="flex:2">
+        </div>
         <div class="actions"><button class="btnP" onclick="saveBalance()">Ruaj gjendjen</button></div>
-        <div class="muted" id="balMsg" style="margin-top:6px;font-size:12px"></div>
+        <div id="balMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
       <div class="card" style="margin-top:12px">
@@ -275,7 +309,7 @@
 
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🧹 Cache & reset</h4>
-        <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle dhe sıfırla</button></div>
+        <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle dhe sıfërla</button></div>
         <div id="cacheMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
@@ -299,14 +333,11 @@
   </div>
   <div class="row" style="margin-top:8px">
     <div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div>
-    <div style="flex:1">
-        <label>Monedha</label>
-        <select id="mCurr">
-            <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
-        </select>
-    </div>
+    <div style="flex:1"><label>Data</label><input id="mDate" type="date"></div>
   </div>
-  <div class="row" style="margin-top:8px"><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Monedha (Döviz)</label><select id="mCurr"></select></div>
+  </div>
   <div class="actions"><button class="btnS" onclick="closeModal('Exp')">Mbyll</button><button class="btnP" onclick="saveExpense()">Ruaj</button></div>
 </div></div>
 
@@ -334,15 +365,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ========= SUPABASE & GLOBAL VARS ========= */
+/* ========= SUPABASE & GLOBAL VARS (AYNI KALDI) ========= */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
-let rates = {ALL:1};
+let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{ALL:0,EUR:0,USD:0,TRY:0}}, cats=[], activeTab='home';
+let rates = {ALL:1, EUR:1, USD:1, TRY:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
-let viewCurrency = null; // Monedha e cila përdoret për shfaqje (p.sh. EUR kur EUR është aktiv)
+let viewCurrency = null; // Aktif görüntüleme para birimi
 
 /* ===== DOM READY ===== */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -367,16 +398,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('mDate').value=today;
   document.getElementById('dDate').value=today;
 
-  // Vendos dëgjuesit e ngjarjeve për segmentet
+  // Monedha e shpenzimit (Modal Exp)
+  const mCurrSelect = document.getElementById('mCurr');
+  SUPPORTED.forEach(c => {
+      const option = document.createElement('option');
+      option.value = c; option.textContent = c;
+      mCurrSelect.appendChild(option);
+  });
+  
+  // Balanca monedha
+  document.getElementById('balCurrSelect').value = profile.default_currency || 'ALL';
+
+
+  // Segment listeners
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b);drawDebts();});
 
   // FAB
   const fab=document.getElementById('openAdd');
-  const fabOpen=()=>{
-      document.getElementById('mCurr').value = profile?.default_currency || 'ALL'; // Vendos monedhën parazgjedhur në modal
-      if(activeTab==='debts') openModal('Debt'); else openModal('Exp');
-  };
+  const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
   ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
 
   // NAV
@@ -386,9 +426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try{
     const {data:{session}}=await supabase.auth.getSession();
     if(session?.user){ sessionUser=session.user; showApp(); await bootstrap(); }
-  }catch(e){
-    console.error("Gabim në ngarkimin e sesionit:", e);
-  }
+  }catch{}
 
   // Monitoro ndryshimet e sesionit
   supabase.auth.onAuthStateChange(async (_e,session)=>{
@@ -403,9 +441,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ===== BOOTSTRAP: Ngarkon të gjitha të dhënat e përdoruesit ===== */
 async function bootstrap(){
   await ensureProfile();
-  // Vendos viewCurrency në monedhën parazgjedhur
-  viewCurrency = profile?.default_currency || 'ALL'; 
-  
   await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
   renderCurrStrip();
   refreshHeader();
@@ -425,13 +460,13 @@ function showApp(){
   document.getElementById('who').textContent=emailShort(sessionUser?.email);
   document.getElementById('userInfo').textContent=sessionUser?.email||'-';
   refreshHeader();drawHome();drawDebts();
+  document.getElementById('mCurr').value = profile.default_currency || 'ALL';
 }
 function swapAuth(w){
   document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');
   document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');
   document.getElementById('authLogin').style.display=(w==='login')?'block':'none';
   document.getElementById('authReg').style.display=(w==='reg')?'block':'none';
-  // Pastro mesazhet e gabimit kur ndërrohet mes hyrjes/regjistrimit
   setText('authMsg', ''); setText('regMsg', '');
 }
 async function registerUser(){
@@ -440,15 +475,16 @@ async function registerUser(){
   const box=document.getElementById('regMsg'); box.textContent='';
   if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
   const {error}=await supabase.auth.signUp({email,password:pass});
-  // Përditëso mesazhin, por mos shfaq "Invalid login credential" pas regjistrimit
-  box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
+  // Düzeltme: Kayıt başarılı olsa bile e-posta onayı gerektiğini belirtiyoruz.
+  box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in për të hyrë.';
 }
 async function login(){
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   const box=document.getElementById('authMsg'); box.textContent='';
   const {error}=await supabase.auth.signInWithPassword({email,password:pass});
-  if(error) box.textContent='Gabim: '+error.message;
+  // Hata mesajını daha açık hale getirdik
+  if(error) box.textContent='Gabim: '+ (error.message.includes('Invalid login') ? 'Kredenciale të pavlefshme ose e-maili i pa konfirmuar.' : error.message);
 }
 async function logout(){await supabase.auth.signOut()}
 
@@ -457,7 +493,6 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(sec=>sec.classList.toggle('active', sec.id==='tab-'+name));
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name));
   activeTab=name;
-  // Shfaq/fshih kartat e statistikave në varësi të skedës
   document.getElementById('statsRow').style.display=(name==='settings')?'none':'flex';
   refreshHeader(); 
   window.scrollTo({top:0,behavior:'smooth'});
@@ -467,9 +502,14 @@ function switchTab(name){
 async function ensureProfile(){
   try{
     let {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).maybeSingle();
-    if(data) profile=data;
+    if(data) {
+        // Balanca formatını güncelledik: Hata oluşmaması için tüm desteklenen kurların sıfır bakiyesini ekle
+        const safeBalances = {...profile.balances, ...(data.balances || {})};
+        SUPPORTED.forEach(c => { if (safeBalances[c] === undefined || safeBalances[c] === null) safeBalances[c] = 0; });
+        profile = {...data, balances: safeBalances};
+    }
     else{
-      const def={user_id:sessionUser.id,default_currency:'ALL',num_format:'eu',balances:{}};
+      const def={user_id:sessionUser.id,default_currency:'ALL',num_format:'eu',balances:{ALL:0,EUR:0,USD:0,TRY:0}};
       const {data:newp}=await supabase.from('profiles').insert(def).select().single();
       profile=newp||def;
     }
@@ -481,10 +521,21 @@ async function ensureProfile(){
   document.getElementById('setFmt').value=profile.num_format||'eu';
   const c=profile.default_currency||'ALL';
   document.getElementById('setCurr').value=SUPPORTED.includes(c)?c+' — '+ (c==='ALL'?'Albania Lek':c==='EUR'?'Euro':c==='USD'?'US Dollar':'Turkish Lira'):'ALL — Albania Lek';
-  document.getElementById('lblCurr').textContent=c;
-  document.getElementById('balInput').value=(profile.balances?.[c]??0);
+  document.getElementById('balCurrSelect').value = c;
+  updateBalInput(); // Güncel default kurun bakiyesini inputa yansıt
+  
   refreshHeader();
 }
+
+// Balance input'u günceller
+function updateBalInput() {
+    const selectedCurr = document.getElementById('balCurrSelect').value;
+    const balance = profile.balances?.[selectedCurr] ?? 0;
+    document.getElementById('balInput').value = balance;
+    // Harcama monedrasını da default'a ayarla
+    document.getElementById('mCurr').value = profile.default_currency || 'ALL';
+}
+
 async function savePrefs(){
   const sel=document.getElementById('setCurr').value.split(' — ')[0];
   const fmt=document.getElementById('setFmt').value;
@@ -492,28 +543,28 @@ async function savePrefs(){
   document.getElementById('prefsMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
   if(!error){
     profile=data;
-    document.getElementById('lblCurr').textContent=sel;
-    document.getElementById('balInput').value=(profile.balances?.[sel]??0);
-    
-    // Vendos monedhën aktive në atë parazgjedhur pas ndryshimit
-    viewCurrency = sel; 
-    
+    document.getElementById('balCurrSelect').value = sel; // Default kur değişince, balance input'u da o kura ayarla
+    updateBalInput();
     renderCurrStrip();
     refreshHeader();
-    drawHome(); // Rindërto listat me formatin e ri/monedhën e re të listës
-    drawAll();
   }
 }
 async function saveBalance(){
   const val=parseFloat(document.getElementById('balInput').value||'0')||0;
-  const curr=profile.default_currency||'ALL';
+  const curr=document.getElementById('balCurrSelect').value;
   const newBalances={...(profile.balances||{})}; newBalances[curr]=val;
+  
   const {data,error}=await supabase.from('profiles').update({balances:newBalances}).eq('user_id',sessionUser.id).select().single();
   document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
-  if(!error){profile=data;refreshHeader();}
+  if(!error){
+    profile=data;
+    // Kaydetme işlemi default kurun bakiyesini etkilediyse viewCurrency'yi null yapıp yeniden renderla
+    if(curr === profile.default_currency) viewCurrency = null; 
+    refreshHeader();
+  }
 }
 
-/* ===== Kategoritë ===== */
+/* ===== Kategoritë (Aynı kaldı) ===== */
 const DEFAULT_CATS=[
   {name:'Ushqime',emoji:'🍔'},{name:'Transport',emoji:'⛽'},{name:'Shtëpia',emoji:'🏠'},
   {name:'Argëtim',emoji:'🎟️'},{name:'Fatura',emoji:'💡'},{name:'Të tjera',emoji:'🧾'}
@@ -578,36 +629,53 @@ async function loadRates(){
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
     if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
-    // Përdorim ALL si bazë, siç kishim
-    const url = 'https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY';
+    // Değişiklik: Base ALL yerine EUR kullandık, çünkü ALL/TRY kuru hatalı olabilir. Hesaplama mantığı içinde FX fonksiyonu bunu düzeltecek.
+    const url = 'https://api.exchangerate.host/latest?base=EUR&symbols=ALL,USD,TRY'; 
     const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
-    // Sigurohuni që të gjitha monedhat të jenë të pranishme
-    rates = {ALL:1, EUR:js?.rates?.EUR||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
+    // API'dan gelen kurlar: 1 EUR = X ALL, Y USD, Z TRY
+    const eurRates = {EUR:1, ALL:js?.rates?.ALL||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
+    // Bizim için her şeyi ALL bazına çevirelim (Daha doğru hesaplama için)
+    const baseAll = 1 / eurRates.ALL;
+    rates = {
+      ALL: 1, // 1 ALL
+      EUR: eurRates.ALL, // 1 EUR kaç ALL
+      USD: eurRates.ALL / eurRates.USD, // 1 USD kaç ALL
+      TRY: eurRates.ALL / eurRates.TRY // 1 TRY kaç ALL
+    };
+    
     localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
   }catch(e){
-    // Në rast gabimi, përdor vlerat parazgjedhura
+    // Hata durumunda default kurları kullan
+    rates = {ALL:1, EUR:130, USD:110, TRY:4.5}; // Sadece örnek default kurlar
+    console.warn("Kurlar yüklenemedi. Örnek kurlar kullanılıyor.", e);
   }
   renderCurrStrip(); refreshHeader();
 }
+
 /**
- * Konverton shumën nga monedha 'from' në monedhën 'to'.
+ * Konvertim: Të kthesh shumën nga një monedhë në tjetrën.
+ * @param {number} amount Shuma për t'u konvertuar.
+ * @param {string} from Monedha burimore (p.sh., 'EUR').
+ * @param {string} to Monedha destinacion (p.sh., 'ALL').
+ * @returns {number} Shuma e konvertuar.
  */
 function fx(amount, from, to){
   const A = Number(amount)||0; 
-  from = (from || 'ALL').toUpperCase(); 
-  to = (to || 'ALL').toUpperCase();
-  
-  // Kontrollo nëse monedhat janë të mbështetura
-  if (!SUPPORTED.includes(from) || !SUPPORTED.includes(to)) return A;
-  
+  from = from||'ALL'; 
+  to = to||'ALL';
   if(from===to) return A;
   
-  // Rregullohet në rast se kurset nuk janë ngarkuar
+  // 1 Kur: 1 Monedhë = X ALL
+  // rFrom: 1 From kaç ALL
+  // rTo: 1 To kaç ALL
   const rFrom = rates[from] ?? 1;
   const rTo   = rates[to]   ?? 1;
   
-  return A * (rTo / rFrom);
+  // Önce ALL'ye çevir: A * rFrom
+  // Sonra istenen T'ye çevir: (A * rFrom) / rTo
+  return (A * rFrom) / rTo;
 }
+
 function renderCurrStrip(){
   const box = document.getElementById('currStrip');
   if(!box) return;
@@ -620,8 +688,6 @@ function renderCurrStrip(){
       viewCurrency=code;
       box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===code));
       refreshHeader();
-      drawHome(); // Rindërto listat për të parë vlerat në valutën aktive
-      drawAll();
     };
     box.appendChild(b);
     if(code === currentView) b.classList.add('active');
@@ -638,40 +704,46 @@ function doConvert(){
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
   
-  // Gjendja Totale (Balancat e konvertuara)
-  const totalBalances = SUPPORTED.reduce((sum, curr) => {
-      const balance = Number(profile.balances?.[curr] || 0);
-      return sum + fx(balance, curr, to);
-  }, 0);
-  
-  // Shpenzimet e konvertuara
+  // 1. Shpenzimet e konvertuara
   const totalExpenses = (items||[]).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
   const todayExpenses = (items||[]).filter(isToday).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
   const monthExpenses = (items||[]).filter(isThisMonth).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
   
-  // Llogaritja e borxheve (vetëm ato të hapura)
+  // 2. Balanca e monedhës aktuale të caktuar nga settings (Default Balance)
+  const defaultCurr = profile?.default_currency || 'ALL';
+  const balMap = profile?.balances || {}; 
+  const defaultBalInView = fx(Number(balMap[defaultCurr]||0), defaultCurr, to);
+
+  // 3. Totali i të gjitha cüzdanëve (Total Wallets FX)
+  let totalWalletsFX = 0;
+  SUPPORTED.forEach(c => {
+      const balance = Number(balMap[c] || 0);
+      totalWalletsFX += fx(balance, c, to);
+  });
+  
+  // 4. Llogaritja e borxheve (vetëm ato të hapura)
   const totalDebts = (debts||[]).filter(x=>x.status==='open').reduce((sum,x)=>{
-    // Borxhet supozohet se janë në ALL pasi nuk kishin kolonë monedhe
-    const amountInView = fx(x.amount, 'ALL', to); 
+    // Borxhet supozohet në monedhën default (ALL), ose duhet të shtohet kolona e monedhës
+    const amountInView = fx(x.amount, defaultCurr, to); 
     return sum + (x.kind==='borrow'? amountInView : -amountInView);
   }, 0);
 
-  const remain = totalBalances - totalExpenses; // Bilanci (Gjendja Totale - Shpenzimet Totale)
-  
   let totalForHeader, headerText, headerSub;
 
   if (activeTab === 'debts') {
-      totalForHeader = totalDebts; // Shuma neto e borxheve/huave
+      totalForHeader = totalDebts; 
       headerText = 'Borxhet';
       headerSub  = 'Detyrimet & Më detyrohen';
   } else {
-      totalForHeader = remain; 
+      // Për Kreu/Lista: Trego balancën e monedhës parazgjedhur - total shpenzime
+      totalForHeader = defaultBalInView - totalExpenses; 
       headerText = 'Bilanci';
-      headerSub  = 'Gjendja Totale − Shpenzimet';
+      headerSub  = `Gjendja e ${defaultCurr} - Shpenzimet`;
   }
 
+  // Vendosja e vlerave
   setText('hdrTotal', `${fmt(totalForHeader)} ${to}`);
-  setText('stat0', `${fmt(totalBalances)} ${to}`); // Gjendja Totale
+  setText('hdrTotalFX', `${fmt(totalWalletsFX)} ${to}`); // Yeni Alan!
   setText('stat1', `${fmt(totalExpenses)} ${to}`); 
   setText('stat2', `${fmt(todayExpenses)} ${to}`); 
   setText('stat3', `${fmt(monthExpenses)} ${to}`);
@@ -683,7 +755,6 @@ function refreshHeader(){
 /* ===== Shpenzimet (Expenses) ===== */
 async function loadExpenses(){
   try{
-    // Kërkesë e përditësuar për të marrë të dhëna me fushën e re `curr`
     const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
     if(error) throw error;
     items=data||[]; drawHome(); drawAll(); refreshHeader();
@@ -696,13 +767,11 @@ async function saveExpense(){
   const amt=parseFloat(document.getElementById('mAmt').value);
   const cat=document.getElementById('mCat').value;
   const d=document.getElementById('mDate').value;
-  const curr=document.getElementById('mCurr').value.toUpperCase(); // Merr monedhën e zgjedhur
+  const curr=document.getElementById('mCurr').value; // Monedha e re
   
   if(!name||isNaN(amt)||(amt<=0)||!d){alert('Plotësoni emrin, shumën (>0) dhe datën.');return;}
   
   const payload = {user_id:sessionUser.id,name,amount:amt,category:cat,d,curr};
-  
-  // Më parë u bë një tentativë për insert, tani nuk është e nevojshme.
   const {data,error}=await supabase.from('expenses').insert(payload).select().single();
   
   if(error){alert('Gabim: '+error.message);return;}
@@ -736,29 +805,17 @@ function rowExpense(x){
   const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);
   const meta=document.createElement('div');meta.className='meta';
   const t=document.createElement('div');t.className='t';t.textContent=x.name;
-  
-  // Konverto shumën në monedhën aktive për shfaqje
   const currencySymbol = x.curr || 'ALL'; 
-  const displayCurrency = viewCurrency || (profile?.default_currency || 'ALL');
-  const amountInView = fx(x.amount, currencySymbol, displayCurrency);
-  
-  // Përdor shfaqjen e monedhës së listës, por trego monedhën origjinale si të dhënë
-  const s=document.createElement('div');s.className='s';
-  const detail = [x.category, fmtDate(x.d)].filter(Boolean).join(' • ') + ` (${fmt(x.amount)} ${currencySymbol})`;
-  s.textContent=detail;
-  
+  const s=document.createElement('div');s.className='s';s.textContent=[x.category, fmtDate(x.d)].filter(Boolean).join(' • ');
   meta.append(t,s);
-  
-  // Shfaq vlerën e konvertuar
   const amt=document.createElement('div');amt.className='amt';
-  amt.textContent=`${fmt(amountInView)} ${displayCurrency}`;
-  
+  // Monedha e shpenzimit ruhet ose përdor ALL
+  amt.textContent=`${fmt(x.amount)} ${currencySymbol}`;
   const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);
   el.append(ic,meta,amt,del); return el;
 }
 
-
-/* ===== Borxhet (Debts) ===== */
+/* ===== Borxhet (Debts - Aynı kaldı) ===== */
 async function loadDebts(){
   try{
     const {data,error}=await supabase.from('debts').select('*').eq('user_id',sessionUser.id).order('created_at',{ascending:false}).limit(2000);
@@ -776,7 +833,6 @@ async function saveDebt(){
   const due=document.getElementById('dDate').value||null;
   if(!party||isNaN(amt)||(amt<=0)){alert('Shkruaj Palën (Emri) dhe shumën (>0).');return;}
   
-  // Borxhet regjistrohen në monedhën parazgjedhur (ALL në këtë rast bazuar në skemën e të dhënave origjinale)
   const payload={user_id:sessionUser.id,party,name,amount:amt,kind,due,status:'open'}; 
   const {data,error}=await supabase.from('debts').insert(payload).select().single();
   
@@ -805,8 +861,6 @@ function drawDebts(){
 
   if(q)arr=arr.filter(x=>(x.party||'').toLowerCase().includes(q)||(x.name||'').toLowerCase().includes(q));
   if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
-  
-  const displayCurrency = viewCurrency || (profile?.default_currency || 'ALL');
 
   const box=document.getElementById('debtList'); box.innerHTML='';
   document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
@@ -824,10 +878,9 @@ function drawDebts(){
 
     const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
     const amt=document.createElement('div'); amt.className='amt'; 
-    
-    // Konverto shumën e borxhit në monedhën aktive
-    const amountInView = fx(x.amount, 'ALL', displayCurrency);
-    amt.textContent=`${fmt(amountInView)} ${displayCurrency}`;
+    // Borxhet monedhën default (ALL) kullanır.
+    const defaultCurr = profile?.default_currency || 'ALL';
+    amt.textContent=`${fmt(x.amount)} ${defaultCurr}`;
 
     right.appendChild(amt);
 
@@ -862,18 +915,16 @@ function isThisMonth(x){
 }
 function fmtDate(iso){
   const d=new Date((iso||'')+'T00:00:00');
-  // Përdor 'sq-AL' për formatin shqiptar, siç kishim
   return isNaN(d.getTime())?'':d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short',year:'numeric'});
 }
 function fmt(n){
   const f=profile?.num_format||'eu';
   const v=(Math.round((Number(n)||0)*100)/100);
-  // Përdor LocaleString për formatim
   return f==='us' ? v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
                   : v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-/* ===== Cache / Reset ===== */
+/* ===== Cache / Reset (Aynı kaldı) ===== */
 async function clearAppCache(){
   try{
     localStorage.removeItem('nh_rates_cache');
