@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Normal Holding • Shpenzimet</title>
+<title>Normal Holding • Shpenzimet (FINALE)</title>
 <meta name="theme-color" content="#0d1117">
 <style>
   :root{
@@ -71,19 +71,30 @@
       justify-content: space-between;
       align-items: flex-end;
       margin-top: 8px;
+      gap: 16px;
   }
   .header-fx-summary .fx-total {
       text-align: right;
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 28px; /* Biraz küçülttüm */
+      font-weight: 900;
       color: #e6edf3;
-      opacity: 0.9;
+      opacity: 1;
+      line-height: 1.2;
   }
   .header-fx-summary .fx-label {
       font-size: 12px;
+      font-weight: 800;
       color: #e6edf3;
       opacity: 0.7;
-      margin-bottom: 2px;
+      margin-bottom: 0px;
+      white-space: nowrap;
+  }
+  .header-fx-summary .main-balance{
+    flex:1;
+  }
+  .header-fx-summary .fx-wallet-total{
+    flex-shrink: 0;
+    text-align: right;
   }
 
   /* Alt NAV */
@@ -119,7 +130,7 @@
   /* Modal */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;place-items:end;padding:14px;z-index:3000}
   .modal.on{display:grid}
-  .sheet{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
+  .sheet{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 14px 18px;width:100%;box-shadow:0 -12px 30px rgba(0,0,0,.5)}
 
   /* Auth gate */
   .gate{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);padding:18px;z-index:4000}
@@ -161,7 +172,7 @@
         <div style="flex:1"><label>Fjalëkalimi</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
       </div>
       <div class="actions"><button class="btnP" onclick="login()">Hyr</button></div>
-      <div id="authMsg" class="muted" style="margin-top:6px"></div>
+      <div id="authMsg" class="muted" style="margin-top:6px;color:var(--danger)"></div>
     </div>
     <div id="authReg" style="display:none">
       <label>Email</label>
@@ -182,12 +193,12 @@
       <div class="muted" id="who">@përdoruesi</div>
     </div>
     <div class="header-fx-summary">
-        <div style="flex:1">
+        <div class="main-balance">
             <div class="title"><span id="hdrIcon">💰</span><span id="hdrText">Bilanci</span></div>
             <div class="big"><span id="hdrTotal">0</span></div>
             <div class="muted" id="hdrSub">Gjendja e monedhës aktuale − Shpenzimet (totale)</div>
         </div>
-        <div style="flex-shrink: 0; text-align: right; display:flex; flex-direction: column; justify-content: flex-end;">
+        <div class="fx-wallet-total">
             <div class="fx-label">Totali i Cüzdanëve</div>
             <div class="fx-total"><span id="hdrTotalFX">0</span></div>
         </div>
@@ -365,7 +376,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ========= SUPABASE & GLOBAL VARS (AYNI KALDI) ========= */
+/* ========= SUPABASE & GLOBAL VARS ========= */
 const SUPABASE_URL='https://nvpjqvggaiipwziolend.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cGpxdmdnYWlpcHd6aW9sZW5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTExNzcsImV4cCI6MjA3NDQ2NzE3N30.PnJh09kx-kK8iChgQl2M1eTw5P2qRZUEO31wVY7_iP4';
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
@@ -375,12 +386,11 @@ let rates = {ALL:1, EUR:1, USD:1, TRY:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
 let viewCurrency = null; // Aktif görüntüleme para birimi
 
-/* ===== DOM READY ===== */
+/* ===== DOM READY & INIT ===== */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Shfaq ekranin e hyrjes
   showGate();
 
-  // Krijo grid-in e emojis
+  // Emoji Grid ve Diğer UI Hazırlıkları (Kategori, Tarih vs.)
   '🍔 🥗 🍕 🍰 ☕ 🍺 🛒 🚌 ⛽ 🚕 🛠️ 🧽 🎁 🎮 🎬 🎟️ 💡 📱 💻 🏠 🐾 ⚽ 🧾 💊 ✈️ 🚗 💳 💎 🎓 📚 🔌 🔋 👟 🍼 🧻 🧴 🐶 🐱'.split(' ')
     .forEach(e=>{
       const b=document.createElement('button');
@@ -393,12 +403,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('emojiGrid').appendChild(b);
     });
 
-  // Vendos datat e sotme
   const today = new Date().toISOString().slice(0,10);
   document.getElementById('mDate').value=today;
   document.getElementById('dDate').value=today;
 
-  // Monedha e shpenzimit (Modal Exp)
   const mCurrSelect = document.getElementById('mCurr');
   SUPPORTED.forEach(c => {
       const option = document.createElement('option');
@@ -406,27 +414,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       mCurrSelect.appendChild(option);
   });
   
-  // Balanca monedha
   document.getElementById('balCurrSelect').value = profile.default_currency || 'ALL';
 
-
-  // Segment listeners
   document.querySelectorAll('#segType button').forEach(b=>b.onclick=()=>toggleSeg('segType',b));
   document.querySelectorAll('#dSegFilter button').forEach(b=>b.onclick=()=>{toggleSeg('dSegFilter',b);drawDebts();});
 
-  // FAB
   const fab=document.getElementById('openAdd');
   const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
   ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
 
-  // NAV
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.addEventListener('click', ()=>switchTab(btn.dataset.tab)));
 
   // Ngarko sesionin
   try{
     const {data:{session}}=await supabase.auth.getSession();
     if(session?.user){ sessionUser=session.user; showApp(); await bootstrap(); }
-  }catch{}
+  }catch(e){console.error("Session load error:", e)}
 
   // Monitoro ndryshimet e sesionit
   supabase.auth.onAuthStateChange(async (_e,session)=>{
@@ -434,16 +437,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     else{sessionUser=null; showGate();}
   });
 
-  // Ngarko kurset e këmbimit
-  loadRates();
+  loadRates(); // Kurları başlat
 });
 
-/* ===== BOOTSTRAP: Ngarkon të gjitha të dhënat e përdoruesit ===== */
+/* ===== BOOTSTRAP: Ngarkon të gjitha të dhënat e përdoruesit (İlk Yükleme Sırası Düzeltildi) ===== */
 async function bootstrap(){
-  await ensureProfile();
-  await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
-  renderCurrStrip();
-  refreshHeader();
+  await ensureProfile(); // Profil yükle/oluştur
+  renderCurrStrip(); // Para şeridini profile göre çiz
+  await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]); // Verileri yükle
+  refreshHeader(); // Header'ı hesapla ve göster
 }
 
 /* ===== UI helpers (Gjendja e aplikacionit) ===== */
@@ -459,8 +461,7 @@ function showApp(){
   document.getElementById('navbar').style.display='grid';
   document.getElementById('who').textContent=emailShort(sessionUser?.email);
   document.getElementById('userInfo').textContent=sessionUser?.email||'-';
-  refreshHeader();drawHome();drawDebts();
-  document.getElementById('mCurr').value = profile.default_currency || 'ALL';
+  document.getElementById('mCurr').value = profile.default_currency || 'ALL'; // Modal varsayılan döviz
 }
 function swapAuth(w){
   document.getElementById('tabLoginBtn').classList.toggle('active',w==='login');
@@ -475,16 +476,21 @@ async function registerUser(){
   const box=document.getElementById('regMsg'); box.textContent='';
   if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
   const {error}=await supabase.auth.signUp({email,password:pass});
-  // Düzeltme: Kayıt başarılı olsa bile e-posta onayı gerektiğini belirtiyoruz.
   box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in për të hyrë.';
 }
 async function login(){
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   const box=document.getElementById('authMsg'); box.textContent='';
+  
+  // LOGIN LOGIC FIX: Invalid credential hatasını yakalama
   const {error}=await supabase.auth.signInWithPassword({email,password:pass});
-  // Hata mesajını daha açık hale getirdik
-  if(error) box.textContent='Gabim: '+ (error.message.includes('Invalid login') ? 'Kredenciale të pavlefshme ose e-maili i pa konfirmuar.' : error.message);
+  if(error) {
+    console.error("Login Error:", error);
+    box.textContent='Gabim: ' + (error.message.includes('Invalid login') ? 'Kredenciale të pavlefshme ose e-maili i pa konfirmuar.' : error.message);
+  } else {
+    box.textContent = ''; // Başarılı giriş
+  }
 }
 async function logout(){await supabase.auth.signOut()}
 
@@ -502,49 +508,57 @@ function switchTab(name){
 async function ensureProfile(){
   try{
     let {data}=await supabase.from('profiles').select('*').eq('user_id',sessionUser.id).maybeSingle();
+    const defaultBalances = {ALL:0, EUR:0, USD:0, TRY:0};
+
     if(data) {
-        // Balanca formatını güncelledik: Hata oluşmaması için tüm desteklenen kurların sıfır bakiyesini ekle
-        const safeBalances = {...profile.balances, ...(data.balances || {})};
-        SUPPORTED.forEach(c => { if (safeBalances[c] === undefined || safeBalances[c] === null) safeBalances[c] = 0; });
+        // Balansları kontrol et ve eksik olanları default ile doldur
+        const safeBalances = {...defaultBalances, ...(data.balances || {})};
         profile = {...data, balances: safeBalances};
     }
     else{
-      const def={user_id:sessionUser.id,default_currency:'ALL',num_format:'eu',balances:{ALL:0,EUR:0,USD:0,TRY:0}};
-      const {data:newp}=await supabase.from('profiles').insert(def).select().single();
+      // Yeni kullanıcı: Default profil oluştur
+      const def={user_id:sessionUser.id,default_currency:'ALL',num_format:'eu',balances:defaultBalances};
+      const {data:newp, error: insertError}=await supabase.from('profiles').insert(def).select().single();
+      if (insertError) throw insertError;
       profile=newp||def;
     }
   }catch(e){
     console.error("Gabim në marrjen/krijimin e profilit:", e);
+    // Hata durumunda uygulama kilitlenmesin
+    profile = {user_id:sessionUser.id,default_currency:'ALL',num_format:'eu',balances:{ALL:0,EUR:0,USD:0,TRY:0}};
   }
   
   // Konfiguro UI-në e cilësimeve
   document.getElementById('setFmt').value=profile.num_format||'eu';
   const c=profile.default_currency||'ALL';
-  document.getElementById('setCurr').value=SUPPORTED.includes(c)?c+' — '+ (c==='ALL'?'Albania Lek':c==='EUR'?'Euro':c==='USD'?'US Dollar':'Turkish Lira'):'ALL — Albania Lek';
+  const currencyOption = SUPPORTED.includes(c)? c + ' — ' + (c==='ALL'?'Albania Lek':c==='EUR'?'Euro':c==='USD'?'US Dollar':'Turkish Lira') : 'ALL — Albania Lek';
+  document.getElementById('setCurr').value = currencyOption;
   document.getElementById('balCurrSelect').value = c;
-  updateBalInput(); // Güncel default kurun bakiyesini inputa yansıt
-  
+  updateBalInput(); 
   refreshHeader();
 }
-
-// Balance input'u günceller
 function updateBalInput() {
     const selectedCurr = document.getElementById('balCurrSelect').value;
     const balance = profile.balances?.[selectedCurr] ?? 0;
     document.getElementById('balInput').value = balance;
-    // Harcama monedrasını da default'a ayarla
     document.getElementById('mCurr').value = profile.default_currency || 'ALL';
 }
-
 async function savePrefs(){
   const sel=document.getElementById('setCurr').value.split(' — ')[0];
   const fmt=document.getElementById('setFmt').value;
+  
+  // Kontrol: Sadece desteklenen dövizleri kullan
+  if (!SUPPORTED.includes(sel)) {
+      document.getElementById('prefsMsg').textContent = 'Gabim: Monedha e zgjedhur nuk mbështetet.'; return;
+  }
+
   const {data,error}=await supabase.from('profiles').update({default_currency:sel,num_format:fmt}).eq('user_id',sessionUser.id).select().single();
   document.getElementById('prefsMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
   if(!error){
     profile=data;
-    document.getElementById('balCurrSelect').value = sel; // Default kur değişince, balance input'u da o kura ayarla
+    document.getElementById('balCurrSelect').value = sel;
     updateBalInput();
+    viewCurrency = sel; // Default kur değişti, görüntüleme kurunu da ayarla
     renderCurrStrip();
     refreshHeader();
   }
@@ -552,15 +566,15 @@ async function savePrefs(){
 async function saveBalance(){
   const val=parseFloat(document.getElementById('balInput').value||'0')||0;
   const curr=document.getElementById('balCurrSelect').value;
-  const newBalances={...(profile.balances||{})}; newBalances[curr]=val;
+  const newBalances={...(profile.balances||{})}; 
+  newBalances[curr]=val;
   
   const {data,error}=await supabase.from('profiles').update({balances:newBalances}).eq('user_id',sessionUser.id).select().single();
   document.getElementById('balMsg').textContent=error?('Gabim: '+error.message):'U ruajt.';
   if(!error){
     profile=data;
-    // Kaydetme işlemi default kurun bakiyesini etkilediyse viewCurrency'yi null yapıp yeniden renderla
-    if(curr === profile.default_currency) viewCurrency = null; 
-    refreshHeader();
+    // Sadece mevcut görünüm para birimindeki bakiye değiştiyse başlığı yenile.
+    if(curr === (viewCurrency || profile.default_currency)) refreshHeader();
   }
 }
 
@@ -624,32 +638,45 @@ function emojiFor(catName){
   return (hit?hit.emoji:'💸');
 }
 
-/* ===== Kurset e Këmbimit (Rates) ===== */
+/* ===== Kurset e Këmbimit (Rates - Düzeltildi) ===== */
 async function loadRates(){
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
-    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
-    // Değişiklik: Base ALL yerine EUR kullandık, çünkü ALL/TRY kuru hatalı olabilir. Hesaplama mantığı içinde FX fonksiyonu bunu düzeltecek.
+    // 6 saatlik cache süresi
+    if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; refreshHeader(); return; } 
+    
+    // Base EUR olarak çekiyoruz, daha sonra ALL bazına çeviriyoruz
     const url = 'https://api.exchangerate.host/latest?base=EUR&symbols=ALL,USD,TRY'; 
-    const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
-    // API'dan gelen kurlar: 1 EUR = X ALL, Y USD, Z TRY
+    const res = await fetch(url,{cache:'no-store'}); 
+    if (!res.ok) throw new Error("API response not OK");
+    const js = await res.json();
+    
+    // API'dan gelen kurlar (1 EUR = X ALL, Y USD, Z TRY)
     const eurRates = {EUR:1, ALL:js?.rates?.ALL||1, USD:js?.rates?.USD||1, TRY:js?.rates?.TRY||1};
-    // Bizim için her şeyi ALL bazına çevirelim (Daha doğru hesaplama için)
-    const baseAll = 1 / eurRates.ALL;
+    
+    // HER ŞEYİ ALL bazına çevir: (1 ALL = 1/eurRates.ALL EUR)
+    // 1 ALL kaç ALL -> 1
+    // 1 EUR kaç ALL -> eurRates.ALL
+    // 1 USD kaç ALL -> (1/eurRates.USD) EUR * eurRates.ALL
+    // 1 TRY kaç ALL -> (1/eurRates.TRY) EUR * eurRates.ALL
+    
     rates = {
-      ALL: 1, // 1 ALL
-      EUR: eurRates.ALL, // 1 EUR kaç ALL
-      USD: eurRates.ALL / eurRates.USD, // 1 USD kaç ALL
-      TRY: eurRates.ALL / eurRates.TRY // 1 TRY kaç ALL
+      ALL: 1, 
+      EUR: eurRates.ALL, 
+      USD: eurRates.ALL / eurRates.USD, 
+      TRY: eurRates.ALL / eurRates.TRY
     };
     
     localStorage.setItem('nh_rates_cache', JSON.stringify({t:Date.now(), rates}));
   }catch(e){
-    // Hata durumunda default kurları kullan
-    rates = {ALL:1, EUR:130, USD:110, TRY:4.5}; // Sadece örnek default kurlar
+    // Hata durumunda default kurları kullan (ALL bazında)
+    rates = {ALL:1, EUR:130, USD:100, TRY:3.5}; // Örnek kurlar (1 EUR = 130 ALL, 1 USD = 100 ALL, 1 TRY = 3.5 ALL)
     console.warn("Kurlar yüklenemedi. Örnek kurlar kullanılıyor.", e);
   }
-  renderCurrStrip(); refreshHeader();
+  
+  // Kurlar yüklendikten sonra Strip ve Header'ı yenile
+  renderCurrStrip(); 
+  refreshHeader();
 }
 
 /**
@@ -661,18 +688,15 @@ async function loadRates(){
  */
 function fx(amount, from, to){
   const A = Number(amount)||0; 
-  from = from||'ALL'; 
-  to = to||'ALL';
+  from = from?.toUpperCase() || 'ALL'; // null/undefined/boş ise ALL kabul et
+  to = to?.toUpperCase() || 'ALL';
   if(from===to) return A;
   
-  // 1 Kur: 1 Monedhë = X ALL
-  // rFrom: 1 From kaç ALL
-  // rTo: 1 To kaç ALL
-  const rFrom = rates[from] ?? 1;
-  const rTo   = rates[to]   ?? 1;
+  // rFrom: 1 FROM kaç ALL, rTo: 1 TO kaç ALL
+  const rFrom = rates[from] ?? rates['ALL']; 
+  const rTo   = rates[to]   ?? rates['ALL'];
   
-  // Önce ALL'ye çevir: A * rFrom
-  // Sonra istenen T'ye çevir: (A * rFrom) / rTo
+  // (A * rFrom) / rTo
   return (A * rFrom) / rTo;
 }
 
@@ -680,7 +704,9 @@ function renderCurrStrip(){
   const box = document.getElementById('currStrip');
   if(!box) return;
   box.innerHTML = '';
-  const currentView = viewCurrency || (profile?.default_currency || 'ALL');
+  // viewCurrency set edilmemişse default_currency'yi kullan
+  const currentView = viewCurrency || (profile?.default_currency || 'ALL'); 
+
   SUPPORTED.forEach(code=>{
     const b=document.createElement('button');
     b.className='curr-pill'; b.dataset.c=code; b.textContent=code;
@@ -700,31 +726,32 @@ function doConvert(){
   const r=fx(a,f,t); document.getElementById('cvRes').textContent=`${fmt(r)} ${t}`;
 }
 
-/* ===== Header/Statistika (Llogaritjet) ===== */
+/* ===== Header/Statistika (Llogaritjet - Düzeltildi) ===== */
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
   
   // 1. Shpenzimet e konvertuara
-  const totalExpenses = (items||[]).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
-  const todayExpenses = (items||[]).filter(isToday).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
-  const monthExpenses = (items||[]).filter(isThisMonth).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
+  const totalExpenses = (items||[]).reduce((s,x)=> s + fx(x.amount, x.curr, to), 0);
+  const todayExpenses = (items||[]).filter(isToday).reduce((s,x)=> s + fx(x.amount, x.curr, to), 0);
+  const monthExpenses = (items||[]).filter(isThisMonth).reduce((s,x)=> s + fx(x.amount, x.curr, to), 0);
   
   // 2. Balanca e monedhës aktuale të caktuar nga settings (Default Balance)
   const defaultCurr = profile?.default_currency || 'ALL';
   const balMap = profile?.balances || {}; 
   const defaultBalInView = fx(Number(balMap[defaultCurr]||0), defaultCurr, to);
 
-  // 3. Totali i të gjitha cüzdanëve (Total Wallets FX)
+  // 3. Totali i të gjitha cüzdanëve (Total Wallets FX - İSTENEN TOPLAM)
   let totalWalletsFX = 0;
   SUPPORTED.forEach(c => {
       const balance = Number(balMap[c] || 0);
-      totalWalletsFX += fx(balance, c, to);
+      // Toplam cüzdan = Her bir cüzdan bakiyesini görüntüleme kuruna çevir ve topla
+      totalWalletsFX += fx(balance, c, to); 
   });
   
   // 4. Llogaritja e borxheve (vetëm ato të hapura)
+  const debtCurr = profile?.default_currency || 'ALL'; // Borçlar varsayılan kurda tutulur varsayımı
   const totalDebts = (debts||[]).filter(x=>x.status==='open').reduce((sum,x)=>{
-    // Borxhet supozohet në monedhën default (ALL), ose duhet të shtohet kolona e monedhës
-    const amountInView = fx(x.amount, defaultCurr, to); 
+    const amountInView = fx(x.amount, debtCurr, to); 
     return sum + (x.kind==='borrow'? amountInView : -amountInView);
   }, 0);
 
@@ -733,17 +760,17 @@ function refreshHeader(){
   if (activeTab === 'debts') {
       totalForHeader = totalDebts; 
       headerText = 'Borxhet';
-      headerSub  = 'Detyrimet & Më detyrohen';
+      headerSub  = `Detyrimet & Më detyrohen (${to})`;
   } else {
       // Për Kreu/Lista: Trego balancën e monedhës parazgjedhur - total shpenzime
       totalForHeader = defaultBalInView - totalExpenses; 
       headerText = 'Bilanci';
-      headerSub  = `Gjendja e ${defaultCurr} - Shpenzimet`;
+      headerSub  = `Gjendja e ${defaultCurr} - Shpenzimet (${to})`;
   }
 
   // Vendosja e vlerave
   setText('hdrTotal', `${fmt(totalForHeader)} ${to}`);
-  setText('hdrTotalFX', `${fmt(totalWalletsFX)} ${to}`); // Yeni Alan!
+  setText('hdrTotalFX', `${fmt(totalWalletsFX)} ${to}`); // Cüzdanların toplamı
   setText('stat1', `${fmt(totalExpenses)} ${to}`); 
   setText('stat2', `${fmt(todayExpenses)} ${to}`); 
   setText('stat3', `${fmt(monthExpenses)} ${to}`);
@@ -752,14 +779,17 @@ function refreshHeader(){
   document.getElementById('hdrSub').textContent  = headerSub;
 }
 
-/* ===== Shpenzimet (Expenses) ===== */
+/* ===== Shpenzimet (Expenses - Düzeltildi) ===== */
 async function loadExpenses(){
   try{
     const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
     if(error) throw error;
-    items=data||[]; drawHome(); drawAll(); refreshHeader();
+    // Data.curr alanının NULL gelmesi ihtimaline karşı ALL ataması yapılıyor.
+    items=data.map(x => ({...x, curr: x.curr || 'ALL'})) || []; 
+    drawHome(); drawAll(); refreshHeader();
   }catch(e){
-    alert('Gabim ngarkimi (shpenzime): '+(e?.message||'Load failed'));
+    console.error('Gabim ngarkimi (shpenzime):', e);
+    // Hata mesajı gösterme veya loglama
   }
 }
 async function saveExpense(){
@@ -767,7 +797,7 @@ async function saveExpense(){
   const amt=parseFloat(document.getElementById('mAmt').value);
   const cat=document.getElementById('mCat').value;
   const d=document.getElementById('mDate').value;
-  const curr=document.getElementById('mCurr').value; // Monedha e re
+  const curr=document.getElementById('mCurr').value.toUpperCase(); 
   
   if(!name||isNaN(amt)||(amt<=0)||!d){alert('Plotësoni emrin, shumën (>0) dhe datën.');return;}
   
@@ -776,7 +806,7 @@ async function saveExpense(){
   
   if(error){alert('Gabim: '+error.message);return;}
   
-  items.unshift(data);
+  items.unshift({...data, curr: data.curr || 'ALL'}); // Yeni harcamayı eklerken curr alanını kontrol et
   document.getElementById('mName').value='';document.getElementById('mAmt').value='';
   closeModal('Exp');drawHome();drawAll();refreshHeader();
 }
@@ -805,12 +835,12 @@ function rowExpense(x){
   const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);
   const meta=document.createElement('div');meta.className='meta';
   const t=document.createElement('div');t.className='t';t.textContent=x.name;
-  const currencySymbol = x.curr || 'ALL'; 
+  // Harcamanın orijinal döviz birimi gösteriliyor (İstenen özellik)
+  const currency = x.curr || 'ALL'; 
   const s=document.createElement('div');s.className='s';s.textContent=[x.category, fmtDate(x.d)].filter(Boolean).join(' • ');
   meta.append(t,s);
   const amt=document.createElement('div');amt.className='amt';
-  // Monedha e shpenzimit ruhet ose përdor ALL
-  amt.textContent=`${fmt(x.amount)} ${currencySymbol}`;
+  amt.textContent=`${fmt(x.amount)} ${currency}`;
   const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);
   el.append(ic,meta,amt,del); return el;
 }
@@ -822,7 +852,7 @@ async function loadDebts(){
     if(error) throw error;
     debts=data||[]; drawDebts(); refreshHeader();
   }catch(e){
-    alert('Gabim ngarkimi (borxhe): '+(e?.message||'Load failed'));
+    console.error('Gabim ngarkimi (borxhe):', e);
   }
 }
 async function saveDebt(){
@@ -878,7 +908,6 @@ function drawDebts(){
 
     const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
     const amt=document.createElement('div'); amt.className='amt'; 
-    // Borxhet monedhën default (ALL) kullanır.
     const defaultCurr = profile?.default_currency || 'ALL';
     amt.textContent=`${fmt(x.amount)} ${defaultCurr}`;
 
@@ -905,12 +934,12 @@ function closeModal(w){document.getElementById('modal'+w).classList.remove('on')
 function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function isToday(x){
   if(!x.d) return false;
-  const d=new Date(x.d),t=new Date();
+  const d=new Date(x.d+'T00:00:00'),t=new Date(); // Tarih formatı düzeltildi
   return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth()&&d.getDate()==t.getDate();
 }
 function isThisMonth(x){
   if(!x.d) return false;
-  const d=new Date(x.d),t=new Date();
+  const d=new Date(x.d+'T00:00:00'),t=new Date(); // Tarih formatı düzeltildi
   return d.getFullYear()==t.getFullYear()&&d.getMonth()==t.getMonth();
 }
 function fmtDate(iso){
