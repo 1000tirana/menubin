@@ -168,7 +168,8 @@
   </header>
 
   <div id="statsRow" class="stats">
-    <div class="card"><div class="muted">📊 Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span></div></div>
+    <div class="card"><div class="muted">💰 Gj. Totale</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat0">0</span></div></div>
+    <div class="card"><div class="muted">📊 Harxhuar</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat1">0</span></div></div>
     <div class="card"><div class="muted">📅 Sot</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat2">0</span></div></div>
     <div class="card"><div class="muted">🗓️ Muaj</div><div style="font-weight:800;font-size:18px;color:#e6edf3"><span id="stat3">0</span></div></div>
   </div>
@@ -274,7 +275,7 @@
 
       <div class="card" style="margin-top:12px">
         <h4 style="margin:0 0 8px;color:#e6edf3">🧹 Cache & reset</h4>
-        <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle ve sıfırla</button></div>
+        <div class="actions"><button class="btnS" onclick="clearAppCache()">Cache&#39;i temizle dhe sıfırla</button></div>
         <div id="cacheMsg" class="muted" style="margin-top:6px;font-size:12px"></div>
       </div>
 
@@ -292,8 +293,20 @@
 
 <div class="modal" id="modalExp"><div class="sheet">
   <h3 style="margin:4px 0 10px">➕ Shto shpenzim</h3>
-  <div class="row"><div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div><div style="flex:1"><label>Shuma</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div></div>
-  <div class="row" style="margin-top:8px"><div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
+  <div class="row">
+    <div style="flex:2"><label>Emri</label><input id="mName" placeholder="p.sh. Karburant"></div>
+    <div style="flex:1"><label>Shuma</label><input id="mAmt" type="number" step="0.01" inputmode="decimal" placeholder="0"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1"><label>Kategoria</label><select id="mCat"></select></div>
+    <div style="flex:1">
+        <label>Monedha</label>
+        <select id="mCurr">
+            <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+        </select>
+    </div>
+  </div>
+  <div class="row" style="margin-top:8px"><div style="flex:1"><label>Data</label><input id="mDate" type="date"></div></div>
   <div class="actions"><button class="btnS" onclick="closeModal('Exp')">Mbyll</button><button class="btnP" onclick="saveExpense()">Ruaj</button></div>
 </div></div>
 
@@ -329,7 +342,7 @@ const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let sessionUser=null, items=[], debts=[], profile={default_currency:'ALL',num_format:'eu',balances:{}}, cats=[], activeTab='home';
 let rates = {ALL:1};
 const SUPPORTED = ['ALL','EUR','USD','TRY'];
-let viewCurrency = null;
+let viewCurrency = null; // Monedha e cila përdoret për shfaqje (p.sh. EUR kur EUR është aktiv)
 
 /* ===== DOM READY ===== */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -360,7 +373,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // FAB
   const fab=document.getElementById('openAdd');
-  const fabOpen=()=>{ if(activeTab==='debts') openModal('Debt'); else openModal('Exp'); };
+  const fabOpen=()=>{
+      document.getElementById('mCurr').value = profile?.default_currency || 'ALL'; // Vendos monedhën parazgjedhur në modal
+      if(activeTab==='debts') openModal('Debt'); else openModal('Exp');
+  };
   ['pointerup','touchend','click'].forEach(ev=>fab.addEventListener(ev,fabOpen,{passive:true}));
 
   // NAV
@@ -387,6 +403,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ===== BOOTSTRAP: Ngarkon të gjitha të dhënat e përdoruesit ===== */
 async function bootstrap(){
   await ensureProfile();
+  // Vendos viewCurrency në monedhën parazgjedhur
+  viewCurrency = profile?.default_currency || 'ALL'; 
+  
   await Promise.all([ensureCategoriesSeed(), loadCategories(), loadExpenses(), loadDebts()]);
   renderCurrStrip();
   refreshHeader();
@@ -412,6 +431,7 @@ function swapAuth(w){
   document.getElementById('tabRegBtn').classList.toggle('active',w==='reg');
   document.getElementById('authLogin').style.display=(w==='login')?'block':'none';
   document.getElementById('authReg').style.display=(w==='reg')?'block':'none';
+  // Pastro mesazhet e gabimit kur ndërrohet mes hyrjes/regjistrimit
   setText('authMsg', ''); setText('regMsg', '');
 }
 async function registerUser(){
@@ -420,6 +440,7 @@ async function registerUser(){
   const box=document.getElementById('regMsg'); box.textContent='';
   if(!email||pass.length<6){box.textContent='Email dhe fjalëkalim ≥ 6.';return;}
   const {error}=await supabase.auth.signUp({email,password:pass});
+  // Përditëso mesazhin, por mos shfaq "Invalid login credential" pas regjistrimit
   box.textContent=error?('Gabim: '+error.message):'Llogaria u krijua. Kontrollo email-in.';
 }
 async function login(){
@@ -436,8 +457,9 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(sec=>sec.classList.toggle('active', sec.id==='tab-'+name));
   document.querySelectorAll('nav.nav .btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.tab===name));
   activeTab=name;
+  // Shfaq/fshih kartat e statistikave në varësi të skedës
   document.getElementById('statsRow').style.display=(name==='settings')?'none':'flex';
-  refreshHeader(); // Rindërto header-in për Borxhet/Bilanci
+  refreshHeader(); 
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -472,9 +494,14 @@ async function savePrefs(){
     profile=data;
     document.getElementById('lblCurr').textContent=sel;
     document.getElementById('balInput').value=(profile.balances?.[sel]??0);
+    
+    // Vendos monedhën aktive në atë parazgjedhur pas ndryshimit
+    viewCurrency = sel; 
+    
     renderCurrStrip();
     refreshHeader();
-    await loadExpenses(); // Riload shpenzimet në rast se formati ndikon në rindërtim
+    drawHome(); // Rindërto listat me formatin e ri/monedhën e re të listës
+    drawAll();
   }
 }
 async function saveBalance(){
@@ -551,6 +578,7 @@ async function loadRates(){
   try{
     const cache = JSON.parse(localStorage.getItem('nh_rates_cache')||'{}');
     if(cache.t && (Date.now()-cache.t) < 6*60*60*1000){ rates = cache.rates; renderCurrStrip(); refreshHeader(); return; }
+    // Përdorim ALL si bazë, siç kishim
     const url = 'https://api.exchangerate.host/latest?base=ALL&symbols=EUR,USD,TRY';
     const res = await fetch(url,{cache:'no-store'}); const js = await res.json();
     // Sigurohuni që të gjitha monedhat të jenë të pranishme
@@ -561,11 +589,23 @@ async function loadRates(){
   }
   renderCurrStrip(); refreshHeader();
 }
+/**
+ * Konverton shumën nga monedha 'from' në monedhën 'to'.
+ */
 function fx(amount, from, to){
-  const A = Number(amount)||0; from = from||'ALL'; to = to||'ALL';
+  const A = Number(amount)||0; 
+  from = (from || 'ALL').toUpperCase(); 
+  to = (to || 'ALL').toUpperCase();
+  
+  // Kontrollo nëse monedhat janë të mbështetura
+  if (!SUPPORTED.includes(from) || !SUPPORTED.includes(to)) return A;
+  
   if(from===to) return A;
+  
+  // Rregullohet në rast se kurset nuk janë ngarkuar
   const rFrom = rates[from] ?? 1;
   const rTo   = rates[to]   ?? 1;
+  
   return A * (rTo / rFrom);
 }
 function renderCurrStrip(){
@@ -580,6 +620,8 @@ function renderCurrStrip(){
       viewCurrency=code;
       box.querySelectorAll('.curr-pill').forEach(x=>x.classList.toggle('active', x.dataset.c===code));
       refreshHeader();
+      drawHome(); // Rindërto listat për të parë vlerat në valutën aktive
+      drawAll();
     };
     box.appendChild(b);
     if(code === currentView) b.classList.add('active');
@@ -596,6 +638,12 @@ function doConvert(){
 function refreshHeader(){
   const to = viewCurrency || (profile?.default_currency || 'ALL');
   
+  // Gjendja Totale (Balancat e konvertuara)
+  const totalBalances = SUPPORTED.reduce((sum, curr) => {
+      const balance = Number(profile.balances?.[curr] || 0);
+      return sum + fx(balance, curr, to);
+  }, 0);
+  
   // Shpenzimet e konvertuara
   const totalExpenses = (items||[]).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
   const todayExpenses = (items||[]).filter(isToday).reduce((s,x)=> s + fx(x.amount, x.curr||'ALL', to), 0);
@@ -603,12 +651,12 @@ function refreshHeader(){
   
   // Llogaritja e borxheve (vetëm ato të hapura)
   const totalDebts = (debts||[]).filter(x=>x.status==='open').reduce((sum,x)=>{
-    const amountInView = fx(x.amount, 'ALL', to); // Supozojmë ALL për borxhet (ose bëj ndryshime nëse ke kolona për monedhën)
+    // Borxhet supozohet se janë në ALL pasi nuk kishin kolonë monedhe
+    const amountInView = fx(x.amount, 'ALL', to); 
     return sum + (x.kind==='borrow'? amountInView : -amountInView);
   }, 0);
 
-  const balMap = profile?.balances || {}; 
-  const balInTo = Number(balMap[to]||0);
+  const remain = totalBalances - totalExpenses; // Bilanci (Gjendja Totale - Shpenzimet Totale)
   
   let totalForHeader, headerText, headerSub;
 
@@ -617,12 +665,13 @@ function refreshHeader(){
       headerText = 'Borxhet';
       headerSub  = 'Detyrimet & Më detyrohen';
   } else {
-      totalForHeader = balInTo - totalExpenses; // Bilanci (Gjendja - Shpenzimet)
+      totalForHeader = remain; 
       headerText = 'Bilanci';
-      headerSub  = 'Gjendja − Shpenzimet (totale)';
+      headerSub  = 'Gjendja Totale − Shpenzimet';
   }
 
   setText('hdrTotal', `${fmt(totalForHeader)} ${to}`);
+  setText('stat0', `${fmt(totalBalances)} ${to}`); // Gjendja Totale
   setText('stat1', `${fmt(totalExpenses)} ${to}`); 
   setText('stat2', `${fmt(todayExpenses)} ${to}`); 
   setText('stat3', `${fmt(monthExpenses)} ${to}`);
@@ -634,6 +683,7 @@ function refreshHeader(){
 /* ===== Shpenzimet (Expenses) ===== */
 async function loadExpenses(){
   try{
+    // Kërkesë e përditësuar për të marrë të dhëna me fushën e re `curr`
     const {data,error}=await supabase.from('expenses').select('*').eq('user_id',sessionUser.id).order('d',{ascending:false}).limit(2000);
     if(error) throw error;
     items=data||[]; drawHome(); drawAll(); refreshHeader();
@@ -646,10 +696,13 @@ async function saveExpense(){
   const amt=parseFloat(document.getElementById('mAmt').value);
   const cat=document.getElementById('mCat').value;
   const d=document.getElementById('mDate').value;
+  const curr=document.getElementById('mCurr').value.toUpperCase(); // Merr monedhën e zgjedhur
+  
   if(!name||isNaN(amt)||(amt<=0)||!d){alert('Plotësoni emrin, shumën (>0) dhe datën.');return;}
-  const curr = profile?.default_currency || 'ALL';
   
   const payload = {user_id:sessionUser.id,name,amount:amt,category:cat,d,curr};
+  
+  // Më parë u bë një tentativë për insert, tani nuk është e nevojshme.
   const {data,error}=await supabase.from('expenses').insert(payload).select().single();
   
   if(error){alert('Gabim: '+error.message);return;}
@@ -683,15 +736,27 @@ function rowExpense(x){
   const ic=document.createElement('div');ic.className='ic';ic.textContent=emojiFor(x.category);
   const meta=document.createElement('div');meta.className='meta';
   const t=document.createElement('div');t.className='t';t.textContent=x.name;
-  const s=document.createElement('div');s.className='s';s.textContent=[x.category,fmtDate(x.d)].filter(Boolean).join(' • ');
-  meta.append(t,s);
-  const amt=document.createElement('div');amt.className='amt';
-  // Monedha e shpenzimit ruhet ose përdor ALL
+  
+  // Konverto shumën në monedhën aktive për shfaqje
   const currencySymbol = x.curr || 'ALL'; 
-  amt.textContent=`${fmt(x.amount)} ${currencySymbol}`;
+  const displayCurrency = viewCurrency || (profile?.default_currency || 'ALL');
+  const amountInView = fx(x.amount, currencySymbol, displayCurrency);
+  
+  // Përdor shfaqjen e monedhës së listës, por trego monedhën origjinale si të dhënë
+  const s=document.createElement('div');s.className='s';
+  const detail = [x.category, fmtDate(x.d)].filter(Boolean).join(' • ') + ` (${fmt(x.amount)} ${currencySymbol})`;
+  s.textContent=detail;
+  
+  meta.append(t,s);
+  
+  // Shfaq vlerën e konvertuar
+  const amt=document.createElement('div');amt.className='amt';
+  amt.textContent=`${fmt(amountInView)} ${displayCurrency}`;
+  
   const del=document.createElement('button');del.className='del';del.textContent='🗑️';del.onclick=()=>delExpense(x.id);
   el.append(ic,meta,amt,del); return el;
 }
+
 
 /* ===== Borxhet (Debts) ===== */
 async function loadDebts(){
@@ -740,6 +805,8 @@ function drawDebts(){
 
   if(q)arr=arr.filter(x=>(x.party||'').toLowerCase().includes(q)||(x.name||'').toLowerCase().includes(q));
   if(kindFilter)arr=arr.filter(x=>x.kind===kindFilter);
+  
+  const displayCurrency = viewCurrency || (profile?.default_currency || 'ALL');
 
   const box=document.getElementById('debtList'); box.innerHTML='';
   document.getElementById('emptyDebts').style.display=arr.length?'none':'block';
@@ -757,7 +824,10 @@ function drawDebts(){
 
     const right=document.createElement('div'); right.style.display='flex'; right.style.alignItems='center'; right.style.gap='8px';
     const amt=document.createElement('div'); amt.className='amt'; 
-    amt.textContent=fmt(x.amount); // Monedha nuk ruhet, supozohet monedha parazgjedhur e profilit
+    
+    // Konverto shumën e borxhit në monedhën aktive
+    const amountInView = fx(x.amount, 'ALL', displayCurrency);
+    amt.textContent=`${fmt(amountInView)} ${displayCurrency}`;
 
     right.appendChild(amt);
 
@@ -798,7 +868,7 @@ function fmtDate(iso){
 function fmt(n){
   const f=profile?.num_format||'eu';
   const v=(Math.round((Number(n)||0)*100)/100);
-  // Përdor LocaleString për formatim, duke respektuar 'eu' (p.sh. 1.234,56) apo 'us' (p.sh. 1,234.56)
+  // Përdor LocaleString për formatim
   return f==='us' ? v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
                   : v.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
@@ -807,7 +877,6 @@ function fmt(n){
 async function clearAppCache(){
   try{
     localStorage.removeItem('nh_rates_cache');
-    // localStorage.clear(); // Ruhet i komentuar si në kodin origjinal
     if (indexedDB && indexedDB.databases) {
       const dbs = await indexedDB.databases();
       await Promise.all((dbs||[]).map(d=> new Promise(res=>{
