@@ -1,0 +1,518 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Battery Pack Designer • OFFLINE (2D Poly) v11</title>
+<style>
+:root{ --bg:#0b1020; --panel:#12182a; --muted:#9db0c9; --text:#d6e3ff; --border:#243354; --warn:#ff9f1c; --error:#ff4d4f; }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial}
+.app{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto 1fr auto;grid-template-areas:"top top" "left main" "foot foot";height:100%}
+.top{grid-area:top;display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,#0b1020,#0e1427)}
+.brand{font-weight:700}
+.langs{margin-left:auto;display:flex;gap:8px;align-items:center}
+.flag{cursor:pointer;border:1px solid var(--border);border-radius:6px;padding:4px 8px;background:#0e1c39;color:#cfe2ff}
+.flag.active{outline:2px solid #5aa0ff}
+.menuBtn{display:none;margin-left:6px}
+.left{grid-area:left;padding:14px;border-right:1px solid var(--border);background:var(--panel);overflow:auto}
+.group{margin-bottom:16px}
+.group h3{margin:8px 0 10px 0;font-size:14px;color:#b2c6e9;text-transform:uppercase;letter-spacing:.08em}
+label{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#b8c7de;font-size:14px;margin:8px 6px}
+input[type="number"],select{width:150px;background:#0b1328;border:1px solid var(--border);color:#eaf2ff;padding:6px 8px;border-radius:8px}
+input[type="checkbox"]{transform:scale(1.2)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:#152341;border:1px solid #2a3e6f;color:#e8f0ff;padding:8px 10px;border-radius:8px;cursor:pointer}
+.btn:hover{background:#1a2a54}
+.btn.ghost{background:transparent}
+.btn.danger{background:#2a0f19;border-color:#5b1e2d}
+.small{font-size:12px;color:#9db0c9}
+.main{grid-area:main;display:grid;grid-template-rows:auto 1fr}
+.toolbar{display:flex;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border);background:#0b1328}
+.kpi{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.kpi span{background:#0e1c39;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px}
+.board{position:relative;background:#091427;touch-action:none}
+#cv{position:absolute;inset:0;display:block}
+.edge{position:absolute;background:#102145;border:1px solid #2b4a82;color:#cfe2ff;padding:2px 6px;border-radius:6px;font-size:12px;white-space:nowrap}
+.handleLbl{position:absolute;transform:translate(-50%,-140%);color:#b7ffaa;font-size:12px}
+.legend{position:absolute;left:10px;bottom:10px;background:#0f1d3a;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;color:#bcd6ff}
+.info{position:absolute;left:12px;top:12px;background:#0f1d3a;border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:#cfe2ff}
+.badgeWarn{background:#3a2a0f;border-color:#805a12;color:#ffd28a}
+.badgeErr{background:#3a1010;border-color:#7a1f1f;color:#ffb3b6}
+.foot{grid-area:foot;padding:8px 12px;border-top:1px solid var(--border);background:#0b1328;color:#9db0c9}
+/* Mobile */
+@media (max-width: 860px){
+  .app{grid-template-columns:1fr}
+  .left{position:fixed;inset:48px 0 auto 0;max-height:60vh;transform:translateY(-120%);transition:.25s;z-index:5}
+  .left.open{transform:translateY(0)}
+  .menuBtn{display:inline-block}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <button class="btn menuBtn" id="menuBtn">☰</button>
+    <div class="brand" data-i18n="title">Battery Pack Designer • OFFLINE v11</div>
+    <div class="langs">
+      <button class="flag active" data-lang="en">🇬🇧 EN</button>
+      <button class="flag" data-lang="sq">🇦🇱 SQ</button>
+      <button class="flag" data-lang="tr">🇹🇷 TR</button>
+    </div>
+  </div>
+
+  <aside class="left" id="leftPane">
+    <div class="group">
+      <h3 data-i18n="cellLayout">CELL LAYOUT</h3>
+      <label><span data-i18n="series">Series (S) • columns</span><input id="cellsS" type="number" min="1" value="13"></label>
+      <label><span data-i18n="parallel">Parallel (P) • per column</span><input id="cellsP" type="number" min="1" value="6"></label>
+      <label><span data-i18n="diameter">Cell diameter (mm)</span><input id="cellDia" type="number" step="0.01" value="18.50"></label>
+      <label><span data-i18n="gap">Cell gap (mm)</span><input id="cellGap" type="number" step="0.01" value="1.00"></label>
+      <label><span data-i18n="padding">Edge margin (mm)</span><input id="padding" type="number" step="0.1" value="0"></label>
+      <label><span data-i18n="pattern">Pattern</span>
+        <select id="pattern">
+          <option value="grid" selected data-i18n="grid">Grid</option>
+          <option value="offset" data-i18n="offset">Offset</option>
+          <option value="honey" data-i18n="honey">Honeycomb (approx)</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="group">
+      <h3 data-i18n="autoPlace">AUTO PLACEMENT</h3>
+      <label><span data-i18n="fixedGap"><b>Use gap (snap to left/bottom)</b></span><input id="modeFixedGap" type="checkbox" checked></label>
+      <label><span data-i18n="stretch">Stretch to edges (flex gap)</span><input id="modeStretch" type="checkbox"></label>
+      <label title="Small misalignments still considered rectangle."><span data-i18n="assumeRect">Assume rectangle (±1 mm)</span><input id="assumeRect" type="checkbox" checked></label>
+    </div>
+
+    <div class="group">
+      <h3 data-i18n="shape">SHAPE</h3>
+      <div class="row">
+        <button class="btn" id="btnAddPoint" data-i18n="addPoint">+ Add Point</button>
+        <button class="btn" id="btnRemovePoint" data-i18n="removePoint">– Remove Point</button>
+        <button class="btn" id="btnRect" data-i18n="resetRect">Reset to Rectangle</button>
+      </div>
+      <div class="small" data-i18n="shapeHint">You can make triangles, pentagons, hexagons… up to 10 points.</div>
+    </div>
+
+    <div class="group">
+      <h3 data-i18n="area">AREA</h3>
+      <label><span data-i18n="startW">Start width (mm)</span><input id="areaW" type="number" value="260"></label>
+      <label><span data-i18n="startH">Start height (mm)</span><input id="areaH" type="number" value="126"></label>
+      <div class="row">
+        <button class="btn" id="btnCenter" data-i18n="center">Center</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3 data-i18n="data">DATA</h3>
+      <div class="row">
+        <button class="btn ghost" id="btnUnits" data-i18n="units">Inches / mm</button>
+        <button class="btn ghost" id="btnShowCells" data-i18n="toggleCells">Show/Hide Cells</button>
+        <button class="btn ghost" id="btnSave" data-i18n="save">Save</button>
+        <button class="btn ghost" id="btnLoad" data-i18n="load">Load</button>
+        <button class="btn danger" id="btnClear" data-i18n="clear">Clear Save</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="btnPNG" data-i18n="png">Export PNG</button>
+        <button class="btn" id="btnJSON" data-i18n="json">Export JSON</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="toolbar">
+      <div class="row" id="hint" data-i18n="hint">Edges show mm/in • Drag green points • Pinch to zoom</div>
+      <div class="kpi">
+        <span id="kpiSize">—</span>
+        <span id="kpiEnergy">—</span>
+        <span id="kpiConfig">—</span>
+      </div>
+    </div>
+    <div class="board" id="board">
+      <canvas id="cv"></canvas>
+      <div class="edge" id="edgeA"></div>
+      <div class="edge" id="edgeB"></div>
+      <div class="edge" id="edgeC"></div>
+      <div class="edge" id="edgeD"></div>
+      <div class="info" id="infoCnt"></div>
+      <div class="legend" id="legend">Zoom: Ctrl+Wheel • Pinch • Drag: points</div>
+    </div>
+  </div>
+
+  <div class="foot" id="footer">© 2025 ANDI • Offline 2D Poly Designer v11</div>
+</div>
+
+<script>
+/*** i18n ***/
+const dict = {
+  en:{
+    title:"Battery Pack Designer • OFFLINE v11",
+    cellLayout:"CELL LAYOUT",
+    series:"Series (S) • columns",
+    parallel:"Parallel (P) • per column",
+    diameter:"Cell diameter (mm)",
+    gap:"Cell gap (mm)",
+    padding:"Edge margin (mm)",
+    pattern:"Pattern",
+    grid:"Grid", offset:"Offset", honey:"Honeycomb (approx)",
+    autoPlace:"AUTO PLACEMENT",
+    fixedGap:"Use gap (snap to left/bottom)",
+    stretch:"Stretch to edges (flex gap)",
+    assumeRect:"Assume rectangle (±1 mm)",
+    shape:"SHAPE",
+    addPoint:"+ Add Point", removePoint:"– Remove Point", resetRect:"Reset to Rectangle",
+    shapeHint:"You can make triangles, pentagons, hexagons… up to 10 points.",
+    area:"AREA", startW:"Start width (mm)", startH:"Start height (mm)", center:"Center",
+    data:"DATA", units:"Inches / mm", toggleCells:"Show/Hide Cells", save:"Save", load:"Load", clear:"Clear Save",
+    png:"Export PNG", json:"Export JSON",
+    hint:"Edges show mm/in • Drag green points • Pinch to zoom",
+    scanMode:"Scan mode (non-rectangle) • Aligned to edges • Valid:",
+    gapFixed:"Gap fixed", spread:"Stretched", need:"Theoretical need", areaLbl:"Area", doesntFit:"Does not fit",
+  },
+  tr:{
+    title:"Battery Pack Designer • OFFLINE v11",
+    cellLayout:"HÜCRE DÜZENİ",
+    series:"Seri (S) • kolon",
+    parallel:"Paralel (P) • kolon başı",
+    diameter:"Hücre çapı (mm)",
+    gap:"Hücre aralığı (mm)",
+    padding:"Kenar boşluğu (mm)",
+    pattern:"Desen",
+    grid:"Izgara", offset:"Offset", honey:"Balpeteği (yaklaşık)",
+    autoPlace:"OTOMATİK YERLEŞİM",
+    fixedGap:"Gap'i kullan (sol-alt kenara yasla)",
+    stretch:"Kenarlara yayarak sığdır (gap esnet)",
+    assumeRect:"Dikdörtgen varsay (±1 mm)",
+    shape:"ŞEKİL",
+    addPoint:"+ Nokta Ekle", removePoint:"– Nokta Sil", resetRect:"Dikdörtgene Sıfırla",
+    shapeHint:"Üçgen, beşgen, altıgen… 10 noktaya kadar.",
+    area:"ALAN", startW:"Başlangıç Genişlik (mm)", startH:"Başlangıç Yükseklik (mm)", center:"Ortala",
+    data:"VERİ", units:"İnç / mm", toggleCells:"Hücreleri Göster/Gizle", save:"Kaydet", load:"Yükle", clear:"Kaydı Sil",
+    png:"PNG Dışa Aktar", json:"JSON Dışa Aktar",
+    hint:"Kenarlar mm/in gösterir • Yeşil noktaları sürükleyin • Pinch zoom",
+    scanMode:"Tarama modu (dikdörtgen değil) • Kenara hizalı • Geçerli:",
+    gapFixed:"Gap sabit", spread:"Yayarak sığdırıldı", need:"Teorik ihtiyaç", areaLbl:"Alan", doesntFit:"Sığmıyor",
+  },
+  sq:{
+    title:"Projektues i Paketës së Baterive • OFFLINE v11",
+    cellLayout:"RREGULLIMI I QELIZAVE",
+    series:"Seri (S) • kolona",
+    parallel:"Paralel (P) • për kolonë",
+    diameter:"Diametri i qelizës (mm)",
+    gap:"Hapësira midis qelizave (mm)",
+    padding:"Hapësirë anësore (mm)",
+    pattern:"Modeli",
+    grid:"Rrjet", offset:"Zhvendosur", honey:"Fole blete (afërsisht)",
+    autoPlace:"VENDOSJE AUTOMATIKE",
+    fixedGap:"Përdor hapësirën (ngjite majtas/poshtë)",
+    stretch:"Shtrije në skaje (hapësirë fleks)",
+    assumeRect:"Supozoni drejtkëndësh (±1 mm)",
+    shape:"FORMA",
+    addPoint:"+ Shto Pikë", removePoint:"– Hiq Pikë", resetRect:"Rivendos në Drejtkëndësh",
+    shapeHint:"Bëj trekëndësha, pesëkëndësha, gjashtëkëndësha… deri në 10 pika.",
+    area:"ZONA", startW:"Gjerësia fillestare (mm)", startH:"Lartësia fillestare (mm)", center:"Qendro",
+    data:"TË DHËNAT", units:"Inch / mm", toggleCells:"Shfaq/Fsheh Qelizat", save:"Ruaj", load:"Ngarko", clear:"Fshi Ruajtjen",
+    png:"Eksporto PNG", json:"Eksporto JSON",
+    hint:"Skajet tregojnë mm/in • Zhvendos pikat e gjelbra • Pinch për zmadhuar",
+    scanMode:"Modaliteti i skanimit (jo drejtkëndësh) • I rreshtuar me skajet • Vlefshme:",
+    gapFixed:"Hapësira fikse", spread:"E shtrirë", need:"Kërkesa teorike", areaLbl:"Zona", doesntFit:"Nuk futet",
+  }
+};
+let currentLang = 'en';
+function applyLang(lang){
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(dict[lang][key]) el.textContent = dict[lang][key];
+  });
+  document.title = dict[lang].title;
+  document.querySelectorAll('.flag').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
+}
+document.querySelectorAll('.flag').forEach(b=> b.addEventListener('click', ()=>applyLang(b.dataset.lang)));
+
+/*** Core canvas logic (based on v10) ***/
+const $ = s=>document.querySelector(s);
+const canvas = $('#cv'), ctx=canvas.getContext('2d'), board=$('#board');
+let DPR = Number.isFinite(window.devicePixelRatio)? (window.devicePixelRatio||1) : 1;
+let unitsMM = true, showCells=true;
+const state = { handles:[{x:-130,y:63},{x:130,y:63},{x:130,y:-63},{x:-130,y:-63}], cellsS:13,cellsP:6,dia:18.5,gap:1.0,pad:0,pattern:'grid',capacity:3200,vcell:3.6,current:10 };
+const MAX_POINTS = 10;
+
+function onUI(){ state.cellsS=+cellsS.value; state.cellsP=+cellsP.value; state.dia=+cellDia.value; state.gap=+cellGap.value; state.pad=+padding.value; state.pattern=pattern.value; draw(); updateKPIs(); updateEdges(); }
+['cellsS','cellsP','cellDia','cellGap','padding','pattern','modeFixedGap','modeStretch','assumeRect'].forEach(id=>document.getElementById(id).addEventListener('input', onUI));
+btnUnits.onclick=()=>{unitsMM=!unitsMM; updateKPIs(); updateEdges();};
+btnShowCells.onclick=()=>{showCells=!showCells; draw();};
+btnRect.onclick=()=>{ setRectangle(+areaW.value, +areaH.value); draw(); updateEdges(); };
+btnCenter.onclick=()=>{ center(); draw(); };
+btnSave.onclick=()=>{ localStorage.setItem('packDesigner2d_v11', JSON.stringify({lang:currentLang,unitsMM,showCells,state,modeFixedGap:modeFixedGap.checked,modeStretch:modeStretch.checked,assumeRect:assumeRect.checked})); alert('Saved'); };
+btnLoad.onclick=()=>{ const s=localStorage.getItem('packDesigner2d_v11'); if(!s){alert('No save');return;} const d=JSON.parse(s); applyLang(d.lang||'en'); unitsMM=d.unitsMM; showCells=d.showCells; Object.assign(state,d.state); modeFixedGap.checked=!!d.modeFixedGap; modeStretch.checked=!!d.modeStretch; assumeRect.checked=!!d.assumeRect; ensureReadyThenRender(); };
+btnClear.onclick=()=>{ localStorage.removeItem('packDesigner2d_v11'); alert('Cleared'); };
+btnPNG.onclick=()=>{ const link=document.createElement('a'); link.download='battery_pack.png'; link.href=canvas.toDataURL('image/png'); link.click(); };
+btnJSON.onclick=()=>{ const data={lang:currentLang,unitsMM,showCells,state,modeFixedGap:modeFixedGap.checked,modeStretch:modeStretch.checked,assumeRect:assumeRect.checked}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='battery_pack.json'; a.click(); URL.revokeObjectURL(url); };
+
+// Add/Remove point
+btnAddPoint.onclick=()=>{
+  if(state.handles.length>=MAX_POINTS) return;
+  // add at midpoint of longest edge
+  let bestLen=-1, bestI=0;
+  for(let i=0;i<state.handles.length;i++){
+    const a=state.handles[i], b=state.handles[(i+1)%state.handles.length];
+    const L = Math.hypot(a.x-b.x,a.y-b.y);
+    if(L>bestLen){bestLen=L; bestI=i;}
+  }
+  const a=state.handles[bestI], b=state.handles[(bestI+1)%state.handles.length];
+  state.handles.splice(bestI+1,0,{x:(a.x+b.x)/2, y:(a.y+b.y)/2});
+  draw(); updateEdges();
+};
+btnRemovePoint.onclick=()=>{
+  if(state.handles.length<=3) return;
+  state.handles.splice(state.handles.length-1,1);
+  draw(); updateEdges();
+};
+
+// Mobile menu
+menuBtn.onclick=()=> document.getElementById('leftPane').classList.toggle('open');
+
+// sizing
+function resize(){ const r=board.getBoundingClientRect(); if(r.width<2||r.height<2){ setTimeout(resize,60); return;} canvas.width=Math.floor(r.width*DPR); canvas.height=Math.floor(r.height*DPR); canvas.style.width=r.width+'px'; canvas.style.height=r.height+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener('resize', ()=>{ resize(); draw(); updateEdges(); });
+function ensureReadyThenRender(){ let tries=0; (function tick(){ tries++; const r=board.getBoundingClientRect(); if(r.width>2&&r.height>2){ resize(); setRectangle(+areaW.value, +areaH.value); center(); draw(); updateKPIs(); updateEdges(); } else if(tries<50){ requestAnimationFrame(tick);} else { setTimeout(()=>{ resize(); setRectangle(+areaW.value,+areaH.value); draw(); updateKPIs(); updateEdges(); },100); } })(); }
+
+function center(){ const r=board.getBoundingClientRect(); const cx=r.width/2, cy=r.height/2; const b=bounds(); const bx=(b.minX+b.maxX)/2, by=(b.minY+b.maxY)/2; const dx=cx-bx, dy=cy-by; state.handles.forEach(h=>{h.x+=dx; h.y+=dy;}); }
+function setRectangle(w,h){ const r=board.getBoundingClientRect(); const cx=r.width/2, cy=r.height/2; state.handles=[{x:cx-w/2,y:cy+h/2},{x:cx+w/2,y:cy+h/2},{x:cx+w/2,y:cy-h/2},{x:cx-w/2,y:cy-h/2}]; }
+function bounds(){ let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9; for(const p of state.handles){minX=Math.min(minX,p.x);maxX=Math.max(maxX,p.x);minY=Math.min(minY,p.y);maxY=Math.max(maxY,p.y);} return {minX,minY,maxX,maxY}; }
+
+function drawGrid(){ const r=board.getBoundingClientRect(); ctx.fillStyle='#071022'; ctx.fillRect(0,0,r.width,r.height); const step=20; ctx.strokeStyle='#142644'; ctx.lineWidth=1; ctx.beginPath(); for(let x=0;x<r.width;x+=step){ctx.moveTo(x,0);ctx.lineTo(x,r.height);} for(let y=0;y<r.height;y+=step){ctx.moveTo(0,y);ctx.lineTo(r.width,y);} ctx.stroke(); ctx.strokeStyle='#1d3866'; ctx.beginPath(); for(let x=0;x<r.width;x+=step*5){ctx.moveTo(x,0);ctx.lineTo(x,r.height);} for(let y=0;y<r.height;y+=step*5){ctx.moveTo(0,y);ctx.lineTo(r.width,y);} ctx.stroke(); }
+function drawPolygon(){ const pts=state.handles; ctx.save(); ctx.setLineDash([6,6]); ctx.strokeStyle='#42d7ff'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); for(let i=1;i<pts.length;i++){ctx.lineTo(pts[i].x,pts[i].y);} ctx.closePath(); ctx.stroke(); ctx.restore(); }
+
+function distToSegment(p,a,b){ const vx=b.x-a.x, vy=b.y-a.y; const wx=p.x-a.x, wy=p.y-a.y; const c1=vx*wx+vy*wy; if(c1<=0) return Math.hypot(p.x-a.x,p.y-a.y); const c2=vx*vx+vy*vy; if(c2<=c1) return Math.hypot(p.x-b.x,p.y-b.y); const t=c1/c2; const px=a.x+t*vx, py=a.y+t*vy; return Math.hypot(p.x-px,p.y-py); }
+function pointInPoly(x,y,poly){ const eps=1e-8; let inside=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const xi=poly[i].x, yi=poly[i].y, xj=poly[j].x, yj=poly[j].y; if(distToSegment({x,y},{x:xi,y:yi},{x:xj,y:yj})<eps) return true; const intersect=((yi>y)!=(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi); if(intersect) inside=!inside; } return inside; }
+function minSignedDistanceToEdges(x,y,poly){ let minD=1e9; for(let i=0;i<poly.length;i++){ const a=poly[i], b=poly[(i+1)%poly.length]; const d=distToSegment({x,y},a,b); if(d<minD) minD=d; } return pointInPoly(x,y,poly)?minD:-minD; }
+function circleInsideWithMargin(x,y,r,poly,margin){ const d=minSignedDistanceToEdges(x,y,poly); return d >= (r + margin - 0.01); }
+
+function isAxisAlignedRect(poly){
+  const tol = assumeRect.checked ? 1.0 : 0.01;
+  return poly.length===4 && poly.every((p,i)=>{
+    const q=poly[(i+1)%4], r=poly[(i+3)%4];
+    const horiz = Math.abs(p.y-q.y)<=tol || Math.abs(p.y-r.y)<=tol;
+    const vert  = Math.abs(p.x-q.x)<=tol || Math.abs(p.x-r.x)<=tol;
+    return horiz && vert;
+  });
+}
+
+// draw cell
+function drawCell18650(x,y,d,mode,parity){
+  const r=d/2;
+  ctx.save();
+  ctx.shadowColor = '#00000055'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
+  if(mode==='extra'){
+    const g=ctx.createRadialGradient(x-r*0.35,y-r*0.35,r*0.1, x,y,r);
+    g.addColorStop(0,'#58afff'); g.addColorStop(1,'#0a2a57');
+    ctx.fillStyle=g;
+  }else{
+    if(parity===0){
+      const g=ctx.createRadialGradient(x-r*0.35,y-r*0.35,r*0.1, x,y,r);
+      g.addColorStop(0,'#e65050'); g.addColorStop(1,'#6c2020'); ctx.fillStyle=g;
+    }else{
+      const g=ctx.createRadialGradient(x-r*0.35,y-r*0.35,r*0.1, x,y,r);
+      g.addColorStop(0,'#4a4a4a'); g.addColorStop(1,'#121212'); ctx.fillStyle=g;
+    }
+  }
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.lineWidth = Math.max(1, d*0.06); ctx.strokeStyle = '#cfd2d8';
+  ctx.beginPath(); ctx.arc(x,y,r*0.78,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#e6e7ea'; ctx.beginPath(); ctx.arc(x,y,r*0.18,0,Math.PI*2); ctx.fill();
+  const vr = r*0.04, vrad=r*0.42;
+  for(let k=0;k<3;k++){ const a = -Math.PI/2 + k*(2*Math.PI/3); ctx.beginPath(); ctx.arc(x+vrad*Math.cos(a), y+vrad*Math.sin(a), vr, 0, Math.PI*2); ctx.fillStyle='#d0d3d8'; ctx.fill(); }
+  ctx.strokeStyle='#00000088'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawCells(){
+  if(!showCells) return;
+  const poly = state.handles;
+  const b = bounds();
+  const dia = state.dia; const gap=state.gap; const pad = state.pad;
+  const r = dia/2;
+  const rect = isAxisAlignedRect(poly);
+  const fixedGap = modeFixedGap.checked;
+  const stretch = modeStretch.checked;
+
+  let totalValid=0,totalExtra=0;
+  if(rect && (fixedGap || stretch)){
+    const L=b.minX+pad, R=b.maxX-pad, T=b.minY+pad, B=b.maxY-pad;
+    const innerW = R-L, innerH = B-T;
+    const needW = state.cellsS*dia + (state.cellsS-1)*gap;
+    const needH = state.cellsP*dia + (state.cellsP-1)*gap;
+
+    if(fixedGap && (needW>innerW+1e-6 || needH>innerH+1e-6)){
+      infoCnt.className='info badgeErr';
+      infoCnt.textContent=`${dict[currentLang].doesntFit} • ${dict[currentLang].need}: ${needW.toFixed(2)}×${needH.toFixed(2)} mm • ${dict[currentLang].areaLbl}: ${innerW.toFixed(2)}×${innerH.toFixed(2)} mm`;
+      return;
+    }
+
+    let stepX = dia+gap, stepY=dia+gap;
+    if(stretch){
+      stepX = (state.cellsS>1)? ((innerW - dia)/(state.cellsS-1)) : 0;
+      stepY = (state.cellsP>1)? ((innerH - dia)/(state.cellsP-1)) : 0;
+    }
+    for(let s=0;s<state.cellsS;s++){
+      const x = L + r + s*stepX;
+      const parity = s%2;
+      for(let p=0;p<state.cellsP;p++){
+        const y = B - r - p*stepY;
+        const ok = circleInsideWithMargin(x,y,r,poly,0);
+        drawCell18650(x,y,dia, ok?'valid':'extra',parity);
+        ok? totalValid++ : totalExtra++;
+      }
+    }
+    infoCnt.className='info';
+    infoCnt.textContent=`${fixedGap?dict[currentLang].gapFixed:dict[currentLang].spread} • ${dict[currentLang].need}: ${needW.toFixed(2)}×${needH.toFixed(2)} mm • GapX/Y≈${(stepX-dia).toFixed(2)}/${(stepY-dia).toFixed(2)} mm • Valid: ${totalValid}${totalExtra? ' • Blue:'+totalExtra:''}`;
+    return;
+  }
+
+  // scan mode (aligned start)
+  const L=b.minX+pad, R=b.maxX-pad, T=b.minY+pad, B=b.maxY-pad;
+  const step = dia + gap;
+  const startX = L + r;
+  const startY = B - r;
+  const maxX = R - r + 1e-6;
+  const minY = T + r - 1e-6;
+
+  const columns = [];
+  for(let x=startX; x<=maxX; x+=step){
+    const col = [];
+    for(let y=startY; y>=minY; y-=step){
+      if(circleInsideWithMargin(x,y,r,poly,0)) col.push({x,y});
+    }
+    if(col.length) columns.push(col);
+  }
+  for(let s=0; s<columns.length; s++){
+    const arr = columns[s];
+    const parity = s%2;
+    for(let p=0; p<arr.length; p++){
+      const valid = (s<state.cellsS) && (p<state.cellsP);
+      drawCell18650(arr[p].x, arr[p].y, dia, valid?'valid':'extra', parity);
+      valid ? totalValid++ : totalExtra++;
+    }
+  }
+  infoCnt.className='info badgeWarn';
+  infoCnt.textContent=`${dict[currentLang].scanMode} ${totalValid}${totalExtra? ' • Blue:'+totalExtra:''}`;
+}
+
+function drawHandles(){
+  for(let i=0;i<state.handles.length;i++){
+    const h=state.handles[i];
+    ctx.fillStyle='#00e07b'; ctx.strokeStyle='#000'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(h.x,h.y,7,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  }
+}
+function draw(){ drawGrid(); drawCells(); drawPolygon(); drawHandles(); }
+
+// mouse/touch interaction
+let dragging=null;
+function pickHandle(p){
+  for(let i=0;i<state.handles.length;i++){
+    const h=state.handles[i];
+    if(Math.hypot(h.x-p.x, h.y-p.y)<12) return i;
+  }
+  return null;
+}
+board.addEventListener('mousedown', e=>{ const p=getMouse(e); dragging = pickHandle(p); });
+window.addEventListener('mouseup', ()=>dragging=null);
+window.addEventListener('mousemove', e=>{
+  if(dragging==null) return;
+  const r=board.getBoundingClientRect();
+  const p=getMouse(e);
+  state.handles[dragging].x=Math.max(10, Math.min(r.width-10, p.x));
+  state.handles[dragging].y=Math.max(10, Math.min(r.height-10, p.y));
+  draw(); updateEdges(); updateKPIs();
+});
+// touch
+let pinchStartDist=null;
+board.addEventListener('touchstart', e=>{
+  if(e.touches.length===1){
+    const p=getTouch(e.touches[0]);
+    dragging = pickHandle(p);
+  }else if(e.touches.length===2){
+    pinchStartDist = touchDist(e.touches[0], e.touches[1]);
+  }
+},{passive:false});
+board.addEventListener('touchmove', e=>{
+  if(e.touches.length===1 && dragging!=null){
+    const p=getTouch(e.touches[0]);
+    const r=board.getBoundingClientRect();
+    state.handles[dragging].x=Math.max(10, Math.min(r.width-10, p.x));
+    state.handles[dragging].y=Math.max(10, Math.min(r.height-10, p.y));
+    draw(); updateEdges(); updateKPIs();
+  }else if(e.touches.length===2 && pinchStartDist){
+    e.preventDefault();
+    const cur = touchDist(e.touches[0], e.touches[1]);
+    const scale = cur/pinchStartDist;
+    pinchStartDist = cur;
+    const m = {x:(getTouch(e.touches[0]).x+getTouch(e.touches[1]).x)/2, y:(getTouch(e.touches[0]).y+getTouch(e.touches[1]).y)/2};
+    for(const h of state.handles){
+      h.x = m.x + (h.x - m.x)*scale;
+      h.y = m.y + (h.y - m.y)*scale;
+    }
+    draw(); updateEdges(); updateKPIs();
+  }
+},{passive:false});
+window.addEventListener('touchend', ()=>{ dragging=null; pinchStartDist=null; });
+
+board.addEventListener('wheel', e=>{
+  if(!e.ctrlKey) return;
+  e.preventDefault();
+  const m = getMouse(e);
+  const scale = (e.deltaY>0) ? 0.92 : 1.08;
+  for(const h of state.handles){
+    h.x = m.x + (h.x - m.x)*scale;
+    h.y = m.y + (h.y - m.y)*scale;
+  }
+  draw(); updateEdges(); updateKPIs();
+},{passive:false});
+
+function getMouse(e){ const r=board.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; }
+function getTouch(t){ const r=board.getBoundingClientRect(); return {x:t.clientX-r.left, y:t.clientY-r.top}; }
+function touchDist(a,b){ return Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY); }
+
+function updateEdges(){
+  const pts = state.handles;
+  const els = [edgeA,edgeB,edgeC,edgeD];
+  for(let i=0;i<4;i++){
+    if(i<pts.length){
+      const A=pts[i], B=pts[(i+1)%pts.length];
+      const midx=(A.x+B.x)/2, midy=(A.y+B.y)/2;
+      const mm = Math.hypot(A.x-B.x, A.y-B.y);
+      const val = unitsMM ? (mm.toFixed(2)+' mm') : ((mm/25.4).toFixed(2)+' in');
+      els[i].style.display='block';
+      els[i].textContent = String.fromCharCode(65+i)+' '+val;
+      els[i].style.left = (midx - 40)+'px';
+      els[i].style.top = (midy - 10)+'px';
+    }else{
+      els[i].style.display='none';
+    }
+  }
+}
+function updateKPIs(){
+  const cfg = state.cellsS+'S'+state.cellsP+'P';
+  kpiConfig.textContent='Config: '+cfg;
+  const energyWh = (state.cellsP*state.capacity/1000) * (state.cellsS*state.vcell);
+  const volts = (state.cellsS*state.vcell).toFixed(2);
+  kpiEnergy.textContent = `Energy: ${energyWh.toFixed(2)} Wh • ${(energyWh/3.6).toFixed(2)} Ah @ ${volts}V`;
+  const b = bounds();
+  const w = (b.maxX-b.minX), h=(b.maxY-b.minY);
+  const sizeTxt = unitsMM ? `${w.toFixed(1)} × ${h.toFixed(1)} mm` : `${(w/25.4).toFixed(2)} × ${(h/25.4).toFixed(2)} in`;
+  kpiSize.textContent = 'Size: '+sizeTxt;
+}
+
+// boot: default EN
+function boot(){ applyLang('en'); ensureReadyThenRender(); }
+window.addEventListener('DOMContentLoaded', boot);
+window.addEventListener('pageshow', boot);
+</script>
+</body>
+</html>
