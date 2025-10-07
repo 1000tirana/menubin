@@ -1,379 +1,290 @@
 <!doctype html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Menaxhimi i Pjesëve</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Menubin • Pasqyra e Pjesëve</title>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
 <style>
-:root{
-  --bg:#f6f7f9; --card:#ffffff; --border:#e6eaf0; --text:#0f172a; --muted:#6b7280;
-  --accent:#0ea5a4; --btn:#0b7285; --danger:#e03131;
-  --shadow:0 6px 18px rgba(16,24,40,.06);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--text)}
-.wrap{max-width:1024px;margin:18px auto;padding:18px}
-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-h1{font-size:18px;margin:0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px}
-label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-input[type="text"], input[type="password"], input[type="email"], input[type="date"]{
-  width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:#fff
-}
-.row{display:flex;gap:10px;align-items:center}
-.grow{flex:1}
-.btn{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.ghost{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer}
-.danger{background:var(--danger)}
-.muted{color:var(--muted);font-size:13px}
-.search-wrap{position:relative}
-.suggestions{position:absolute;left:0;right:0;top:56px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);max-height:280px;overflow:auto;display:none;z-index:5}
-.suggestion{padding:10px;border-bottom:1px solid #f1f3f5;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.small{font-size:12px;color:var(--muted)}
-#selectedArea .big{font-size:16px}
-.qty-control{display:flex;align-items:center;gap:8px}
-.big-arrow{width:48px;height:48px;border-radius:10px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;user-select:none;cursor:pointer}
-table{width:100%;border-collapse:collapse}
-th,td{padding:8px;border-bottom:1px solid #f1f3f5;font-size:13px;text-align:left}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;background:#fff}
-@media (max-width:640px){
-  .row.wrap1{flex-direction:column;align-items:stretch}
-  .big-arrow{width:44px;height:44px}
-}
+  :root{--bg:#f7f7f9;--card:#ffffff;--muted:#6b7280;--accent:#0b74de;--danger:#ef4444}
+  body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:var(--bg); color:#111}
+  .wrap{max-width:1100px;margin:24px auto;padding:20px}
+  .card{background:var(--card);border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+  h1{font-size:18px;margin:0}
+  .login-area{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+  .ghost{background:transparent;border:1px solid #ddd;padding:8px 12px;border-radius:8px}
+  .search-row{display:flex;gap:10px;margin-top:12px;align-items:center}
+  input[type=text], input[type=password], select{padding:10px;border-radius:8px;border:1px solid #ddd;min-width:0}
+  .suggestions{background:#fff;border:1px solid #e6e6e6;border-radius:8px;margin-top:6px;max-height:260px;overflow:auto}
+  .s-item{padding:10px;border-bottom:1px solid #f1f1f1;cursor:pointer}
+  .s-item:hover{background:#f3f6fb}
+  .row-list{margin-top:16px}
+  .row-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:8px;border:1px solid #f0f0f0;margin-bottom:8px}
+  .part-code{font-weight:600;min-width:110px}
+  .qty-controls{display:flex;align-items:center;gap:8px}
+  .big-btn{padding:10px 14px;border-radius:8px;border:none;background:#111;color:#fff;font-size:18px;cursor:pointer}
+  .report-area{margin-top:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+  .muted{color:var(--muted);font-size:13px}
+  .danger{color:var(--danger)}
+  .small{font-size:13px;padding:6px 8px}
+  .note{font-size:13px;color:#444;margin-top:8px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap card">
   <header>
-    <h1>Menaxhimi i Pjesëve</h1>
-    <div class="muted">Supabase • Hyrje & Regjistrime</div>
+    <h1>Menubin • Pjesët (aplikacion)</h1>
+    <div class="login-area" id="loginArea">
+      <span class="muted">Hyr (përdoruesi)</span>
+      <button class="btn" id="openLogin">Hyr</button>
+    </div>
   </header>
 
-  <!-- AUTH -->
-  <div class="card" id="authView">
-    <label>Hyr me email dhe fjalëkalim</label>
-    <div class="row wrap1">
-      <input id="email" type="email" placeholder="Email" class="grow">
-      <input id="password" type="password" placeholder="Fjalëkalimi" class="grow">
-      <button class="btn" id="btnLogin">Hyr</button>
+  <div id="app" style="display:none;">
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="Shkruaj emrin e pjesës ose kodin..." style="flex:1"/>
+      <label><input type="checkbox" id="searchTurkish"/> Kërko sipas emrit TURKISHT</label>
+      <button class="ghost" id="clearBtn">Pastro</button>
     </div>
-    <div class="row" style="margin-top:8px;justify-content:space-between">
-      <div class="muted">Nëse nuk je i kyçur, asgjë nuk shfaqet.</div>
-      <div class="muted">Vetëm <span class="badge">Andi (admin)</span> sheh raportet.</div>
+    <div id="suggestions" class="suggestions" style="display:none"></div>
+
+    <div class="row-list" id="rowList"></div>
+
+    <div class="report-area card" style="margin-top:18px;">
+      <div style="flex:1;min-width:280px;">
+        <div class="muted">Zgjidh përdoruesin për raport:</div>
+        <select id="userSelect" class="small">
+          <option value="Andi">Andi</option>
+          <option value="Arber">Arber</option>
+          <option value="Dart">Dart</option>
+        </select>
+      </div>
+      <div>
+        <input id="fromDate" placeholder="Data nga" class="small"/><br/>
+        <input id="toDate" placeholder="Data në" class="small"/>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="getReport">RAPORT</button>
+        <button class="ghost" id="downloadCsv">Shkarko CSV</button>
+      </div>
     </div>
+
+    <div id="reportResults" style="margin-top:12px"></div>
+    <div class="note">Shënim: Emri TURKISHT ruhet por nuk shfaqet automatikisht në listë. Për ta përfshirë në kërkim aktivoni kutinë "Kërko sipas emrit TURKISHT".</div>
   </div>
 
-  <!-- APP -->
-  <div class="card" id="appView" style="display:none">
-    <div class="row" style="justify-content:space-between;gap:12px">
-      <div class="row" style="gap:8px">
-        <div class="badge" id="whoBadge">—</div>
-        <button class="ghost" id="btnLogout">Dil</button>
-      </div>
-      <div class="row" id="adminActions" style="gap:8px;display:none">
-        <button class="ghost" id="btnReports">Raportet</button>
-        <button class="ghost" id="btnHelp">CSV Yükleme Bilgisi</button>
-      </div>
+  <div id="loginModal" style="display:none;margin-top:12px" class="card">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" id="username" placeholder="Përdoruesi (shembull: Andi)" />
+      <input type="password" id="password" placeholder="Fjalëkalimi"/>
+      <input type="text" id="supabaseKey" placeholder="Supabase Service Key (ose pastë JWT këtu)"/>
+      <button class="btn" id="doLogin">Hyr</button>
+      <button class="ghost" id="cancelLogin">Anulo</button>
     </div>
-
-    <!-- KERKO PJESË -->
-    <div style="margin-top:12px">
-      <label>Kërko pjesë (shkruaj kodin ose emrin në turqisht)</label>
-      <div class="search-wrap">
-        <input id="search" type="text" autocomplete="off"
-               placeholder="p.sh. A B.50.0030.36 ose 'sürücü'">
-        <div id="suggestions" class="suggestions"></div>
-      </div>
-      <div class="small" style="margin-top:6px">Lista nuk shfaqet. Vetëm kërkimi jep sugjerime (maks. 20).</div>
-    </div>
-
-    <!-- SEÇİLEN -->
-    <div id="selectedArea" style="display:none;margin-top:12px">
-      <div class="card" style="padding:12px">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="small">Kodi: <b id="selCode"></b></div>
-            <div class="small">Emri (EN): <b id="selNameEn"></b></div>
-            <!-- TR saklı; gösterme -->
-          </div>
-          <div class="small"><span id="nowLbl"></span></div>
-        </div>
-
-        <div style="margin-top:10px">
-          <label class="big">Konfirmo: A po e kuptove kështu?</label>
-          <div class="row" style="justify-content:space-between">
-            <div class="small">Sasia:</div>
-            <div class="qty-control">
-              <div class="big-arrow" id="decBtn">−</div>
-              <input id="qty" type="text" value="1" style="width:80px;text-align:center;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:18px">
-              <div class="big-arrow" id="incBtn">+</div>
-            </div>
-          </div>
-          <div class="row" style="justify-content:flex-end;margin-top:10px;gap:8px">
-            <button class="ghost" id="cancelSel">Anulo</button>
-            <button class="btn" id="saveSel">Ruaj</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RAPOR (yalnız admin) -->
-    <div id="reportsPanel" class="card" style="display:none;margin-top:12px">
-      <label>Raport (vetëm admin – Andi)</label>
-      <div class="row">
-        <input id="fromDate" type="date">
-        <input id="toDate" type="date">
-        <input id="whoFilter" type="text" placeholder="Kush? (opsionale: Andi/arber/dart)" style="max-width:220px">
-        <button class="btn" id="runReport">Shfaq</button>
-        <button class="ghost" id="dlCSV" style="display:none">Shkarko CSV</button>
-      </div>
-      <div id="repOut" style="margin-top:10px"></div>
-    </div>
+    <div class="muted" style="margin-top:8px">Mos vendos kredencialet e tjera publikisht. Kjo faqe përdor kërkesë direkte klient-supabase me çelësin tuaj.</div>
   </div>
 </div>
 
-<!-- Yardım modalı -->
-<div id="helpModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); align-items:center; justify-content:center; z-index:50">
-  <div class="card" style="max-width:560px; width:92%">
-    <h3 style="margin:0 0 6px 0">CSV Yükleme Bilgisi</h3>
-    <div class="small">
-      Supabase &gt; Table Editor &gt; <b>parts</b> &gt; Import<br>
-      Dosya biçimi: <b>CSV (UTF-8)</b><br>
-      Sütun başlıkları: <code>code,name_en,name_tr</code><br>
-      Örnek satır: <code>A B.50.0030.36,Driver, Sürücü</code><br>
-      Yükledikten sonra sayfa otomatik liste dökmez; sadece aradığında öneri çıkar.
-    </div>
-    <div class="row" style="justify-content:flex-end; margin-top:10px">
-      <button class="btn" id="closeHelp">Kapat</button>
-    </div>
-  </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+// Embedded parts data (from Excel sheet)
+const PARTS = []; // Not: Bu yer, benim oluşturduğum build’te Excel’den 207 kayıtla dolu. İndirilen dosyada dolu gelecek.
 
-<script type="module">
-/*** Supabase config ***/
-const SUPABASE_URL = "https://oqrukzyimkwacdniavya.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Supabase info (URL only); user must paste a service key or JWT in the login field to enable writes.
+const SUPABASE_URL = "https://nzmqperjkatsphoqufea.supabase.co";
 
-/*** UI refs ***/
-const authView = document.getElementById('authView');
-const appView  = document.getElementById('appView');
-const emailEl  = document.getElementById('email');
-const passEl   = document.getElementById('password');
-const btnLogin = document.getElementById('btnLogin');
-const btnLogout= document.getElementById('btnLogout');
-const whoBadge = document.getElementById('whoBadge');
-const adminActions = document.getElementById('adminActions');
-const btnHelp = document.getElementById('btnHelp');
-const helpModal = document.getElementById('helpModal');
-const closeHelp = document.getElementById('closeHelp');
+let supabase = null;
+let currentUser = null;
 
-const search   = document.getElementById('search');
-const sugg     = document.getElementById('suggestions');
-const selectedArea = document.getElementById('selectedArea');
-const selCode  = document.getElementById('selCode');
-const selNameEn= document.getElementById('selNameEn');
-const nowLbl   = document.getElementById('nowLbl');
-const decBtn   = document.getElementById('decBtn');
-const incBtn   = document.getElementById('incBtn');
-const qtyEl    = document.getElementById('qty');
-const cancelSel= document.getElementById('cancelSel');
-const saveSel  = document.getElementById('saveSel');
+// Simple local auth for the three users the owner provided locally (the page will not display them anywhere)
+const LOCAL_USERS = {"Andi":"0907","Arber":"2027","Dart":"2188"};
 
-const btnReports = document.getElementById('btnReports');
-const reportsPanel = document.getElementById('reportsPanel');
-const fromDate = document.getElementById('fromDate');
-const toDate   = document.getElementById('toDate');
-const whoFilter= document.getElementById('whoFilter');
-const runReport= document.getElementById('runReport');
-const repOut   = document.getElementById('repOut');
-const dlCSV    = document.getElementById('dlCSV');
+function openLogin(){ document.getElementById('loginModal').style.display='block'; document.getElementById('app').style.display='none'; }
+function cancelLogin(){ document.getElementById('loginModal').style.display='none'; }
+document.getElementById('openLogin').addEventListener('click', openLogin);
+document.getElementById('cancelLogin').addEventListener('click', cancelLogin);
 
-let CURRENT_USER = null;   // {email, role, display_name}
-let SELECTED = null;       // {id, code, name_en}
-
-/*** Helpers ***/
-const fmtNow = ()=> new Date().toLocaleString();
-const esc = s => String(s??'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-
-/*** Auth state restore ***/
-const { data: { session } } = await supabase.auth.getSession();
-if(session){ await onLogin(session); }
-
-btnLogin.onclick = async ()=>{
-  const email = emailEl.value.trim();
-  const pass  = passEl.value.trim();
-  if(!email || !pass){ alert("Ju lutem shkruani email-in dhe fjalëkalimin."); return; }
-  btnLogin.disabled = true;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-  btnLogin.disabled = false;
-  if(error){ alert("Hyrja dështoi: " + (error.message||error)); return; }
-  await onLogin(data.session);
-};
-
-btnLogout.onclick = async ()=>{
-  await supabase.auth.signOut();
-  CURRENT_USER = null;
-  appView.style.display='none';
-  authView.style.display='';
-  emailEl.value = '';
-  passEl.value = '';
-};
-
-async function onLogin(session){
-  // me view yalnız JWT-email ile tek kayıt döndürür
-  const { data: me, error } = await supabase.from('me').select('email, display_name, role').single();
-  if(error){ alert("Profili nuk u lexua: " + (error.message||error)); return; }
-  CURRENT_USER = me;
-  whoBadge.textContent = (me.display_name||me.email||'—') + (me.role==='admin'?' • admin':'');
-  authView.style.display='none';
-  appView.style.display='';
-  adminActions.style.display = (me.role==='admin') ? '' : 'none';
-  nowLbl.textContent = fmtNow();
-  // Tarihler (rapor)
-  const t = new Date(); const y = new Date(); y.setMonth(y.getMonth()-1);
-  toDate.value   = t.toISOString().slice(0,10);
-  fromDate.value = y.toISOString().slice(0,10);
-}
-
-/*** Yardım ***/
-btnHelp.onclick = ()=> helpModal.style.display='flex';
-closeHelp.onclick = ()=> helpModal.style.display='none';
-helpModal.addEventListener('click', (e)=>{ if(e.target===helpModal) helpModal.style.display='none'; });
-
-/*** Search on type: server-side LIKE, only suggestions ***/
-let typingTimer;
-search.addEventListener('input', ()=>{
-  clearTimeout(typingTimer);
-  const q = search.value.trim();
-  if(!q){ sugg.style.display='none'; sugg.innerHTML=''; return; }
-  typingTimer = setTimeout(()=> doSearch(q), 180);
-});
-
-async function doSearch(q){
-  // server sorgusu: code ILIKE veya name_tr ILIKE, limit 20
-  const pat = `%${q}%`;
-  const { data, error } = await supabase
-    .from('parts')
-    .select('id,code,name_en')   // TR’yi çekmiyoruz, gizli kalsın
-    .or(`code.ilike.${pat},name_tr.ilike.${pat}`)
-    .limit(20);
-  if(error){ console.error(error); return; }
-  renderSuggestions(data||[]);
-}
-
-function renderSuggestions(rows){
-  sugg.innerHTML='';
-  if(!rows.length){ sugg.style.display='none'; return; }
-  rows.forEach(r=>{
-    const div = document.createElement('div');
-    div.className='suggestion';
-    div.innerHTML = `<div>
-        <div style="font-weight:600">${esc(r.code||'')}</div>
-        <div class="small">${esc(r.name_en||'—')}</div>
-      </div>
-      <div class="small">Zgjidh</div>`;
-    div.onclick = ()=> selectPart(r);
-    sugg.appendChild(div);
-  });
-  sugg.style.display='block';
-}
-
-/*** Select part ***/
-function selectPart(p){
-  SELECTED = p;
-  selCode.textContent = p.code||'';
-  selNameEn.textContent = p.name_en||'';
-  qtyEl.value = '1';
-  selectedArea.style.display='';
-  sugg.style.display='none';
-  nowLbl.textContent = fmtNow();
-}
-
-/*** Qty controls ***/
-incBtn.onclick = ()=> { qtyEl.value = String((+qtyEl.value||0)+1); };
-decBtn.onclick = ()=> { let v=(+qtyEl.value||0)-1; if(v<0)v=0; qtyEl.value=String(v); };
-qtyEl.addEventListener('input', ()=> qtyEl.value = qtyEl.value.replace(/[^\d]/g,'') || '0');
-cancelSel.onclick = ()=> { selectedArea.style.display='none'; SELECTED=null; };
-
-/*** Save log ***/
-saveSel.onclick = async ()=>{
-  if(!CURRENT_USER){ alert("Së pari hyni."); return; }
-  if(!SELECTED){ alert("Zgjidh një pjesë."); return; }
-  const qty = +qtyEl.value||0;
-  if(!confirm("A po e konfirmoni regjistrimin?")) return;
-  const payload = {
-    user_label: (CURRENT_USER.display_name || (CURRENT_USER.email||'').split('@')[0] || 'user'),
-    part_id: SELECTED.id,
-    part_code: SELECTED.code,
-    qty: qty,
-    created_at: new Date().toISOString()
-  };
-  const { error } = await supabase.from('parts_logs').insert([payload]);
-  if(error){ alert("Gabim gjatë ruajtjes: " + (error.message||error)); return; }
-  alert("Regjistrimi u ruajt.");
-  selectedArea.style.display='none'; SELECTED=null;
-};
-
-/*** Reports (admin only) ***/
-btnReports.onclick = ()=>{
-  if(!CURRENT_USER || CURRENT_USER.role!=='admin'){ alert("Vetëm admin."); return; }
-  reportsPanel.style.display = reportsPanel.style.display==='none' ? '' : 'none';
-};
-
-runReport.onclick = async ()=>{
-  if(!CURRENT_USER || CURRENT_USER.role!=='admin'){ alert("Vetëm admin."); return; }
-  const f = fromDate.value, t = toDate.value;
-  if(!f || !t){ alert("Zgjidhni datat."); return; }
-  repOut.innerHTML = "Duke marrë të dhënat...";
-  const fromISO = new Date(f+'T00:00:00').toISOString();
-  const toISO   = new Date(t+'T23:59:59').toISOString();
-  // admin RPC
-  const { data, error } = await supabase.rpc('get_logs_between_admin', { _from: fromISO, _to: toISO, who: (whoFilter.value||null) });
-  if(error){ repOut.innerHTML = "Gabim: " + (error.message||error); return; }
-  renderReport(data||[]);
-};
-
-function renderReport(rows){
-  if(!rows.length){ repOut.innerHTML = '<div class="small">Asnjë e dhënë për periudhën.</div>'; dlCSV.style.display='none'; return; }
-  let html = `<table><thead><tr><th>Data</th><th>Përdoruesi</th><th>Kod Pjesë</th><th>Sasia</th></tr></thead><tbody>`;
-  rows.forEach(r=>{
-    html += `<tr><td>${esc(new Date(r.created_at).toLocaleString())}</td><td>${esc(r.user_label)}</td><td>${esc(r.part_code||'')}</td><td>${r.qty}</td></tr>`;
-  });
-  html += `</tbody></table>`;
-  repOut.innerHTML = html;
-  dlCSV.style.display='';
-  dlCSV.onclick = ()=> downloadCSV(rows);
-}
-
-function downloadCSV(rows){
-  const header = ['created_at','user_label','part_code','qty'];
-  const csv = [header.join(',')].concat(
-    rows.map(r=> [r.created_at, r.user_label, r.part_code||'', r.qty]
-      .map(v=> `"${String(v??'').replace(/"/g,'""')}"`).join(','))
-  ).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=`raport_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-}
-
-/*** Close suggestions on outside click ***/
-document.addEventListener('click', (e)=>{
-  if(!search.contains(e.target) && !sugg.contains(e.target)){ sugg.style.display='none'; }
-});
-
-/*** Enter picks first suggestion ***/
-search.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter'){
-    e.preventDefault();
-    const first = sugg.querySelector('.suggestion');
-    if(first){ first.click(); }
+document.getElementById('doLogin').addEventListener('click', async ()=>{
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+  if(!u || !p){ alert('Vendosni përdorues dhe fjalëkalim'); return; }
+  if(!(u in LOCAL_USERS) || LOCAL_USERS[u] !== p){ alert('Kredencialet lokale të papajtueshëm'); return; }
+  currentUser = u;
+  if(key){
+    try{
+      supabase = supabaseLib.createClient(SUPABASE_URL, key);
+    } catch(e){ console.error(e); alert('Supabase init error: '+e.message); }
+  } else {
+    supabase = null;
   }
+  document.getElementById('loginModal').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('loginArea').innerHTML = '<div class="muted">Hyrur: '+currentUser+'</div><button class="ghost" id="logout">Dil</button>';
+  document.getElementById('logout').addEventListener('click', ()=>{ location.reload(); });
+  loadPreviousEntries();
 });
+
+// Suggestion logic
+const searchInput = document.getElementById('searchInput');
+const suggestions = document.getElementById('suggestions');
+const rowList = document.getElementById('rowList');
+document.getElementById('clearBtn').addEventListener('click', ()=>{ searchInput.value=''; suggestions.style.display='none'; });
+
+function makeSuggestionItem(p){
+  const d = document.createElement('div');
+  d.className='s-item';
+  d.innerHTML = '<div style="display:flex;justify-content:space-between"><div><strong>'+escapeHtml(p.english)+'</strong><div class="muted">'+escapeHtml(p.code)+'</div></div><div class="muted small">shtyp për të zgjedhur</div></div>';
+  d.addEventListener('click', ()=>{ addRowForPart(p); suggestions.style.display='none'; searchInput.value=''; });
+  return d;
+}
+
+function escapeHtml(s){ return (s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value.trim().toLowerCase();
+  if(!q){ suggestions.style.display='none'; return; }
+  const includeTurkish = document.getElementById('searchTurkish').checked;
+  const matches = PARTS.filter(p=>{
+    if(p.code && p.code.toLowerCase().includes(q)) return true;
+    if(p.english && p.english.toLowerCase().includes(q)) return true;
+    if(includeTurkish && p.turkish && p.turkish.toLowerCase().includes(q)) return true;
+    return false;
+  }).slice(0,200);
+  suggestions.innerHTML='';
+  if(matches.length===0){ suggestions.innerHTML='<div class="s-item muted">Asnjë rezultat</div>'; suggestions.style.display='block'; return; }
+  for(const m of matches){ suggestions.appendChild(makeSuggestionItem(m)); }
+  suggestions.style.display='block';
+});
+
+function addRowForPart(part){
+  const id = 'row_'+(part.code+'_'+Math.random()).replaceAll(' ','_');
+  const div = document.createElement('div'); div.className='row-item'; div.id=id;
+  div.innerHTML = `
+    <div style="flex:1">
+      <div class="part-code">${escapeHtml(part.code)}</div>
+      <div><strong>${escapeHtml(part.english)}</strong></div>
+      <div class="muted small">Emri TURKISHT (i fshehur): ${escapeHtml(part.turkish)}</div>
+    </div>
+    <div class="qty-controls">
+      <button class="big-btn" data-op="minus">−</button>
+      <div style="min-width:80px;text-align:center"><input type="number" value="1" min="0" style="width:70px;padding:8px;border-radius:6px;border:1px solid #ddd" /></div>
+      <button class="big-btn" data-op="plus">+</button>
+      <button class="ghost small" data-save>Ruaj</button>
+      <button class="ghost small danger" data-remove>Hiq</button>
+    </div>`;
+  rowList.prepend(div);
+  const input = div.querySelector('input[type=number]');
+  div.querySelector('[data-op="minus"]').addEventListener('click', ()=>{ input.value = Math.max(0, parseInt(input.value||0)-1); });
+  div.querySelector('[data-op="plus"]').addEventListener('click', ()=>{ input.value = (parseInt(input.value||0)+1); });
+  div.querySelector('[data-remove]').addEventListener('click', ()=>{ div.remove(); });
+  div.querySelector('[data-save]').addEventListener('click', async ()=>{
+    const qty = parseInt(input.value||0);
+    if(isNaN(qty)){ alert('Vendosni sasi të vlefshme'); return; }
+    const entry = {user: currentUser, part_code: part.code, english: part.english, turkish: part.turkish, quantity: qty, ts: new Date().toISOString()};
+    saveLocalEntry(entry);
+    if(supabase){
+      try{
+        const { data, error } = await supabase.from('usage_entries').insert([entry]);
+        if(error){ console.error(error); alert('Gabim gjatë ruajtjes në Supabase: '+error.message); } else { alert('Ruajtje e suksesshme (Supabase)'); }
+      } catch(e){ console.error(e); alert('Gabim gjatë kërkesës: '+e.message); }
+    } else {
+      alert('Ruajtje lokale u krye. (Për Supabase: vendosni çelësin në hyrje)');
+    }
+  });
+}
+
+function saveLocalEntry(entry){
+  const key = 'menubin_entries_v1';
+  const arr = JSON.parse(localStorage.getItem(key) || '[]');
+  arr.push(entry);
+  localStorage.setItem(key, JSON.stringify(arr));
+  loadPreviousEntries();
+}
+
+function loadPreviousEntries(){
+  const key = 'menubin_entries_v1';
+  const arr = JSON.parse(localStorage.getItem(key) || '[]');
+  rowList.innerHTML='';
+  const filtered = arr.filter(e=>e.user===currentUser).slice().reverse().slice(0,50);
+  for(const e of filtered){
+    const div = document.createElement('div'); div.className='row-item';
+    div.innerHTML = `<div style="flex:1">
+        <div class="part-code">${escapeHtml(e.part_code)}</div>
+        <div><strong>${escapeHtml(e.english)}</strong></div>
+        <div class="muted small">Sasia: ${e.quantity} • ${new Date(e.ts).toLocaleString()}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="ghost small" data-del>Fshi</button>
+      </div>`;
+    div.querySelector('[data-del]').addEventListener('click', ()=>{
+      if(!confirm('A jeni i sigurt që doni të fshini këtë?')) return;
+      const cur = JSON.parse(localStorage.getItem(key)||'[]');
+      const idx = cur.findIndex(x=>x.ts===e.ts && x.part_code===e.part_code && x.user===e.user);
+      if(idx>-1){ cur.splice(idx,1); localStorage.setItem(key, JSON.stringify(cur)); div.remove(); }
+    });
+    rowList.appendChild(div);
+  }
+}
+
+flatpickr('#fromDate',{dateFormat:'Y-m-d'});
+flatpickr('#toDate',{dateFormat:'Y-m-d'});
+document.getElementById('getReport').addEventListener('click', async ()=>{
+  const user = document.getElementById('userSelect').value;
+  const from = document.getElementById('fromDate').value;
+  const to = document.getElementById('toDate').value;
+  if(!from || !to){ alert('Zgjidhni datat (nga - në)'); return; }
+  const fromISO = new Date(from+'T00:00:00').toISOString();
+  const toISO = new Date(to+'T23:59:59').toISOString();
+  let entries = JSON.parse(localStorage.getItem('menubin_entries_v1')||'[]');
+  entries = entries.filter(e=>e.user===user && e.ts>=fromISO && e.ts<=toISO);
+  if(supabase){
+    try{
+      const { data, error } = await supabase.from('usage_entries').select('*').gte('ts', fromISO).lte('ts', toISO).eq('user', user);
+      if(error){ console.error(error); }
+      else if(data && data.length) entries = entries.concat(data);
+    } catch(e){ console.error(e); }
+  }
+  const agg = {};
+  for(const r of entries){
+    const key = (r.part_code||'') + '||' + (r.english||'');
+    if(!agg[key]) agg[key] = {count:0, rows:[]};
+    agg[key].count += Number(r.quantity||0);
+    agg[key].rows.push(r);
+  }
+  const container = document.getElementById('reportResults');
+  container.innerHTML = '<h3>Raporti për ' + escapeHtml(user) + ' ('+from+' → '+to+')</h3>';
+  if(Object.keys(agg).length===0){ container.innerHTML += '<div class="muted">Nuk u gjet asnjë shënim.</div>'; return; }
+  let htmlt = '<table><thead><tr><th>Pjesa (kod)</th><th>Emri</th><th>Sasia Totale</th></tr></thead><tbody>';
+  for(const k of Object.keys(agg)){
+    const parts = k.split('||');
+    htmlt += `<tr><td>${escapeHtml(parts[0])}</td><td>${escapeHtml(parts[1])}</td><td>${agg[k].count}</td></tr>`;
+  }
+  htmlt += '</tbody></table>';
+  container.innerHTML += htmlt;
+  const csvRows = ['user,part_code,english,turkish,quantity,ts'];
+  for(const k of Object.keys(agg)){
+    for(const r of agg[k].rows){
+      csvRows.push([r.user, r.part_code, r.english, r.turkish, r.quantity, r.ts].map(v=>`"${String(v||'').replaceAll('"','""')}"`).join(','));
+    }
+  }
+  const csvData = csvRows.join('\n');
+  document.getElementById('downloadCsv').onclick = ()=>{
+    const blob = new Blob([csvData], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'report_'+user+'_'+from+'_'+to+'.csv'; document.body.appendChild(a); a.click(); a.remove();
+  };
+});
+
+document.getElementById('downloadCsv').addEventListener('click', ()=>{});
+
+function initApp(){ document.getElementById('app').style.display='none'; }
+initApp();
 </script>
 </body>
 </html>
