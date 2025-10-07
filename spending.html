@@ -40,8 +40,6 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
 .tab{padding:6px 10px;border:1px solid var(--border);border-radius:999px;cursor:pointer;color:var(--muted)}
 .tab.active{background:#1b222c;color:#fff}
 hr{border:none;border-top:1px solid var(--border);margin:12px 0}
-
-/* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal.show{display:flex}
 .sheet{width:min(680px,100%);background:var(--card);border:1px solid var(--border);border-radius:14px;max-height:85vh;overflow:auto}
@@ -55,6 +53,7 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0}
 .suggest button{font-size:12px;padding:6px 8px}
 footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;border-top:1px solid var(--border)}
 .empty{color:var(--muted);text-align:center;padding:24px}
+.small{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -66,6 +65,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
         <span class="badge" id="langBadge">🇦🇱 shqip</span>
       </div>
       <div class="grow"></div>
+      <span id="cloudStatus" class="badge small">Offline (Yerel)</span>
       <button id="btnSettings" class="ghost">⚙️ <span data-i18n="settings">Cilësimet</span></button>
     </div>
   </div>
@@ -74,19 +74,19 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
 <div class="container">
   <div class="card">
     <div class="section-title">
-      <strong data-i18n="overview">Genel Bakış</strong>
+      <strong data-i18n="overview">Përmbledhje</strong>
       <div class="tabs" id="currencyTabs"></div>
     </div>
     <div class="kpis">
-      <div class="kpi"><div class="v" id="kpiBalance">ALL 0</div><div class="hint" data-i18n="balance">Bakiye</div></div>
-      <div class="kpi"><div class="v" id="kpiIncome">ALL 0</div><div class="hint" data-i18n="income">Gelir</div></div>
-      <div class="kpi"><div class="v" id="kpiExpense">ALL 0</div><div class="hint" data-i18n="expense">Gider</div></div>
-      <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" data-i18n="debtors">Borçlu kişi sayısı</div></div>
+      <div class="kpi"><div class="v" id="kpiBalance">ALL 0</div><div class="hint" data-i18n="balance">Bilanci</div></div>
+      <div class="kpi"><div class="v" id="kpiIncome">ALL 0</div><div class="hint" data-i18n="income">Të ardhurat</div></div>
+      <div class="kpi"><div class="v" id="kpiExpense">ALL 0</div><div class="hint" data-i18n="expense">Shpenzimet</div></div>
+      <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" data-i18n="debtors">Debitorë aktivë</div></div>
     </div>
   </div>
 
   <div class="section-title">
-    <strong data-i18n="latest">Son işlemler</strong>
+    <strong data-i18n="latest">Lëvizjet e fundit</strong>
     <div class="row">
       <input id="search" placeholder="Ara..." />
       <button id="btnReload">↻</button>
@@ -94,7 +94,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
   </div>
 
   <div class="list" id="txList"></div>
-  <div class="empty" id="emptyState" style="display:none" data-i18n="empty">Henüz kayıt yok. Aşağıdaki + ile ekleyin.</div>
+  <div class="empty" id="emptyState" style="display:none" data-i18n="empty">Ende s’ka të dhëna. Shtoni me +.</div>
 </div>
 
 <button class="plus" id="btnAdd">+</button>
@@ -103,17 +103,17 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
 <div class="modal" id="modal">
   <div class="sheet">
     <header>
-      <strong id="modalTitle" data-i18n="addRecord">Yeni Kayıt</strong>
+      <strong id="modalTitle" data-i18n="addRecord">Regjistrim i ri</strong>
       <button id="modalClose" class="ghost">✖</button>
     </header>
     <main>
       <div class="grid two">
         <div>
-          <label data-i18n="amount">Tutar</label>
+          <label data-i18n="amount">Shuma</label>
           <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" />
         </div>
         <div>
-          <label data-i18n="currency">Para birimi</label>
+          <label data-i18n="currency">Monedha</label>
           <select id="fCurrency">
             <option value="ALL">ALL</option>
             <option value="EUR">EUR</option>
@@ -125,36 +125,36 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
 
       <div class="grid two">
         <div>
-          <label data-i18n="type">Tür</label>
+          <label data-i18n="type">Lloji</label>
           <select id="fType">
-            <option value="expense" data-i18n-opt="expense">Gider</option>
-            <option value="income" data-i18n-opt="income">Gelir</option>
+            <option value="expense" data-i18n-opt="expense">Shpenzim</option>
+            <option value="income" data-i18n-opt="income">Të ardhura</option>
             <option value="debt" data-i18n-opt="debt">Borç verdim</option>
             <option value="debt_repay" data-i18n-opt="debt_repay">Borcum ödendi</option>
           </select>
         </div>
         <div>
-          <label data-i18n="category">Kategori</label>
+          <label data-i18n="category">Kategoria</label>
           <select id="fCategory"></select>
         </div>
       </div>
 
       <div id="personBlock" style="display:none">
-        <label data-i18n="person">Kişi</label>
-        <input id="fPerson" placeholder="İsim yazın..." autocomplete="off" />
+        <label data-i18n="person">Personi</label>
+        <input id="fPerson" placeholder="Emri..." autocomplete="off" />
         <div class="suggest" id="personSuggest"></div>
       </div>
 
       <div>
-        <label data-i18n="note">Not (opsiyonel)</label>
-        <textarea id="fNote" rows="2" placeholder="Açıklama..."></textarea>
+        <label data-i18n="note">Shënim (opsionale)</label>
+        <textarea id="fNote" rows="2" placeholder="Përshkrim..."></textarea>
       </div>
-      <div class="hint" data-i18n="hintSave">Kaydedince Supabase’e yazılır. İnternet gerekir.</div>
+      <div class="hint" data-i18n="hintSave">Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.</div>
     </main>
     <footer class="sheet">
-      <button class="ghost" id="btnClear" data-i18n="clear">Temizle</button>
+      <button class="ghost" id="btnClear" data-i18n="clear">Pastro</button>
       <div class="grow"></div>
-      <button class="primary" id="btnSave" data-i18n="save">Kaydet</button>
+      <button class="primary" id="btnSave" data-i18n="save">Ruaj</button>
     </footer>
   </div>
 </div>
@@ -169,7 +169,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
     <main class="grid">
       <div class="grid two">
         <div>
-          <label data-i18n="language">Dil</label>
+          <label data-i18n="language">Gjuha</label>
           <select id="sLang">
             <option value="sq">🇦🇱 shqip</option>
             <option value="en">🇬🇧 English</option>
@@ -178,7 +178,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
           </select>
         </div>
         <div>
-          <label data-i18n="defaultCurrency">Varsayılan para birimi</label>
+          <label data-i18n="defaultCurrency">Monedha bazë</label>
           <select id="sBase">
             <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
           </select>
@@ -199,6 +199,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
           <div class="grow"></div>
           <button id="sSave" class="primary">Kaydet</button>
         </div>
+        <div class="hint small">Supabase boş bırakılırsa uygulama tamamen lokal çalışır.</div>
       </details>
 
       <details>
@@ -213,38 +214,18 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       <details>
         <summary>🧰 SQL Şeması (Supabase)</summary>
 <pre style="white-space:pre-wrap;font-size:12px;border:1px solid var(--border);padding:8px;border-radius:8px;background:#0f141b">
--- Bir kez çalıştırın (SQL Editor)
-create table if not exists profiles(
-  id uuid primary key default uuid_generate_v4(),
-  created_at timestamptz default now()
-);
-
-create table if not exists categories(
-  id bigserial primary key,
-  name text not null,
-  created_at timestamptz default now()
-);
-
--- varsayılan kategoriler (tekrar denerse hata vermez)
+create table if not exists categories(id bigserial primary key, name text not null, created_at timestamptz default now());
 insert into categories(name)
-select x from (values
-  ('Genel'),('Market'),('Faturalar'),('Araç'),
-  ('Eğlence'),('Sağlık'),('Kira'),('Borç')
-) v(x)
+select x from (values ('Genel'),('Market'),('Faturalar'),('Araç'),('Eğlence'),('Sağlık'),('Kira'),('Borç')) v(x)
 on conflict do nothing;
-
 create table if not exists transactions(
   id bigserial primary key,
   created_at timestamptz default now(),
   typ text check(typ in ('income','expense','debt','debt_repay')) not null,
   amount numeric not null,
   currency text check(currency in ('ALL','EUR','USD','TRY')) not null,
-  category text,
-  note text,
-  person_name text
+  category text, note text, person_name text
 );
-
--- hızlı aramalar için index
 create index if not exists idx_tx_created on transactions(created_at desc);
 create index if not exists idx_tx_person on transactions(person_name);
 </pre>
@@ -260,60 +241,45 @@ create index if not exists idx_tx_person on transactions(person_name);
 <script>
 /*** i18n ***/
 const I18N = {
-  sq: {
-    settings:"Cilësimet", language:"Gjuha", defaultCurrency:"Monedha bazë",
-    manageCategories:"Menaxho Kategoritë", overview:"Përmbledhje", balance:"Bilanci",
-    income:"Të ardhurat", expense:"Shpenzimet", debtors:"Debitorë aktivë",
-    latest:"Lëvizjet e fundit", empty:"Ende s’ka të dhëna. Shtoni me +.",
-    addRecord:"Regjistrim i ri", amount:"Shuma", currency:"Monedha", type:"Lloji",
-    category:"Kategoria", person:"Personi", note:"Shënim (opsionale)",
-    hintSave:"Pas ruajtjes dërgohet në Supabase. Kërkon internet.",
-    clear:"Pastro", save:"Ruaj"
+  sq: {settings:"Cilësimet",language:"Gjuha",defaultCurrency:"Monedha bazë",manageCategories:"Menaxho Kategoritë",
+    overview:"Përmbledhje",balance:"Bilanci",income:"Të ardhurat",expense:"Shpenzimet",debtors:"Debitorë aktivë",
+    latest:"Lëvizjet e fundit",empty:"Ende s’ka të dhëna. Shtoni me +.",addRecord:"Regjistrim i ri",amount:"Shuma",
+    currency:"Monedha",type:"Lloji",category:"Kategoria",person:"Personi",note:"Shënim (opsionale)",
+    hintSave:"Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.",clear:"Pastro",save:"Ruaj"
   },
-  en: {
-    settings:"Settings", language:"Language", defaultCurrency:"Default currency",
-    manageCategories:"Manage Categories", overview:"Overview", balance:"Balance",
-    income:"Income", expense:"Expense", debtors:"Active debtors",
-    latest:"Latest transactions", empty:"No data yet. Use + to add.",
-    addRecord:"New Record", amount:"Amount", currency:"Currency", type:"Type",
-    category:"Category", person:"Person", note:"Note (optional)",
-    hintSave:"Saves to Supabase. Requires internet.", clear:"Clear", save:"Save"
+  en: {settings:"Settings",language:"Language",defaultCurrency:"Default currency",manageCategories:"Manage Categories",
+    overview:"Overview",balance:"Balance",income:"Income",expense:"Expense",debtors:"Active debtors",
+    latest:"Latest transactions",empty:"No data yet. Use + to add.",addRecord:"New Record",amount:"Amount",
+    currency:"Currency",type:"Type",category:"Category",person:"Person",note:"Note (optional)",
+    hintSave:"Saves locally; if Supabase is set, also goes to cloud.",clear:"Clear",save:"Save"
   },
-  tr: {
-    settings:"Cilsettings", language:"Dil", defaultCurrency:"Varsayılan para birimi",
-    manageCategories:"Kategorileri Yönet", overview:"Genel Bakış", balance:"Bakiye",
-    income:"Gelir", expense:"Gider", debtors:"Borçlu kişi sayısı",
-    latest:"Son işlemler", empty:"Henüz kayıt yok. + ile ekleyin.",
-    addRecord:"Yeni Kayıt", amount:"Tutar", currency:"Para birimi", type:"Tür",
-    category:"Kategori", person:"Kişi", note:"Not (opsiyonel)",
-    hintSave:"Kaydınız Supabase'e yazılır. İnternet gerekir.",
-    clear:"Temizle", save:"Kaydet"
+  tr: {settings:"Ayarlar",language:"Dil",defaultCurrency:"Varsayılan para birimi",manageCategories:"Kategorileri Yönet",
+    overview:"Genel Bakış",balance:"Bakiye",income:"Gelir",expense:"Gider",debtors:"Borçlu kişi sayısı",
+    latest:"Son işlemler",empty:"+ ile kayıt ekleyin.",addRecord:"Yeni Kayıt",amount:"Tutar",currency:"Para birimi",
+    type:"Tür",category:"Kategori",person:"Kişi",note:"Not (opsiyonel)",
+    hintSave:"Önce localStorage; Supabase varsa buluta da yazar.",clear:"Temizle",save:"Kaydet"
   },
-  it: {
-    settings:"Impostazioni", language:"Lingua", defaultCurrency:"Valuta predefinita",
-    manageCategories:"Gestisci categorie", overview:"Panoramica", balance:"Saldo",
-    income:"Entrate", expense:"Uscite", debtors:"Debitori attivi",
-    latest:"Ultime transazioni", empty:"Nessun dato. Usa + per aggiungere.",
-    addRecord:"Nuovo record", amount:"Importo", currency:"Valuta", type:"Tipo",
-    category:"Categoria", person:"Persona", note:"Nota (opz.)",
-    hintSave:"Salva su Supabase. Richiede internet.", clear:"Pulisci", save:"Salva"
+  it: {settings:"Impostazioni",language:"Lingua",defaultCurrency:"Valuta predefinita",manageCategories:"Gestisci categorie",
+    overview:"Panoramica",balance:"Saldo",income:"Entrate",expense:"Uscite",debtors:"Debitori attivi",
+    latest:"Ultime transazioni",empty:"Nessun dato. Usa + per aggiungere.",addRecord:"Nuovo record",amount:"Importo",
+    currency:"Valuta",type:"Tipo",category:"Categoria",person:"Persona",note:"Nota (opz.)",
+    hintSave:"Salva in locale; se c’è Supabase invia anche al cloud.",clear:"Pulisci",save:"Salva"
   }
 };
-// küçük düzeltme (TR key yaması)
-I18N.tr.settings = "Ayarlar";
 
-/*** State ***/
+/*** State & Storage ***/
 const LS = {
   lang: 'app.lang',
   base: 'app.base',
   sbUrl: 'sb.url',
-  sbKey: 'sb.key'
+  sbKey: 'sb.key',
+  txs: 'app.txs',
+  cats: 'app.cats'
 };
 let SUPA = null;
 let currentCurrency = localStorage.getItem(LS.base) || 'ALL';
 let currentLang = localStorage.getItem(LS.lang) || 'sq';
 
-/*** Helpers ***/
 const $ = s=>document.querySelector(s);
 const el = (t,cls)=>{const x=document.createElement(t); if(cls) x.className=cls; return x;};
 function fmt(n){return (Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:2});}
@@ -330,10 +296,29 @@ function setLang(l){currentLang=l; localStorage.setItem(LS.lang,l); applyI18N();
 function getClient(){
   const url = localStorage.getItem(LS.sbUrl);
   const key = localStorage.getItem(LS.sbKey);
-  if(!url || !key) return null;
+  if(!url || !key) { SUPA=null; setCloudStatus(false); return null; }
   if(!SUPA) SUPA = supabase.createClient(url, key);
+  setCloudStatus(true);
   return SUPA;
 }
+function setCloudStatus(online){
+  $('#cloudStatus').textContent = online ? 'Online (Cloud Bağlı)' : 'Offline (Yerel)';
+}
+
+/*** Local helpers ***/
+function readJSON(k, fallback){
+  try{ const v=localStorage.getItem(k); return v? JSON.parse(v): fallback; }
+  catch(e){ return fallback;}
+}
+function writeJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+function ensureDefaultCats(){
+  let cats = readJSON(LS.cats, null);
+  if(!cats || !Array.isArray(cats) || cats.length===0){
+    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç'];
+    writeJSON(LS.cats, cats);
+  }
+}
+ensureDefaultCats();
 
 /*** UI Build ***/
 const CURRENCIES = ['ALL','EUR','USD','TRY'];
@@ -345,59 +330,46 @@ function buildTabs(){
     box.appendChild(b);
   });
 }
+
+/*** Categories ***/
 async function loadCategories(){
-  const sb=getClient(); if(!sb) return defaultCats();
-  const {data,error} = await sb.from('categories').select('name').order('name',{ascending:true});
-  if(error){ console.warn(error); return defaultCats(); }
-  return data.map(x=>x.name);
+  const sb=getClient();
+  if(sb){
+    const {data,error} = await sb.from('categories').select('name').order('name',{ascending:true});
+    if(!error && data) return data.map(x=>x.name);
+  }
+  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç']);
 }
-function defaultCats(){return ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç'];}
 async function fillCategorySelect(){
   const cats = await loadCategories();
   const s = $('#fCategory'); s.innerHTML='';
   cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);});
-  // “Borç” varsa onu seçme; varsayılan “Genel”
   if(cats.includes('Genel')) s.value='Genel';
 }
 
-/*** Data fetch & render ***/
-async function refresh(){
-  applyI18N(); buildTabs();
-  const sb = getClient();
-  const txList = $('#txList'); txList.innerHTML='';
-  if(!sb){ $('#emptyState').style.display='block'; updateKPIs([]); return; }
+/*** Transactions fetch & render ***/
+async function listTransactions(){
+  const sb=getClient();
   const q = $('#search').value?.trim();
-  let query = sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(100);
-  if(q){
-    query = query.or(`note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%`);
+  if(sb){
+    let query = sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(200);
+    if(q){ query = query.or(`note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%`); }
+    const {data,error}=await query;
+    if(!error && data) return data;
   }
-  const {data,error} = await query;
-  if(error){ console.error(error); $('#emptyState').style.display='block'; updateKPIs([]); return; }
-  const rows = data||[];
-  const any = rows.length>0;
-  $('#emptyState').style.display = any?'none':'block';
-  updateKPIs(rows);
-
-  rows.forEach(r=>{
-    const it = el('div','item');
-    const L = el('div'); const R = el('div');
-    const title = el('div','t'); title.textContent = labelForType(r.typ)+' • '+(r.category||'-');
-    const meta = el('div','meta'); meta.textContent = new Date(r.created_at).toLocaleString() + (r.person_name?(' • '+r.person_name):'') + (r.note?(' • '+r.note):'');
-    L.appendChild(title); L.appendChild(meta);
-    const amt = el('div','amt'); amt.textContent = r.currency+' '+fmt(r.amount);
-    R.appendChild(amt);
-    it.appendChild(L); it.appendChild(R);
-    txList.appendChild(it);
-  });
-}
-function labelForType(typ){
-  const map = {
-    income:{sq:'Të ardhura',en:'Income',tr:'Gelir',it:'Entrata'},
-    expense:{sq:'Shpenzim',en:'Expense',tr:'Gider',it:'Uscita'},
-    debt:{sq:'Dëbim (borxh)',en:'Loaned out',tr:'Borç verdim',it:'Prestato'},
-    debt_repay:{sq:'Pagesë borxhi',en:'Debt repaid',tr:'Borcum ödendi',it:'Rimborso'}
-  };
-  return (map[typ]||{} )[currentLang] || typ;
+  // local fallback
+  let rows = readJSON(LS.txs, []);
+  if(q){
+    const Q=q.toLowerCase();
+    rows = rows.filter(r=>
+      (r.note||'').toLowerCase().includes(Q) ||
+      (r.category||'').toLowerCase().includes(Q) ||
+      (r.person_name||'').toLowerCase().includes(Q)
+    );
+  }
+  // sort by created_at desc
+  rows.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
+  return rows.slice(0,200);
 }
 function calcByCurrency(rows){
   const res = {}; CURRENCIES.forEach(c=>res[c]={inc:0,exp:0});
@@ -415,7 +387,6 @@ async function updateKPIs(rows){
   $('#kpiExpense').textContent = currentCurrency+' '+fmt(cur.exp);
   $('#kpiBalance').textContent = currentCurrency+' '+fmt(cur.inc - cur.exp);
 
-  // aktif borçlu sayısı: kişi bazında borç - ödeme farkı > 0 ise aktif say
   const debts = {};
   rows.forEach(r=>{
     if(!r.person_name) return;
@@ -426,6 +397,34 @@ async function updateKPIs(rows){
   });
   const active = Object.values(debts).filter(v=>v>0.0001).length;
   $('#kpiDebtors').textContent = active;
+}
+function labelForType(typ){
+  const map = {
+    income:{sq:'Të ardhura',en:'Income',tr:'Gelir',it:'Entrata'},
+    expense:{sq:'Shpenzim',en:'Expense',tr:'Gider',it:'Uscita'},
+    debt:{sq:'Dëbim (borxh)',en:'Loaned out',tr:'Borç verdim',it:'Prestato'},
+    debt_repay:{sq:'Pagesë borxhi',en:'Debt repaid',tr:'Borcum ödendi',it:'Rimborso'}
+  };
+  return (map[typ]||{} )[currentLang] || typ;
+}
+async function refresh(){
+  applyI18N(); buildTabs();
+  const rows = await listTransactions();
+  const txList = $('#txList'); txList.innerHTML='';
+  const any = rows.length>0;
+  $('#emptyState').style.display = any?'none':'block';
+  updateKPIs(rows);
+  rows.forEach(r=>{
+    const it = el('div','item');
+    const L = el('div'); const R = el('div');
+    const title = el('div','t'); title.textContent = labelForType(r.typ)+' • '+(r.category||'-');
+    const meta = el('div','meta'); meta.textContent = new Date(r.created_at).toLocaleString() + (r.person_name?(' • '+r.person_name):'') + (r.note?(' • '+r.note):'');
+    L.appendChild(title); L.appendChild(meta);
+    const amt = el('div','amt'); amt.textContent = r.currency+' '+fmt(r.amount);
+    R.appendChild(amt);
+    it.appendChild(L); it.appendChild(R);
+    txList.appendChild(it);
+  });
 }
 
 /*** Add modal logic ***/
@@ -439,7 +438,7 @@ function openModal(){
   $('#fPerson').value='';
   fillCategorySelect();
   updatePersonBlock();
-  loadPersonSuggestions(); // may be empty first
+  loadPersonSuggestions(); 
 }
 function closeModal(){ $('#modal').classList.remove('show'); }
 function updatePersonBlock(){
@@ -448,30 +447,28 @@ function updatePersonBlock(){
   $('#personBlock').style.display = show? 'block':'none';
 }
 $('#fType').addEventListener('change',()=>{
-  // kategori seti: borç seçildiyse kategori "Borç" olsun
   if($('#fType').value==='debt'){ $('#fCategory').value='Borç'; }
   updatePersonBlock();
   loadPersonSuggestions();
 });
 $('#fCategory').addEventListener('change',()=>{
-  // kategori Borç ise tip otomatik debt'e çekilebilir
   if($('#fCategory').value==='Borç') $('#fType').value='debt';
   updatePersonBlock();
 });
 
 async function loadPersonSuggestions(){
   const sb=getClient(); const box=$('#personSuggest'); box.innerHTML='';
-  const typ=$('#fType').value;
-  if(!sb || (typ!=='debt' && typ!=='debt_repay')) return;
-  // geçmişte borç verdiğimiz kişileri getir
-  const {data,error} = await sb.from('transactions')
-    .select('person_name')
-    .neq('person_name',null)
-    .eq('typ','debt')
-    .order('created_at',{ascending:false})
-    .limit(200);
-  if(error||!data) return;
-  const names=[...new Set(data.map(x=>x.person_name).filter(Boolean))].slice(0,30);
+  let names = [];
+  if(sb){
+    const {data,error} = await sb.from('transactions')
+      .select('person_name').neq('person_name',null).eq('typ','debt')
+      .order('created_at',{ascending:false}).limit(200);
+    if(!error && data) names = data.map(x=>x.person_name).filter(Boolean);
+  } else {
+    const rows = readJSON(LS.txs, []);
+    names = rows.filter(x=>x.typ==='debt' && x.person_name).map(x=>x.person_name);
+  }
+  names = [...new Set(names)].slice(0,30);
   names.forEach(n=>{
     const b=el('button'); b.textContent=n; b.onclick=()=>{$('#fPerson').value=n;};
     box.appendChild(b);
@@ -482,12 +479,18 @@ $('#btnClear').onclick=()=>{
   $('#fAmount').value=''; $('#fNote').value=''; $('#fPerson').value='';
 };
 
+async function saveLocal(row){
+  const arr = readJSON(LS.txs, []);
+  arr.unshift(row); // başa ekle
+  writeJSON(LS.txs, arr);
+}
+
 $('#btnSave').onclick = async ()=>{
-  const sb=getClient();
-  if(!sb){ alert('Önce Ayarlar > Supabase bağlantısını kaydet.'); return; }
   const amount = parseFloat($('#fAmount').value);
   if(!(amount>0)){ alert('Tutar giriniz'); return; }
   const row = {
+    id: Date.now(), // local id
+    created_at: new Date().toISOString(),
     typ: $('#fType').value,
     amount,
     currency: $('#fCurrency').value,
@@ -495,8 +498,23 @@ $('#btnSave').onclick = async ()=>{
     note: $('#fNote').value||null,
     person_name: ($('#fType').value==='debt' || $('#fType').value==='debt_repay') ? ($('#fPerson').value||null) : null
   };
-  const {error} = await sb.from('transactions').insert(row);
-  if(error){ alert('Hata: '+error.message); return; }
+
+  // her durumda local’e yaz
+  await saveLocal(row);
+
+  // Supabase varsa buluta da gönder (best-effort)
+  const sb=getClient();
+  if(sb){
+    try{
+      const {error} = await sb.from('transactions').insert({
+        typ: row.typ, amount: row.amount, currency: row.currency,
+        category: row.category, note: row.note, person_name: row.person_name,
+        created_at: row.created_at
+      });
+      if(error) console.warn('Supabase insert error:', error.message);
+    }catch(e){ console.warn('Supabase error:', e); }
+  }
+
   closeModal(); await refresh();
 };
 
@@ -512,15 +530,16 @@ function fillSettings(){
 $('#sLang').addEventListener('change',e=>{ setLang(e.target.value); });
 $('#sBase').addEventListener('change',e=>{ localStorage.setItem(LS.base,e.target.value); currentCurrency=e.target.value; buildTabs(); refresh(); });
 $('#sSave').onclick=()=>{
-  localStorage.setItem(LS.sbUrl,$('#sSupabaseUrl').value.trim());
-  localStorage.setItem(LS.sbKey',$('#sSupabaseKey').value.trim());
+  localStorage.setItem(LS.sbUrl, $('#sSupabaseUrl').value.trim());
+  localStorage.setItem(LS.sbKey, $('#sSupabaseKey').value.trim());
   SUPA=null; getClient(); $('#sStatus').textContent='Kaydedildi';
+  refresh();
 };
 $('#sTest').onclick=async ()=>{
   try{
     SUPA=null; const sb=getClient();
     if(!sb) throw new Error('Eksik ayar');
-    const {data,error} = await sb.from('categories').select('count',{count:'exact',head:true});
+    const {error} = await sb.from('categories').select('count',{count:'exact',head:true});
     if(error) throw error;
     $('#sStatus').textContent='Bağlı ✓';
   }catch(e){ $('#sStatus').textContent='Hata: '+(e.message||e); }
@@ -542,10 +561,17 @@ async function renderCats(){
 $('#catAdd').onclick=async ()=>{
   const name = $('#catNew').value.trim();
   if(!name) return;
+  // local’e yaz
+  const cats = await loadCategories();
+  if(!cats.includes(name)){
+    const localCats = readJSON(LS.cats, []);
+    localCats.push(name);
+    writeJSON(LS.cats, [...new Set(localCats)]);
+  }
+  // Supabase varsa buluta da ekle
   const sb=getClient();
   if(sb){
-    const {error} = await sb.from('categories').insert({name});
-    if(error){ alert('Hata: '+error.message); return; }
+    try{ await sb.from('categories').insert({name}); }catch(e){}
   }
   $('#catNew').value=''; await renderCats(); await fillCategorySelect();
 };
