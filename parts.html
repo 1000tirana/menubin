@@ -1,518 +1,379 @@
 <!doctype html>
-<html lang="tr">
+<html lang="sq">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Parça Sayaç • Supabase Entegre</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Menaxhimi i Pjesëve</title>
 <style>
-  :root{--bg:#f4f6f8;--card:#ffffff;--muted:#6b7280;--accent:#0b74de;--ok:#16a34a}
-  html,body{height:100%}
-  body{margin:0;font-family:Inter, system-ui, Arial; background:var(--bg);color:#111}
-  .wrap{max-width:1100px;margin:18px auto;padding:18px}
-  .card{background:var(--card);border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:12px}
-  header{display:flex;gap:12px;align-items:center;justify-content:space-between}
-  h1{font-size:18px;margin:0}
-  .muted{color:var(--muted);font-size:13px}
-  .login{max-width:360px;margin:12px 0}
-  label{display:block;font-size:13px;margin:8px 0 6px}
-  input[type=text], input[type=password], input[type=date], select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ee}
-  button{padding:10px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-  .btn-ghost{background:transparent;border:1px solid #e6e9ee;color:#111}
-  .small{font-size:13px;padding:6px 8px}
-  .flex{display:flex;gap:8px;align-items:center}
-  .right{margin-left:auto}
-  .top-actions{display:flex;gap:8px;align-items:center}
-  .search{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
-  .filebox{display:flex;gap:6px;align-items:center}
-  .parts-list{margin-top:12px}
-  table{width:100%;border-collapse:collapse}
-  th,td{padding:8px;border-bottom:1px dashed #eee;font-size:14px}
-  th{font-weight:600;text-align:left}
-  .hidden-turk{color:transparent;text-shadow:0 0 6px rgba(0,0,0,0.05);user-select:none}
-  .controls{display:flex;gap:8px;align-items:center}
-  .big-arrow{font-size:26px;padding:6px 12px;border-radius:8px;border:1px solid #ddd;background:#fafafa;cursor:pointer;user-select:none}
-  .qty{width:100px;padding:8px;border-radius:8px;border:1px solid #ddd;text-align:center;font-size:20px}
-  .note{font-size:13px;color:var(--muted);margin-top:8px}
-  .report-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef4ff;color:#274c9b;font-size:12px}
-  footer{font-size:12px;color:var(--muted);margin-top:18px;text-align:center}
-  @media(max-width:700px){.controls{flex-direction:column;align-items:flex-start}.right{margin-left:0}}
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --border:#e6eaf0; --text:#0f172a; --muted:#6b7280;
+  --accent:#0ea5a4; --btn:#0b7285; --danger:#e03131;
+  --shadow:0 6px 18px rgba(16,24,40,.06);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--text)}
+.wrap{max-width:1024px;margin:18px auto;padding:18px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+h1{font-size:18px;margin:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+input[type="text"], input[type="password"], input[type="email"], input[type="date"]{
+  width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:#fff
+}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1}
+.btn{background:var(--btn);color:#fff;border:0;border-radius:10px;padding:10px 14px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.ghost{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer}
+.danger{background:var(--danger)}
+.muted{color:var(--muted);font-size:13px}
+.search-wrap{position:relative}
+.suggestions{position:absolute;left:0;right:0;top:56px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);max-height:280px;overflow:auto;display:none;z-index:5}
+.suggestion{padding:10px;border-bottom:1px solid #f1f3f5;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.small{font-size:12px;color:var(--muted)}
+#selectedArea .big{font-size:16px}
+.qty-control{display:flex;align-items:center;gap:8px}
+.big-arrow{width:48px;height:48px;border-radius:10px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;user-select:none;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #f1f3f5;font-size:13px;text-align:left}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px;background:#fff}
+@media (max-width:640px){
+  .row.wrap1{flex-direction:column;align-items:stretch}
+  .big-arrow{width:44px;height:44px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <header>
-      <div>
-        <h1>Parça Sayaç • Supabase</h1>
-        <div class="muted">Türkçe adlar gizli görünür; aramada aktif. Kayıtlar Supabase’e anında yazılır.</div>
-      </div>
-      <div class="top-actions">
-        <span id="userInfo" style="display:none" class="pill">Giriş: <b id="userLabel"></b></span>
-        <button id="btnLogout" style="display:none" class="small btn-ghost">Çıkış</button>
-        <button id="btnSettings" class="small btn-ghost">Ayarlar</button>
-      </div>
-    </header>
+  <header>
+    <h1>Menaxhimi i Pjesëve</h1>
+    <div class="muted">Supabase • Hyrje & Regjistrime</div>
+  </header>
 
-    <!-- LOGIN -->
-    <div id="loginCard" class="card login">
-      <label>Kullanıcı adı</label>
-      <input id="inpUser" type="text" placeholder="Andi / Arber / Dart" />
-      <label>Şifre</label>
-      <input id="inpPass" type="password" placeholder="Şifre" />
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button id="btnLogin">Giriş Yap</button>
-        <button id="btnDemo" class="btn-ghost">Demo Parça Yükle</button>
+  <!-- AUTH -->
+  <div class="card" id="authView">
+    <label>Hyr me email dhe fjalëkalim</label>
+    <div class="row wrap1">
+      <input id="email" type="email" placeholder="Email" class="grow">
+      <input id="password" type="password" placeholder="Fjalëkalimi" class="grow">
+      <button class="btn" id="btnLogin">Hyr</button>
+    </div>
+    <div class="row" style="margin-top:8px;justify-content:space-between">
+      <div class="muted">Nëse nuk je i kyçur, asgjë nuk shfaqet.</div>
+      <div class="muted">Vetëm <span class="badge">Andi (admin)</span> sheh raportet.</div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div class="card" id="appView" style="display:none">
+    <div class="row" style="justify-content:space-between;gap:12px">
+      <div class="row" style="gap:8px">
+        <div class="badge" id="whoBadge">—</div>
+        <button class="ghost" id="btnLogout">Dil</button>
       </div>
-      <div class="note">Andi: <b>0907</b> • Arber: <b>2027</b> • Dart: <b>2188</b></div>
+      <div class="row" id="adminActions" style="gap:8px;display:none">
+        <button class="ghost" id="btnReports">Raportet</button>
+        <button class="ghost" id="btnHelp">CSV Yükleme Bilgisi</button>
+      </div>
     </div>
 
-    <!-- APP -->
-    <div id="app" style="display:none">
-      <div class="search">
-        <input id="txtSearch" type="text" placeholder="Parça ara (İngilizce/Türkçe/Kod) ..." />
-        <button id="btnImport" class="btn-ghost small">CSV/JSON Yükle</button>
-        <input id="fileInput" type="file" accept=".csv,.json" style="display:none" />
-        <div class="right filebox">
-          <button id="btnPullParts" class="small btn-ghost">Parçaları Supabase’den Çek</button>
-          <button id="btnExportParts" class="small">Parça CSV Dışa Aktar</button>
-        </div>
+    <!-- KERKO PJESË -->
+    <div style="margin-top:12px">
+      <label>Kërko pjesë (shkruaj kodin ose emrin në turqisht)</label>
+      <div class="search-wrap">
+        <input id="search" type="text" autocomplete="off"
+               placeholder="p.sh. A B.50.0030.36 ose 'sürücü'">
+        <div id="suggestions" class="suggestions"></div>
       </div>
-      <div class="note">CSV başlıkları: <code>Code,EnglishName,TurkishName</code>. Türkçe adlar listede gizli ama aramada çalışır.</div>
+      <div class="small" style="margin-top:6px">Lista nuk shfaqet. Vetëm kërkimi jep sugjerime (maks. 20).</div>
+    </div>
 
-      <div class="parts-list card" id="partsCard" style="display:none">
-        <table id="tblParts">
-          <thead><tr><th>Kod</th><th>İngilizce Ad</th><th style="width:260px">İşlem</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div id="emptyMsg" class="card" style="display:none"><div class="muted">Henüz parça yok — ‘Demo Parça Yükle’ veya CSV/JSON içe aktar.</div></div>
-
-      <!-- Hızlı ekleme paneli -->
-      <div id="controlsModal" style="display:none" class="card">
-        <div style="display:flex;gap:12px;align-items:center">
+    <!-- SEÇİLEN -->
+    <div id="selectedArea" style="display:none;margin-top:12px">
+      <div class="card" style="padding:12px">
+        <div class="row" style="justify-content:space-between">
           <div>
-            <strong id="selPartTitle"></strong>
-            <div class="muted" id="selPartCode"></div>
+            <div class="small">Kodi: <b id="selCode"></b></div>
+            <div class="small">Emri (EN): <b id="selNameEn"></b></div>
+            <!-- TR saklı; gösterme -->
           </div>
-          <div class="right">
-            <div class="controls">
-              <button id="decr" class="big-arrow" aria-label="Azalt">−</button>
-              <input id="qtyInput" class="qty" type="number" value="1" min="0" />
-              <button id="incr" class="big-arrow" aria-label="Artır">+</button>
-              <button id="btnConfirm" class="small" style="background:var(--ok);color:#fff">Ekle / Kaydet</button>
+          <div class="small"><span id="nowLbl"></span></div>
+        </div>
+
+        <div style="margin-top:10px">
+          <label class="big">Konfirmo: A po e kuptove kështu?</label>
+          <div class="row" style="justify-content:space-between">
+            <div class="small">Sasia:</div>
+            <div class="qty-control">
+              <div class="big-arrow" id="decBtn">−</div>
+              <input id="qty" type="text" value="1" style="width:80px;text-align:center;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:18px">
+              <div class="big-arrow" id="incBtn">+</div>
             </div>
           </div>
-        </div>
-        <div class="note" style="margin-top:8px">Önce onay (“Bunu mu demek istedin?”), sonra adet belirlenir.</div>
-      </div>
-
-      <!-- Kayıtlar -->
-      <div class="card">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div><strong>Kayıtlar (son 50)</strong></div>
-          <div class="muted"><span id="recCount">0</span> kayıt</div>
-          <div class="right">
-            <button id="btnExportCSV" class="small btn-ghost">Tüm Kayıtları CSV</button>
-            <button id="btnClearLocal" class="small btn-ghost">Local Temizle</button>
+          <div class="row" style="justify-content:flex-end;margin-top:10px;gap:8px">
+            <button class="ghost" id="cancelSel">Anulo</button>
+            <button class="btn" id="saveSel">Ruaj</button>
           </div>
-        </div>
-        <div style="margin-top:12px">
-          <table id="tblRecords">
-            <thead><tr><th>Tarih</th><th>Kullanıcı</th><th>Kod</th><th>Parça</th><th>Adet</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Rapor -->
-      <div class="card">
-        <strong>Raporlar</strong>
-        <div class="report-controls" style="margin-top:8px">
-          <label style="margin:0">Kullanıcı</label>
-          <select id="reportUser"><option>Andi</option><option>Arber</option><option>Dart</option></select>
-          <label style="margin:0">Başlangıç</label>
-          <input id="repFrom" type="date" />
-          <label style="margin:0">Bitiş</label>
-          <input id="repTo" type="date" />
-          <button id="btnGetReport" class="small">Rapor Al (CSV)</button>
-        </div>
-      </div>
-
-      <!-- Ayarlar (Supabase) -->
-      <div id="settingsCard" class="card" style="display:none">
-        <strong>Ayarlar / Supabase</strong>
-        <div class="muted">URL ve anon key otomatik dolu. İstersen değiştir.</div>
-        <label>Supabase URL</label>
-        <input id="supUrl" placeholder="https://xyz.supabase.co" />
-        <label>Supabase anon key</label>
-        <input id="supKey" placeholder="anon key" />
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="btnSaveSettings" class="small">Kaydet</button>
-          <button id="btnCloseSettings" class="small btn-ghost">Kapat</button>
-        </div>
-        <div class="note">
-          Sunucunda <code>parts</code> ve <code>usage_records</code> tabloları yoksa REST 404/401 dönebilir. Bu normaldir; tabloyu oluşturup RLS’i ayarla.
         </div>
       </div>
     </div>
 
-    <footer>Supabase anında yazma aktiftir. Bir hata olursa kayıt yine localStorage’da saklanır.</footer>
+    <!-- RAPOR (yalnız admin) -->
+    <div id="reportsPanel" class="card" style="display:none;margin-top:12px">
+      <label>Raport (vetëm admin – Andi)</label>
+      <div class="row">
+        <input id="fromDate" type="date">
+        <input id="toDate" type="date">
+        <input id="whoFilter" type="text" placeholder="Kush? (opsionale: Andi/arber/dart)" style="max-width:220px">
+        <button class="btn" id="runReport">Shfaq</button>
+        <button class="ghost" id="dlCSV" style="display:none">Shkarko CSV</button>
+      </div>
+      <div id="repOut" style="margin-top:10px"></div>
+    </div>
   </div>
 </div>
 
-<script>
-/* ==== Supabase vars (senin verdiğin) ==== */
-const DEFAULT_SUP_URL = "https://oqrukzyimkwacdniavya.supabase.co";
-const DEFAULT_SUP_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
+<!-- Yardım modalı -->
+<div id="helpModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); align-items:center; justify-content:center; z-index:50">
+  <div class="card" style="max-width:560px; width:92%">
+    <h3 style="margin:0 0 6px 0">CSV Yükleme Bilgisi</h3>
+    <div class="small">
+      Supabase &gt; Table Editor &gt; <b>parts</b> &gt; Import<br>
+      Dosya biçimi: <b>CSV (UTF-8)</b><br>
+      Sütun başlıkları: <code>code,name_en,name_tr</code><br>
+      Örnek satır: <code>A B.50.0030.36,Driver, Sürücü</code><br>
+      Yükledikten sonra sayfa otomatik liste dökmez; sadece aradığında öneri çıkar.
+    </div>
+    <div class="row" style="justify-content:flex-end; margin-top:10px">
+      <button class="btn" id="closeHelp">Kapat</button>
+    </div>
+  </div>
+</div>
 
-/* ==== Sabit kullanıcılar ==== */
-const USERS = {"Andi":"0907","Arber":"2027","Dart":"2188"};
+<script type="module">
+/*** Supabase config ***/
+const SUPABASE_URL = "https://oqrukzyimkwacdniavya.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xcnVrenlpbWt3YWNkbmlhdnlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODg3MTgsImV4cCI6MjA3NDk2NDcxOH0.Z0gxZL72qWFcI-wJinQT_NEUBDaUk4qP0mP1acqXJbI";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ==== Durum ==== */
-let currentUser = null;
-let parts = [];   // {Code, EnglishName, TurkishName}
-let records = []; // {ts, user, code, part, qty}
-
-const LS_PARTS_KEY = "sp_parts_v1";
-const LS_RECS_KEY  = "sp_recs_v1";
-const LS_SETTINGS_KEY = "sp_settings_v1";
-
-/* ==== DOM ==== */
-const loginCard = document.getElementById('loginCard');
-const app = document.getElementById('app');
-const inpUser = document.getElementById('inpUser');
-const inpPass = document.getElementById('inpPass');
+/*** UI refs ***/
+const authView = document.getElementById('authView');
+const appView  = document.getElementById('appView');
+const emailEl  = document.getElementById('email');
+const passEl   = document.getElementById('password');
 const btnLogin = document.getElementById('btnLogin');
-const btnDemo  = document.getElementById('btnDemo');
-
-const userInfo = document.getElementById('userInfo');
-const userLabel= document.getElementById('userLabel');
 const btnLogout= document.getElementById('btnLogout');
+const whoBadge = document.getElementById('whoBadge');
+const adminActions = document.getElementById('adminActions');
+const btnHelp = document.getElementById('btnHelp');
+const helpModal = document.getElementById('helpModal');
+const closeHelp = document.getElementById('closeHelp');
 
-const txtSearch = document.getElementById('txtSearch');
-const partsCard = document.getElementById('partsCard');
-const tblPartsBody = document.querySelector('#tblParts tbody');
-const emptyMsg = document.getElementById('emptyMsg');
-const fileInput = document.getElementById('fileInput');
-const btnImport = document.getElementById('btnImport');
-const btnExportParts = document.getElementById('btnExportParts');
-const btnPullParts = document.getElementById('btnPullParts');
+const search   = document.getElementById('search');
+const sugg     = document.getElementById('suggestions');
+const selectedArea = document.getElementById('selectedArea');
+const selCode  = document.getElementById('selCode');
+const selNameEn= document.getElementById('selNameEn');
+const nowLbl   = document.getElementById('nowLbl');
+const decBtn   = document.getElementById('decBtn');
+const incBtn   = document.getElementById('incBtn');
+const qtyEl    = document.getElementById('qty');
+const cancelSel= document.getElementById('cancelSel');
+const saveSel  = document.getElementById('saveSel');
 
-const controlsModal = document.getElementById('controlsModal');
-const selPartTitle = document.getElementById('selPartTitle');
-const selPartCode  = document.getElementById('selPartCode');
-const decr = document.getElementById('decr');
-const incr = document.getElementById('incr');
-const qtyInput = document.getElementById('qtyInput');
-const btnConfirm = document.getElementById('btnConfirm');
+const btnReports = document.getElementById('btnReports');
+const reportsPanel = document.getElementById('reportsPanel');
+const fromDate = document.getElementById('fromDate');
+const toDate   = document.getElementById('toDate');
+const whoFilter= document.getElementById('whoFilter');
+const runReport= document.getElementById('runReport');
+const repOut   = document.getElementById('repOut');
+const dlCSV    = document.getElementById('dlCSV');
 
-const tblRecordsBody = document.querySelector('#tblRecords tbody');
-const recCount = document.getElementById('recCount');
-const btnExportCSV = document.getElementById('btnExportCSV');
-const btnClearLocal = document.getElementById('btnClearLocal');
+let CURRENT_USER = null;   // {email, role, display_name}
+let SELECTED = null;       // {id, code, name_en}
 
-const reportUser = document.getElementById('reportUser');
-const repFrom = document.getElementById('repFrom');
-const repTo = document.getElementById('repTo');
-const btnGetReport = document.getElementById('btnGetReport');
+/*** Helpers ***/
+const fmtNow = ()=> new Date().toLocaleString();
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
-const settingsCard = document.getElementById('settingsCard');
-const btnSettings = document.getElementById('btnSettings');
-const supUrl = document.getElementById('supUrl');
-const supKey = document.getElementById('supKey');
-const btnSaveSettings = document.getElementById('btnSaveSettings');
-const btnCloseSettings = document.getElementById('btnCloseSettings');
+/*** Auth state restore ***/
+const { data: { session } } = await supabase.auth.getSession();
+if(session){ await onLogin(session); }
 
-/* ==== Utils ==== */
-function escapeHtml(s){ return String(s||"").replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function csvToArray(text){
-  const lines = text.split(/\r\n|\n/).filter(l=>l!=="" );
-  return lines.map(line=>{
-    let inQ=false, cur="", row=[];
-    for(let i=0;i<line.length;i++){
-      const ch = line[i];
-      if(ch==='"' ){ if(inQ && line[i+1]==='"'){cur+='"'; i++;} else inQ=!inQ; }
-      else if(ch===',' && !inQ){ row.push(cur); cur=""; }
-      else cur+=ch;
-    }
-    row.push(cur);
-    return row.map(c=>c.trim());
+btnLogin.onclick = async ()=>{
+  const email = emailEl.value.trim();
+  const pass  = passEl.value.trim();
+  if(!email || !pass){ alert("Ju lutem shkruani email-in dhe fjalëkalimin."); return; }
+  btnLogin.disabled = true;
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  btnLogin.disabled = false;
+  if(error){ alert("Hyrja dështoi: " + (error.message||error)); return; }
+  await onLogin(data.session);
+};
+
+btnLogout.onclick = async ()=>{
+  await supabase.auth.signOut();
+  CURRENT_USER = null;
+  appView.style.display='none';
+  authView.style.display='';
+  emailEl.value = '';
+  passEl.value = '';
+};
+
+async function onLogin(session){
+  // me view yalnız JWT-email ile tek kayıt döndürür
+  const { data: me, error } = await supabase.from('me').select('email, display_name, role').single();
+  if(error){ alert("Profili nuk u lexua: " + (error.message||error)); return; }
+  CURRENT_USER = me;
+  whoBadge.textContent = (me.display_name||me.email||'—') + (me.role==='admin'?' • admin':'');
+  authView.style.display='none';
+  appView.style.display='';
+  adminActions.style.display = (me.role==='admin') ? '' : 'none';
+  nowLbl.textContent = fmtNow();
+  // Tarihler (rapor)
+  const t = new Date(); const y = new Date(); y.setMonth(y.getMonth()-1);
+  toDate.value   = t.toISOString().slice(0,10);
+  fromDate.value = y.toISOString().slice(0,10);
+}
+
+/*** Yardım ***/
+btnHelp.onclick = ()=> helpModal.style.display='flex';
+closeHelp.onclick = ()=> helpModal.style.display='none';
+helpModal.addEventListener('click', (e)=>{ if(e.target===helpModal) helpModal.style.display='none'; });
+
+/*** Search on type: server-side LIKE, only suggestions ***/
+let typingTimer;
+search.addEventListener('input', ()=>{
+  clearTimeout(typingTimer);
+  const q = search.value.trim();
+  if(!q){ sugg.style.display='none'; sugg.innerHTML=''; return; }
+  typingTimer = setTimeout(()=> doSearch(q), 180);
+});
+
+async function doSearch(q){
+  // server sorgusu: code ILIKE veya name_tr ILIKE, limit 20
+  const pat = `%${q}%`;
+  const { data, error } = await supabase
+    .from('parts')
+    .select('id,code,name_en')   // TR’yi çekmiyoruz, gizli kalsın
+    .or(`code.ilike.${pat},name_tr.ilike.${pat}`)
+    .limit(20);
+  if(error){ console.error(error); return; }
+  renderSuggestions(data||[]);
+}
+
+function renderSuggestions(rows){
+  sugg.innerHTML='';
+  if(!rows.length){ sugg.style.display='none'; return; }
+  rows.forEach(r=>{
+    const div = document.createElement('div');
+    div.className='suggestion';
+    div.innerHTML = `<div>
+        <div style="font-weight:600">${esc(r.code||'')}</div>
+        <div class="small">${esc(r.name_en||'—')}</div>
+      </div>
+      <div class="small">Zgjidh</div>`;
+    div.onclick = ()=> selectPart(r);
+    sugg.appendChild(div);
   });
-}
-function arrayToCsv(arr){
-  if(!arr.length) return "";
-  const keys = Object.keys(arr[0]);
-  const lines = [keys.join(',')];
-  for(const o of arr){
-    const row = keys.map(k=>{
-      const v = o[k]===undefined? "": String(o[k]);
-      return (v.includes(',')||v.includes('"')||v.includes('\n'))? `"${v.replace(/"/g,'""')}"`: v;
-    });
-    lines.push(row.join(','));
-  }
-  return lines.join('\n');
-}
-function downloadText(text, filename){
-  const blob = new Blob([text], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
-  URL.revokeObjectURL(url);
+  sugg.style.display='block';
 }
 
-/* ==== Local state ==== */
-function loadState(){
-  try{ parts = JSON.parse(localStorage.getItem(LS_PARTS_KEY)||"[]"); }catch{ parts=[]; }
-  try{ records = JSON.parse(localStorage.getItem(LS_RECS_KEY)||"[]"); }catch{ records=[]; }
-}
-function saveParts(){ localStorage.setItem(LS_PARTS_KEY, JSON.stringify(parts)); }
-function saveRecords(){ localStorage.setItem(LS_RECS_KEY, JSON.stringify(records)); }
-
-/* ==== Settings ==== */
-function loadSettings(){
-  const s = JSON.parse(localStorage.getItem(LS_SETTINGS_KEY)||"null");
-  if(s){
-    supUrl.value = s.url || DEFAULT_SUP_URL;
-    supKey.value = s.key || DEFAULT_SUP_KEY;
-  } else {
-    supUrl.value = DEFAULT_SUP_URL;
-    supKey.value = DEFAULT_SUP_KEY;
-    localStorage.setItem(LS_SETTINGS_KEY, JSON.stringify({url:DEFAULT_SUP_URL, key:DEFAULT_SUP_KEY}));
-  }
-}
-function getSup(){ 
-  const s = JSON.parse(localStorage.getItem(LS_SETTINGS_KEY)||"{}");
-  return { url: s.url || supUrl.value.trim(), key: s.key || supKey.value.trim() };
-}
-function saveSettings(){ 
-  localStorage.setItem(LS_SETTINGS_KEY, JSON.stringify({url:supUrl.value.trim(), key:supKey.value.trim()})); 
-  alert("Ayarlar kaydedildi.");
+/*** Select part ***/
+function selectPart(p){
+  SELECTED = p;
+  selCode.textContent = p.code||'';
+  selNameEn.textContent = p.name_en||'';
+  qtyEl.value = '1';
+  selectedArea.style.display='';
+  sugg.style.display='none';
+  nowLbl.textContent = fmtNow();
 }
 
-/* ==== UI ==== */
-function onLogin(){
-  loginCard.style.display='none';
-  app.style.display='block';
-  userInfo.style.display='inline-block';
-  btnLogout.style.display='inline-block';
-  userLabel.textContent = currentUser;
-  renderParts();
-  renderRecords();
-  loadSettings();
-}
-btnLogin.addEventListener('click', ()=>{
-  const u=(inpUser.value||"").trim(); const p=(inpPass.value||"").trim();
-  if(USERS[u]===p){ currentUser=u; onLogin(); } else alert("Hatalı kullanıcı / şifre.");
-});
-btnLogout.addEventListener('click', ()=>{
-  currentUser=null; app.style.display='none'; userInfo.style.display='none'; btnLogout.style.display='none'; loginCard.style.display='block';
-});
-btnSettings.addEventListener('click', ()=> settingsCard.style.display = (settingsCard.style.display==='none'?'block':'none'));
-btnSaveSettings.addEventListener('click', saveSettings);
-btnCloseSettings.addEventListener('click', ()=> settingsCard.style.display='none');
+/*** Qty controls ***/
+incBtn.onclick = ()=> { qtyEl.value = String((+qtyEl.value||0)+1); };
+decBtn.onclick = ()=> { let v=(+qtyEl.value||0)-1; if(v<0)v=0; qtyEl.value=String(v); };
+qtyEl.addEventListener('input', ()=> qtyEl.value = qtyEl.value.replace(/[^\d]/g,'') || '0');
+cancelSel.onclick = ()=> { selectedArea.style.display='none'; SELECTED=null; };
 
-btnDemo.addEventListener('click', ()=>{
-  parts = [
-    {Code:"A100", EnglishName:"Driver Bearing", TurkishName:"Sürücü Yatak"},
-    {Code:"B200", EnglishName:"Control Lever", TurkishName:"Kontrol Kolu"},
-    {Code:"C300", EnglishName:"Spring Set", TurkishName:"Yay Takımı"},
-    {Code:"D400", EnglishName:"Oil Seal", TurkishName:"Yağ Keçesi"},
-    {Code:"E500", EnglishName:"Brake Pad", TurkishName:"Fren Balatası"}
-  ];
-  saveParts(); renderParts(); alert("Demo parçalar yüklendi.");
-});
-
-/* ==== Parça liste/arama ==== */
-function normalizePart(p){
-  return {
-    Code:(p.Code||p.code||"").toString().trim(),
-    EnglishName:(p.EnglishName||p.english_name||p.englishName||p.name||"").toString().trim(),
-    TurkishName:(p.TurkishName||p.turkish_name||p.turkishName||"").toString().trim()
+/*** Save log ***/
+saveSel.onclick = async ()=>{
+  if(!CURRENT_USER){ alert("Së pari hyni."); return; }
+  if(!SELECTED){ alert("Zgjidh një pjesë."); return; }
+  const qty = +qtyEl.value||0;
+  if(!confirm("A po e konfirmoni regjistrimin?")) return;
+  const payload = {
+    user_label: (CURRENT_USER.display_name || (CURRENT_USER.email||'').split('@')[0] || 'user'),
+    part_id: SELECTED.id,
+    part_code: SELECTED.code,
+    qty: qty,
+    created_at: new Date().toISOString()
   };
-}
-function renderParts(){
-  const q=(txtSearch.value||"").trim().toLowerCase();
-  const tbody=tblPartsBody; tbody.innerHTML="";
-  let list = parts;
-  if(q){
-    list = parts.filter(p=>{
-      return (p.EnglishName||"").toLowerCase().includes(q) ||
-             (p.TurkishName||"").toLowerCase().includes(q) ||
-             (p.Code||"").toLowerCase().includes(q);
-    });
-  }
-  if(!list.length){
-    partsCard.style.display = 'none';
-    emptyMsg.style.display = parts.length? 'none':'block';
-    return;
-  }
-  partsCard.style.display='block';
-  emptyMsg.style.display='none';
-  for(const p of list){
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${escapeHtml(p.Code||"")}</td>
-      <td>${escapeHtml(p.EnglishName||"")}<div class="hidden-turk" style="font-size:12px">(${escapeHtml(p.TurkishName||"")})</div></td>
-      <td>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="small btn-ghost" data-code="${escapeHtml(p.Code)}">Seç</button>
-          <div class="muted" style="font-size:13px">${escapeHtml(p.TurkishName||"")}</div>
-        </div>
-      </td>`;
-    const btn = tr.querySelector('button');
-    btn.addEventListener('click', ()=>{
-      const code = p.Code;
-      if(!confirm(`"${p.EnglishName}" için işlem yapılıyor. Bunu mu demek istedin?`)) return;
-      selPartTitle.textContent = p.EnglishName;
-      selPartCode.textContent = code;
-      qtyInput.value = 1;
-      controlsModal.style.display='block';
-      btnConfirm.dataset.code = code;
-      btnConfirm.dataset.partname = p.EnglishName;
-    });
-    tbody.appendChild(tr);
-  }
-}
-txtSearch.addEventListener('input', renderParts);
+  const { error } = await supabase.from('parts_logs').insert([payload]);
+  if(error){ alert("Gabim gjatë ruajtjes: " + (error.message||error)); return; }
+  alert("Regjistrimi u ruajt.");
+  selectedArea.style.display='none'; SELECTED=null;
+};
 
-/* ==== Hızlı Ekle ==== */
-incr.addEventListener('click', ()=> qtyInput.value = Number(qtyInput.value||0)+1 );
-decr.addEventListener('click', ()=> qtyInput.value = Math.max(0, Number(qtyInput.value||0)-1) );
-btnConfirm.addEventListener('click', async ()=>{
-  const qty = Number(qtyInput.value||0);
-  if(qty<=0) return alert("Adet 0'dan büyük olmalı.");
-  const code = btnConfirm.dataset.code;
-  const pname = btnConfirm.dataset.partname;
-  const rec = { ts:new Date().toISOString(), user: currentUser, code, part: pname, qty };
-  records.unshift(rec);
-  if(records.length>2000) records = records.slice(0,2000);
-  saveRecords();
-  renderRecords();
-  controlsModal.style.display='none';
-  // Supabase'e anında yaz
-  try{ await supInsertRecord(rec); }catch(e){ console.warn("Supabase insert hata:", e); }
-});
+/*** Reports (admin only) ***/
+btnReports.onclick = ()=>{
+  if(!CURRENT_USER || CURRENT_USER.role!=='admin'){ alert("Vetëm admin."); return; }
+  reportsPanel.style.display = reportsPanel.style.display==='none' ? '' : 'none';
+};
 
-/* ==== Kayıt tablosu ==== */
-function renderRecords(){
-  const tbody=tblRecordsBody; tbody.innerHTML="";
-  for(let i=0;i<Math.min(records.length,50);i++){
-    const r=records[i]; const d=new Date(r.ts);
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${d.toLocaleString()}</td><td>${escapeHtml(r.user)}</td><td>${escapeHtml(r.code)}</td><td>${escapeHtml(r.part)}</td><td>${escapeHtml(String(r.qty))}</td>`;
-    tbody.appendChild(tr);
-  }
-  recCount.textContent = records.length;
-}
-btnExportCSV.addEventListener('click', ()=>{
-  if(!records.length) return alert("Kayıt yok.");
-  const csv = arrayToCsv(records.map(r=>({ts:r.ts,user:r.user,code:r.code,part:r.part,qty:r.qty})));
-  downloadText(csv, `records_${new Date().toISOString().slice(0,10)}.csv`);
-});
-btnClearLocal.addEventListener('click', ()=>{
-  if(!confirm("Local kayıtları temizle?")) return;
-  records=[]; saveRecords(); renderRecords();
-});
+runReport.onclick = async ()=>{
+  if(!CURRENT_USER || CURRENT_USER.role!=='admin'){ alert("Vetëm admin."); return; }
+  const f = fromDate.value, t = toDate.value;
+  if(!f || !t){ alert("Zgjidhni datat."); return; }
+  repOut.innerHTML = "Duke marrë të dhënat...";
+  const fromISO = new Date(f+'T00:00:00').toISOString();
+  const toISO   = new Date(t+'T23:59:59').toISOString();
+  // admin RPC
+  const { data, error } = await supabase.rpc('get_logs_between_admin', { _from: fromISO, _to: toISO, who: (whoFilter.value||null) });
+  if(error){ repOut.innerHTML = "Gabim: " + (error.message||error); return; }
+  renderReport(data||[]);
+};
 
-/* ==== CSV/JSON import ==== */
-btnImport.addEventListener('click', ()=> fileInput.click());
-fileInput.addEventListener('change', async (ev)=>{
-  const f=ev.target.files[0]; if(!f) return;
-  const txt = await f.text();
-  if(f.name.toLowerCase().endsWith('.json')){
-    try{ const data=JSON.parse(txt); if(Array.isArray(data)){ parts=data.map(normalizePart); saveParts(); renderParts(); alert("JSON yüklendi."); } }
-    catch{ alert("JSON okunamadı."); }
-  } else {
-    const rows = csvToArray(txt);
-    if(rows.length){
-      const headers = rows[0].map(h=>h.trim().toLowerCase());
-      const idxCode = headers.findIndex(h=>/code/.test(h));
-      const idxEng  = headers.findIndex(h=>/(english|name)/.test(h));
-      const idxTur  = headers.findIndex(h=>/(turkish|turk)/.test(h));
-      const out=[];
-      for(let i=1;i<rows.length;i++){
-        const r=rows[i]; if(!r.length) continue;
-        out.push({ Code:r[idxCode]||r[0]||"", EnglishName:r[idxEng]||r[1]||"", TurkishName:r[idxTur]||r[2]||"" });
-      }
-      parts=out.map(normalizePart); saveParts(); renderParts(); alert("CSV yüklendi.");
-    } else alert("CSV okunamadı.");
-  }
-  fileInput.value="";
-});
-btnExportParts.addEventListener('click', ()=>{
-  if(!parts.length) return alert("Parça yok.");
-  const csv = arrayToCsv(parts.map(p=>({Code:p.Code,EnglishName:p.EnglishName,TurkishName:p.TurkishName})));
-  downloadText(csv, `parts_${new Date().toISOString().slice(0,10)}.csv`);
-});
-
-/* ==== Supabase REST ==== */
-async function supFetch(path, opts={}){
-  const {url,key} = getSup();
-  if(!url||!key) throw new Error("Supabase ayarsız");
-  const res = await fetch(`${url}/rest/v1/${path}`, {
-    ...opts,
-    headers: {
-      apikey: key,
-      Authorization: 'Bearer '+key,
-      ...(opts.headers||{})
-    }
+function renderReport(rows){
+  if(!rows.length){ repOut.innerHTML = '<div class="small">Asnjë e dhënë për periudhën.</div>'; dlCSV.style.display='none'; return; }
+  let html = `<table><thead><tr><th>Data</th><th>Përdoruesi</th><th>Kod Pjesë</th><th>Sasia</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    html += `<tr><td>${esc(new Date(r.created_at).toLocaleString())}</td><td>${esc(r.user_label)}</td><td>${esc(r.part_code||'')}</td><td>${r.qty}</td></tr>`;
   });
-  if(!res.ok){
-    const t = await res.text();
-    throw new Error(`HTTP ${res.status} - ${t.slice(0,300)}`);
-  }
-  return res;
+  html += `</tbody></table>`;
+  repOut.innerHTML = html;
+  dlCSV.style.display='';
+  dlCSV.onclick = ()=> downloadCSV(rows);
 }
-async function supInsertRecord(rec){
-  try{
-    await supFetch('usage_records', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body: JSON.stringify([rec])
-    });
-  }catch(e){
-    // tablo yoksa ya da RLS engeliyse sessizce localde tut; kullanıcıyı rahatsız etme
-    console.warn(e.message);
-  }
-}
-async function supPullParts(){
-  try{
-    const res = await supFetch('parts?select=code,english_name,turkish_name',{});
-    const data = await res.json();
-    if(!Array.isArray(data) || !data.length){ alert("Supabase 'parts' boş veya bulunamadı."); return; }
-    parts = data.map(x=>({Code:x.code, EnglishName:x.english_name, TurkishName:x.turkish_name}));
-    saveParts(); renderParts(); alert(`Supabase'den ${parts.length} parça çekildi.`);
-  }catch(e){
-    alert("Parça çekilemedi: " + e.message);
-  }
-}
-btnPullParts.addEventListener('click', supPullParts);
 
-/* ==== Rapor ==== */
-btnGetReport.addEventListener('click', ()=>{
-  const u = reportUser.value;
-  const from = repFrom.value ? new Date(repFrom.value+"T00:00:00") : null;
-  const to   = repTo.value   ? new Date(repTo.value+"T23:59:59") : null;
-  const filtered = records.filter(r=>{
-    if(r.user!==u) return false;
-    const d=new Date(r.ts);
-    if(from && d<from) return false;
-    if(to && d>to) return false;
-    return true;
-  });
-  if(!filtered.length) return alert("Bu aralıkta kayıt yok.");
-  const csv = arrayToCsv(filtered.map(r=>({ts:r.ts,user:r.user,code:r.code,part:r.part,qty:r.qty})));
-  downloadText(csv, `report_${u}_${new Date().toISOString().slice(0,10)}.csv`);
+function downloadCSV(rows){
+  const header = ['created_at','user_label','part_code','qty'];
+  const csv = [header.join(',')].concat(
+    rows.map(r=> [r.created_at, r.user_label, r.part_code||'', r.qty]
+      .map(v=> `"${String(v??'').replace(/"/g,'""')}"`).join(','))
+  ).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=`raport_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/*** Close suggestions on outside click ***/
+document.addEventListener('click', (e)=>{
+  if(!search.contains(e.target) && !sugg.contains(e.target)){ sugg.style.display='none'; }
 });
 
-/* ==== Init ==== */
-loadSettings();
-loadState();
-renderParts();
-renderRecords();
-
-/* ==== Geliştirici kolaylığı ==== */
-window._addPart = (code,eng,tur)=>{ parts.push({Code:code,EnglishName:eng,TurkishName:tur}); saveParts(); renderParts(); };
-
+/*** Enter picks first suggestion ***/
+search.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const first = sugg.querySelector('.suggestion');
+    if(first){ first.click(); }
+  }
+});
 </script>
 </body>
 </html>
