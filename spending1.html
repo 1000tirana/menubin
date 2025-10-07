@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Normal Holding • Kuletat & Shpenzimet</title>
+<meta name="theme-color" content="#0d1117">
+<style>
+:root{
+  --bg:#0d1117; --card:#161b22; --border:#30363d;
+  --text:#c9d1d9; --muted:#8b949e;
+  --primary:#2ea043; --primary2:#238636;
+  --blue:#1f6feb; --danger:#f85149; --warn:#d29922;
+  --radius:14px; --pad:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Apple Color Emoji","Segoe UI Emoji",sans-serif}
+body{margin:0}
+button,select,input,textarea{color:inherit;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px}
+button.primary{background:var(--primary);border-color:var(--primary2);color:#fff;cursor:pointer}
+button.ghost{background:transparent;border:1px dashed var(--border)}
+button.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+button:disabled{opacity:.6;cursor:not-allowed}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(to bottom,rgba(13,17,23,.9),rgba(13,17,23,.6) 70%,transparent);backdrop-filter:blur(6px)}
+.container{max-width:980px;margin:0 auto;padding:10px 16px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:var(--pad)}
+.h{margin:10px 0 6px;font-weight:700}
+.sub{color:var(--muted);font-size:.9rem}
+.badge{display:inline-block;border:1px solid var(--border);border-radius:50px;padding:4px 10px;font-size:.85rem;color:var(--muted)}
+.kpi{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kpi b{font-size:1.3rem}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{border-bottom:1px solid var(--border);padding:10px;text-align:left}
+.table th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:.8rem}
+.tag.plus{color:#1a7f37;border-color:#1a7f37}
+.tag.minus{color:#f85149;border-color:#f85149}
+footer{height:70px}
+.fab{position:fixed;right:18px;bottom:18px;z-index:6}
+.fab button{height:56px;width:56px;border-radius:50%;font-size:28px;line-height:0}
+.modal{position:fixed;inset:0;display:none;align-items:flex-end;background:rgba(0,0,0,.6);z-index:10}
+.modal.show{display:flex}
+.sheet{background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;width:100%;max-width:980px;margin:0 auto;border:1px solid var(--border);border-bottom:0}
+.sheet .hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sheet .bd{padding:16px;display:grid;gap:12px}
+.grid2{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+hr.sep{border:0;border-top:1px dashed var(--border);margin:6px 0}
+.small{font-size:.85rem}
+.right{margin-left:auto}
+.inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+code.inline{background:#0b1117;border:1px solid var(--border);border-radius:8px;padding:2px 6px}
+input[type="number"]{appearance:textfield}
+input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{appearance:none;margin:0}
+.notice{background:rgba(31,111,235,.12);border:1px solid rgba(31,111,235,.35);padding:10px;border-radius:10px}
+.warn{background:rgba(210,153,34,.12);border:1px solid rgba(210,153,34,.35)}
+.success{background:rgba(46,160,67,.12);border:1px solid rgba(46,160,67,.35)}
+.empty{border:1px dashed var(--border);border-radius:12px;padding:20px;text-align:center;color:var(--muted)}
+/* mobile tweaks */
+@media (max-width:640px){ .grid2{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header>
+  <div class="container row" style="align-items:center;justify-content:space-between">
+    <div class="inline">
+      <strong>💼 Normal Holding</strong>
+      <span class="badge" id="badge-env">LOCAL</span>
+    </div>
+    <div class="inline">
+      <label class="small" for="langSel">🌐</label>
+      <select id="langSel">
+        <option value="sq">Shqip (default)</option>
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+        <option value="it">Italiano</option>
+      </select>
+      <label class="small" for="baseCur">≈</label>
+      <select id="baseCur">
+        <option>ALL</option>
+        <option>EUR</option>
+        <option>USD</option>
+        <option>TRY</option>
+      </select>
+      <button class="ghost small" id="btnSettings">⚙️ <span data-i="settings">Cilësimet</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="container" id="app">
+  <div class="row">
+    <div class="card" style="flex:1 1 320px;min-width:280px">
+      <div class="kpi">
+        <div>
+          <div class="sub" data-i="wallets_total">Totali i kuletave (në bazë)</div>
+          <b id="totalBase">—</b>
+        </div>
+        <button class="primary" id="btnSum"><span data-i="sum_wallets">Llogarit totalin</span></button>
+      </div>
+      <div class="small" id="sumDetail" style="margin-top:8px;color:var(--muted)"></div>
+    </div>
+
+    <div class="card" style="flex:1 1 320px;min-width:280px">
+      <div class="h" data-i="rates">Kursi i këmbimit</div>
+      <div class="row small" id="ratesRow"></div>
+      <div class="sub" id="ratesStamp" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="h inline" style="justify-content:space-between">
+      <span data-i="movements">Lëvizjet</span>
+      <div class="inline">
+        <select id="filterType">
+          <option value="all" data-i="all">Të gjitha</option>
+          <option value="inc" data-i="income">Të ardhura</option>
+          <option value="exp" data-i="expense">Shpenzime</option>
+        </select>
+        <select id="filterCur">
+          <option value="all">ALL/EUR/USD/TRY</option>
+          <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+        </select>
+      </div>
+    </div>
+    <table class="table" id="txTable">
+      <thead>
+        <tr>
+          <th data-i="date">Data</th>
+          <th data-i="type">Tipi</th>
+          <th data-i="amount">Shuma</th>
+          <th data-i="currency">Monedha</th>
+          <th data-i="category">Kategoria</th>
+          <th data-i="note">Shënim</th>
+          <th data-i="person">Personi</th>
+        </tr>
+      </thead>
+      <tbody id="txTbody">
+        <tr><td colspan="7"><div class="empty" data-i="no_data">Ende nuk ka të dhëna. Shtyp “+”.</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<div class="fab"><button class="primary" id="btnAdd">＋</button></div>
+
+<!-- Modal: Add/Edit -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="hd">
+      <strong id="modalTitle" data-i="add_move">Shto lëvizje</strong>
+      <button id="closeModal">✕</button>
+    </div>
+    <div class="bd">
+      <div class="grid2">
+        <div>
+          <label class="small" data-i="amount">Shuma</label>
+          <input id="inAmount" type="number" step="0.01" placeholder="0.00">
+        </div>
+        <div>
+          <label class="small" data-i="currency">Monedha</label>
+          <select id="inCur">
+            <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="inline">
+        <label><input type="radio" name="inType" value="exp" checked> <span data-i="expense">Shpenzim</span></label>
+        <label><input type="radio" name="inType" value="inc"> <span data-i="income">Të ardhura</span></label>
+      </div>
+
+      <div>
+        <label class="small" data-i="category">Kategoria</label>
+        <select id="inCat"></select>
+        <div class="small sub"><span data-i="or_write">ose shkruaj vetë</span> → <input id="inCatManual" placeholder="p.sh. Kafe" /></div>
+      </div>
+
+      <div>
+        <label class="small" data-i="note">Shënim (opsionale)</label>
+        <input id="inNote" placeholder="p.sh. Paga mujore / Punë ekstra">
+      </div>
+
+      <div id="debtArea" style="display:none">
+        <hr class="sep">
+        <div class="notice warn small" data-i="debt_hint">Për borxhe, shkruaj emrin që të të propozohet herën tjetër.</div>
+        <label class="small" data-i="person">Personi</label>
+        <input id="inPerson" list="personsList" placeholder="p.sh. Arbi">
+        <datalist id="personsList"></datalist>
+        <div class="inline small">
+          <label><input id="inRepay" type="checkbox"> <span data-i="mark_repaid">Shëno si “borç u kthye”</span></label>
+        </div>
+      </div>
+
+      <button class="primary" id="btnSave"><span data-i="save">Ruaj</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Settings -->
+<div class="modal" id="modalSettings">
+  <div class="sheet">
+    <div class="hd">
+      <strong data-i="settings">Cilësimet</strong>
+      <button id="closeSettings">✕</button>
+    </div>
+    <div class="bd">
+      <div class="grid2">
+        <div>
+          <label class="small" data-i="default_lang">Gjuha parazgjedhur</label>
+          <select id="setLang">
+            <option value="sq">Shqip</option><option value="en">English</option>
+            <option value="tr">Türkçe</option><option value="it">Italiano</option>
+          </select>
+        </div>
+        <div>
+          <label class="small" data-i="default_currency">Monedha parazgjedhur</label>
+          <select id="setCur">
+            <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="small" data-i="categories">Kategoritë</label>
+        <div id="catsBox" class="row"></div>
+        <div class="inline" style="margin-top:6px">
+          <input id="catNew" placeholder="p.sh. Transport">
+          <button id="btnCatAdd" class="ghost"><span data-i="add">Shto</span></button>
+        </div>
+      </div>
+
+      <div class="notice small success">
+        <b>Supabase</b> — <span data-i="sb_hint">opsionale, për sinkronizim online.</span>
+      </div>
+      <div class="grid2">
+        <div>
+          <label class="small">SUPABASE_URL</label>
+          <input id="sbUrl" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div>
+          <label class="small">SUPABASE_ANON_KEY</label>
+          <input id="sbKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+        </div>
+      </div>
+      <div class="inline">
+        <label class="small"><input type="checkbox" id="sbEnable"> <span data-i="enable_sync">Sinkronizo me Supabase</span></label>
+        <span class="small sub" id="sbState">—</span>
+      </div>
+
+      <button class="primary" id="btnSettingsSave"><span data-i="save">Ruaj</span></button>
+
+      <div class="small sub" style="margin-top:10px">
+        <details>
+          <summary>📜 SQL (kopjo në Supabase SQL editor)</summary>
+<pre class="small" style="white-space:pre-wrap">
+-- Tabelat minimale
+create table if not exists profiles(
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamp default now()
+);
+
+create table if not exists transactions(
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamp default now(),
+  kind text check (kind in ('inc','exp')) not null,
+  amount numeric not null,
+  currency text check (currency in ('ALL','EUR','USD','TRY')) not null,
+  category text not null,
+  note text,
+  person text
+);
+
+create table if not exists persons(
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null
+);
+
+create table if not exists categories(
+  id uuid primary key default gen_random_uuid(),
+  name text unique not null
+);
+
+-- RLS off (publik test). Prod'da RLS + policies ekle.
+-- alter table transactions enable row level security;
+-- alter table persons enable row level security;
+-- alter table categories enable row level security;
+</pre>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*** i18n ***/
+const I18N = {
+  sq:{settings:"Cilësimet", wallets_total:"Totali i kuletave (në bazë)",
+      sum_wallets:"Llogarit totalin", rates:"Kursi i këmbimit",
+      movements:"Lëvizjet", all:"Të gjitha", income:"Të ardhura", expense:"Shpenzim",
+      date:"Data", type:"Tipi", amount:"Shuma", currency:"Monedha", category:"Kategoria",
+      note:"Shënim", person:"Personi", no_data:"Ende nuk ka të dhëna. Shtyp “+”.",
+      add_move:"Shto lëvizje", or_write:"ose shkruaj vetë", debt_hint:"Për borxhe, shkruaj emrin që të të propozohet herën tjetër.",
+      mark_repaid:'Shëno si “borç u kthye”', save:"Ruaj", default_lang:"Gjuha parazgjedhur",
+      default_currency:"Monedha parazgjedhur", categories:"Kategoritë", add:"Shto",
+      sb_hint:"opsionale, për sinkronizim online.", enable_sync:"Sinkronizo me Supabase"},
+  en:{settings:"Settings", wallets_total:"Wallets total (in base)",
+      sum_wallets:"Sum wallets", rates:"Exchange rates",
+      movements:"Movements", all:"All", income:"Income", expense:"Expense",
+      date:"Date", type:"Type", amount:"Amount", currency:"Currency", category:"Category",
+      note:"Note", person:"Person", no_data:"No data yet. Press “+”.",
+      add_move:"Add movement", or_write:"or write manually", debt_hint:"For debts, type the name to get suggestions next time.",
+      mark_repaid:"Mark as repaid", save:"Save", default_lang:"Default language",
+      default_currency:"Default currency", categories:"Categories", add:"Add",
+      sb_hint:"optional, for online sync.", enable_sync:"Sync with Supabase"},
+  tr:{settings:"Ayarlar", wallets_total:"Cüzdan toplamı (bazda)",
+      sum_wallets:"Cüzdanları topla", rates:"Döviz kurları",
+      movements:"Hareketler", all:"Tümü", income:"Gelir", expense:"Gider",
+      date:"Tarih", type:"Tip", amount:"Tutar", currency:"Para birimi", category:"Kategori",
+      note:"Not", person:"Kişi", no_data:"Henüz veri yok. “+” tuşuna bas.",
+      add_move:"Hareket ekle", or_write:"veya manuel yaz", debt_hint:"Borçlar için isim yaz — sonraki sefer önerir.",
+      mark_repaid:"“Borç ödendi” olarak işaretle", save:"Kaydet", default_lang:"Varsayılan dil",
+      default_currency:"Varsayılan para", categories:"Kategoriler", add:"Ekle",
+      sb_hint:"opsiyonel, online senkron için.", enable_sync:"Supabase ile senkron"},
+  it:{settings:"Impostazioni", wallets_total:"Totale portafogli (in base)",
+      sum_wallets:"Somma portafogli", rates:"Tassi di cambio",
+      movements:"Movimenti", all:"Tutti", income:"Entrata", expense:"Uscita",
+      date:"Data", type:"Tipo", amount:"Importo", currency:"Valuta", category:"Categoria",
+      note:"Nota", person:"Persona", no_data:"Nessun dato. Premi “+”.",
+      add_move:"Aggiungi movimento", or_write:"oppure scrivi tu", debt_hint:"Per i debiti, scrivi il nome per il suggerimento.",
+      mark_repaid:"Segna come rimborsato", save:"Salva", default_lang:"Lingua predefinita",
+      default_currency:"Valuta predefinita", categories:"Categorie", add:"Aggiungi",
+      sb_hint:"opzionale, per sync online.", enable_sync:"Sincronizza con Supabase"}
+};
+
+function t(key){ const lang = state.lang; return (I18N[lang]&&I18N[lang][key])||I18N.sq[key]||key; }
+function applyI18N(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent = t(el.dataset.i);});
+}
+
+/*** State & Defaults ***/
+const DEFAULT_CATS = [
+  "Shpenzim i përgjithshëm","Ushqim/Market","Karburant/Makinë","Qira",
+  "Fatura (energji/ujë/internet)","Argëtim","Shëndet","Borxh dhashë","Borc u kthye","Të tjera"
+];
+const state = {
+  lang: localStorage.getItem('nh.lang') || 'sq',
+  baseCur: localStorage.getItem('nh.base') || 'ALL',
+  defCur: localStorage.getItem('nh.defcur') || 'ALL',
+  cats: JSON.parse(localStorage.getItem('nh.cats')||'null') || DEFAULT_CATS,
+  persons: JSON.parse(localStorage.getItem('nh.persons')||'[]'),
+  tx: JSON.parse(localStorage.getItem('nh.tx')||'[]'), // {id,ts,kind,amount,currency,category,note,person}
+  rates: JSON.parse(localStorage.getItem('nh.rates')||'null'),
+  ratesStamp: localStorage.getItem('nh.ratesStamp')||'',
+  sb:{enabled: JSON.parse(localStorage.getItem('nh.sb.enabled')||'false'),
+      url: localStorage.getItem('nh.sb.url')||'',
+      key: localStorage.getItem('nh.sb.key')||''}
+};
+
+/*** DOM refs ***/
+const langSel = document.getElementById('langSel');
+const baseCur = document.getElementById('baseCur');
+const ratesRow = document.getElementById('ratesRow');
+const ratesStamp = document.getElementById('ratesStamp');
+const totalBase = document.getElementById('totalBase');
+const sumDetail = document.getElementById('sumDetail');
+const txTbody = document.getElementById('txTbody');
+const filterType = document.getElementById('filterType');
+const filterCur  = document.getElementById('filterCur');
+const badgeEnv = document.getElementById('badge-env');
+
+/*** Init ***/
+langSel.value = state.lang;
+baseCur.value = state.baseCur;
+document.getElementById('setLang')?.value = state.lang;
+document.getElementById('setCur')?.value = state.defCur;
+
+/*** UI Helpers ***/
+function fmt(n,cur){ return new Intl.NumberFormat(state.lang, {style:'currency',currency:cur}).format(n); }
+function byId(id){ return document.getElementById(id); }
+function nowISO(){ return new Date().toISOString(); }
+
+/*** Rates ***/
+async function fetchRates(){
+  // cache 12h
+  const freshEnough = state.rates && state.ratesStamp && (Date.now()-(+state.ratesStamp)) < 12*3600*1000;
+  if(freshEnough) return;
+  const base = 'ALL';
+  const syms = 'ALL,EUR,USD,TRY';
+  try{
+    const res = await fetch(`https://api.exchangerate.host/latest?base=${base}&symbols=${syms}`);
+    const j = await res.json();
+    state.rates = j.rates; // ex: {ALL:1,EUR:0.0093,...}
+    state.ratesStamp = ''+Date.now();
+    localStorage.setItem('nh.rates', JSON.stringify(state.rates));
+    localStorage.setItem('nh.ratesStamp', state.ratesStamp);
+  }catch(e){ console.warn('Rate fetch failed', e); }
+}
+function convert(amount, from, to){
+  if(from===to) return amount;
+  if(!state.rates) return NaN;
+  // rates are per 1 ALL; convert: amount_from -> ALL -> to
+  // Actually base=ALL => rate[to] = to per ALL; and rate[from] = from per ALL
+  // amount (from) * (ALL per from) * (to per ALL) = amount * (1/r[from]) * r[to]
+  const r = state.rates;
+  if(!r[from]||!r[to]) return NaN;
+  return amount * (1/r[from]) * r[to];
+}
+function renderRates(){
+  ratesRow.innerHTML = '';
+  if(!state.rates){ ratesRow.textContent = '—'; return; }
+  ['ALL','EUR','USD','TRY'].forEach(c=>{
+    const box = document.createElement('div');
+    box.className='badge';
+    box.textContent = `1 ALL = ${(state.rates[c]).toFixed(4)} ${c}`;
+    ratesRow.appendChild(box);
+  });
+  const d = new Date(+state.ratesStamp||Date.now());
+  ratesStamp.textContent = `↑ ${d.toLocaleString()} • exchangerate.host`;
+}
+
+/*** Transactions ***/
+function saveLocal(){
+  localStorage.setItem('nh.tx', JSON.stringify(state.tx));
+  localStorage.setItem('nh.persons', JSON.stringify(state.persons));
+  localStorage.setItem('nh.cats', JSON.stringify(state.cats));
+  localStorage.setItem('nh.lang', state.lang);
+  localStorage.setItem('nh.base', state.baseCur);
+  localStorage.setItem('nh.defcur', state.defCur);
+  localStorage.setItem('nh.sb.enabled', JSON.stringify(state.sb.enabled));
+  localStorage.setItem('nh.sb.url', state.sb.url||'');
+  localStorage.setItem('nh.sb.key', state.sb.key||'');
+}
+function renderTx(){
+  const fType = filterType.value;
+  const fCur  = filterCur.value;
+  let rows = state.tx.slice().sort((a,b)=>b.ts.localeCompare(a.ts));
+  if(fType!=='all') rows = rows.filter(x=>x.kind===fType);
+  if(fCur!=='all') rows = rows.filter(x=>x.currency===fCur);
+  txTbody.innerHTML='';
+  if(!rows.length){
+    txTbody.innerHTML = `<tr><td colspan="7"><div class="empty" data-i="no_data">${t('no_data')}</div></td></tr>`;
+    return;
+  }
+  for(const r of rows){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${new Date(r.ts).toLocaleString()}</td>
+      <td><span class="tag ${r.kind==='inc'?'plus':'minus'}">${r.kind==='inc'?t('income'):t('expense')}</span></td>
+      <td>${fmt(r.amount,r.currency)}</td>
+      <td>${r.currency}</td>
+      <td>${r.category}</td>
+      <td>${r.note||''}</td>
+      <td>${r.person||''}</td>
+    `;
+    txTbody.appendChild(tr);
+  }
+}
+function computeTotals(){
+  const base = state.baseCur;
+  let sum = 0;
+  const detail = {ALL:0,EUR:0,USD:0,TRY:0};
+  for(const r of state.tx){
+    const signed = r.kind==='inc' ? +r.amount : -r.amount;
+    detail[r.currency] += signed;
+    const toBase = convert(Math.abs(r.amount), r.currency, base);
+    sum += (r.kind==='inc' ? +toBase : -toBase);
+  }
+  totalBase.textContent = fmt(sum, base);
+  // detail line
+  const parts = Object.entries(detail)
+    .filter(([k,v])=>Math.abs(v)>0.0001)
+    .map(([k,v])=>`${v>=0?'+':'−'} ${fmt(Math.abs(v),k)}`);
+  sumDetail.textContent = parts.length ? parts.join(' • ') : '';
+}
+
+/*** Add Modal ***/
+const modal = byId('modal');
+const btnAdd = byId('btnAdd');
+const closeModal = byId('closeModal');
+const inAmount = byId('inAmount');
+const inCur = byId('inCur');
+const inNote = byId('inNote');
+const inCat = byId('inCat');
+const inCatManual = byId('inCatManual');
+const inPerson = byId('inPerson');
+const personsList = byId('personsList');
+const inRepay = byId('inRepay');
+const debtArea = byId('debtArea');
+
+function openModal(){
+  modal.classList.add('show');
+  // defaults
+  inAmount.value='';
+  inCur.value = state.defCur || 'ALL';
+  document.querySelector('input[name="inType"][value="exp"]').checked = true;
+  fillCats();
+  inCat.value = state.cats[0]||'Shpenzim i përgjithshëm';
+  inCatManual.value=''; inNote.value=''; inPerson.value=''; inRepay.checked=false;
+  debtArea.style.display = (inCat.value.includes('Borxh'))?'block':'none';
+  fillPersons();
+  setTimeout(()=>inAmount.focus(),50);
+}
+function closeModalFn(){ modal.classList.remove('show'); }
+btnAdd.onclick = openModal;
+closeModal.onclick = closeModalFn;
+modal.addEventListener('click',e=>{ if(e.target===modal) closeModalFn(); });
+
+inCat.addEventListener('change',()=>{
+  const isDebt = /Borxh|Borc/i.test(inCat.value) || /Debt|Debito|Borc/i.test(inCat.value);
+  debtArea.style.display = isDebt ? 'block' : 'none';
+});
+
+function fillCats(){
+  inCat.innerHTML='';
+  state.cats.forEach(c=>{
+    const o = document.createElement('option'); o.textContent=c; inCat.appendChild(o);
+  });
+}
+function fillPersons(){
+  personsList.innerHTML='';
+  state.persons.forEach(p=>{
+    const o = document.createElement('option'); o.value=p; personsList.appendChild(o);
+  });
+}
+
+byId('btnSave').onclick = async ()=>{
+  const amt = parseFloat(inAmount.value||'0');
+  const cur = inCur.value;
+  const kind = document.querySelector('input[name="inType"]:checked').value; // exp/inc
+  let cat = inCat.value;
+  if(inCatManual.value.trim()) cat = inCatManual.value.trim();
+
+  if(!(amt>0)) { alert('Shuma?'); return; }
+
+  // Debt logic helpers
+  let person = inPerson.value.trim()||null;
+  if(person && !state.persons.includes(person)) state.persons.push(person);
+
+  if(/Borxh dhashë|Borc.*dhash|Debt.*gave/i.test(cat) && kind!=='exp'){ // ensure expense
+    alert('“Borxh dhashë” është shpenzim. U caktua si Shpenzim.');
+  }
+
+  if(inRepay.checked && person){
+    // add a matching “income” record labelled "Borc u kthye"
+    state.tx.push({
+      id: crypto.randomUUID(), ts: nowISO(), kind:'inc', amount: amt, currency:cur,
+      category: state.cats.find(c=>/Borc u kthye|Borç ödendi|Debt repaid/i.test(c)) || 'Borc u kthye',
+      note: (inNote.value?inNote.value+' • ':'') + `(${person})`,
+      person
+    });
+  }
+
+  // main record
+  state.tx.push({
+    id: crypto.randomUUID(),
+    ts: nowISO(),
+    kind,
+    amount: amt,
+    currency: cur,
+    category: cat,
+    note: inNote.value.trim()||null,
+    person
+  });
+
+  saveLocal(); renderTx(); computeTotals(); closeModalFn();
+  if(state.sb.enabled) { trySyncTx([{kind,amount:amt,currency:cur,category:cat,note:inNote.value||null,person}]); }
+}
+
+/*** Filters & Sum ***/
+filterType.onchange = ()=>renderTx();
+filterCur.onchange = ()=>renderTx();
+byId('btnSum').onclick = ()=>{ computeTotals(); };
+
+/*** Settings Modal ***/
+const modalSettings = byId('modalSettings');
+byId('btnSettings').onclick = ()=>{ openSettings(); };
+byId('closeSettings').onclick = ()=>{ modalSettings.classList.remove('show'); };
+modalSettings.addEventListener('click',e=>{ if(e.target===modalSettings) modalSettings.classList.remove('show'); });
+
+const setLang = byId('setLang');
+const setCur = byId('setCur');
+const catsBox = byId('catsBox');
+const catNew = byId('catNew');
+byId('btnCatAdd').onclick = ()=>{
+  const v = catNew.value.trim(); if(!v) return;
+  if(!state.cats.includes(v)){ state.cats.push(v); catNew.value=''; drawCats(); saveLocal(); fillCats(); }
+};
+function drawCats(){
+  catsBox.innerHTML='';
+  state.cats.forEach((c,i)=>{
+    const wrap = document.createElement('div'); wrap.className='badge';
+    wrap.style.display='flex'; wrap.style.alignItems='center'; wrap.style.gap='6px';
+    wrap.textContent = c;
+    const x = document.createElement('button'); x.textContent='✕'; x.className='ghost small'; x.style.marginLeft='6px';
+    x.onclick=()=>{ state.cats.splice(i,1); drawCats(); saveLocal(); fillCats(); };
+    wrap.appendChild(x);
+    catsBox.appendChild(wrap);
+  });
+}
+function openSettings(){
+  setLang.value = state.lang;
+  setCur.value = state.defCur;
+  drawCats();
+  byId('sbUrl').value = state.sb.url||'';
+  byId('sbKey').value = state.sb.key||'';
+  byId('sbEnable').checked = !!state.sb.enabled;
+  byId('sbState').textContent = state.sb.enabled ? 'ON' : 'OFF';
+  modalSettings.classList.add('show');
+}
+byId('btnSettingsSave').onclick = ()=>{
+  state.lang = setLang.value;
+  state.defCur = setCur.value;
+  state.sb.url = byId('sbUrl').value.trim();
+  state.sb.key = byId('sbKey').value.trim();
+  state.sb.enabled = byId('sbEnable').checked;
+  badgeEnv.textContent = state.sb.enabled ? 'ONLINE' : 'LOCAL';
+  saveLocal(); applyI18N(); fillCats(); renderTx(); computeTotals();
+  modalSettings.classList.remove('show');
+};
+langSel.onchange = ()=>{ state.lang=langSel.value; saveLocal(); applyI18N(); renderTx(); computeTotals(); };
+baseCur.onchange = ()=>{ state.baseCur=baseCur.value; saveLocal(); computeTotals(); };
+
+/*** Supabase Sync (simple, no RLS) ***/
+async function trySyncTx(batch){
+  if(!state.sb.enabled || !state.sb.url || !state.sb.key) return;
+  try{
+    const headers = {'Content-Type':'application/json','apikey':state.sb.key,'Authorization':'Bearer '+state.sb.key','Prefer':'return=minimal'};
+    const res = await fetch(`${state.sb.url}/rest/v1/transactions`,{
+      method:'POST', headers, body: JSON.stringify(batch.map(x=>({
+        kind:x.kind, amount:x.amount, currency:x.currency, category:x.category, note:x.note, person:x.person
+      })))
+    });
+    if(!res.ok) console.warn('SB insert failed', await res.text());
+    else byId('sbState').textContent='SYNC ✓';
+  }catch(e){ console.warn('SB error', e); }
+}
+async function pullAll(){
+  if(!state.sb.enabled || !state.sb.url || !state.sb.key) return;
+  try{
+    const headers = {'apikey':state.sb.key,'Authorization':'Bearer '+state.sb.key'};
+    const res = await fetch(`${state.sb.url}/rest/v1/transactions?select=*&order=created_at.desc`,{headers});
+    if(!res.ok) return;
+    const data = await res.json();
+    // naive merge (append if not exists by (amount,currency,category,note,person,created_at))
+    const keyify = r => [r.created_at,r.kind,r.amount,r.currency,r.category,r.note||'',r.person||''].join('|');
+    const have = new Set(state.tx.map(r=>keyify({created_at:r.ts, ...r})));
+    for(const r of data){
+      const k = keyify(r);
+      if(!have.has(k)){
+        state.tx.push({id:crypto.randomUUID(), ts:r.created_at, kind:r.kind, amount:+r.amount, currency:r.currency, category:r.category, note:r.note, person:r.person});
+      }
+    }
+    saveLocal(); renderTx(); computeTotals();
+  }catch(e){ console.warn('pullAll error', e); }
+}
+
+/*** Boot ***/
+(async function boot(){
+  applyI18N();
+  await fetchRates();
+  renderRates();
+  renderTx();
+  computeTotals();
+  badgeEnv.textContent = state.sb.enabled ? 'ONLINE' : 'LOCAL';
+  // optional auto-pull on start
+  if(state.sb.enabled) pullAll();
+})();
+
+/*** Example quick actions (optional):
+   - Gelir örneği: 200 TL, not: "Punë ekstra"
+   - Euro 20 gelir
+   - ALL 100000 maaş
+   - Gider: Qira, Faturë, Market vs.
+***/
+</script>
+</body>
+</html>
