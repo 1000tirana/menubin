@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ALL → EUR Konvertues i Thjeshtë</title>
+<style>
+  body{margin:0;background:#0d1117;color:#c9d1d9;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  .wrap{max-width:520px;margin:0 auto;padding:20px}
+  h1{font-size:20px;margin:0 0 14px}
+  .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin:10px 0}
+  label{font-size:13px;color:#8b949e}
+  input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #30363d;background:#0f141a;color:#c9d1d9;font-size:16px}
+  button{background:#2ea043;color:#fff;font-weight:700;cursor:pointer;margin-top:10px}
+  .muted{color:#8b949e;font-size:12px}
+  .total{border:1px dashed #30363d;padding:14px;border-radius:12px;background:#0f141a;font-size:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ALL → EUR (Live kurs)</h1>
+
+  <div class="card">
+    <label>Shuma në Lek (ALL)</label>
+    <input type="number" id="amtALL" step="0.01" placeholder="p.sh. 10,000">
+    <button id="refresh">Rifresko kursin</button>
+    <div class="muted" id="rateInfo">Duke marrë kursin…</div>
+  </div>
+
+  <div class="card total" id="out">Totali: — EUR</div>
+  <div class="muted">Burimi: exchangerate.host (përmes corsproxy). Offline → përdoret cache.</div>
+</div>
+
+<script>
+(function(){
+  const amt = document.getElementById('amtALL');
+  const out = document.getElementById('out');
+  const rateInfo = document.getElementById('rateInfo');
+  const btn = document.getElementById('refresh');
+
+  // 1 ALL kaç EUR? (base=ALL, symbols=EUR)
+  let rateEURperALL = null;
+
+  async function fetchRate(){
+    rateInfo.textContent = 'Duke marrë kursin…';
+    try{
+      const url = 'https://corsproxy.io/?https://api.exchangerate.host/latest?base=ALL&symbols=EUR';
+      const r = await fetch(url,{cache:'no-store'});
+      const d = await r.json();
+      if(!d?.rates?.EUR) throw new Error('rate missing');
+      rateEURperALL = Number(d.rates.EUR);
+      localStorage.setItem('rate_ALL_EUR', String(rateEURperALL));
+      rateInfo.textContent = Kursi aktual: 1 ALL = ${rateEURperALL.toFixed(6)} EUR (${d.date});
+      calc();
+    }catch(e){
+      const cached = localStorage.getItem('rate_ALL_EUR');
+      if(cached){
+        rateEURperALL = Number(cached);
+        rateInfo.textContent = Offline — cache: 1 ALL = ${rateEURperALL.toFixed(6)} EUR;
+        calc();
+      }else{
+        rateInfo.textContent = 'Gabim: s’u mor kursi dhe s’ka cache.';
+        out.textContent = 'Totali: — EUR';
+      }
+    }
+  }
+
+  function fmt(n){ return Number(n).toLocaleString(undefined,{maximumFractionDigits:2}); }
+
+  function calc(){
+    if(rateEURperALL==null){ out.textContent='Totali: — EUR'; return; }
+    const all = parseFloat(amt.value||0);
+    const eur = all * rateEURperALL; // direkt ALL → EUR
+    out.textContent = Totali: ${fmt(eur)} EUR;
+  }
+
+  amt.addEventListener('input', calc);
+  btn.addEventListener('click', fetchRate);
+
+  fetchRate(); // başlangıçta kursu al
+})();
+</script>
+</body>
+</html>
