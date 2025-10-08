@@ -22,7 +22,7 @@ button,.btn{appearance:none;border:1px solid var(--border);background:#1b222c;co
 button.primary{background:var(--accent);border-color:#2b8a3e;color:#fff}
 button.ghost{background:transparent}
 button.danger{background:var(--danger);border-color:#b13a32}
-select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:#var(--text)}
+select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:var(--text)}
 label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin:8px 0 6px}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -35,7 +35,7 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
 .item .amt{font-weight:700}
 .plus{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;font-size:26px;line-height:0;background:var(--accent);border:none;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#0d1117 70%,#0d111700);padding:12px 0}
-.toolbar{display:flex;gap:8px;align-items:center}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .tabs{display:flex;gap:6px;flex-wrap:wrap}
 .tab{padding:6px 10px;border:1px solid var(--border);border-radius:999px;cursor:pointer;color:var(--muted)}
 .tab.active{background:#1b222c;color:#fff}
@@ -54,6 +54,8 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0}
 footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;border-top:1px solid var(--border)}
 .empty{color:var(--muted);text-align:center;padding:24px}
 .small{font-size:12px;color:var(--muted)}
+.authbar{display:flex;gap:8px;align-items:center}
+.authbar input{max-width:200px}
 </style>
 </head>
 <body>
@@ -66,6 +68,20 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       </div>
       <div class="grow"></div>
       <span id="cloudStatus" class="badge small">Offline (Yerel)</span>
+
+      <!-- 🔐 Auth mini bar -->
+      <div class="authbar" id="authBar">
+        <input id="authEmail" type="email" placeholder="email" />
+        <input id="authPass" type="password" placeholder="şifre" />
+        <button id="btnSignUp" class="ghost">Kayıt ol</button>
+        <button id="btnSignIn" class="ghost">Giriş</button>
+        <button id="btnReset" class="ghost">Reset Pass</button>
+      </div>
+      <div class="authbar" id="userBar" style="display:none">
+        <span class="badge" id="whoAmI">—</span>
+        <button id="btnSignOut" class="ghost">Çıkış</button>
+      </div>
+
       <button id="btnSettings" class="ghost">⚙️ <span data-i18n="settings">Cilësimet</span></button>
     </div>
   </div>
@@ -81,10 +97,10 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       <div class="kpi"><div class="v" id="kpiBalance">ALL 0</div><div class="hint" data-i18n="balance">Bilanci</div></div>
       <div class="kpi"><div class="v" id="kpiIncome">ALL 0</div><div class="hint" data-i18n="income">Të ardhurat</div></div>
       <div class="kpi"><div class="v" id="kpiExpense">ALL 0</div><div class="hint" data-i18n="expense">Shpenzimet</div></div>
-      <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" data-i18n="debtors">Debitorë aktivë</div></div>
+      <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" id="kpiDebtorsLabel">Debitorë aktivë</div></div>
     </div>
 
-    <!-- 💱 Toplu Dönüştürme -->
+    <!-- 💱 Dönüştürme -->
     <div class="row" style="margin-top:10px">
       <button id="btnConvert" class="primary">💱 <span data-i18n="convertAll">Të gjithë kuletat → monedha bazë</span></button>
       <div class="hint" id="rateHint"></div>
@@ -136,10 +152,10 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
           <select id="fType">
             <option value="expense" data-i18n-opt="expense">Shpenzim</option>
             <option value="income" data-i18n-opt="income">Të ardhura</option>
-            <option value="borrow" data-i18n-opt="borrow">Borç ALDIM</option>
-            <option value="borrow_repay" data-i18n-opt="borrow_repay">Aldığım borcu ÖDEDİM</option>
-            <option value="lend" data-i18n-opt="lend">Borç VERDİM</option>
-            <option value="lend_repay" data-i18n-opt="lend_repay">Borcumu GERİ VERDİ</option>
+            <option value="borrow_in">Borç aldım</option>
+            <option value="borrow_repay">Aldığım borcu ödedim</option>
+            <option value="lend_out">Birine borç verdim</option>
+            <option value="lend_repay">Borç geri ödendi</option>
           </select>
         </div>
         <div>
@@ -149,7 +165,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       </div>
 
       <div id="personBlock" style="display:none">
-        <label id="personLabel" data-i18n="person">Personi</label>
+        <label id="personLabel">Person</label>
         <input id="fPerson" placeholder="Emri..." autocomplete="off" />
         <div class="suggest" id="personSuggest"></div>
       </div>
@@ -223,25 +239,52 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       <details>
         <summary>🧰 SQL Şeması (Supabase)</summary>
 <pre style="white-space:pre-wrap;font-size:12px;border:1px solid var(--border);padding:8px;border-radius:8px;background:#0f141b">
+-- 📦 Kategoriler
 create table if not exists categories(
   id bigserial primary key,
   name text not null,
   created_at timestamptz default now()
 );
-insert into categories(name)
-select x from (values ('Genel'),('Market'),('Faturalar'),('Araç'),('Eğlence'),('Sağlık'),('Kira'),('Borç Verdim'),('Borç Aldım')) v(x)
-on conflict do nothing;
 
+insert into categories(name)
+select x from (values
+  ('Genel'),('Market'),('Faturalar'),('Araç'),
+  ('Eğlence'),('Sağlık'),('Kira'),('Borç')
+) v(x) on conflict do nothing;
+
+-- 💳 İşlemler
 create table if not exists transactions(
   id bigserial primary key,
   created_at timestamptz default now(),
-  typ text check(typ in ('income','expense','borrow','borrow_repay','lend','lend_repay')) not null,
+  user_id uuid, -- auth.users.id (opsiyonel)
+  typ text check(typ in (
+    'income','expense',
+    'lend_out','lend_repay',
+    'borrow_in','borrow_repay'
+  )) not null,
   amount numeric not null,
   currency text check(currency in ('ALL','EUR','USD','TRY')) not null,
-  category text, note text, person_name text
+  category text,
+  note text,
+  person_name text
 );
+
 create index if not exists idx_tx_created on transactions(created_at desc);
 create index if not exists idx_tx_person on transactions(person_name);
+create index if not exists idx_tx_user on transactions(user_id);
+
+-- 👤 Profiller (opsiyonel)
+create table if not exists profiles(
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text unique,
+  role text default 'user',
+  created_at timestamptz default now()
+);
+
+-- Admin rolünü atamak için, önce uygulamada kullanıcıyı oluşturun,
+-- sonra aşağıdaki insert'i o kullanıcının UUID'si ile çalıştırın:
+-- insert into profiles(id,email,role) values ('AUTH_USER_UUID','panzlife@gmail.com','admin')
+-- on conflict (id) do update set role='admin', email='panzlife@gmail.com';
 </pre>
       </details>
     </main>
@@ -253,47 +296,39 @@ create index if not exists idx_tx_person on transactions(person_name);
 
 <script src="https://unpkg.com/@supabase/supabase-js@2.45.6/dist/umd/supabase.js"></script>
 <script>
-/* i18n */
+/*** i18n ***/
 const I18N = {
   sq: {settings:"Cilësimet",language:"Gjuha",defaultCurrency:"Monedha bazë",manageCategories:"Menaxho Kategoritë",
     overview:"Përmbledhje",balance:"Bilanci",income:"Të ardhurat",expense:"Shpenzimet",debtors:"Debitorë aktivë",
     latest:"Lëvizjet e fundit",empty:"Ende s’ka të dhëna. Shtoni me +.",addRecord:"Regjistrim i ri",amount:"Shuma",
     currency:"Monedha",type:"Lloji",category:"Kategoria",person:"Personi",note:"Shënim (opsionale)",
     hintSave:"Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.",clear:"Pastro",save:"Ruaj",
-    convertAll:"Të gjithë kuletat → monedha bazë",
-    borrow:"Borxh MORA", borrow_repay:"Borzhin E PAGAOVA",
-    lend:"Dhashë Borxh", lend_repay:"Ma Kthyen Borxhin"
+    convertAll:"Të gjithë kuletat → monedha bazë"
   },
   en: {settings:"Settings",language:"Language",defaultCurrency:"Default currency",manageCategories:"Manage Categories",
     overview:"Overview",balance:"Balance",income:"Income",expense:"Expense",debtors:"Active debtors",
     latest:"Latest transactions",empty:"No data yet. Use + to add.",addRecord:"New Record",amount:"Amount",
     currency:"Currency",type:"Type",category:"Category",person:"Person",note:"Note (optional)",
     hintSave:"Saves locally; if Supabase is set, also goes to cloud.",clear:"Clear",save:"Save",
-    convertAll:"Convert all wallets → base currency",
-    borrow:"I BORROWED", borrow_repay:"I REPAID MY LOAN",
-    lend:"I LENT", lend_repay:"THEY REPAID ME"
+    convertAll:"Convert all wallets → base currency"
   },
   tr: {settings:"Ayarlar",language:"Dil",defaultCurrency:"Varsayılan para birimi",manageCategories:"Kategorileri Yönet",
     overview:"Genel Bakış",balance:"Bakiye",income:"Gelir",expense:"Gider",debtors:"Borçlu kişi sayısı",
     latest:"Son işlemler",empty:"+ ile kayıt ekleyin.",addRecord:"Yeni Kayıt",amount:"Tutar",currency:"Para birimi",
     type:"Tür",category:"Kategori",person:"Kişi",note:"Not (opsiyonel)",
     hintSave:"Önce localStorage; Supabase varsa buluta da yazar.",clear:"Temizle",save:"Kaydet",
-    convertAll:"Tüm cüzdanları → baz kura çevir",
-    borrow:"Borç ALDIM", borrow_repay:"Aldığım borcu ÖDEDİM",
-    lend:"Borç VERDİM", lend_repay:"Borcumu GERİ VERDİ"
+    convertAll:"Tüm cüzdanları → baz kura çevir"
   },
   it: {settings:"Impostazioni",language:"Lingua",defaultCurrency:"Valuta predefinita",manageCategories:"Gestisci categorie",
     overview:"Panoramica",balance:"Saldo",income:"Entrate",expense:"Uscite",debtors:"Debitori attivi",
     latest:"Ultime transazioni",empty:"Nessun dato. Usa + per aggiungere.",addRecord:"Nuovo record",amount:"Importo",
     currency:"Valuta",type:"Tipo",category:"Categoria",person:"Persona",note:"Nota (opz.)",
     hintSave:"Salva in locale; se c’è Supabase invia anche al cloud.",clear:"Pulisci",save:"Salva",
-    convertAll:"Converti tutti i portafogli → valuta base",
-    borrow:"Ho PRESO in prestito", borrow_repay:"Ho RIPAGATO il prestito",
-    lend:"Ho PRESTATO", lend_repay:"Mi hanno RIPAGATO"
+    convertAll:"Converti tutti i portafogli → valuta base"
   }
 };
 
-/* State & Storage */
+/*** State & Storage ***/
 const LS = {
   lang: 'app.lang',
   base: 'app.base',
@@ -317,7 +352,7 @@ function applyI18N(){
   $('#appTitle').textContent = (currentLang==='sq'?'Financa': currentLang==='tr'?'Finans':'Finance');
 }
 
-/* Supabase init */
+/*** Supabase init ***/
 function getClient(){
   const url = localStorage.getItem(LS.sbUrl);
   const key = localStorage.getItem(LS.sbKey);
@@ -330,7 +365,7 @@ function setCloudStatus(online){
   $('#cloudStatus').textContent = online ? 'Online (Cloud Bağlı)' : 'Offline (Yerel)';
 }
 
-/* Local helpers */
+/*** Local helpers ***/
 function readJSON(k, fallback){
   try{ const v=localStorage.getItem(k); return v? JSON.parse(v): fallback; }
   catch(e){ return fallback;}
@@ -339,13 +374,13 @@ function writeJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 function ensureDefaultCats(){
   let cats = readJSON(LS.cats, null);
   if(!cats || !Array.isArray(cats) || cats.length===0){
-    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç Verdim','Borç Aldım'];
+    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç'];
     writeJSON(LS.cats, cats);
   }
 }
 ensureDefaultCats();
 
-/* UI Build */
+/*** UI Build ***/
 const CURRENCIES = ['ALL','EUR','USD','TRY'];
 function buildTabs(){
   const box = $('#currencyTabs'); box.innerHTML='';
@@ -356,14 +391,14 @@ function buildTabs(){
   });
 }
 
-/* Categories */
+/*** Categories ***/
 async function loadCategories(){
   const sb=getClient();
   if(sb){
     const {data,error} = await sb.from('categories').select('name').order('name',{ascending:true});
     if(!error && data) return data.map(x=>x.name);
   }
-  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç Verdim','Borç Aldım']);
+  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç']);
 }
 async function fillCategorySelect(){
   const cats = await loadCategories();
@@ -372,27 +407,34 @@ async function fillCategorySelect(){
   if(cats.includes('Genel')) s.value='Genel';
 }
 
-/* Transactions fetch & render */
-function normalizeType(typ){
-  // Eski veri uyumu: debt -> lend, debt_repay -> lend_repay
-  if(typ==='debt') return 'lend';
-  if(typ==='debt_repay') return 'lend_repay';
-  return typ;
+/*** Auth helpers ***/
+async function getSession(){ const sb=getClient(); if(!sb) return null; const { data } = await sb.auth.getSession(); return data.session||null; }
+async function showAuthBars(){
+  const ses = await getSession();
+  if(ses){
+    $('#authBar').style.display='none';
+    $('#userBar').style.display='';
+    $('#whoAmI').textContent = ses.user.email || ses.user.id;
+  }else{
+    $('#authBar').style.display='';
+    $('#userBar').style.display='none';
+  }
 }
 
+/*** Transactions fetch & render ***/
 async function listTransactions(){
   const sb=getClient();
   const q = $('#search').value?.trim();
   if(sb){
+    const ses = await getSession();
     let query = sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(200);
-    if(q){ query = query.or(note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%); }
+    if(ses) query = query.eq('user_id', ses.user.id);
+    if(q){ query = query.or(`note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%`); }
     const {data,error}=await query;
-    if(!error && data){
-      return data.map(r=>({...r, typ: normalizeType(r.typ)}));
-    }
+    if(!error && data) return data;
   }
   // local fallback
-  let rows = readJSON(LS.txs, []).map(r=>({...r, typ: normalizeType(r.typ)}));
+  let rows = readJSON(LS.txs, []);
   if(q){
     const Q=q.toLowerCase();
     rows = rows.filter(r=>
@@ -404,20 +446,22 @@ async function listTransactions(){
   rows.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
   return rows.slice(0,200);
 }
-
 function calcByCurrency(rows){
   const res = {}; CURRENCIES.forEach(c=>res[c]={inc:0,exp:0});
   rows.forEach(r=>{
-    const t=r.typ;
-    const incLike = (t==='income'||t==='lend_repay'||t==='borrow');       // para girişi
-    const expLike = (t==='expense'||t==='lend'||t==='borrow_repay');      // para çıkışı
-    if(!res[r.currency]) res[r.currency]={inc:0,exp:0};
-    if(incLike) res[r.currency].inc += Number(r.amount)||0;
-    if(expLike) res[r.currency].exp += Number(r.amount)||0;
+    // Borç akışları bilanço etkisi:
+    // borrow_in (borç aldım)  → cebe para girdi (inc)
+    // borrow_repay (aldığım borcu ödedim) → para çıktı (exp)
+    // lend_out (birine borç verdim) → para çıktı (exp)
+    // lend_repay (borcu geri aldım) → para girdi (inc)
+    const typ=r.typ;
+    const isInc = (typ==='income' || typ==='lend_repay' || typ==='borrow_in');
+    const isExp = (typ==='expense' || typ==='lend_out' || typ==='borrow_repay');
+    if(isInc) res[r.currency].inc += Number(r.amount)||0;
+    if(isExp) res[r.currency].exp += Number(r.amount)||0;
   });
   return res;
 }
-
 async function updateKPIs(rows){
   const by = calcByCurrency(rows);
   const cur = by[currentCurrency] || {inc:0,exp:0};
@@ -425,31 +469,34 @@ async function updateKPIs(rows){
   $('#kpiExpense').textContent = currentCurrency+' '+fmt(cur.exp);
   $('#kpiBalance').textContent = currentCurrency+' '+fmt(cur.inc - cur.exp);
 
-  // Sana borcu olanlar (lend - lend_repay > 0)
-  const owesMe = {};
+  // Aktif "bizden alacaklılar" (lend_out - lend_repay > 0) sayısı
+  const ledger = {};
   rows.forEach(r=>{
     if(!r.person_name) return;
     const k=r.person_name;
-    owesMe[k] = owesMe[k]||0;
-    if(r.typ==='lend') owesMe[k]+=Number(r.amount)||0;
-    if(r.typ==='lend_repay') owesMe[k]-=Number(r.amount)||0;
+    ledger[k] = ledger[k]||{lend:0,borrow:0};
+    if(r.typ==='lend_out') ledger[k].lend += Number(r.amount)||0;
+    if(r.typ==='lend_repay') ledger[k].lend -= Number(r.amount)||0;
+    if(r.typ==='borrow_in') ledger[k].borrow += Number(r.amount)||0;
+    if(r.typ==='borrow_repay') ledger[k].borrow -= Number(r.amount)||0;
   });
-  const active = Object.values(owesMe).filter(v=>v>0.0001).length;
-  $('#kpiDebtors').textContent = active;
+  const activeDebtors = Object.values(ledger).filter(v=>v.lend>0.0001).length; // bize borçlu olanlar
+  $('#kpiDebtors').textContent = activeDebtors;
+  $('#kpiDebtorsLabel').textContent = (currentLang==='tr'?'Bize borçlu kişi':
+    currentLang==='en'?'People owe us':
+    currentLang==='it'?'Debitori verso di noi':'Debitorë aktivë');
 }
-
 function labelForType(typ){
   const map = {
     income:{sq:'Të ardhura',en:'Income',tr:'Gelir',it:'Entrata'},
     expense:{sq:'Shpenzim',en:'Expense',tr:'Gider',it:'Uscita'},
-    borrow:{sq:'Mora borxh',en:'Borrowed',tr:'Borç aldım',it:'Ho preso in prestito'},
-    borrow_repay:{sq:'Pagova borxhin',en:'Repaid my loan',tr:'Aldığım borcu ödedim',it:'Ho ripagato'},
-    lend:{sq:'Dhashë borxh',en:'Lent out',tr:'Borç verdim',it:'Ho prestato'},
-    lend_repay:{sq:'Ma kthyen borxhin',en:'They repaid me',tr:'Borcumu geri verdi',it:'Mi hanno ripagato'}
+    lend_out:{sq:'Dëbim dhënë',en:'Lent out',tr:'Borç verdim',it:'Prestato (uscito)'},
+    lend_repay:{sq:'Kthim borxhi tek ne',en:'Debt repaid to us',tr:'Borç geri ödendi',it:'Rimborso a noi'},
+    borrow_in:{sq:'Mora hua',en:'Borrowed (received)',tr:'Borç aldım',it:'Preso in prestito'},
+    borrow_repay:{sq:'Shlyej hua',en:'Repaid my debt',tr:'Aldığım borcu ödedim',it:'Rimborsato il mio debito'}
   };
   return (map[typ]||{} )[currentLang] || typ;
 }
-
 async function refresh(){
   applyI18N(); buildTabs();
   const rows = await listTransactions();
@@ -470,7 +517,7 @@ async function refresh(){
   });
 }
 
-/* Add modal logic */
+/*** Add modal logic ***/
 function openModal(){
   $('#modal').classList.add('show');
   $('#modalTitle').textContent = t('addRecord');
@@ -484,48 +531,40 @@ function openModal(){
   loadPersonSuggestions(); 
 }
 function closeModal(){ $('#modal').classList.remove('show'); }
-
 function updatePersonBlock(){
   const typ = $('#fType').value;
-  const show = (typ==='borrow' || typ==='borrow_repay' || typ==='lend' || typ==='lend_repay');
-  $('#personBlock').style.display = show? 'block':'none';
-  // Label ipucu: kime göre
-  const labelText = (typ==='borrow'||typ==='borrow_repay')
-    ? {sq:'Personi (prej kujt)', en:'Person (from whom)', tr:'Kişi (kimden)', it:'Persona (da chi)'}
-    : {sq:'Personi (kujti)', en:'Person (to whom)', tr:'Kişi (kime)', it:'Persona (a chi)'};
-  $('#personLabel').textContent = labelText[currentLang] || 'Person';
+  const needsPerson = ['lend_out','lend_repay','borrow_in','borrow_repay'].includes(typ);
+  $('#personBlock').style.display = needsPerson? 'block':'none';
+  // Etiket yönlendirme
+  const label = (typ==='lend_out'||typ==='lend_repay')
+    ? (currentLang==='tr'?'Kime (borç verdiğim kişi)':'Person (we lent to)')
+    : (currentLang==='tr'?'Kimden (borç aldığım kişi)':'Person (we borrowed from)');
+  $('#personLabel').textContent = label;
 }
 $('#fType').addEventListener('change',()=>{
-  const v=$('#fType').value;
-  if(v==='lend'){ if([...$('#fCategory').options].some(o=>o.value==='Borç Verdim')) $('#fCategory').value='Borç Verdim'; }
-  if(v==='borrow'){ if([...$('#fCategory').options].some(o=>o.value==='Borç Aldım')) $('#fCategory').value='Borç Aldım'; }
+  const typ = $('#fType').value;
+  if(typ==='lend_out') $('#fCategory').value='Borç';
+  if(typ==='borrow_in') $('#fCategory').value='Borç';
   updatePersonBlock();
   loadPersonSuggestions();
 });
-$('#fCategory').addEventListener('change',()=>{
-  const val=$('#fCategory').value;
-  if(val==='Borç Verdim') $('#fType').value='lend';
-  if(val==='Borç Aldım') $('#fType').value='borrow';
-  updatePersonBlock();
-});
+$('#fCategory').addEventListener('change',()=>{ updatePersonBlock(); });
 
-/* Person suggestions (direction-aware) */
 async function loadPersonSuggestions(){
-  const sb=getClient(); const box=$('#personSuggest'); box.innerHTML='';
   const typ = $('#fType').value;
-  const wantFromBorrowSide = (typ==='borrow' || typ==='borrow_repay'); // borç aldığım kişiler
-  const seedTyp = wantFromBorrowSide ? 'borrow' : 'lend';
-
+  const want = (typ==='lend_out'||typ==='lend_repay') ? 'lend_out' : (typ==='borrow_in'||typ==='borrow_repay') ? 'borrow_in' : null;
+  const sb=getClient(); const box=$('#personSuggest'); box.innerHTML='';
   let names = [];
-  if(sb){
-    const {data,error} = await sb.from('transactions')
-      .select('person_name,typ').neq('person_name',null)
-      .in('typ',[seedTyp]) // sadece o yön
-      .order('created_at',{ascending:false}).limit(200);
-    if(!error && data) names = data.map(x=>x.person_name).filter(Boolean);
-  } else {
-    const rows = readJSON(LS.txs, []);
-    names = rows.filter(x=>x.typ===seedTyp && x.person_name).map(x=>x.person_name);
+  if(want){
+    if(sb){
+      const {data,error} = await sb.from('transactions')
+        .select('person_name,typ').neq('person_name',null).eq('typ', want)
+        .order('created_at',{ascending:false}).limit(200);
+      if(!error && data) names = data.map(x=>x.person_name).filter(Boolean);
+    } else {
+      const rows = readJSON(LS.txs, []);
+      names = rows.filter(x=>x.typ===want && x.person_name).map(x=>x.person_name);
+    }
   }
   names = [...new Set(names)].slice(0,30);
   names.forEach(n=>{
@@ -547,15 +586,17 @@ async function saveLocal(row){
 $('#btnSave').onclick = async ()=>{
   const amount = parseFloat($('#fAmount').value);
   if(!(amount>0)){ alert('Tutar giriniz'); return; }
+  const typ = $('#fType').value;
+  const needsPerson = ['lend_out','lend_repay','borrow_in','borrow_repay'].includes(typ);
   const row = {
     id: Date.now(),
     created_at: new Date().toISOString(),
-    typ: $('#fType').value,
+    typ,
     amount,
     currency: $('#fCurrency').value,
     category: $('#fCategory').value||null,
     note: $('#fNote').value||null,
-    person_name: (['borrow','borrow_repay','lend','lend_repay'].includes($('#fType').value)) ? ($('#fPerson').value||null) : null
+    person_name: needsPerson ? ($('#fPerson').value||null) : null
   };
 
   await saveLocal(row);
@@ -563,11 +604,13 @@ $('#btnSave').onclick = async ()=>{
   const sb=getClient();
   if(sb){
     try{
-      const {error} = await sb.from('transactions').insert({
+      const ses = await getSession();
+      const payload = {
         typ: row.typ, amount: row.amount, currency: row.currency,
         category: row.category, note: row.note, person_name: row.person_name,
-        created_at: row.created_at
-      });
+        created_at: row.created_at, user_id: ses? ses.user.id : null
+      };
+      const {error} = await sb.from('transactions').insert(payload);
       if(error) console.warn('Supabase insert error:', error.message);
     }catch(e){ console.warn('Supabase error:', e); }
   }
@@ -575,7 +618,7 @@ $('#btnSave').onclick = async ()=>{
   closeModal(); await refresh();
 };
 
-/* Settings */
+/*** Settings ***/
 function openSettings(){ $('#modalSettings').classList.add('show'); fillSettings(); renderCats(); }
 function closeSettings(){ $('#modalSettings').classList.remove('show'); }
 function fillSettings(){
@@ -584,7 +627,7 @@ function fillSettings(){
   $('#sSupabaseUrl').value=localStorage.getItem(LS.sbUrl)||'';
   $('#sSupabaseKey').value=localStorage.getItem(LS.sbKey)||'';
 }
-$('#sLang').addEventListener('change',e=>{ currentLang=e.target.value; localStorage.setItem(LS.lang,currentLang); applyI18N(); updatePersonBlock(); });
+$('#sLang').addEventListener('change',e=>{ currentLang=e.target.value; localStorage.setItem(LS.lang,currentLang); applyI18N(); });
 $('#sBase').addEventListener('change',e=>{ localStorage.setItem(LS.base,e.target.value); currentCurrency=e.target.value; buildTabs(); refresh(); });
 $('#sSave').onclick=()=>{
   localStorage.setItem(LS.sbUrl, $('#sSupabaseUrl').value.trim());
@@ -607,7 +650,7 @@ $('#sReset').onclick=()=>{
   SUPA=null; location.reload();
 };
 
-/* Categories manage */
+/*** Categories manage ***/
 async function renderCats(){
   const wrap = $('#catList'); wrap.innerHTML='';
   const cats = await loadCategories();
@@ -625,13 +668,11 @@ $('#catAdd').onclick=async ()=>{
     writeJSON(LS.cats, [...new Set(localCats)]);
   }
   const sb=getClient();
-  if(sb){
-    try{ await sb.from('categories').insert({name}); }catch(e){}
-  }
+  if(sb){ try{ await sb.from('categories').insert({name}); }catch(e){} }
   $('#catNew').value=''; await renderCats(); await fillCategorySelect();
 };
 
-/* Events */
+/*** Events ***/
 $('#btnAdd').onclick=openModal;
 $('#modalClose').onclick=closeModal;
 $('#btnSettings').onclick=openSettings;
@@ -639,10 +680,9 @@ $('#sClose').onclick=closeSettings;
 $('#btnReload').onclick=refresh;
 $('#search').addEventListener('input',()=>{ refresh(); });
 
-/* 💱 Kur & Dönüştürme */
+/*** 💱 KUR & DÖNÜŞTÜRME ***/
 let EXRATES = { base: 'EUR', rates: { ALL: 100, EUR: 1, USD: 1.07, TRY: 35 } };
 
-// İlk açılışta senin verdiğin Supabase bilgilerini otomatik doldur (local boşsa)
 (function seedSupabaseDefaults(){
   if(!localStorage.getItem(LS.sbUrl)){
     localStorage.setItem(LS.sbUrl,'https://ouewqhgkunyzduvmhybi.supabase.co');
@@ -660,7 +700,7 @@ async function updateRates(){
       EXRATES = { base: 'EUR', rates: json.rates };
       localStorage.setItem('app.rates', JSON.stringify(EXRATES));
       const ts = new Date().toLocaleString();
-      $('#rateHint').textContent = EUR baz • güncellendi: ${ts};
+      $('#rateHint').textContent = `EUR baz • güncellendi: ${ts}`;
     }
   }catch(e){
     console.warn('Rate fetch error', e);
@@ -669,46 +709,33 @@ async function updateRates(){
     $('#rateHint').textContent = 'Kur: lokal önbellek kullanıldı';
   }
 }
-
-function getRate(cur){
-  if(cur === EXRATES.base) return 1;
-  return EXRATES.rates[cur] || 1;
-}
+function getRate(cur){ if(cur === EXRATES.base) return 1; return EXRATES.rates[cur] || 1; }
 function convertAmount(amount, from, to){
   if(from === to) return amount;
-  const rFrom = getRate(from);
-  const rTo = getRate(to);
-  const inBase = amount / rFrom; // EUR karşılığı
-  return inBase * rTo;
+  const rFrom = getRate(from), rTo = getRate(to);
+  const inBase = amount / rFrom; return inBase * rTo;
 }
-
 async function convertAll(){
   const rows = await listTransactions();
   const base = localStorage.getItem(LS.base) || 'ALL';
-
-  // Netleri tip yönüne göre topla
   const perCurrency = {};
   rows.forEach(r=>{
-    const t = r.typ;
-    const sign = (t==='income'||t==='lend_repay'||t==='borrow') ? 1 : -1;
+    const typ=r.typ;
+    const sign = (typ==='income'||typ==='lend_repay'||typ==='borrow_in') ? 1 : -1;
     perCurrency[r.currency] = (perCurrency[r.currency]||0) + sign * (Number(r.amount)||0);
   });
-
-  let html = '';
-  let grandTotal = 0;
+  let html = ''; let grandTotal = 0;
   Object.keys(perCurrency).forEach(cur=>{
     const net = perCurrency[cur];
     if(Math.abs(net) < 1e-9) return;
     const conv = convertAmount(net, cur, base);
     grandTotal += conv;
-    html += ${cur}: ${fmt(net)} → ${base} ${fmt(conv)}<br>;
+    html += `${cur}: ${fmt(net)} → ${base} ${fmt(conv)}<br>`;
   });
-  html += <b>NET (${base}): ${fmt(grandTotal)}</b>;
+  html += `<b>NET (${base}): ${fmt(grandTotal)}</b>`;
   $('#convertResult').innerHTML = html || '<span class="hint">Kayıt yok.</span>';
 }
 $('#btnConvert').onclick = convertAll;
-
-// Kurları başlat ve periyodik güncelle
 (function bootRates(){
   const saved = localStorage.getItem('app.rates');
   if(saved) EXRATES = JSON.parse(saved);
@@ -716,11 +743,54 @@ $('#btnConvert').onclick = convertAll;
   setInterval(updateRates, 5*60*1000);
 })();
 
-/* Boot */
-(function init(){
+/*** 🔐 Auth actions ***/
+async function ensureAdmin(){
+  // Admin kullanıcısını uyg. tarafında oluşturmayı dener
+  try{
+    const sb=getClient(); if(!sb) return;
+    const { data:ses } = await sb.auth.getSession();
+    // önce giriş dene:
+    let sign = await sb.auth.signInWithPassword({email:'panzlife@gmail.com', password:'090709'});
+    if(sign.error){
+      // kayıt yoksa oluştur:
+      const up = await sb.auth.signUp({email:'panzlife@gmail.com', password:'090709'});
+      if(up.error){ console.warn('Admin signUp error:', up.error.message); }
+      // tekrar giriş dene
+      await sb.auth.signInWithPassword({email:'panzlife@gmail.com', password:'090709'});
+    }
+  }catch(e){ console.warn('ensureAdmin error', e); }
+}
+$('#btnSignUp').onclick = async ()=>{
+  const sb=getClient(); if(!sb) return alert('Supabase ayarlarını kaydedin.');
+  const email=$('#authEmail').value.trim(), password=$('#authPass').value;
+  const r = await sb.auth.signUp({email,password});
+  if(r.error) alert('Kayıt hata: '+r.error.message); else alert('Kayıt ok. (Doğrulama kapalıysa direkt kullanabilirsiniz)');
+  showAuthBars();
+};
+$('#btnSignIn').onclick = async ()=>{
+  const sb=getClient(); if(!sb) return alert('Supabase ayarlarını kaydedin.');
+  const email=$('#authEmail').value.trim(), password=$('#authPass').value;
+  const r = await sb.auth.signInWithPassword({email,password});
+  if(r.error) alert('Giriş hata: '+r.error.message);
+  await showAuthBars(); await refresh();
+};
+$('#btnSignOut').onclick = async ()=>{ const sb=getClient(); if(!sb) return; await sb.auth.signOut(); await showAuthBars(); await refresh(); };
+$('#btnReset').onclick = async ()=>{
+  const sb=getClient(); if(!sb) return alert('Supabase ayarlarını kaydedin.');
+  const email=$('#authEmail').value.trim();
+  if(!email) return alert('E-posta giriniz');
+  const r = await sb.auth.resetPasswordForEmail(email);
+  if(r.error) alert('Reset hata: '+r.error.message); else alert('Reset maili gönderildi (Supabase Auth ayarlarına göre).');
+};
+
+/*** Boot ***/
+(async function init(){
   applyI18N();
   buildTabs();
+  await showAuthBars();
   refresh();
+  // Admin otomatik kur (ayarlar girilmişse)
+  if(getClient()) { ensureAdmin(); }
 })();
 </script>
 </body>
