@@ -1,83 +1,685 @@
 <!DOCTYPE html>
 <html lang="sq">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ALL → EUR Konvertues i Thjeshtë</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
+<title>Normal Holding • Financa</title>
+<meta name="theme-color" content="#0d1117" />
 <style>
-  body{margin:0;background:#0d1117;color:#c9d1d9;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{max-width:520px;margin:0 auto;padding:20px}
-  h1{font-size:20px;margin:0 0 14px}
-  .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin:10px 0}
-  label{font-size:13px;color:#8b949e}
-  input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #30363d;background:#0f141a;color:#c9d1d9;font-size:16px}
-  button{background:#2ea043;color:#fff;font-weight:700;cursor:pointer;margin-top:10px}
-  .muted{color:#8b949e;font-size:12px}
-  .total{border:1px dashed #30363d;padding:14px;border-radius:12px;background:#0f141a;font-size:18px}
+:root{
+  --bg:#0d1117; --card:#161b22; --muted:#8b949e; --text:#c9d1d9;
+  --border:#30363d; --accent:#2ea043; --danger:#f85149; --blue:#1f6feb;
+}
+*{box-sizing:border-box} html,body{height:100%} body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,Segoe UI,Roboto,Ubuntu,Arial}
+.container{max-width:960px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;gap:12px}
+.header h1{font-size:18px;margin:0}
+.badge{padding:3px 8px;border:1px solid var(--border);border-radius:999px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+button,.btn{appearance:none;border:1px solid var(--border);background:#1b222c;color:var(--text);padding:10px 12px;border-radius:10px;cursor:pointer}
+button.primary{background:var(--accent);border-color:#2b8a3e;color:#fff}
+button.ghost{background:transparent}
+button.danger{background:var(--danger);border-color:#b13a32}
+select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:var(--text)}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:8px 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.kpi{background:#111821;border:1px solid var(--border);border-radius:10px;padding:10px}
+.kpi .v{font-weight:700;font-size:16px}
+.list{display:grid;gap:8px}
+.item{display:grid;grid-template-columns:1fr auto;gap:6px;border:1px solid var(--border);border-radius:10px;padding:10px;background:#111821}
+.item .t{font-weight:600}
+.item .meta{color:var(--muted);font-size:12px}
+.item .amt{font-weight:700}
+.plus{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;font-size:26px;line-height:0;background:var(--accent);border:none;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.topbar{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#0d1117 70%,#0d111700);padding:12px 0}
+.toolbar{display:flex;gap:8px;align-items:center}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{padding:6px 10px;border:1px solid var(--border);border-radius:999px;cursor:pointer;color:var(--muted)}
+.tab.active{background:#1b222c;color:#fff}
+hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.show{display:flex}
+.sheet{width:min(680px,100%);background:var(--card);border:1px solid var(--border);border-radius:14px;max-height:85vh;overflow:auto}
+.sheet header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)}
+.sheet main{padding:14px}
+.grid{display:grid;gap:12px}
+.grid.two{grid-template-columns:1fr 1fr}
+.hint{font-size:12px;color:var(--muted)}
+.badge2{background:#0f141b;border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:12px}
+.suggest{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.suggest button{font-size:12px;padding:6px 8px}
+footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;border-top:1px solid var(--border)}
+.empty{color:var(--muted);text-align:center;padding:24px}
+.small{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>ALL → EUR (Live kurs)</h1>
-
-  <div class="card">
-    <label>Shuma në Lek (ALL)</label>
-    <input type="number" id="amtALL" step="0.01" placeholder="p.sh. 10,000">
-    <button id="refresh">Rifresko kursin</button>
-    <div class="muted" id="rateInfo">Duke marrë kursin…</div>
+<div class="topbar">
+  <div class="container">
+    <div class="toolbar">
+      <div class="header">
+        <h1 id="appTitle">Financa</h1>
+        <span class="badge" id="langBadge">🇦🇱 shqip</span>
+      </div>
+      <div class="grow"></div>
+      <span id="cloudStatus" class="badge small">Offline (Yerel)</span>
+      <button id="btnSettings" class="ghost">⚙️ <span data-i18n="settings">Cilësimet</span></button>
+    </div>
   </div>
-
-  <div class="card total" id="out">Totali: — EUR</div>
-  <div class="muted">Burimi: exchangerate.host (përmes corsproxy). Offline → përdoret cache.</div>
 </div>
 
+<div class="container">
+  <div class="card">
+    <div class="section-title">
+      <strong data-i18n="overview">Përmbledhje</strong>
+      <div class="tabs" id="currencyTabs"></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="kpiBalance">ALL 0</div><div class="hint" data-i18n="balance">Bilanci</div></div>
+      <div class="kpi"><div class="v" id="kpiIncome">ALL 0</div><div class="hint" data-i18n="income">Të ardhurat</div></div>
+      <div class="kpi"><div class="v" id="kpiExpense">ALL 0</div><div class="hint" data-i18n="expense">Shpenzimet</div></div>
+      <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" data-i18n="debtors">Debitorë aktivë</div></div>
+    </div>
+
+    <!-- 💱 YAMA: Toplu Dönüştürme Butonu + Sonuç -->
+    <div class="row" style="margin-top:10px">
+      <button id="btnConvert" class="primary">💱 <span data-i18n="convertAll">Të gjithë kuletat → monedha bazë</span></button>
+      <div class="hint" id="rateHint"></div>
+    </div>
+    <div id="convertResult" class="small" style="margin-top:8px"></div>
+    <!-- /YAMA -->
+  </div>
+
+  <div class="section-title">
+    <strong data-i18n="latest">Lëvizjet e fundit</strong>
+    <div class="row">
+      <input id="search" placeholder="Ara..." />
+      <button id="btnReload">↻</button>
+    </div>
+  </div>
+
+  <div class="list" id="txList"></div>
+  <div class="empty" id="emptyState" style="display:none" data-i18n="empty">Ende s’ka të dhëna. Shtoni me +.</div>
+</div>
+
+<button class="plus" id="btnAdd">+</button>
+
+<!-- Add/Edit Modal -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <header>
+      <strong id="modalTitle" data-i18n="addRecord">Regjistrim i ri</strong>
+      <button id="modalClose" class="ghost">✖</button>
+    </header>
+    <main>
+      <div class="grid two">
+        <div>
+          <label data-i18n="amount">Shuma</label>
+          <input id="fAmount" type="number" step="0.01" inputmode="decimal" placeholder="0.00" />
+        </div>
+        <div>
+          <label data-i18n="currency">Monedha</label>
+          <select id="fCurrency">
+            <option value="ALL">ALL</option>
+            <option value="EUR">EUR</option>
+            <option value="USD">USD</option>
+            <option value="TRY">TRY</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div>
+          <label data-i18n="type">Lloji</label>
+          <select id="fType">
+            <option value="expense" data-i18n-opt="expense">Shpenzim</option>
+            <option value="income" data-i18n-opt="income">Të ardhura</option>
+            <option value="debt" data-i18n-opt="debt">Borç verdim</option>
+            <option value="debt_repay" data-i18n-opt="debt_repay">Borcum ödendi</option>
+          </select>
+        </div>
+        <div>
+          <label data-i18n="category">Kategoria</label>
+          <select id="fCategory"></select>
+        </div>
+      </div>
+
+      <div id="personBlock" style="display:none">
+        <label data-i18n="person">Personi</label>
+        <input id="fPerson" placeholder="Emri..." autocomplete="off" />
+        <div class="suggest" id="personSuggest"></div>
+      </div>
+
+      <div>
+        <label data-i18n="note">Shënim (opsionale)</label>
+        <textarea id="fNote" rows="2" placeholder="Përshkrim..."></textarea>
+      </div>
+      <div class="hint" data-i18n="hintSave">Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.</div>
+    </main>
+    <footer class="sheet">
+      <button class="ghost" id="btnClear" data-i18n="clear">Pastro</button>
+      <div class="grow"></div>
+      <button class="primary" id="btnSave" data-i18n="save">Ruaj</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal" id="modalSettings">
+  <div class="sheet">
+    <header>
+      <strong data-i18n="settings">Cilësimet</strong>
+      <button id="sClose" class="ghost">✖</button>
+    </header>
+    <main class="grid">
+      <div class="grid two">
+        <div>
+          <label data-i18n="language">Gjuha</label>
+          <select id="sLang">
+            <option value="sq">🇦🇱 shqip</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="it">🇮🇹 Italiano</option>
+          </select>
+        </div>
+        <div>
+          <label data-i18n="defaultCurrency">Monedha bazë</label>
+          <select id="sBase">
+            <option>ALL</option><option>EUR</option><option>USD</option><option>TRY</option>
+          </select>
+        </div>
+      </div>
+
+      <hr/>
+
+      <details>
+        <summary><strong>Supabase</strong> (URL & Anon Key)</summary>
+        <label>URL</label>
+        <input id="sSupabaseUrl" placeholder="https://XXXX.supabase.co" />
+        <label>Anon Key</label>
+        <input id="sSupabaseKey" placeholder="eyJhbGciOi..." />
+        <div class="row">
+          <button id="sTest">Bağlantıyı Test Et</button>
+          <div id="sStatus" class="badge2">–</div>
+          <div class="grow"></div>
+          <button id="sSave" class="primary">Kaydet</button>
+        </div>
+        <div class="hint small">Supabase boş bırakılırsa uygulama tamamen lokal çalışır.</div>
+      </details>
+
+      <details>
+        <summary data-i18n="manageCategories"><strong>Kategorileri Yönet</strong></summary>
+        <div class="row">
+          <input id="catNew" placeholder="Yeni kategori..." />
+          <button id="catAdd">Ekle</button>
+        </div>
+        <div id="catList" class="suggest"></div>
+      </details>
+
+      <details>
+        <summary>🧰 SQL Şeması (Supabase)</summary>
+<pre style="white-space:pre-wrap;font-size:12px;border:1px solid var(--border);padding:8px;border-radius:8px;background:#0f141b">
+create table if not exists categories(id bigserial primary key, name text not null, created_at timestamptz default now());
+insert into categories(name)
+select x from (values ('Genel'),('Market'),('Faturalar'),('Araç'),('Eğlence'),('Sağlık'),('Kira'),('Borç')) v(x)
+on conflict do nothing;
+create table if not exists transactions(
+  id bigserial primary key,
+  created_at timestamptz default now(),
+  typ text check(typ in ('income','expense','debt','debt_repay')) not null,
+  amount numeric not null,
+  currency text check(currency in ('ALL','EUR','USD','TRY')) not null,
+  category text, note text, person_name text
+);
+create index if not exists idx_tx_created on transactions(created_at desc);
+create index if not exists idx_tx_person on transactions(person_name);
+</pre>
+      </details>
+    </main>
+    <footer class="sheet">
+      <button id="sReset" class="danger">Tüm Ayarları Sıfırla</button>
+    </footer>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2.45.6/dist/umd/supabase.js"></script>
 <script>
-(function(){
-  const amt = document.getElementById('amtALL');
-  const out = document.getElementById('out');
-  const rateInfo = document.getElementById('rateInfo');
-  const btn = document.getElementById('refresh');
+/* i18n */
+const I18N = {
+  sq: {settings:"Cilësimet",language:"Gjuha",defaultCurrency:"Monedha bazë",manageCategories:"Menaxho Kategoritë",
+    overview:"Përmbledhje",balance:"Bilanci",income:"Të ardhurat",expense:"Shpenzimet",debtors:"Debitorë aktivë",
+    latest:"Lëvizjet e fundit",empty:"Ende s’ka të dhëna. Shtoni me +.",addRecord:"Regjistrim i ri",amount:"Shuma",
+    currency:"Monedha",type:"Lloji",category:"Kategoria",person:"Personi",note:"Shënim (opsionale)",
+    hintSave:"Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.",clear:"Pastro",save:"Ruaj",
+    convertAll:"Të gjithë kuletat → monedha bazë"
+  },
+  en: {settings:"Settings",language:"Language",defaultCurrency:"Default currency",manageCategories:"Manage Categories",
+    overview:"Overview",balance:"Balance",income:"Income",expense:"Expense",debtors:"Active debtors",
+    latest:"Latest transactions",empty:"No data yet. Use + to add.",addRecord:"New Record",amount:"Amount",
+    currency:"Currency",type:"Type",category:"Category",person:"Person",note:"Note (optional)",
+    hintSave:"Saves locally; if Supabase is set, also goes to cloud.",clear:"Clear",save:"Save",
+    convertAll:"Convert all wallets → base currency"
+  },
+  tr: {settings:"Ayarlar",language:"Dil",defaultCurrency:"Varsayılan para birimi",manageCategories:"Kategorileri Yönet",
+    overview:"Genel Bakış",balance:"Bakiye",income:"Gelir",expense:"Gider",debtors:"Borçlu kişi sayısı",
+    latest:"Son işlemler",empty:"+ ile kayıt ekleyin.",addRecord:"Yeni Kayıt",amount:"Tutar",currency:"Para birimi",
+    type:"Tür",category:"Kategori",person:"Kişi",note:"Not (opsiyonel)",
+    hintSave:"Önce localStorage; Supabase varsa buluta da yazar.",clear:"Temizle",save:"Kaydet",
+    convertAll:"Tüm cüzdanları → baz kura çevir"
+  },
+  it: {settings:"Impostazioni",language:"Lingua",defaultCurrency:"Valuta predefinita",manageCategories:"Gestisci categorie",
+    overview:"Panoramica",balance:"Saldo",income:"Entrate",expense:"Uscite",debtors:"Debitori attivi",
+    latest:"Ultime transazioni",empty:"Nessun dato. Usa + per aggiungere.",addRecord:"Nuovo record",amount:"Importo",
+    currency:"Valuta",type:"Tipo",category:"Categoria",person:"Persona",note:"Nota (opz.)",
+    hintSave:"Salva in locale; se c’è Supabase invia anche al cloud.",clear:"Pulisci",save:"Salva",
+    convertAll:"Converti tutti i portafogli → valuta base"
+  }
+};
 
-  // 1 ALL kaç EUR? (base=ALL, symbols=EUR)
-  let rateEURperALL = null;
+/* State & Storage */
+const LS = {
+  lang: 'app.lang',
+  base: 'app.base',
+  sbUrl: 'sb.url',
+  sbKey: 'sb.key',
+  txs: 'app.txs',
+  cats: 'app.cats'
+};
+let SUPA = null;
+let currentCurrency = localStorage.getItem(LS.base) || 'ALL';
+let currentLang = localStorage.getItem(LS.lang) || 'sq';
 
-  async function fetchRate(){
-    rateInfo.textContent = 'Duke marrë kursin…';
+const $ = s=>document.querySelector(s);
+const el = (t,cls)=>{const x=document.createElement(t); if(cls) x.className=cls; return x;};
+function fmt(n){return (Number(n)||0).toLocaleString(undefined,{maximumFractionDigits:2});}
+function t(key){const pack=I18N[currentLang]||I18N.sq; return pack[key]||key;}
+function applyI18N(){
+  document.querySelectorAll('[data-i18n]').forEach(n=>n.textContent=t(n.getAttribute('data-i18n')));
+  document.querySelectorAll('[data-i18n-opt]').forEach(n=>n.textContent=t(n.getAttribute('data-i18n-opt')));
+  $('#langBadge').textContent = ({sq:'🇦🇱 shqip',en:'🇬🇧 English',tr:'🇹🇷 Türkçe',it:'🇮🇹 Italiano'})[currentLang];
+  $('#appTitle').textContent = (currentLang==='sq'?'Financa': currentLang==='tr'?'Finans':'Finance');
+}
+
+/* Supabase init */
+function getClient(){
+  const url = localStorage.getItem(LS.sbUrl);
+  const key = localStorage.getItem(LS.sbKey);
+  if(!url || !key) { SUPA=null; setCloudStatus(false); return null; }
+  if(!SUPA) SUPA = supabase.createClient(url, key);
+  setCloudStatus(true);
+  return SUPA;
+}
+function setCloudStatus(online){
+  $('#cloudStatus').textContent = online ? 'Online (Cloud Bağlı)' : 'Offline (Yerel)';
+}
+
+/* Local helpers */
+function readJSON(k, fallback){
+  try{ const v=localStorage.getItem(k); return v? JSON.parse(v): fallback; }
+  catch(e){ return fallback;}
+}
+function writeJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+function ensureDefaultCats(){
+  let cats = readJSON(LS.cats, null);
+  if(!cats || !Array.isArray(cats) || cats.length===0){
+    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç'];
+    writeJSON(LS.cats, cats);
+  }
+}
+ensureDefaultCats();
+
+/* UI Build */
+const CURRENCIES = ['ALL','EUR','USD','TRY'];
+function buildTabs(){
+  const box = $('#currencyTabs'); box.innerHTML='';
+  CURRENCIES.forEach(c=>{
+    const b = el('div','tab'+(c===currentCurrency?' active':'')); b.textContent=c;
+    b.onclick=()=>{ currentCurrency=c; buildTabs(); refresh(); };
+    box.appendChild(b);
+  });
+}
+
+/* Categories */
+async function loadCategories(){
+  const sb=getClient();
+  if(sb){
+    const {data,error} = await sb.from('categories').select('name').order('name',{ascending:true});
+    if(!error && data) return data.map(x=>x.name);
+  }
+  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç']);
+}
+async function fillCategorySelect(){
+  const cats = await loadCategories();
+  const s = $('#fCategory'); s.innerHTML='';
+  cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);});
+  if(cats.includes('Genel')) s.value='Genel';
+}
+
+/* Transactions fetch & render */
+async function listTransactions(){
+  const sb=getClient();
+  const q = $('#search').value?.trim();
+  if(sb){
+    let query = sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(200);
+    if(q){ query = query.or(note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%); }
+    const {data,error}=await query;
+    if(!error && data) return data;
+  }
+  // local fallback
+  let rows = readJSON(LS.txs, []);
+  if(q){
+    const Q=q.toLowerCase();
+    rows = rows.filter(r=>
+      (r.note||'').toLowerCase().includes(Q) ||
+      (r.category||'').toLowerCase().includes(Q) ||
+      (r.person_name||'').toLowerCase().includes(Q)
+    );
+  }
+  // sort by created_at desc
+  rows.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
+  return rows.slice(0,200);
+}
+function calcByCurrency(rows){
+  const res = {}; CURRENCIES.forEach(c=>res[c]={inc:0,exp:0});
+  rows.forEach(r=>{
+    if(!res[r.currency]) res[r.currency]={inc:0,exp:0};
+    if(r.typ==='income' || r.typ==='debt_repay') res[r.currency].inc += Number(r.amount)||0;
+    else res[r.currency].exp += Number(r.amount)||0;
+  });
+  return res;
+}
+async function updateKPIs(rows){
+  const by = calcByCurrency(rows);
+  const cur = by[currentCurrency] || {inc:0,exp:0};
+  $('#kpiIncome').textContent = currentCurrency+' '+fmt(cur.inc);
+  $('#kpiExpense').textContent = currentCurrency+' '+fmt(cur.exp);
+  $('#kpiBalance').textContent = currentCurrency+' '+fmt(cur.inc - cur.exp);
+
+  const debts = {};
+  rows.forEach(r=>{
+    if(!r.person_name) return;
+    const k=r.person_name;
+    debts[k] = debts[k]||0;
+    if(r.typ==='debt') debts[k]+=Number(r.amount)||0;
+    if(r.typ==='debt_repay') debts[k]-=Number(r.amount)||0;
+  });
+  const active = Object.values(debts).filter(v=>v>0.0001).length;
+  $('#kpiDebtors').textContent = active;
+}
+function labelForType(typ){
+  const map = {
+    income:{sq:'Të ardhura',en:'Income',tr:'Gelir',it:'Entrata'},
+    expense:{sq:'Shpenzim',en:'Expense',tr:'Gider',it:'Uscita'},
+    debt:{sq:'Dëbim (borxh)',en:'Loaned out',tr:'Borç verdim',it:'Prestato'},
+    debt_repay:{sq:'Pagesë borxhi',en:'Debt repaid',tr:'Borcum ödendi',it:'Rimborso'}
+  };
+  return (map[typ]||{} )[currentLang] || typ;
+}
+async function refresh(){
+  applyI18N(); buildTabs();
+  const rows = await listTransactions();
+  const txList = $('#txList'); txList.innerHTML='';
+  const any = rows.length>0;
+  $('#emptyState').style.display = any?'none':'block';
+  updateKPIs(rows);
+  rows.forEach(r=>{
+    const it = el('div','item');
+    const L = el('div'); const R = el('div');
+    const title = el('div','t'); title.textContent = labelForType(r.typ)+' • '+(r.category||'-');
+    const meta = el('div','meta'); meta.textContent = new Date(r.created_at).toLocaleString() + (r.person_name?(' • '+r.person_name):'') + (r.note?(' • '+r.note):'');
+    L.appendChild(title); L.appendChild(meta);
+    const amt = el('div','amt'); amt.textContent = r.currency+' '+fmt(r.amount);
+    R.appendChild(amt);
+    it.appendChild(L); it.appendChild(R);
+    txList.appendChild(it);
+  });
+}
+
+/* Add modal logic */
+function openModal(){
+  $('#modal').classList.add('show');
+  $('#modalTitle').textContent = t('addRecord');
+  $('#fAmount').value='';
+  $('#fCurrency').value = localStorage.getItem(LS.base)||'ALL';
+  $('#fType').value='expense';
+  $('#fNote').value='';
+  $('#fPerson').value='';
+  fillCategorySelect();
+  updatePersonBlock();
+  loadPersonSuggestions(); 
+}
+function closeModal(){ $('#modal').classList.remove('show'); }
+function updatePersonBlock(){
+  const typ = $('#fType').value;
+  const show = (typ==='debt' || typ==='debt_repay');
+  $('#personBlock').style.display = show? 'block':'none';
+}
+$('#fType').addEventListener('change',()=>{
+  if($('#fType').value==='debt'){ $('#fCategory').value='Borç'; }
+  updatePersonBlock();
+  loadPersonSuggestions();
+});
+$('#fCategory').addEventListener('change',()=>{
+  if($('#fCategory').value==='Borç') $('#fType').value='debt';
+  updatePersonBlock();
+});
+
+async function loadPersonSuggestions(){
+  const sb=getClient(); const box=$('#personSuggest'); box.innerHTML='';
+  let names = [];
+  if(sb){
+    const {data,error} = await sb.from('transactions')
+      .select('person_name').neq('person_name',null).eq('typ','debt')
+      .order('created_at',{ascending:false}).limit(200);
+    if(!error && data) names = data.map(x=>x.person_name).filter(Boolean);
+  } else {
+    const rows = readJSON(LS.txs, []);
+    names = rows.filter(x=>x.typ==='debt' && x.person_name).map(x=>x.person_name);
+  }
+  names = [...new Set(names)].slice(0,30);
+  names.forEach(n=>{
+    const b=el('button'); b.textContent=n; b.onclick=()=>{$('#fPerson').value=n;};
+    box.appendChild(b);
+  });
+}
+
+$('#btnClear').onclick=()=>{
+  $('#fAmount').value=''; $('#fNote').value=''; $('#fPerson').value='';
+};
+
+async function saveLocal(row){
+  const arr = readJSON(LS.txs, []);
+  arr.unshift(row); // başa ekle
+  writeJSON(LS.txs, arr);
+}
+
+$('#btnSave').onclick = async ()=>{
+  const amount = parseFloat($('#fAmount').value);
+  if(!(amount>0)){ alert('Tutar giriniz'); return; }
+  const row = {
+    id: Date.now(), // local id
+    created_at: new Date().toISOString(),
+    typ: $('#fType').value,
+    amount,
+    currency: $('#fCurrency').value,
+    category: $('#fCategory').value||null,
+    note: $('#fNote').value||null,
+    person_name: ($('#fType').value==='debt' || $('#fType').value==='debt_repay') ? ($('#fPerson').value||null) : null
+  };
+
+  // her durumda local’e yaz
+  await saveLocal(row);
+
+  // Supabase varsa buluta da gönder (best-effort)
+  const sb=getClient();
+  if(sb){
     try{
-      const url = 'https://corsproxy.io/?https://api.exchangerate.host/latest?base=ALL&symbols=EUR';
-      const r = await fetch(url,{cache:'no-store'});
-      const d = await r.json();
-      if(!d?.rates?.EUR) throw new Error('rate missing');
-      rateEURperALL = Number(d.rates.EUR);
-      localStorage.setItem('rate_ALL_EUR', String(rateEURperALL));
-      rateInfo.textContent = Kursi aktual: 1 ALL = ${rateEURperALL.toFixed(6)} EUR (${d.date});
-      calc();
-    }catch(e){
-      const cached = localStorage.getItem('rate_ALL_EUR');
-      if(cached){
-        rateEURperALL = Number(cached);
-        rateInfo.textContent = Offline — cache: 1 ALL = ${rateEURperALL.toFixed(6)} EUR;
-        calc();
-      }else{
-        rateInfo.textContent = 'Gabim: s’u mor kursi dhe s’ka cache.';
-        out.textContent = 'Totali: — EUR';
-      }
+      const {error} = await sb.from('transactions').insert({
+        typ: row.typ, amount: row.amount, currency: row.currency,
+        category: row.category, note: row.note, person_name: row.person_name,
+        created_at: row.created_at
+      });
+      if(error) console.warn('Supabase insert error:', error.message);
+    }catch(e){ console.warn('Supabase error:', e); }
+  }
+
+  closeModal(); await refresh();
+};
+
+/* Settings */
+function openSettings(){ $('#modalSettings').classList.add('show'); fillSettings(); renderCats(); }
+function closeSettings(){ $('#modalSettings').classList.remove('show'); }
+function fillSettings(){
+  $('#sLang').value=currentLang;
+  $('#sBase').value=localStorage.getItem(LS.base)||'ALL';
+  $('#sSupabaseUrl').value=localStorage.getItem(LS.sbUrl)||'';
+  $('#sSupabaseKey').value=localStorage.getItem(LS.sbKey)||'';
+}
+$('#sLang').addEventListener('change',e=>{ currentLang=e.target.value; localStorage.setItem(LS.lang,currentLang); applyI18N(); });
+$('#sBase').addEventListener('change',e=>{ localStorage.setItem(LS.base,e.target.value); currentCurrency=e.target.value; buildTabs(); refresh(); });
+$('#sSave').onclick=()=>{
+  localStorage.setItem(LS.sbUrl, $('#sSupabaseUrl').value.trim());
+  localStorage.setItem(LS.sbKey, $('#sSupabaseKey').value.trim());
+  SUPA=null; getClient(); $('#sStatus').textContent='Kaydedildi';
+  refresh();
+};
+$('#sTest').onclick=async ()=>{
+  try{
+    SUPA=null; const sb=getClient();
+    if(!sb) throw new Error('Eksik ayar');
+    const {error} = await sb.from('categories').select('count',{count:'exact',head:true});
+    if(error) throw error;
+    $('#sStatus').textContent='Bağlı ✓';
+  }catch(e){ $('#sStatus').textContent='Hata: '+(e.message||e); }
+};
+$('#sReset').onclick=()=>{
+  if(!confirm('Tüm yerel ayarları temizle?')) return;
+  Object.values(LS).forEach(k=>localStorage.removeItem(k));
+  SUPA=null; location.reload();
+};
+
+/* Categories manage */
+async function renderCats(){
+  const wrap = $('#catList'); wrap.innerHTML='';
+  const cats = await loadCategories();
+  cats.forEach(c=>{
+    const b=el('span','badge2'); b.textContent=c; wrap.appendChild(b);
+  });
+}
+$('#catAdd').onclick=async ()=>{
+  const name = $('#catNew').value.trim();
+  if(!name) return;
+  // local’e yaz
+  const cats = await loadCategories();
+  if(!cats.includes(name)){
+    const localCats = readJSON(LS.cats, []);
+    localCats.push(name);
+    writeJSON(LS.cats, [...new Set(localCats)]);
+  }
+  // Supabase varsa buluta da ekle
+  const sb=getClient();
+  if(sb){
+    try{ await sb.from('categories').insert({name}); }catch(e){}
+  }
+  $('#catNew').value=''; await renderCats(); await fillCategorySelect();
+};
+
+/* Events */
+$('#btnAdd').onclick=openModal;
+$('#modalClose').onclick=closeModal;
+$('#btnSettings').onclick=openSettings;
+$('#sClose').onclick=closeSettings;
+$('#btnReload').onclick=refresh;
+$('#search').addEventListener('input',()=>{ refresh(); });
+
+/* 💱 KUR & DÖNÜŞTÜRME – YAMA */
+let EXRATES = { base: 'EUR', rates: { ALL: 100, EUR: 1, USD: 1.07, TRY: 35 } };
+
+// İlk açılışta senin verdiğin Supabase bilgilerini otomatik doldur (local boşsa)
+(function seedSupabaseDefaults(){
+  if(!localStorage.getItem(LS.sbUrl)){
+    localStorage.setItem(LS.sbUrl,'https://ouewqhgkunyzduvmhybi.supabase.co');
+  }
+  if(!localStorage.getItem(LS.sbKey)){
+    localStorage.setItem(LS.sbKey,'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91ZXdxaGdrdW55emR1dm1oeWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4MTUzODgsImV4cCI6MjA3NTM5MTM4OH0.loONlFq-vsy5T6AcjipbRqeJp2L3HtmhIMgjgV2iTrM');
+  }
+})();
+
+async function updateRates(){
+  try{
+    const res = await fetch('https://open.er-api.com/v6/latest/EUR', {cache:'no-store'});
+    const json = await res.json();
+    if(json && json.result === 'success' && json.rates){
+      EXRATES = { base: 'EUR', rates: json.rates };
+      localStorage.setItem('app.rates', JSON.stringify(EXRATES));
+      const ts = new Date().toLocaleString();
+      $('#rateHint').textContent = EUR baz • güncellendi: ${ts};
     }
+  }catch(e){
+    console.warn('Rate fetch error', e);
+    const saved = localStorage.getItem('app.rates');
+    if(saved) { EXRATES = JSON.parse(saved); }
+    $('#rateHint').textContent = 'Kur: lokal önbellek kullanıldı';
   }
+}
 
-  function fmt(n){ return Number(n).toLocaleString(undefined,{maximumFractionDigits:2}); }
+function getRate(cur){
+  if(cur === EXRATES.base) return 1;
+  return EXRATES.rates[cur] || 1; // bilinmeyende 1
+}
 
-  function calc(){
-    if(rateEURperALL==null){ out.textContent='Totali: — EUR'; return; }
-    const all = parseFloat(amt.value||0);
-    const eur = all * rateEURperALL; // direkt ALL → EUR
-    out.textContent = Totali: ${fmt(eur)} EUR;
-  }
+function convertAmount(amount, from, to){
+  if(from === to) return amount;
+  const rFrom = getRate(from);
+  const rTo = getRate(to);
+  // from → EUR → to (EXRATES.base EUR kabul)
+  const inBase = amount / rFrom; // EUR karşılığı
+  return inBase * rTo;
+}
 
-  amt.addEventListener('input', calc);
-  btn.addEventListener('click', fetchRate);
+async function convertAll(){
+  const rows = await listTransactions();
+  const base = localStorage.getItem(LS.base) || 'ALL';
 
-  fetchRate(); // başlangıçta kursu al
+  // Para birimi bazında NET toplamları topla (gelir + debt_repay eklenir, gider - olarak)
+  const perCurrency = {}; // { CUR: netAmount }
+  rows.forEach(r=>{
+    const sign = (r.typ==='income' || r.typ==='debt_repay') ? 1 : -1;
+    perCurrency[r.currency] = (perCurrency[r.currency]||0) + sign * (Number(r.amount)||0);
+  });
+
+  // Metin oluştur
+  let html = '';
+  let grandTotal = 0;
+  Object.keys(perCurrency).forEach(cur=>{
+    const net = perCurrency[cur];
+    if(Math.abs(net) < 1e-9) return;
+    const conv = convertAmount(net, cur, base);
+    grandTotal += conv;
+    html += ${cur}: ${fmt(net)} → ${base} ${fmt(conv)}<br>;
+  });
+  html += <b>NET (${base}): ${fmt(grandTotal)}</b>;
+  $('#convertResult').innerHTML = html || '<span class="hint">Kayıt yok.</span>';
+}
+
+$('#btnConvert').onclick = convertAll;
+
+// Kurları başlat ve periyodik güncelle
+(function bootRates(){
+  const saved = localStorage.getItem('app.rates');
+  if(saved) EXRATES = JSON.parse(saved);
+  updateRates();
+  setInterval(updateRates, 5*60*1000); // 5 dakikada bir
+})();
+
+/* Boot */
+(function init(){
+  applyI18N();
+  buildTabs();
+  refresh();
 })();
 </script>
 </body>
