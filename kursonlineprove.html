@@ -22,7 +22,7 @@ button,.btn{appearance:none;border:1px solid var(--border);background:#1b222c;co
 button.primary{background:var(--accent);border-color:#2b8a3e;color:#fff}
 button.ghost{background:transparent}
 button.danger{background:var(--danger);border-color:#b13a32}
-select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:var(--text)}
+select,input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0f141b;color:#var(--text)}
 label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
 .section-title{display:flex;align-items:center;justify-content:space-between;margin:8px 0 6px}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -84,13 +84,12 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       <div class="kpi"><div class="v" id="kpiDebtors">0</div><div class="hint" data-i18n="debtors">Debitorë aktivë</div></div>
     </div>
 
-    <!-- 💱 YAMA: Toplu Dönüştürme Butonu + Sonuç -->
+    <!-- 💱 Toplu Dönüştürme -->
     <div class="row" style="margin-top:10px">
       <button id="btnConvert" class="primary">💱 <span data-i18n="convertAll">Të gjithë kuletat → monedha bazë</span></button>
       <div class="hint" id="rateHint"></div>
     </div>
     <div id="convertResult" class="small" style="margin-top:8px"></div>
-    <!-- /YAMA -->
   </div>
 
   <div class="section-title">
@@ -137,8 +136,10 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
           <select id="fType">
             <option value="expense" data-i18n-opt="expense">Shpenzim</option>
             <option value="income" data-i18n-opt="income">Të ardhura</option>
-            <option value="debt" data-i18n-opt="debt">Borç verdim</option>
-            <option value="debt_repay" data-i18n-opt="debt_repay">Borcum ödendi</option>
+            <option value="borrow" data-i18n-opt="borrow">Borç ALDIM</option>
+            <option value="borrow_repay" data-i18n-opt="borrow_repay">Aldığım borcu ÖDEDİM</option>
+            <option value="lend" data-i18n-opt="lend">Borç VERDİM</option>
+            <option value="lend_repay" data-i18n-opt="lend_repay">Borcumu GERİ VERDİ</option>
           </select>
         </div>
         <div>
@@ -148,7 +149,7 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       </div>
 
       <div id="personBlock" style="display:none">
-        <label data-i18n="person">Personi</label>
+        <label id="personLabel" data-i18n="person">Personi</label>
         <input id="fPerson" placeholder="Emri..." autocomplete="off" />
         <div class="suggest" id="personSuggest"></div>
       </div>
@@ -222,14 +223,19 @@ footer.sheet{display:flex;gap:10px;justify-content:flex-end;padding:12px 14px;bo
       <details>
         <summary>🧰 SQL Şeması (Supabase)</summary>
 <pre style="white-space:pre-wrap;font-size:12px;border:1px solid var(--border);padding:8px;border-radius:8px;background:#0f141b">
-create table if not exists categories(id bigserial primary key, name text not null, created_at timestamptz default now());
+create table if not exists categories(
+  id bigserial primary key,
+  name text not null,
+  created_at timestamptz default now()
+);
 insert into categories(name)
-select x from (values ('Genel'),('Market'),('Faturalar'),('Araç'),('Eğlence'),('Sağlık'),('Kira'),('Borç')) v(x)
+select x from (values ('Genel'),('Market'),('Faturalar'),('Araç'),('Eğlence'),('Sağlık'),('Kira'),('Borç Verdim'),('Borç Aldım')) v(x)
 on conflict do nothing;
+
 create table if not exists transactions(
   id bigserial primary key,
   created_at timestamptz default now(),
-  typ text check(typ in ('income','expense','debt','debt_repay')) not null,
+  typ text check(typ in ('income','expense','borrow','borrow_repay','lend','lend_repay')) not null,
   amount numeric not null,
   currency text check(currency in ('ALL','EUR','USD','TRY')) not null,
   category text, note text, person_name text
@@ -254,28 +260,36 @@ const I18N = {
     latest:"Lëvizjet e fundit",empty:"Ende s’ka të dhëna. Shtoni me +.",addRecord:"Regjistrim i ri",amount:"Shuma",
     currency:"Monedha",type:"Lloji",category:"Kategoria",person:"Personi",note:"Shënim (opsionale)",
     hintSave:"Ruhet lokalisht; nëse Supabase i lidhur, dërgohet edhe në cloud.",clear:"Pastro",save:"Ruaj",
-    convertAll:"Të gjithë kuletat → monedha bazë"
+    convertAll:"Të gjithë kuletat → monedha bazë",
+    borrow:"Borxh MORA", borrow_repay:"Borzhin E PAGAOVA",
+    lend:"Dhashë Borxh", lend_repay:"Ma Kthyen Borxhin"
   },
   en: {settings:"Settings",language:"Language",defaultCurrency:"Default currency",manageCategories:"Manage Categories",
     overview:"Overview",balance:"Balance",income:"Income",expense:"Expense",debtors:"Active debtors",
     latest:"Latest transactions",empty:"No data yet. Use + to add.",addRecord:"New Record",amount:"Amount",
     currency:"Currency",type:"Type",category:"Category",person:"Person",note:"Note (optional)",
     hintSave:"Saves locally; if Supabase is set, also goes to cloud.",clear:"Clear",save:"Save",
-    convertAll:"Convert all wallets → base currency"
+    convertAll:"Convert all wallets → base currency",
+    borrow:"I BORROWED", borrow_repay:"I REPAID MY LOAN",
+    lend:"I LENT", lend_repay:"THEY REPAID ME"
   },
   tr: {settings:"Ayarlar",language:"Dil",defaultCurrency:"Varsayılan para birimi",manageCategories:"Kategorileri Yönet",
     overview:"Genel Bakış",balance:"Bakiye",income:"Gelir",expense:"Gider",debtors:"Borçlu kişi sayısı",
     latest:"Son işlemler",empty:"+ ile kayıt ekleyin.",addRecord:"Yeni Kayıt",amount:"Tutar",currency:"Para birimi",
     type:"Tür",category:"Kategori",person:"Kişi",note:"Not (opsiyonel)",
     hintSave:"Önce localStorage; Supabase varsa buluta da yazar.",clear:"Temizle",save:"Kaydet",
-    convertAll:"Tüm cüzdanları → baz kura çevir"
+    convertAll:"Tüm cüzdanları → baz kura çevir",
+    borrow:"Borç ALDIM", borrow_repay:"Aldığım borcu ÖDEDİM",
+    lend:"Borç VERDİM", lend_repay:"Borcumu GERİ VERDİ"
   },
   it: {settings:"Impostazioni",language:"Lingua",defaultCurrency:"Valuta predefinita",manageCategories:"Gestisci categorie",
     overview:"Panoramica",balance:"Saldo",income:"Entrate",expense:"Uscite",debtors:"Debitori attivi",
     latest:"Ultime transazioni",empty:"Nessun dato. Usa + per aggiungere.",addRecord:"Nuovo record",amount:"Importo",
     currency:"Valuta",type:"Tipo",category:"Categoria",person:"Persona",note:"Nota (opz.)",
     hintSave:"Salva in locale; se c’è Supabase invia anche al cloud.",clear:"Pulisci",save:"Salva",
-    convertAll:"Converti tutti i portafogli → valuta base"
+    convertAll:"Converti tutti i portafogli → valuta base",
+    borrow:"Ho PRESO in prestito", borrow_repay:"Ho RIPAGATO il prestito",
+    lend:"Ho PRESTATO", lend_repay:"Mi hanno RIPAGATO"
   }
 };
 
@@ -325,7 +339,7 @@ function writeJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 function ensureDefaultCats(){
   let cats = readJSON(LS.cats, null);
   if(!cats || !Array.isArray(cats) || cats.length===0){
-    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç'];
+    cats = ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç Verdim','Borç Aldım'];
     writeJSON(LS.cats, cats);
   }
 }
@@ -349,7 +363,7 @@ async function loadCategories(){
     const {data,error} = await sb.from('categories').select('name').order('name',{ascending:true});
     if(!error && data) return data.map(x=>x.name);
   }
-  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç']);
+  return readJSON(LS.cats, ['Genel','Market','Faturalar','Araç','Eğlence','Sağlık','Kira','Borç Verdim','Borç Aldım']);
 }
 async function fillCategorySelect(){
   const cats = await loadCategories();
@@ -359,6 +373,13 @@ async function fillCategorySelect(){
 }
 
 /* Transactions fetch & render */
+function normalizeType(typ){
+  // Eski veri uyumu: debt -> lend, debt_repay -> lend_repay
+  if(typ==='debt') return 'lend';
+  if(typ==='debt_repay') return 'lend_repay';
+  return typ;
+}
+
 async function listTransactions(){
   const sb=getClient();
   const q = $('#search').value?.trim();
@@ -366,10 +387,12 @@ async function listTransactions(){
     let query = sb.from('transactions').select('*').order('created_at',{ascending:false}).limit(200);
     if(q){ query = query.or(note.ilike.%${q}%,category.ilike.%${q}%,person_name.ilike.%${q}%); }
     const {data,error}=await query;
-    if(!error && data) return data;
+    if(!error && data){
+      return data.map(r=>({...r, typ: normalizeType(r.typ)}));
+    }
   }
   // local fallback
-  let rows = readJSON(LS.txs, []);
+  let rows = readJSON(LS.txs, []).map(r=>({...r, typ: normalizeType(r.typ)}));
   if(q){
     const Q=q.toLowerCase();
     rows = rows.filter(r=>
@@ -378,19 +401,23 @@ async function listTransactions(){
       (r.person_name||'').toLowerCase().includes(Q)
     );
   }
-  // sort by created_at desc
   rows.sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
   return rows.slice(0,200);
 }
+
 function calcByCurrency(rows){
   const res = {}; CURRENCIES.forEach(c=>res[c]={inc:0,exp:0});
   rows.forEach(r=>{
+    const t=r.typ;
+    const incLike = (t==='income'||t==='lend_repay'||t==='borrow');       // para girişi
+    const expLike = (t==='expense'||t==='lend'||t==='borrow_repay');      // para çıkışı
     if(!res[r.currency]) res[r.currency]={inc:0,exp:0};
-    if(r.typ==='income' || r.typ==='debt_repay') res[r.currency].inc += Number(r.amount)||0;
-    else res[r.currency].exp += Number(r.amount)||0;
+    if(incLike) res[r.currency].inc += Number(r.amount)||0;
+    if(expLike) res[r.currency].exp += Number(r.amount)||0;
   });
   return res;
 }
+
 async function updateKPIs(rows){
   const by = calcByCurrency(rows);
   const cur = by[currentCurrency] || {inc:0,exp:0};
@@ -398,26 +425,31 @@ async function updateKPIs(rows){
   $('#kpiExpense').textContent = currentCurrency+' '+fmt(cur.exp);
   $('#kpiBalance').textContent = currentCurrency+' '+fmt(cur.inc - cur.exp);
 
-  const debts = {};
+  // Sana borcu olanlar (lend - lend_repay > 0)
+  const owesMe = {};
   rows.forEach(r=>{
     if(!r.person_name) return;
     const k=r.person_name;
-    debts[k] = debts[k]||0;
-    if(r.typ==='debt') debts[k]+=Number(r.amount)||0;
-    if(r.typ==='debt_repay') debts[k]-=Number(r.amount)||0;
+    owesMe[k] = owesMe[k]||0;
+    if(r.typ==='lend') owesMe[k]+=Number(r.amount)||0;
+    if(r.typ==='lend_repay') owesMe[k]-=Number(r.amount)||0;
   });
-  const active = Object.values(debts).filter(v=>v>0.0001).length;
+  const active = Object.values(owesMe).filter(v=>v>0.0001).length;
   $('#kpiDebtors').textContent = active;
 }
+
 function labelForType(typ){
   const map = {
     income:{sq:'Të ardhura',en:'Income',tr:'Gelir',it:'Entrata'},
     expense:{sq:'Shpenzim',en:'Expense',tr:'Gider',it:'Uscita'},
-    debt:{sq:'Dëbim (borxh)',en:'Loaned out',tr:'Borç verdim',it:'Prestato'},
-    debt_repay:{sq:'Pagesë borxhi',en:'Debt repaid',tr:'Borcum ödendi',it:'Rimborso'}
+    borrow:{sq:'Mora borxh',en:'Borrowed',tr:'Borç aldım',it:'Ho preso in prestito'},
+    borrow_repay:{sq:'Pagova borxhin',en:'Repaid my loan',tr:'Aldığım borcu ödedim',it:'Ho ripagato'},
+    lend:{sq:'Dhashë borxh',en:'Lent out',tr:'Borç verdim',it:'Ho prestato'},
+    lend_repay:{sq:'Ma kthyen borxhin',en:'They repaid me',tr:'Borcumu geri verdi',it:'Mi hanno ripagato'}
   };
   return (map[typ]||{} )[currentLang] || typ;
 }
+
 async function refresh(){
   applyI18N(); buildTabs();
   const rows = await listTransactions();
@@ -452,32 +484,48 @@ function openModal(){
   loadPersonSuggestions(); 
 }
 function closeModal(){ $('#modal').classList.remove('show'); }
+
 function updatePersonBlock(){
   const typ = $('#fType').value;
-  const show = (typ==='debt' || typ==='debt_repay');
+  const show = (typ==='borrow' || typ==='borrow_repay' || typ==='lend' || typ==='lend_repay');
   $('#personBlock').style.display = show? 'block':'none';
+  // Label ipucu: kime göre
+  const labelText = (typ==='borrow'||typ==='borrow_repay')
+    ? {sq:'Personi (prej kujt)', en:'Person (from whom)', tr:'Kişi (kimden)', it:'Persona (da chi)'}
+    : {sq:'Personi (kujti)', en:'Person (to whom)', tr:'Kişi (kime)', it:'Persona (a chi)'};
+  $('#personLabel').textContent = labelText[currentLang] || 'Person';
 }
 $('#fType').addEventListener('change',()=>{
-  if($('#fType').value==='debt'){ $('#fCategory').value='Borç'; }
+  const v=$('#fType').value;
+  if(v==='lend'){ if([...$('#fCategory').options].some(o=>o.value==='Borç Verdim')) $('#fCategory').value='Borç Verdim'; }
+  if(v==='borrow'){ if([...$('#fCategory').options].some(o=>o.value==='Borç Aldım')) $('#fCategory').value='Borç Aldım'; }
   updatePersonBlock();
   loadPersonSuggestions();
 });
 $('#fCategory').addEventListener('change',()=>{
-  if($('#fCategory').value==='Borç') $('#fType').value='debt';
+  const val=$('#fCategory').value;
+  if(val==='Borç Verdim') $('#fType').value='lend';
+  if(val==='Borç Aldım') $('#fType').value='borrow';
   updatePersonBlock();
 });
 
+/* Person suggestions (direction-aware) */
 async function loadPersonSuggestions(){
   const sb=getClient(); const box=$('#personSuggest'); box.innerHTML='';
+  const typ = $('#fType').value;
+  const wantFromBorrowSide = (typ==='borrow' || typ==='borrow_repay'); // borç aldığım kişiler
+  const seedTyp = wantFromBorrowSide ? 'borrow' : 'lend';
+
   let names = [];
   if(sb){
     const {data,error} = await sb.from('transactions')
-      .select('person_name').neq('person_name',null).eq('typ','debt')
+      .select('person_name,typ').neq('person_name',null)
+      .in('typ',[seedTyp]) // sadece o yön
       .order('created_at',{ascending:false}).limit(200);
     if(!error && data) names = data.map(x=>x.person_name).filter(Boolean);
   } else {
     const rows = readJSON(LS.txs, []);
-    names = rows.filter(x=>x.typ==='debt' && x.person_name).map(x=>x.person_name);
+    names = rows.filter(x=>x.typ===seedTyp && x.person_name).map(x=>x.person_name);
   }
   names = [...new Set(names)].slice(0,30);
   names.forEach(n=>{
@@ -492,7 +540,7 @@ $('#btnClear').onclick=()=>{
 
 async function saveLocal(row){
   const arr = readJSON(LS.txs, []);
-  arr.unshift(row); // başa ekle
+  arr.unshift(row);
   writeJSON(LS.txs, arr);
 }
 
@@ -500,20 +548,18 @@ $('#btnSave').onclick = async ()=>{
   const amount = parseFloat($('#fAmount').value);
   if(!(amount>0)){ alert('Tutar giriniz'); return; }
   const row = {
-    id: Date.now(), // local id
+    id: Date.now(),
     created_at: new Date().toISOString(),
     typ: $('#fType').value,
     amount,
     currency: $('#fCurrency').value,
     category: $('#fCategory').value||null,
     note: $('#fNote').value||null,
-    person_name: ($('#fType').value==='debt' || $('#fType').value==='debt_repay') ? ($('#fPerson').value||null) : null
+    person_name: (['borrow','borrow_repay','lend','lend_repay'].includes($('#fType').value)) ? ($('#fPerson').value||null) : null
   };
 
-  // her durumda local’e yaz
   await saveLocal(row);
 
-  // Supabase varsa buluta da gönder (best-effort)
   const sb=getClient();
   if(sb){
     try{
@@ -538,7 +584,7 @@ function fillSettings(){
   $('#sSupabaseUrl').value=localStorage.getItem(LS.sbUrl)||'';
   $('#sSupabaseKey').value=localStorage.getItem(LS.sbKey)||'';
 }
-$('#sLang').addEventListener('change',e=>{ currentLang=e.target.value; localStorage.setItem(LS.lang,currentLang); applyI18N(); });
+$('#sLang').addEventListener('change',e=>{ currentLang=e.target.value; localStorage.setItem(LS.lang,currentLang); applyI18N(); updatePersonBlock(); });
 $('#sBase').addEventListener('change',e=>{ localStorage.setItem(LS.base,e.target.value); currentCurrency=e.target.value; buildTabs(); refresh(); });
 $('#sSave').onclick=()=>{
   localStorage.setItem(LS.sbUrl, $('#sSupabaseUrl').value.trim());
@@ -572,14 +618,12 @@ async function renderCats(){
 $('#catAdd').onclick=async ()=>{
   const name = $('#catNew').value.trim();
   if(!name) return;
-  // local’e yaz
   const cats = await loadCategories();
   if(!cats.includes(name)){
     const localCats = readJSON(LS.cats, []);
     localCats.push(name);
     writeJSON(LS.cats, [...new Set(localCats)]);
   }
-  // Supabase varsa buluta da ekle
   const sb=getClient();
   if(sb){
     try{ await sb.from('categories').insert({name}); }catch(e){}
@@ -595,7 +639,7 @@ $('#sClose').onclick=closeSettings;
 $('#btnReload').onclick=refresh;
 $('#search').addEventListener('input',()=>{ refresh(); });
 
-/* 💱 KUR & DÖNÜŞTÜRME – YAMA */
+/* 💱 Kur & Dönüştürme */
 let EXRATES = { base: 'EUR', rates: { ALL: 100, EUR: 1, USD: 1.07, TRY: 35 } };
 
 // İlk açılışta senin verdiğin Supabase bilgilerini otomatik doldur (local boşsa)
@@ -628,14 +672,12 @@ async function updateRates(){
 
 function getRate(cur){
   if(cur === EXRATES.base) return 1;
-  return EXRATES.rates[cur] || 1; // bilinmeyende 1
+  return EXRATES.rates[cur] || 1;
 }
-
 function convertAmount(amount, from, to){
   if(from === to) return amount;
   const rFrom = getRate(from);
   const rTo = getRate(to);
-  // from → EUR → to (EXRATES.base EUR kabul)
   const inBase = amount / rFrom; // EUR karşılığı
   return inBase * rTo;
 }
@@ -644,14 +686,14 @@ async function convertAll(){
   const rows = await listTransactions();
   const base = localStorage.getItem(LS.base) || 'ALL';
 
-  // Para birimi bazında NET toplamları topla (gelir + debt_repay eklenir, gider - olarak)
-  const perCurrency = {}; // { CUR: netAmount }
+  // Netleri tip yönüne göre topla
+  const perCurrency = {};
   rows.forEach(r=>{
-    const sign = (r.typ==='income' || r.typ==='debt_repay') ? 1 : -1;
+    const t = r.typ;
+    const sign = (t==='income'||t==='lend_repay'||t==='borrow') ? 1 : -1;
     perCurrency[r.currency] = (perCurrency[r.currency]||0) + sign * (Number(r.amount)||0);
   });
 
-  // Metin oluştur
   let html = '';
   let grandTotal = 0;
   Object.keys(perCurrency).forEach(cur=>{
@@ -664,7 +706,6 @@ async function convertAll(){
   html += <b>NET (${base}): ${fmt(grandTotal)}</b>;
   $('#convertResult').innerHTML = html || '<span class="hint">Kayıt yok.</span>';
 }
-
 $('#btnConvert').onclick = convertAll;
 
 // Kurları başlat ve periyodik güncelle
@@ -672,7 +713,7 @@ $('#btnConvert').onclick = convertAll;
   const saved = localStorage.getItem('app.rates');
   if(saved) EXRATES = JSON.parse(saved);
   updateRates();
-  setInterval(updateRates, 5*60*1000); // 5 dakikada bir
+  setInterval(updateRates, 5*60*1000);
 })();
 
 /* Boot */
