@@ -85,9 +85,9 @@
             cursor: pointer;
         }
         
-        /* Pamjet (Views) - Të fshehura fillimisht, përveç pamjes së ngarkimit */
+        /* Pamjet (Views) */
         #dashboard-view, #settings-view, #auth-view { display: none; } 
-        #loading-view { display: block; } /* Pamja e ngarkimit e dukshme në fillim */
+        #loading-view { display: block; }
 
         /* Navigimi */
         nav {
@@ -240,7 +240,7 @@
         
         // Funksioni për menaxhimin e pamjeve (View Management)
         function tregoPamjen(id) {
-            fshiTeGjithaPamjet(); // Fsheh të gjitha
+            fshiTeGjithaPamjet();
             
             if (id === 'auth-buttons') {
                 document.getElementById('auth-view').style.display = 'block';
@@ -261,18 +261,16 @@
 
         // Funksioni për kontrollin e sesionit (kur ngarkohet faqja)
         async function kontrolloSesionin() {
-            tregoPamjen('loading-view'); // Shfaq pamjen e ngarkimit fillimisht
+            tregoPamjen('loading-view');
             
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
-                // Përdoruesi është i kyçur
                 document.getElementById('current-email').textContent = session.user.email;
                 tregoPamjen('dashboard-view');
                 ngarkoProduktet(); 
                 ngarkoRegjistrimetMujore();
             } else {
-                // Përdoruesi nuk është i kyçur
                 tregoPamjen('auth-view');
                 document.getElementById('auth-buttons').style.display = 'block';
             }
@@ -304,6 +302,7 @@
             e.preventDefault();
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
+            // Shënim: Pas regjistrimit, Supabase kërkon verifikim email-i, nëse e keni aktivizuar.
             const { error } = await supabase.auth.signUp({ email, password });
 
             if (error) {
@@ -330,12 +329,14 @@
         let produkteList = []; 
 
         async function ngarkoProduktet() {
+            // VËMENDJE: Kërkon RLS (Row Level Security) të jetë i konfigururar për aksesin te 'produkte'
             const { data, error } = await supabase
                 .from('produkte')
                 .select('id, emri'); 
 
             if (error) {
                 console.error('Gabim në ngarkimin e produkteve:', error);
+                // Mund të shfaqet gabim nëse RLS nuk është konfiguruar
                 return;
             }
             produkteList = data;
@@ -406,7 +407,7 @@
 
             if (termi.length > 0) {
                 const sugjerimet = produkteList.filter(p => p.emri.toLowerCase().startsWith(termi));
-                sugjerimet.slice(0, 5).forEach(p => { // Shfaq vetëm 5 sugjerime
+                sugjerimet.slice(0, 5).forEach(p => { 
                     const btn = document.createElement('button');
                     btn.textContent = p.emri;
                     btn.onclick = () => {
@@ -441,7 +442,6 @@
                  return;
             }
 
-            // Sortimi nga më i riu te më i vjetri
             muajtUnike.sort().reverse().forEach(muaji => {
                 const elementi = document.createElement('p');
                 elementi.innerHTML = `
