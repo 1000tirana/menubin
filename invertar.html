@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barkafe Inventar</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* CSS RREGULLUAR: Vetëm pamja e autentifikimit shfaqet në fillim. */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 450px; 
+            margin: 0 auto;
+            background-color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            background-color: #3b82f6;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin: -20px -20px 20px -20px;
+        }
+        h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        
+        /* Stilet e butona kryesorë */
+        #auth-view button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #btn-regjistrohu { background-color: #10b981; color: white; }
+        #btn-hyrje { background-color: #3b82f6; color: white; }
+        #btn-regjistrohu:hover { background-color: #059669; }
+        #btn-hyrje:hover { background-color: #2563eb; }
+        
+        /* Stilet e Formave */
+        .form-grup { margin-bottom: 15px; }
+        .form-grup input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-auth { display: none; padding: 20px 0; }
+        
+        /* Paneli Kryesor (Dashboard) Stilet */
+        .seksion {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .seksion h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .seksion button {
+            padding: 10px;
+            margin-right: 10px;
+            background-color: #f97316;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Pamjet (Views) - VETËM AUTH-VIEW DUHET TË SHFAQET NË FILLIM */
+        #dashboard-view, #settings-view { display: none; }
+        #auth-view { display: none; } /* U fsheh në fillim, JS do ta shfaqë. */
+
+        /* Navigimi */
+        nav {
+            display: none; /* E Fshehur në fillim */
+            justify-content: space-around;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #333;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        #sugjerimet-prod button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 5px 0;
+            background-color: #eee;
+            color: #333;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1 id="app-header-title">Barkafe Inventar</h1>
+        </header>
+
+        <div id="loading-view" style="text-align: center; padding: 50px;">
+            <p>Duke kontrolluar statusin e kyçjes...</p>
+        </div>
+
+
+        <div id="auth-view">
+            <h2>Mirë se vini!</h2>
+            <div id="auth-buttons">
+                <button id="btn-hyrje">Hyrje</button>
+                <button id="btn-regjistrohu">Regjistrohu</button>
+            </div>
+
+            <form id="form-hyrje" class="form-auth">
+                <h3>Hyrje</h3>
+                <div class="form-grup"><input type="email" id="login-email" placeholder="Email" required></div>
+                <div class="form-grup"><input type="password" id="login-password" placeholder="Fjalëkalimi" required></div>
+                <button type="submit" id="btn-submit-hyrje">Hyrje</button>
+                <button type="button" onclick="tregoPamjen('auth-buttons')" style="background-color: #ccc; color: #333;">Kthehu</button>
+            </form>
+
+            <form id="form-regjistrim" class="form-auth">
+                <h3>Regjistrohu</h3>
+                <div class="form-grup"><input type="email" id="signup-email" placeholder="Email" required></div>
+                <div class="form-grup"><input type="password" id="signup-password" placeholder="Fjalëkalimi (min. 6 karaktere)" required></div>
+                <button type="submit" id="btn-submit-regjistrim">Regjistrohu</button>
+                <button type="button" onclick="tregoPamjen('auth-buttons')" style="background-color: #ccc; color: #333;">Kthehu</button>
+            </form>
+
+            <p id="auth-mesazh" style="color:red; margin-top: 15px;"></p>
+        </div>
+
+        <div id="dashboard-view">
+            
+            <div class="seksion">
+                <h2>Regjistrimi i Inventarit</h2>
+                <div class="form-grup">
+                    <label for="prod-kerkimi">Produkti (Kërko):</label>
+                    <input type="text" id="prod-kerkimi" placeholder="Shkruaj emrin (p.sh. Kolë)">
+                    <div id="sugjerimet-prod"></div> </div>
+                <div class="form-grup">
+                    <label for="prod-sasia">Sasia e numëruar:</label>
+                    <input type="number" id="prod-sasia" placeholder="P.sh. 25" min="0" required>
+                </div>
+                <button id="btn-regjistro-sasi">Regjistro Numërimin</button>
+                <button id="btn-shto-produkt" style="background-color: #3b82f6;">Shto Produkt të Ri</button>
+            </div>
+            
+            <div class="seksion">
+                <h2>Regjistrimet Mujore</h2>
+                <div id="lista-muajve">
+                    <p>Ngarkimi i regjistrimeve...</p>
+                </div>
+            </div>
+
+        </div>
+        
+        <div id="settings-view">
+            <h2>Parametrat</h2>
+
+            <div class="seksion">
+                <h3>Llogaria</h3>
+                <p>Email-i aktual: <strong id="current-email">ngarkimi...</strong></p>
+                
+                <div class="form-grup">
+                    <input type="email" id="new-email" placeholder="Email i ri">
+                    <button id="btn-ndrysho-email" style="background-color: #3b82f6; margin-top: 10px;">Ndrysho Email-in</button>
+                </div>
+                
+                <button id="btn-reset-password" style="background-color: #f97316;">Resetimi i Fjalëkalimit (me Email)</button>
+            </div>
+
+            <div class="seksion">
+                <h3>Eksporti i të Dhënave</h3>
+                <div class="form-grup">
+                    <label for="data-nga">Data Nga:</label>
+                    <input type="date" id="data-nga">
+                    <label for="data-deri" style="margin-top: 10px; display: block;">Data Deri:</label>
+                    <input type="date" id="data-deri">
+                </div>
+                <button id="btn-shkarko-raport">Shkarko Regjistrimet (CSV)</button>
+            </div>
+
+            <button id="btn-logout" style="background-color: #ef4444; width: 100%; padding: 10px; margin-top: 20px;">Çkyçu</button>
+        </div>
+
+        <nav id="app-nav">
+            <button onclick="tregoPamjen('dashboard-view')">Inventari</button>
+            <button onclick="tregoPamjen('settings-view')">Parametrat</button>
+        </nav>
+        
+    </div>
+
+    <script>
+        // ***********************************************
+        // VENDOS TË DHËNAT TUAJA TË SUPABASE KËTU
+        // ***********************************************
+        const SUPABASE_URL = 'ZËVENDËSO-ME-URL-TËNDIN';
+        const SUPABASE_ANON_KEY = 'ZËVENDËSO-ME-ANON-KEY-TËNDIN';
+
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Fsheh të gjitha pamjet (views)
+        function fshiTeGjithaPamjet() {
+            document.querySelectorAll('#loading-view, #auth-view, #dashboard-view, #settings-view, .form-auth, #auth-buttons, #app-nav').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+        
+        // Funksioni për menaxhimin e pamjeve (View Management)
+        function tregoPamjen(id) {
+            fshiTeGjithaPamjet(); // Fsheh të gjitha
+            
+            if (id === 'auth-buttons') {
+                document.getElementById('auth-view').style.display = 'block';
+                document.getElementById('auth-buttons').style.display = 'block';
+            } else if (id === 'form-hyrje' || id === 'form-regjistrim') {
+                document.getElementById('auth-view').style.display = 'block';
+                document.getElementById(id).style.display = 'block';
+            } else if (id === 'dashboard-view' || id === 'settings-view') {
+                document.getElementById(id).style.display = 'block';
+                document.getElementById('app-nav').style.display = 'flex';
+            } else if (id === 'auth-view') {
+                 document.getElementById('auth-view').style.display = 'block';
+                 document.getElementById('auth-buttons').style.display = 'block';
+            } else if (id === 'loading-view') {
+                document.getElementById('loading-view').style.display = 'block';
+            }
+        }
+
+        // Funksioni për kontrollin e sesionit (kur ngarkohet faqja)
+        async function kontrolloSesionin() {
+            tregoPamjen('loading-view'); // Shfaq pamjen e ngarkimit fillimisht
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                // Përdoruesi është i kyçur
+                document.getElementById('current-email').textContent = session.user.email;
+                tregoPamjen('dashboard-view');
+                ngarkoProduktet(); 
+                ngarkoRegjistrimetMujore();
+            } else {
+                // Përdoruesi nuk është i kyçur
+                tregoPamjen('auth-view');
+                document.getElementById('auth-buttons').style.display = 'block';
+            }
+        }
+
+        // ***********************************************
+        // 1. LOGJIKA E AUTENTIFIKIMIT
+        // ***********************************************
+
+        // Event Listeners për butonat Hyrje/Regjistrohu
+        document.getElementById('btn-hyrje').addEventListener('click', () => tregoPamjen('form-hyrje'));
+        document.getElementById('btn-regjistrohu').addEventListener('click', () => tregoPamjen('form-regjistrim'));
+
+        // HYRJE
+        document.getElementById('form-hyrje').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                document.getElementById('auth-mesazh').textContent = 'Gabim në hyrje: ' + error.message;
+            } else {
+                window.location.reload(); 
+            }
+        });
+
+        // REGJISTRIMI
+        document.getElementById('form-regjistrim').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const { error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                document.getElementById('auth-mesazh').textContent = 'Gabim në regjistrim: ' + error.message;
+            } else {
+                document.getElementById('auth-mesazh').textContent = 'Regjistrim i suksesshëm! Kontrollo email-in për verifikim.';
+                tregoPamjen('auth-buttons');
+            }
+        });
+
+        // ÇKYÇU
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                alert('Gabim në çkyçje.');
+            } else {
+                window.location.reload(); 
+            }
+        });
+        
+        // ***********************************************
+        // 2. LOGJIKA E INVENTARIT
+        // ***********************************************
+        let produkteList = []; 
+
+        async function ngarkoProduktet() {
+            // Duke marrë parasysh që keni vendosur RLS (Row Level Security) në Supabase
+            const { data, error } = await supabase
+                .from('produkte')
+                .select('id, emri'); 
+
+            if (error) {
+                console.error('Gabim në ngarkimin e produkteve:', error);
+                return;
+            }
+            produkteList = data;
+        }
+
+        // Regjistro Numërimin
+        document.getElementById('btn-regjistro-sasi').addEventListener('click', async () => {
+            const emriProdukti = document.getElementById('prod-kerkimi').value.trim();
+            const sasia = parseInt(document.getElementById('prod-sasia').value);
+
+            if (!emriProdukti || isNaN(sasia) || sasia < 0) {
+                alert('Ju lutemi plotësoni sasinë dhe zgjidhni një produkt.');
+                return;
+            }
+
+            const produkti = produkteList.find(p => p.emri.toLowerCase() === emriProdukti.toLowerCase());
+
+            if (!produkti) {
+                alert('Produkti nuk u gjet. Ju lutemi shtoni produktin para se të numëroni.');
+                return;
+            }
+
+            const { data: { user } } = await supabase.auth.getUser();
+            const muaji_vit = new Date().toISOString().substring(0, 7); 
+            
+            const { error } = await supabase
+                .from('inventari_regjistrime')
+                .insert({
+                    produkti_id: produkti.id,
+                    sasia: sasia,
+                    regjistruar_nga: user.id,
+                    muaji_vit: muaji_vit
+                });
+
+            if (error) {
+                alert('Gabim në regjistrimin e inventarit: ' + error.message);
+            } else {
+                alert(`Numërimi i ${emriProdukti} (${sasia}) u regjistrua me sukses!`);
+                document.getElementById('prod-kerkimi').value = '';
+                document.getElementById('prod-sasia').value = '';
+                ngarkoRegjistrimetMujore(); // Rifresko listën mujore
+            }
+        });
+
+        // Shto Produkt të Ri
+        document.getElementById('btn-shto-produkt').addEventListener('click', async () => {
+            const emri = prompt("Shkruaj Emrin e Produktit të Ri (p.sh. Te Kuqen):");
+            if (emri && emri.trim() !== "") {
+                const { data: { user } } = await supabase.auth.getUser();
+                const { error } = await supabase
+                    .from('produkte')
+                    .insert({ emri: emri.trim(), njësia: 'shishe', krijuar_nga: user.id }); 
+
+                if (error) {
+                    alert('Gabim në shtimin e produktit: ' + error.message);
+                } else {
+                    alert(`${emri.trim()} u shtua me sukses!`);
+                    ngarkoProduktet(); 
+                }
+            }
+        });
+        
+        // Kërkimi dhe Sugjerimet
+        document.getElementById('prod-kerkimi').addEventListener('input', (e) => {
+            const termi = e.target.value.toLowerCase();
+            const sugjerimetDiv = document.getElementById('sugjerimet-prod');
+            sugjerimetDiv.innerHTML = '';
+
+            if (termi.length > 0) {
+                const sugjerimet = produkteList.filter(p => p.emri.toLowerCase().startsWith(termi));
+                sugjerimet.forEach(p => {
+                    const btn = document.createElement('button');
+                    btn.textContent = p.emri;
+                    btn.onclick = () => {
+                        document.getElementById('prod-kerkimi').value = p.emri;
+                        sugjerimetDiv.innerHTML = '';
+                    };
+                    sugjerimetDiv.appendChild(btn);
+                });
+            }
+        });
+        
+        // Ngarkimi dhe Shfaqja e Regjistrimeve Mujore
+        async function ngarkoRegjistrimetMujore() {
+            // Kërko muajt unikë nga regjistrimet dhe numrin e regjistrimeve për secilin
+            const { data, error } = await supabase
+                .from('inventari_regjistrime')
+                .select('muaji_vit', { count: 'exact' }); // Supabase nuk mbështet grupin unik në select pa functions/RPC
+
+            if (error) {
+                document.getElementById('lista-muajve').innerHTML = `<p style="color:red;">Gabim në ngarkimin e muajve.</p>`;
+                return;
+            }
+            
+            // Për mungesë të GROUP BY/COUNT në Supabase JS pa RPC, po simulojmë grupimin
+            const muajtUnike = [...new Set(data.map(item => item.muaji_vit))];
+            
+            const listaMuajveDiv = document.getElementById('lista-muajve');
+            listaMuajveDiv.innerHTML = '';
+            
+            if (muajtUnike.length === 0) {
+                 listaMuajveDiv.innerHTML = `<p>Nuk ka regjistrime të mëparshme.</p>`;
+                 return;
+            }
+
+            muajtUnike.sort().reverse().forEach(muaji => {
+                const elementi = document.createElement('p');
+                elementi.innerHTML = `
+                    <strong>Regjistrimet e: ${muaji}</strong> 
+                    <button onclick="shikoRegjistrimet('${muaji}')" style="background-color: #3b82f6; margin-left: 10px;">Shiko Detajet</button>`;
+                listaMuajveDiv.appendChild(elementi);
+            });
+        }
+        
+        // Funksion për të shfaqur detajet e një muaji (mund të hapet si modal)
+        async function shikoRegjistrimet(muaji) {
+             const { data, error } = await supabase
+                .from('inventari_regjistrime')
+                .select(`
+                    sasia,
+                    data_koha,
+                    produkte (emri)
+                `)
+                .eq('muaji_vit', muaji)
+                .order('data_koha', { ascending: false });
+            
+            if (error) {
+                alert('Gabim në ngarkimin e detajeve të muajit: ' + error.message);
+                return;
+            }
+            
+            let detajet = `Detajet e Regjistrimeve për ${muaji}:\n\n`;
+            data.forEach(r => {
+                const emri = r.produkte ? r.produkte.emri : 'I panjohur';
+                detajet += `- ${emri}: ${r.sasia} (në ${new Date(r.data_koha).toLocaleDateString()})\n`;
+            });
+            
+            alert(detajet); // Për thjeshtësi, po e shfaqim me Alert
+        }
+
+        
+        // ***********************************************
+        // 3. LOGJIKA E PARAMETRAVE DHE RAPORTIT
+        // ***********************************************
+        
+        // Ndrysho Email-in
+        document.getElementById('btn-ndrysho-email').addEventListener('click', async () => {
+            const newEmail = document.getElementById('new-email').value;
+            if (newEmail.trim() === "") {
+                alert('Ju lutemi shkruani një email të ri.');
+                return;
+            }
+            const { error } = await supabase.auth.updateUser({ email: newEmail });
+            if (error) {
+                alert('Gabim në ndryshimin e email-it: ' + error.message);
+            } else {
+                alert('Email-i u ndryshua. Ju lutemi ri-hyni me email-in e ri.');
+                supabase.auth.signOut();
+                window.location.reload();
+            }
+        });
+
+        // Resetimi i Fjalëkalimit
+        document.getElementById('btn-reset-password').addEventListener('click', async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { error } = await supabase.auth.resetPasswordForEmail(user.email);
+                if (error) {
+                    alert('Gabim në dërgimin e email-it: ' + error.message);
+                } else {
+                    alert('Një email për resetimin e fjalëkalimit u dërgua te adresa juaj.');
+                }
+            }
+        });
+
+        // Shkarko Raportin (CSV)
+        document.getElementById('btn-shkarko-raport').addEventListener('click', async () => {
+            const dataNga = document.getElementById('data-nga').value;
+            const dataDeri = document.getElementById('data-deri').value;
+            
+            if (!dataNga || !dataDeri) {
+                alert('Ju lutemi zgjidhni datën e fillimit dhe të fundit.');
+                return;
+            }
+
+            let query = supabase
+                .from('inventari_regjistrime')
+                .select(`
+                    sasia,
+                    data_koha,
+                    produkte (emri)
+                `)
+                .gte('data_koha', dataNga)
+                .lte('data_koha', dataDeri + 'T23:59:59'); 
+            
+            const { data, error } = await query;
+
+            if (error) {
+                alert('Gabim në marrjen e të dhënave: ' + error.message);
+                return;
+            }
+            
+            if (data.length === 0) {
+                alert('Nuk u gjetën regjistrime në këtë interval datash.');
+                return;
+            }
+
+            // Krijimi i CSV (Comma Separated Values)
+            let csvContent = "Emri i Produktit,Sasia,Data dhe Ora e Regjistrimit\n";
+            data.forEach(row => {
+                const emri = row.produkte ? row.produkte.emri : 'I panjohur';
+                csvContent += `${emri},${row.sasia},"${new Date(row.data_koha).toLocaleString('sq-AL')}"\n`;
+            });
+
+            // Shkarkimi i skedarit
+            const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `inventari_${dataNga}_deri_${dataDeri}.csv`);
+            document.body.appendChild(link); 
+            link.click();
+            document.body.removeChild(link);
+        });
+
+
+        // Thirrja fillestare
+        kontrolloSesionin();
+
+    </script>
+</body>
+</html>
