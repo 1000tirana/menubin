@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
-        /* CSS RREGULLUAR: Vetëm pamja e autentifikimit shfaqet në fillim. */
+        /* CSS BAZË PËR PAMJEN SI APLIKACION */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -85,13 +85,13 @@
             cursor: pointer;
         }
         
-        /* Pamjet (Views) - VETËM AUTH-VIEW DUHET TË SHFAQET NË FILLIM */
-        #dashboard-view, #settings-view { display: none; }
-        #auth-view { display: none; } /* U fsheh në fillim, JS do ta shfaqë. */
+        /* Pamjet (Views) - Të fshehura fillimisht, përveç pamjes së ngarkimit */
+        #dashboard-view, #settings-view, #auth-view { display: none; } 
+        #loading-view { display: block; } /* Pamja e ngarkimit e dukshme në fillim */
 
         /* Navigimi */
         nav {
-            display: none; /* E Fshehur në fillim */
+            display: none; 
             justify-content: space-around;
             position: fixed;
             bottom: 0;
@@ -114,8 +114,10 @@
             width: 100%;
             text-align: left;
             margin: 5px 0;
+            padding: 5px;
             background-color: #eee;
             color: #333;
+            border: 1px solid #ccc;
         }
         
     </style>
@@ -165,7 +167,8 @@
                 <div class="form-grup">
                     <label for="prod-kerkimi">Produkti (Kërko):</label>
                     <input type="text" id="prod-kerkimi" placeholder="Shkruaj emrin (p.sh. Kolë)">
-                    <div id="sugjerimet-prod"></div> </div>
+                    <div id="sugjerimet-prod"></div> 
+                </div>
                 <div class="form-grup">
                     <label for="prod-sasia">Sasia e numëruar:</label>
                     <input type="number" id="prod-sasia" placeholder="P.sh. 25" min="0" required>
@@ -221,10 +224,10 @@
 
     <script>
         // ***********************************************
-        // VENDOS TË DHËNAT TUAJA TË SUPABASE KËTU
+        // TË DHËNAT TË PLOTA TË SUPABASE TË INTEGRUARA
         // ***********************************************
-        const SUPABASE_URL = 'ZËVENDËSO-ME-URL-TËNDIN';
-        const SUPABASE_ANON_KEY = 'ZËVENDËSO-ME-ANON-KEY-TËNDIN';
+        const SUPABASE_URL = 'https://ouewqhgkunyzduvmhybi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91ZXdxaGdrdW55emR1dm1oeWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4MTUzODgsImV4cCI6MjA3NTM5MTM4OH0.loONlFq-vsy5T6AcjipbRqeJp2L3HtmhIMgjgV2iTrM';
 
         const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -279,7 +282,6 @@
         // 1. LOGJIKA E AUTENTIFIKIMIT
         // ***********************************************
 
-        // Event Listeners për butonat Hyrje/Regjistrohu
         document.getElementById('btn-hyrje').addEventListener('click', () => tregoPamjen('form-hyrje'));
         document.getElementById('btn-regjistrohu').addEventListener('click', () => tregoPamjen('form-regjistrim'));
 
@@ -328,7 +330,6 @@
         let produkteList = []; 
 
         async function ngarkoProduktet() {
-            // Duke marrë parasysh që keni vendosur RLS (Row Level Security) në Supabase
             const { data, error } = await supabase
                 .from('produkte')
                 .select('id, emri'); 
@@ -375,7 +376,7 @@
                 alert(`Numërimi i ${emriProdukti} (${sasia}) u regjistrua me sukses!`);
                 document.getElementById('prod-kerkimi').value = '';
                 document.getElementById('prod-sasia').value = '';
-                ngarkoRegjistrimetMujore(); // Rifresko listën mujore
+                ngarkoRegjistrimetMujore(); 
             }
         });
 
@@ -405,7 +406,7 @@
 
             if (termi.length > 0) {
                 const sugjerimet = produkteList.filter(p => p.emri.toLowerCase().startsWith(termi));
-                sugjerimet.forEach(p => {
+                sugjerimet.slice(0, 5).forEach(p => { // Shfaq vetëm 5 sugjerime
                     const btn = document.createElement('button');
                     btn.textContent = p.emri;
                     btn.onclick = () => {
@@ -419,17 +420,17 @@
         
         // Ngarkimi dhe Shfaqja e Regjistrimeve Mujore
         async function ngarkoRegjistrimetMujore() {
-            // Kërko muajt unikë nga regjistrimet dhe numrin e regjistrimeve për secilin
+            document.getElementById('lista-muajve').innerHTML = `<p>Duke ngarkuar muajt...</p>`;
+
             const { data, error } = await supabase
                 .from('inventari_regjistrime')
-                .select('muaji_vit', { count: 'exact' }); // Supabase nuk mbështet grupin unik në select pa functions/RPC
+                .select('muaji_vit'); 
 
             if (error) {
                 document.getElementById('lista-muajve').innerHTML = `<p style="color:red;">Gabim në ngarkimin e muajve.</p>`;
                 return;
             }
             
-            // Për mungesë të GROUP BY/COUNT në Supabase JS pa RPC, po simulojmë grupimin
             const muajtUnike = [...new Set(data.map(item => item.muaji_vit))];
             
             const listaMuajveDiv = document.getElementById('lista-muajve');
@@ -440,6 +441,7 @@
                  return;
             }
 
+            // Sortimi nga më i riu te më i vjetri
             muajtUnike.sort().reverse().forEach(muaji => {
                 const elementi = document.createElement('p');
                 elementi.innerHTML = `
@@ -469,10 +471,10 @@
             let detajet = `Detajet e Regjistrimeve për ${muaji}:\n\n`;
             data.forEach(r => {
                 const emri = r.produkte ? r.produkte.emri : 'I panjohur';
-                detajet += `- ${emri}: ${r.sasia} (në ${new Date(r.data_koha).toLocaleDateString()})\n`;
+                detajet += `- ${emri}: ${r.sasia} (në ${new Date(r.data_koha).toLocaleDateString('sq-AL')})\n`;
             });
             
-            alert(detajet); // Për thjeshtësi, po e shfaqim me Alert
+            alert(detajet); 
         }
 
         
