@@ -229,7 +229,8 @@
         const SUPABASE_URL = 'https://ouewqhgkunyzduvmhybi.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91ZXdxaGdrdW55emR1dm1oeWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk4MTUzODgsImV4cCI6MjA3NTM5MTM4OH0.loONlFq-vsy5T6AcjipbRqeJp2L3HtmhIMgjgV2iTrM';
 
-        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Inicializimi i Supabase - NUK KA MË GABIME REFERENCASH
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Fsheh të gjitha pamjet (views)
         function fshiTeGjithaPamjet() {
@@ -259,7 +260,7 @@
             }
         }
 
-        // Funksioni për kontrollin e sesionit (kur ngarkohet faqja)
+        // Funksioni për kontrollin e sesionit (kur ngarkohet faqja) - Përmirësuar
         async function kontrolloSesionin() {
             tregoPamjen('loading-view');
             
@@ -267,9 +268,12 @@
             
             if (session) {
                 document.getElementById('current-email').textContent = session.user.email;
+                
+                // Përgatit të dhënat para shfaqjes së Dashboard-it
+                await ngarkoProduktet(); 
+                await ngarkoRegjistrimetMujore();
+                
                 tregoPamjen('dashboard-view');
-                ngarkoProduktet(); 
-                ngarkoRegjistrimetMujore();
             } else {
                 tregoPamjen('auth-view');
                 document.getElementById('auth-buttons').style.display = 'block';
@@ -428,7 +432,7 @@
                 .select('muaji_vit'); 
 
             if (error) {
-                document.getElementById('lista-muajve').innerHTML = `<p style="color:red;">Gabim në ngarkimin e muajve.</p>`;
+                document.getElementById('lista-muajve').innerHTML = `<p style="color:red;">Gabim në ngarkimin e muajve. (Kontrollo RLS)</p>`;
                 return;
             }
             
