@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bark Kafe - Menaxhimi i Stokut</title>
+    <title>BARK KAFFE - Menaxhimi i Stokut</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -47,7 +47,7 @@
             border-bottom: 2px solid #efebe9;
             padding-bottom: 5px;
         }
-        input[type="email"], input[type="password"], input[type="text"], input[type="number"], input[type="date"] {
+        input[type="email"], input[type="password"], input[type="text"], input[type="number"], input[type="date"], textarea {
             width: 95%;
             padding: 10px;
             margin: 8px 0;
@@ -88,11 +88,24 @@
         .lista-produktit-autocomplete div:hover {
             background-color: #efebe9;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>BARK KAFA - Menaxhimi i Stokut</h1>
+        <h1>BARK KAFFE - Menaxhimi i Stokut</h1>
         <nav id="navbar" style="display:none;">
             <button onclick="shfaqFaqen('numërimi')">Numërimi i Stokut</button>
             <button onclick="shfaqFaqen('historiku')">Historiku</button>
@@ -109,8 +122,8 @@
             <h2>Hyrje / Regjistrim</h2>
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="fjalëkalimi" placeholder="Fjalëkalimi">
-            <button onclick="hyrja()">Hyr (Giriş Yap)</button>
-            <button onclick="regjistrimi()">Regjistrohu (Kayıt Ol)</button>
+            <button onclick="hyrja()">Hyr</button>
+            <button onclick="regjistrimi()">Regjistrohu</button>
             <button onclick="resetFjalekaliminEmail()">Harrova Fjalëkalimin</button>
         </section>
 
@@ -174,7 +187,7 @@
     
     <script>
         // ======================================================================
-        // I. KONFIGURIMI I SUPABASE (Supabase Ayarları)
+        // I. KONFIGURIMI I SUPABASE
         // ======================================================================
         const SUPABASE_URL = 'https://oryjcnwvfeuugjogexdo.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeWpjbnd2ZmV1dWdqb2dleGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODUzODUsImV4cCI6MjA3NjU2MTM4NX0.hicdNybxqXpK840ksn7sZvhI8V1NSG46PZvxrgjvLms';
@@ -223,10 +236,10 @@
         }
         
         // ======================================================================
-        // III. AUTHENTICATION (Kimlik Doğrulama)
+        // III. AUTHENTICATION
         // ======================================================================
 
-        /** Hyrja në llogari (Giriş Yap) */
+        /** Hyrja në llogari */
         async function hyrja() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('fjalëkalimi').value;
@@ -241,11 +254,16 @@
             }
         }
 
-        /** Regjistrimi i ri (Kayıt Ol) */
+        /** Regjistrimi i ri */
         async function regjistrimi() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('fjalëkalimi').value;
             
+            if (!email || !password) {
+                shfaqAlert("Ju lutemi plotësoni fushat Email dhe Fjalëkalim.");
+                return;
+            }
+
             const { error } = await supabase.auth.signUp({ 
                 email, 
                 password,
@@ -258,10 +276,13 @@
                 shfaqAlert(Gabim në Regjistrim: ${error.message});
             } else {
                 shfaqAlert("Regjistrimi u krye. Kontrolloni emailin tuaj për konfirmim!", 'sukses');
+                // Pastro fushat pas regjistrimit
+                document.getElementById('email').value = '';
+                document.getElementById('fjalëkalimi').value = '';
             }
         }
 
-        /** Dil nga llogaria (Çıkış Yap) */
+        /** Dil nga llogaria */
         async function dilNgaLlogaria() {
             const { error } = await supabase.auth.signOut();
             if (error) {
@@ -281,21 +302,22 @@
             }
             
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + '/reset-password.html', // Duhet të keni një faqe të veçantë
+                // Kërkon një faqe të dedikuar për reset
+                redirectTo: window.location.origin + '/reset-password.html', 
             });
 
             if (error) {
                 shfaqAlert(Gabim: ${error.message});
             } else {
-                shfaqAlert("Linku i rivendosjes u dërgua në emailin tuaj.", 'sukses');
+                shfaqAlert("Linku i rivendosjes u dërgua në emailin tuaj. Ju lutemi kontrolloni.", 'sukses');
             }
         }
 
         // ======================================================================
-        // IV. FUNKSIONET E STOKUT (Stok İşlemleri)
+        // IV. FUNKSIONET E STOKUT
         // ======================================================================
         
-        let produktiIDAktual = null; // ID-ja e produktit të zgjedhur
+        let produktiIDAktual = null; 
 
         // Autokompletimi i Kërkimit
         document.getElementById('kërko-produkt').addEventListener('input', debounce(kërkoProduktin, 300));
@@ -312,7 +334,7 @@
                 .from('produktet')
                 .select('id, emri_produktit')
                 .ilike('emri_produktit', %${term}%)
-                .eq('user_id', perdoruesi.id) // Vetëm produktet e përdoruesit
+                .eq('user_id', perdoruesi.id) 
                 .limit(10);
 
             if (error) return shfaqAlert(Gabim kërkimi: ${error.message});
@@ -331,7 +353,7 @@
             document.getElementById('emri-produktit-për-numërim').innerText = Numërimi i: ${emri};
             document.getElementById('produkt-id-per-numërim').value = id;
             document.getElementById('kërko-produkt').value = emri;
-            document.getElementById('lista-produktit-autocomplete').innerHTML = ''; // Fsheh listën
+            document.getElementById('lista-produktit-autocomplete').innerHTML = ''; 
             document.getElementById('numërimi-i-produktit').style.display = 'block';
             document.getElementById('sasia-e-numëruar').focus();
         }
@@ -351,10 +373,8 @@
                 sasia_e_numëruar: sasia,
                 shënime: shënime,
                 user_id: perdoruesi.id,
-                // Supabase do të përdorë 'current_date' për 'data_e_numërimit' (nga SQL RLS)
             };
 
-            // Përdorim 'upsert' që nëse ka një numërim për këtë produkt sot, ta ndryshojë.
             const { error } = await supabase
                 .from('regjistrimet_e_numërimit')
                 .upsert(regjistrimi, { onConflict: 'produkt_id, data_e_numërimit, user_id' });
@@ -372,7 +392,7 @@
         }
         
         // ======================================================================
-        // V. FUNKSIONET E HISTORIKUT (Historik İşlemleri)
+        // V. FUNKSIONET E HISTORIKUT
         // ======================================================================
 
         /** Ngarkon të dhënat e historikut brenda një periudhe */
@@ -431,7 +451,7 @@
             document.getElementById('data-fillimi').value = fillimiIMuajit;
             document.getElementById('data-mbarimit').value = sotString;
 
-            ngarkoHistorikun();
+            // ngarkoHistorikun(); // Thirrja bëhet nëse do të ngarkojmë automatikisht
         }
 
 
@@ -481,7 +501,7 @@
         }
 
         // ======================================================================
-        // VI. FUNKSIONET E MENAXHIMIT TË PRODUKTEVE (Ürün Yönetimi)
+        // VI. FUNKSIONET E MENAXHIMIT TË PRODUKTEVE
         // ======================================================================
 
         /** Ngarkon listën e produkteve për menaxhim */
@@ -516,8 +536,8 @@
                         <td>${p.sasia_min_alarmit}</td>
                         <td>${lloji}</td>
                         <td>
-                            <button style="width:auto;" onclick="ndryshoProduktin(${p.id}, '${p.emri_produktit}', ${p.sasia_min_alarmit}, ${p.eshte_i_ftohte})">Ndrysho</button>
-                            <button style="width:auto; background-color: #d32f2f;" onclick="fshiProduktin(${p.id})">Fshi</button>
+                            <button style="width:auto; margin: 2px;" onclick="ndryshoProduktin(${p.id}, '${p.emri_produktit}', ${p.sasia_min_alarmit}, ${p.eshte_i_ftohte})">Ndrysho</button>
+                            <button style="width:auto; margin: 2px; background-color: #d32f2f;" onclick="fshiProduktin(${p.id})">Fshi</button>
                         </td>
                     </tr>
                 `;
@@ -606,7 +626,7 @@
         }
 
         // ======================================================================
-        // VII. FUNKSIONET E CILËSIVE (Ayarlar İşlemleri)
+        // VII. FUNKSIONET E CILËSIVE
         // ======================================================================
 
         /** Ndrysho Emailin */
@@ -614,12 +634,12 @@
             const emailRi = document.getElementById('email-i-ri').value;
             const passwordAktual = document.getElementById('fjalëkalimi-aktual-email').value;
 
-            // Supabase kërkon që të bëhet re-autentifikimi para se të ndryshohet emaili.
-            // Për thjeshtësi, e bëjmë ndryshimin direkt duke përdorur sessionin.
-
             if (!emailRi) return shfaqAlert("Ju lutemi vendosni emailin e ri.");
 
-            // Shënim: Supabase automatikisht dërgon një email konfirmimi në emailin e ri.
+            // Për ndryshim të sigurt të emailit kërkohet fjalëkalimi aktual
+            // Megjithatë, për thjeshtësi, Supabase bën konfirmimin me email.
+            // Për një zgjidhje më të sigurt, duhet të implementohet një rrugë tjetër.
+            
             const { error } = await supabase.auth.updateUser({ 
                 email: emailRi 
             });
