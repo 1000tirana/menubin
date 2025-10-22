@@ -16,7 +16,7 @@
             color: #333;
         }
         header {
-            background-color: #5D4037; /* Kafe/Bar Rrënjë */
+            background-color: #5D4037;
             color: white;
             padding: 15px 20px;
             text-align: center;
@@ -55,7 +55,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
-            font-size: 16px; /* E rëndësishme për të parandaluar zmadhimin në celular */
+            font-size: 16px; 
         }
         button {
             background-color: #8D6E63;
@@ -79,7 +79,6 @@
             border-radius: 4px;
             display: none;
         }
-        /* Stilet e listës së produkteve në Numërim */
         .lista-produktit-autocomplete div {
             padding: 10px;
             cursor: pointer;
@@ -187,19 +186,18 @@
     
     <script>
         // ======================================================================
-        // I. KONFIGURIMI I SUPABASE
+        // I. KONFIGURIMI I SUPABASE (NDRYSHO KËTO ME ÇELËSAT TUAJ)
         // ======================================================================
-        const SUPABASE_URL = 'https://oryjcnwvfeuugjogexdo.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeWpjbnd2ZmV1dWdqb2dleGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODUzODUsImV4cCI6MjA3NjU2MTM4NX0.hicdNybxqXpK840ksn7sZvhI8V1NSG46PZvxrgjvLms';
+        const SUPABASE_URL = 'https://oryjcnwvfeuugjogexdo.supabase.co'; // VENDOS URL-NË TËNDE
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeWpjbnd2ZmV1dWdqb2dleGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODUzODUsImV4cCI6MjA3NjU2MTM4NX0.hicdNybxqXpK840ksn7sZvhI8V1NSG46PZvxrgjvLms'; // VENDOS KEY-IN TËND
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let perdoruesi = null; // Përdoruesi aktual
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let perdoruesi = null; 
 
         // ======================================================================
         // II. FUNKSIONET KRYESORE TË NAVIGIMIT DHE SHFAQJES
         // ======================================================================
 
-        /** Shfaq mesazhe alarmi */
         function shfaqAlert(mesazhi, tipi = 'error') {
             const alertDiv = document.getElementById('mesazhi-alert');
             alertDiv.innerText = mesazhi;
@@ -209,19 +207,16 @@
             setTimeout(() => { alertDiv.style.display = 'none'; }, 5000);
         }
 
-        /** Fsheh të gjitha seksionet dhe shfaq atë të kërkuarin */
         function shfaqFaqen(faqjaID) {
             document.querySelectorAll('section').forEach(section => {
                 section.style.display = 'none';
             });
             document.getElementById(faqjaID).style.display = 'block';
 
-            // Funksione specifike për ngarkimin e të dhënave pas ndërrimit të faqes
             if (faqjaID === 'produktet') ngarkoProduktetMenaxhim();
             if (faqjaID === 'historiku') ngarkoHistorikunMujorParazgjedhur();
         }
 
-        /** Kontrollon nëse përdoruesi është i kyçur */
         async function kontrolloStatusinELlogarisë() {
             const { data: { user } } = await supabase.auth.getUser();
             perdoruesi = user;
@@ -236,10 +231,9 @@
         }
         
         // ======================================================================
-        // III. AUTHENTICATION
+        // III. AUTHENTICATION (Me rregullimet e fundit)
         // ======================================================================
 
-        /** Hyrja në llogari */
         async function hyrja() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('fjalëkalimi').value;
@@ -254,7 +248,6 @@
             }
         }
 
-        /** Regjistrimi i ri */
         async function regjistrimi() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('fjalëkalimi').value;
@@ -264,7 +257,7 @@
                 return;
             }
 
-            const { error } = await supabase.auth.signUp({ 
+            const { data, error } = await supabase.auth.signUp({ 
                 email, 
                 password,
                 options: {
@@ -274,15 +267,16 @@
 
             if (error) {
                 shfaqAlert(`Gabim në Regjistrim: ${error.message}`);
-            } else {
+                console.error("Gabim i plotë i Supabase në regjistrim:", error);
+            } else if (data.user) {
                 shfaqAlert("Regjistrimi u krye. Kontrolloni emailin tuaj për konfirmim!", 'sukses');
-                // Pastro fushat pas regjistrimit
                 document.getElementById('email').value = '';
                 document.getElementById('fjalëkalimi').value = '';
+            } else if (data.session === null && data.user === null) {
+                shfaqAlert("Regjistrimi u krye. Kontrolloni emailin tuaj për konfirmim (Linku i konfirmimit u dërgua).", 'sukses');
             }
         }
 
-        /** Dil nga llogaria */
         async function dilNgaLlogaria() {
             const { error } = await supabase.auth.signOut();
             if (error) {
@@ -293,7 +287,6 @@
             }
         }
 
-        /** Rivendos Fjalëkalimin (Harrova Fjalëkalimin - E-mail) */
         async function resetFjalekaliminEmail() {
             const email = document.getElementById('email').value;
             if (!email) {
@@ -302,7 +295,6 @@
             }
             
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                // Kërkon një faqe të dedikuar për reset
                 redirectTo: window.location.origin + '/reset-password.html', 
             });
 
@@ -319,7 +311,6 @@
         
         let produktiIDAktual = null; 
 
-        // Autokompletimi i Kërkimit
         document.getElementById('kërko-produkt').addEventListener('input', debounce(kërkoProduktin, 300));
 
         async function kërkoProduktin(e) {
@@ -347,7 +338,6 @@
             });
         }
 
-        /** Zgjedh një produkt për numërim */
         function zgjidhProduktin(id, emri) {
             produktiIDAktual = id;
             document.getElementById('emri-produktit-për-numërim').innerText = `Numërimi i: ${emri}`;
@@ -358,7 +348,6 @@
             document.getElementById('sasia-e-numëruar').focus();
         }
 
-        /** Ruaj Numërimin (INSERT/UPSERT) */
         async function ruajNumërimin() {
             const produkt_id = document.getElementById('produkt-id-per-numërim').value;
             const sasia = parseInt(document.getElementById('sasia-e-numëruar').value);
@@ -383,7 +372,6 @@
                 shfaqAlert(`Gabim gjatë ruajtjes: ${error.message}`);
             } else {
                 shfaqAlert("Numërimi u ruajt me sukses! Ju mund ta ndryshoni sot sërish.", 'sukses');
-                // Pastrimi i fushave pas ruajtjes
                 document.getElementById('kërko-produkt').value = '';
                 document.getElementById('sasia-e-numëruar').value = '';
                 document.getElementById('shenime-numërimi').value = '';
@@ -395,7 +383,6 @@
         // V. FUNKSIONET E HISTORIKUT
         // ======================================================================
 
-        /** Ngarkon të dhënat e historikut brenda një periudhe */
         async function ngarkoHistorikun() {
             const dataFillimi = document.getElementById('data-fillimi').value;
             const dataMbarimit = document.getElementById('data-mbarimit').value;
@@ -426,7 +413,6 @@
                 return shfaqAlert(`Gabim historiku: ${error.message}`);
             }
 
-            // Shfaqja në listë
             if (data.length === 0) {
                 listaDiv.innerHTML = '<p>Nuk u gjet asnjë regjistrim për periudhën e zgjedhur.</p>';
                 return;
@@ -442,7 +428,6 @@
             listaDiv.innerHTML = html;
         }
         
-        /** Ngarkon historikun e muajit aktual si parazgjedhje */
         function ngarkoHistorikunMujorParazgjedhur() {
             const sot = new Date();
             const fillimiIMuajit = new Date(sot.getFullYear(), sot.getMonth(), 1).toISOString().split('T')[0];
@@ -450,12 +435,8 @@
             
             document.getElementById('data-fillimi').value = fillimiIMuajit;
             document.getElementById('data-mbarimit').value = sotString;
-
-            // ngarkoHistorikun(); // Thirrja bëhet nëse do të ngarkojmë automatikisht
         }
 
-
-        /** Shkarko Të Dhënat (CSV) */
         async function shkarkoTëDhënat() {
             const dataFillimi = document.getElementById('data-fillimi').value;
             const dataMbarimit = document.getElementById('data-mbarimit').value;
@@ -478,19 +459,15 @@
             if (data.length === 0) return shfaqAlert("Nuk ka të dhëna për t'u shkarkuar.", 'error');
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            
-            // Headeri
             csvContent += "Emri_Produktit,Data,Sasia,Lloji_Produktit,Shenime\n";
             
-            // Të dhënat
             data.forEach(r => {
                 const emri = r.produktet ? r.produktet.emri_produktit : 'Nuk gjendet';
                 const lloji = r.produktet && r.produktet.eshte_i_ftohte ? 'I Ftohtë' : 'Normal';
-                const sh = r.shënime ? r.shënime.replace(/,/g, '') : ''; // Heq presjet
+                const sh = r.shënime ? r.shënime.replace(/,/g, '') : ''; 
                 csvContent += `${emri},${r.data_e_numërimit},${r.sasia_e_numëruar},${lloji},${sh}\n`;
             });
 
-            // Krijimi i linkut të shkarkimit
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -504,7 +481,6 @@
         // VI. FUNKSIONET E MENAXHIMIT TË PRODUKTEVE
         // ======================================================================
 
-        /** Ngarkon listën e produkteve për menaxhim */
         async function ngarkoProduktetMenaxhim() {
             const listaDiv = document.getElementById('lista-e-produkteve-menaxhimi');
             listaDiv.innerHTML = 'Duke ngarkuar...';
@@ -546,16 +522,14 @@
             listaDiv.innerHTML = html;
         }
 
-        /** Përgatit formularin për ndryshim */
         function ndryshoProduktin(id, emri, sasiaMin, eshteIFtohte) {
             document.getElementById('produkt-id-per-ndryshim').value = id;
             document.getElementById('emri-i-ri-produktit').value = emri;
             document.getElementById('sasia-min-alarmit').value = sasiaMin;
             document.getElementById('eshte-i-ftohte').checked = eshteIFtohte;
-            window.scrollTo(0, 0); // Kthehet në krye të formularit
+            window.scrollTo(0, 0); 
         }
 
-        /** Shton ose Ndryshon Produktin */
         async function shtoOseNdryshoProdukt() {
             const id = document.getElementById('produkt-id-per-ndryshim').value;
             const emri = document.getElementById('emri-i-ri-produktit').value.trim();
@@ -574,7 +548,6 @@
             let error;
 
             if (id) {
-                // Ndryshim (Update)
                 const response = await supabase
                     .from('produktet')
                     .update(produktiData)
@@ -582,7 +555,6 @@
                     .eq('user_id', perdoruesi.id);
                 error = response.error;
             } else {
-                // Shtim (Insert)
                 const response = await supabase
                     .from('produktet')
                     .insert(produktiData);
@@ -597,7 +569,6 @@
                 }
             } else {
                 shfaqAlert(`Produkti u ruajt me sukses!`, 'sukses');
-                // Pastrimi dhe rifreskimi
                 document.getElementById('produkt-id-per-ndryshim').value = '';
                 document.getElementById('emri-i-ri-produktit').value = '';
                 document.getElementById('sasia-min-alarmit').value = '10';
@@ -605,7 +576,6 @@
             }
         }
 
-        /** Fshirja e Produktit */
         async function fshiProduktin(id) {
             if (!confirm("A jeni i sigurt që dëshironi të fshini këtë produkt? Të gjitha numërimet e tij do të fshihen gjithashtu.")) {
                 return;
@@ -629,16 +599,11 @@
         // VII. FUNKSIONET E CILËSIVE
         // ======================================================================
 
-        /** Ndrysho Emailin */
         async function ndryshoEmailin() {
             const emailRi = document.getElementById('email-i-ri').value;
             const passwordAktual = document.getElementById('fjalëkalimi-aktual-email').value;
 
             if (!emailRi) return shfaqAlert("Ju lutemi vendosni emailin e ri.");
-
-            // Për ndryshim të sigurt të emailit kërkohet fjalëkalimi aktual
-            // Megjithatë, për thjeshtësi, Supabase bën konfirmimin me email.
-            // Për një zgjidhje më të sigurt, duhet të implementohet një rrugë tjetër.
             
             const { error } = await supabase.auth.updateUser({ 
                 email: emailRi 
@@ -653,7 +618,6 @@
             }
         }
 
-        /** Rivendos Fjalëkalimin (Brenda Cilësimeve) */
         async function rivendosFjalëkaliminNëCilësime() {
             const passwordRi = document.getElementById('fjalëkalimi-i-ri').value;
             const passwordRiKonfirmo = document.getElementById('fjalëkalimi-i-ri-konfirmo').value;
@@ -677,7 +641,6 @@
         // VIII. UTILITY (Ndihmëse)
         // ======================================================================
 
-        /** Funksion debouncing për kërkim (throttle) */
         function debounce(func, timeout = 300) {
             let timer;
             return (...args) => {
@@ -687,10 +650,9 @@
         }
         
         // ======================================================================
-        // IX. INICIALIZIMI (Nisja)
+        // IX. INICIALIZIMI
         // ======================================================================
 
-        // Kontrollo statusin e llogarisë kur ngarkohet faqja
         kontrolloStatusinELlogarisë();
         
     </script>
