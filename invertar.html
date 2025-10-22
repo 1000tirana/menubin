@@ -247,7 +247,7 @@
             const { error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
-                shfaqAlert(Gabim në Hyrje: ${error.message});
+                shfaqAlert(`Gabim në Hyrje: ${error.message}`);
             } else {
                 shfaqAlert("Hyrje me sukses!", 'sukses');
                 kontrolloStatusinELlogarisë();
@@ -273,7 +273,7 @@
             });
 
             if (error) {
-                shfaqAlert(Gabim në Regjistrim: ${error.message});
+                shfaqAlert(`Gabim në Regjistrim: ${error.message}`);
             } else {
                 shfaqAlert("Regjistrimi u krye. Kontrolloni emailin tuaj për konfirmim!", 'sukses');
                 // Pastro fushat pas regjistrimit
@@ -286,7 +286,7 @@
         async function dilNgaLlogaria() {
             const { error } = await supabase.auth.signOut();
             if (error) {
-                shfaqAlert(Gabim në dalje: ${error.message});
+                shfaqAlert(`Gabim në dalje: ${error.message}`);
             } else {
                 shfaqAlert("Dolët me sukses!", 'sukses');
                 kontrolloStatusinELlogarisë();
@@ -307,7 +307,7 @@
             });
 
             if (error) {
-                shfaqAlert(Gabim: ${error.message});
+                shfaqAlert(`Gabim: ${error.message}`);
             } else {
                 shfaqAlert("Linku i rivendosjes u dërgua në emailin tuaj. Ju lutemi kontrolloni.", 'sukses');
             }
@@ -333,11 +333,11 @@
             const { data, error } = await supabase
                 .from('produktet')
                 .select('id, emri_produktit')
-                .ilike('emri_produktit', %${term}%)
+                .ilike('emri_produktit', `%${term}%`)
                 .eq('user_id', perdoruesi.id) 
                 .limit(10);
 
-            if (error) return shfaqAlert(Gabim kërkimi: ${error.message});
+            if (error) return shfaqAlert(`Gabim kërkimi: ${error.message}`);
 
             data.forEach(p => {
                 const div = document.createElement('div');
@@ -350,7 +350,7 @@
         /** Zgjedh një produkt për numërim */
         function zgjidhProduktin(id, emri) {
             produktiIDAktual = id;
-            document.getElementById('emri-produktit-për-numërim').innerText = Numërimi i: ${emri};
+            document.getElementById('emri-produktit-për-numërim').innerText = `Numërimi i: ${emri}`;
             document.getElementById('produkt-id-per-numërim').value = id;
             document.getElementById('kërko-produkt').value = emri;
             document.getElementById('lista-produktit-autocomplete').innerHTML = ''; 
@@ -380,7 +380,7 @@
                 .upsert(regjistrimi, { onConflict: 'produkt_id, data_e_numërimit, user_id' });
 
             if (error) {
-                shfaqAlert(Gabim gjatë ruajtjes: ${error.message});
+                shfaqAlert(`Gabim gjatë ruajtjes: ${error.message}`);
             } else {
                 shfaqAlert("Numërimi u ruajt me sukses! Ju mund ta ndryshoni sot sërish.", 'sukses');
                 // Pastrimi i fushave pas ruajtjes
@@ -423,7 +423,7 @@
 
             if (error) {
                 listaDiv.innerHTML = '';
-                return shfaqAlert(Gabim historiku: ${error.message});
+                return shfaqAlert(`Gabim historiku: ${error.message}`);
             }
 
             // Shfaqja në listë
@@ -436,7 +436,7 @@
             data.forEach(r => {
                 const emri = r.produktet ? r.produktet.emri_produktit : 'Produkt i Fshirë';
                 const sh = r.shënime ? ` (${r.shënime})` : '';
-                html += <li>[${r.data_e_numërimit}] <b>${emri}</b>: ${r.sasia_e_numëruar} njësi ${sh}</li>;
+                html += `<li>[${r.data_e_numërimit}] <b>${emri}</b>: ${r.sasia_e_numëruar} njësi ${sh}</li>`;
             });
             html += '</ul>';
             listaDiv.innerHTML = html;
@@ -473,7 +473,7 @@
                 .lte('data_e_numërimit', dataMbarimit)
                 .order('data_e_numërimit', { ascending: false });
 
-            if (error) return shfaqAlert(Gabim shkarkimi: ${error.message});
+            if (error) return shfaqAlert(`Gabim shkarkimi: ${error.message}`);
             
             if (data.length === 0) return shfaqAlert("Nuk ka të dhëna për t'u shkarkuar.", 'error');
 
@@ -487,14 +487,14 @@
                 const emri = r.produktet ? r.produktet.emri_produktit : 'Nuk gjendet';
                 const lloji = r.produktet && r.produktet.eshte_i_ftohte ? 'I Ftohtë' : 'Normal';
                 const sh = r.shënime ? r.shënime.replace(/,/g, '') : ''; // Heq presjet
-                csvContent += ${emri},${r.data_e_numërimit},${r.sasia_e_numëruar},${lloji},${sh}\n;
+                csvContent += `${emri},${r.data_e_numërimit},${r.sasia_e_numëruar},${lloji},${sh}\n`;
             });
 
             // Krijimi i linkut të shkarkimit
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", Historiku_Stokut_${dataFillimi}_deri_${dataMbarimit}.csv);
+            link.setAttribute("download", `Historiku_Stokut_${dataFillimi}_deri_${dataMbarimit}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -516,7 +516,7 @@
                 .order('emri_produktit', { ascending: true });
 
             if (error) {
-                listaDiv.innerHTML = Gabim: ${error.message};
+                listaDiv.innerHTML = `Gabim: ${error.message}`;
                 return;
             }
 
@@ -593,10 +593,10 @@
                 if (error.code === '23505') {
                     shfaqAlert("Gabim: Një produkt me këtë emër tashmë ekziston.");
                 } else {
-                    shfaqAlert(Gabim ruajtje: ${error.message});
+                    shfaqAlert(`Gabim ruajtje: ${error.message}`);
                 }
             } else {
-                shfaqAlert(Produkti u ruajt me sukses!, 'sukses');
+                shfaqAlert(`Produkti u ruajt me sukses!`, 'sukses');
                 // Pastrimi dhe rifreskimi
                 document.getElementById('produkt-id-per-ndryshim').value = '';
                 document.getElementById('emri-i-ri-produktit').value = '';
@@ -618,7 +618,7 @@
                 .eq('user_id', perdoruesi.id);
 
             if (error) {
-                shfaqAlert(Gabim fshirje: ${error.message});
+                shfaqAlert(`Gabim fshirje: ${error.message}`);
             } else {
                 shfaqAlert("Produkti u fshi me sukses.", 'sukses');
                 ngarkoProduktetMenaxhim();
@@ -645,7 +645,7 @@
             });
 
             if (error) {
-                shfaqAlert(Gabim në ndryshim: ${error.message});
+                shfaqAlert(`Gabim në ndryshim: ${error.message}`);
             } else {
                 shfaqAlert("Email u ndryshua. Ju lutemi konfirmoni adresën e re në kutinë tuaj hyrëse.", 'sukses');
                 document.getElementById('email-i-ri').value = '';
@@ -666,7 +666,7 @@
             });
 
             if (error) {
-                shfaqAlert(Gabim në rivendosje: ${error.message});
+                shfaqAlert(`Gabim në rivendosje: ${error.message}`);
             } else {
                 shfaqAlert("Fjalëkalimi u rivendos me sukses. Ju duhet të kyçeni sërish.", 'sukses');
                 dilNgaLlogaria();
