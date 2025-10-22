@@ -1,608 +1,678 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="sq">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Bark Kafe - Envanter Sayım Uygulaması</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bark Kafe - Menaxhimi i Stokut</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    
     <style>
-        /* 2. CSS Stilleri (Minimalist ve Mobil Uyumlu) */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-color: #f4f4f4;
             color: #333;
         }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #5C6BC0; /* Mor tonu */
+        header {
+            background-color: #5D4037; /* Kafe/Bar Rrënjë */
+            color: white;
+            padding: 15px 20px;
             text-align: center;
         }
-        input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], button {
-            width: 100%;
-            padding: 12px;
+        nav button {
+            background-color: #795548;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav button:hover {
+            background-color: #4E342E;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2, h3 {
+            color: #795548;
+            border-bottom: 2px solid #efebe9;
+            padding-bottom: 5px;
+        }
+        input[type="email"], input[type="password"], input[type="text"], input[type="number"], input[type="date"] {
+            width: 95%;
+            padding: 10px;
             margin: 8px 0;
-            box-sizing: border-box;
+            display: inline-block;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 16px; /* Mobil zoom'u önlemek için kritik */
+            box-sizing: border-box;
+            font-size: 16px; /* E rëndësishme për të parandaluar zmadhimin në celular */
         }
         button {
-            background-color: #7986CB; /* Daha açık mor */
+            background-color: #8D6E63;
             color: white;
-            cursor: pointer;
+            padding: 10px 15px;
+            margin-top: 10px;
             border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
             transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #5C6BC0;
+            background-color: #6D4C41;
         }
-        #suggerimenti-produktit {
-            border: 1px solid #ddd;
-            max-height: 150px;
-            overflow-y: auto;
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .alert {
+            background-color: #ffe0b2;
+            color: #e65100;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
         }
-        #suggerimenti-produktit li {
+        /* Stilet e listës së produkteve në Numërim */
+        .lista-produktit-autocomplete div {
             padding: 10px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
         }
-        #suggerimenti-produktit li:hover {
-            background-color: #e0e0e0;
-        }
-        .section {
-            display: none; /* JavaScript ile kontrol edilecek */
+        .lista-produktit-autocomplete div:hover {
+            background-color: #efebe9;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>BARK KAFA - Menaxhimi i Stokut</h1>
+        <nav id="navbar" style="display:none;">
+            <button onclick="shfaqFaqen('numërimi')">Numërimi i Stokut</button>
+            <button onclick="shfaqFaqen('historiku')">Historiku</button>
+            <button onclick="shfaqFaqen('produktet')">Produktet</button>
+            <button onclick="shfaqFaqen('cilësimet')">Cilësimet</button>
+            <button onclick="dilNgaLlogaria()">Dil</button>
+        </nav>
+    </header>
 
-<div class="container">
-    
-    <div id="auth-section" class="section">
-        <h1>Bark Kafe - Envanter</h1>
-        <h2>Giriş / Kayıt</h2>
-        
-        <div id="auth-form">
-            <input type="email" id="auth-email" placeholder="E-posta Adresi">
-            <input type="password" id="auth-password" placeholder="Şifre">
-            <button id="btn-login">Giriş Yap</button>
-            <button id="btn-signup">Kaydol</button>
-            <button id="btn-forgot-password">Şifremi Unuttum</button>
-        </div>
-    </div>
+    <main id="app-container">
+        <div id="mesazhi-alert" class="alert"></div>
 
-    <div id="main-section" class="section">
-        <h2>Envanter Sayımı</h2>
-        
-        <input type="text" id="product-search" placeholder="Ürün Ara (Kola, Bira...)">
-        
-        <ul id="product-suggestions"></ul>
-        
-        <div id="count-entry-area" style="display:none;">
-            <h3 id="active-product-name">Seçilen Ürün:</h3>
-            <input type="number" id="count-amount" placeholder="Sayım Miktarı (Adet/Şişe)">
-            <button id="btn-register-count">Sayımı Kaydet (OK)</button>
-        </div>
-        
-        <hr>
-        
-        <h3>Navigasyon</h3>
-        <button id="btn-go-to-products">Ürünleri Yönet/Ekle</button>
-        <button id="btn-go-to-history">Geçmiş Kayıtlar ve İndir</button>
-        <button id="btn-go-to-settings">Ayarlar</button>
-        <button id="btn-logout">Çıkış Yap</button>
-    </div>
+        <section id="hyrja-regjistrimi">
+            <h2>Hyrje / Regjistrim</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="fjalëkalimi" placeholder="Fjalëkalimi">
+            <button onclick="hyrja()">Hyr (Giriş Yap)</button>
+            <button onclick="regjistrimi()">Regjistrohu (Kayıt Ol)</button>
+            <button onclick="resetFjalekaliminEmail()">Harrova Fjalëkalimin</button>
+        </section>
 
-    <div id="products-section" class="section">
-        <h2>Ürünleri Yönet</h2>
-        
-        <h3>Yeni Ürün Ekle</h3>
-        <input type="text" id="new-product-name" placeholder="Ürün Adı (p.ş. Kırmızı Şarap)">
-        <input type="text" id="new-product-unit" placeholder="Birimi (p.ş. Şişe/Kutu/Fıçı)">
-        <button id="btn-add-product">Ürünü Ekle</button>
-
-        <h3>Mevcut Ürünler</h3>
-        <ul id="product-list">
-            </ul>
-        
-        <button id="btn-back-from-products">Ana Sayfaya Dön</button>
-    </div>
-
-    <div id="history-section" class="section">
-        <h2>Geçmiş Envanter Kayıtları</h2>
-        
-        <h3>Tarih Aralığı Seçimi</h3>
-        <label for="date-from">Başlangıç:</label>
-        <input type="date" id="date-from">
-        <label for="date-to">Bitiş:</label>
-        <input type="date" id="date-to">
-        <button id="btn-show-history">Kayıtları Göster</button>
-        
-        <hr>
-        
-        <button id="btn-download-month">Bu Ayın Kayıtlarını İndir (CSV)</button>
-        <button id="btn-download-selected">Seçilen Tarihleri İndir (CSV)</button>
-
-        <h3>Kayıt Listesi</h3>
-        <div id="count-history-list">
+        <section id="numërimi" style="display:none;">
+            <h2>Numërimi Ditor i Stokut</h2>
+            <input type="text" id="kërko-produkt" placeholder="Kërko Produktin...">
+            <div id="lista-produktit-autocomplete" class="lista-produktit-autocomplete">
+                </div>
+            
+            <div id="numërimi-i-produktit" style="border: 1px solid #ccc; padding: 15px; margin-top: 15px; border-radius: 5px; display:none;">
+                <h3 id="emri-produktit-për-numërim"></h3>
+                <input type="hidden" id="produkt-id-per-numërim">
+                <input type="number" id="sasia-e-numëruar" placeholder="Sasia e numëruar (p.sh. 15)" min="0">
+                <textarea id="shenime-numërimi" placeholder="Shënime (opsionale)"></textarea>
+                <button onclick="ruajNumërimin()">Ruaj Numërimin (OK)</button>
             </div>
+        </section>
 
-        <button id="btn-back-from-history">Ana Sayfaya Dön</button>
-    </div>
+        <section id="historiku" style="display:none;">
+            <h2>Historiku i Numërimeve</h2>
+            <label for="data-fillimi">Nga Data:</label>
+            <input type="date" id="data-fillimi">
+            <label for="data-mbarimit">Deri në Datën:</label>
+            <input type="date" id="data-mbarimit">
+            <button onclick="ngarkoHistorikun()">Shfaq Historikun</button>
+            <button onclick="shkarkoTëDhënat()">Shkarko Të Dhënat (CSV)</button>
+            
+            <div id="lista-historikut">
+                </div>
+        </section>
 
-    <div id="settings-section" class="section">
-        <h2>Ayarlar</h2>
+        <section id="produktet" style="display:none;">
+            <h2>Menaxhimi i Produkteve</h2>
+            <input type="hidden" id="produkt-id-per-ndryshim">
+            <input type="text" id="emri-i-ri-produktit" placeholder="Emri i Produktit">
+            <input type="number" id="sasia-min-alarmit" placeholder="Sasia Min. e Alarmit (p.sh. 10)">
+            <label style="display: block; margin: 10px 0;">
+                <input type="checkbox" id="eshte-i-ftohte" checked> Është Produkt i Ftohtë (Sash)
+            </label>
+            <button onclick="shtoOseNdryshoProdukt()">Shto / Ruaj Produktin</button>
+            
+            <h3>Lista Aktuale</h3>
+            <div id="lista-e-produkteve-menaxhimi">
+                </div>
+        </section>
         
-        <h3>E-posta Adresini Değiştir</h3>
-        <input type="email" id="new-email" placeholder="Yeni E-posta Adresi">
-        <button id="btn-update-email">E-postayı Güncelle</button>
-        
-        <hr>
-        
-        <h3>Şifreyi Sıfırla (Site İçi)</h3>
-        <p>Girdiğiniz e-posta adresine bir sıfırlama linki gönderilecektir. Bu linke tıkladıktan sonra uygulamaya geri dönerek yeni şifrenizi belirleyebilirsiniz.</p>
-        <button id="btn-send-reset-email">Şifre Sıfırlama E-postası Gönder</button>
+        <section id="cilësimet" style="display:none;">
+            <h2>Cilësimet</h2>
+            
+            <h3>Ndrysho Emailin</h3>
+            <input type="email" id="email-i-ri" placeholder="Emaili i Ri">
+            <input type="password" id="fjalëkalimi-aktual-email" placeholder="Fjalëkalimi Aktual">
+            <button onclick="ndryshoEmailin()">Ndrysho Emailin</button>
 
-        <button id="btn-back-from-settings">Ana Sayfaya Dön</button>
-    </div>
+            <h3>Rivendos Fjalëkalimin</h3>
+            <input type="password" id="fjalëkalimi-i-ri" placeholder="Fjalëkalimi i Ri">
+            <input type="password" id="fjalëkalimi-i-ri-konfirmo" placeholder="Konfirmo Fjalëkalimin">
+            <button onclick="rivendosFjalëkaliminNëCilësime()">Rivendos Fjalëkalimin</button>
+        </section>
+    </main>
+    
+    <script>
+        // ======================================================================
+        // I. KONFIGURIMI I SUPABASE (Supabase Ayarları)
+        // ======================================================================
+        const SUPABASE_URL = 'https://oryjcnwvfeuugjogexdo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeWpjbnd2ZmV1dWdqb2dleGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5ODUzODUsImV4cCI6MjA3NjU2MTM4NX0.hicdNybxqXpK840ksn7sZvhI8V1NSG46PZvxrgjvLms';
 
-</div>
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let perdoruesi = null; // Përdoruesi aktual
 
-<script>
-    // Supabase Kimlik Bilgilerinizi Buraya Ekleyin
-    const SUPABASE_URL = 'SENIN_SUPABASE_URL_IN'; // Supabase panelinizden alın
-    const SUPABASE_ANON_KEY = 'SENIN_SUPABASE_ANON_KEYIN'; // Supabase panelinizden alın
+        // ======================================================================
+        // II. FUNKSIONET KRYESORE TË NAVIGIMIT DHE SHFAQJES
+        // ======================================================================
 
-    // Supabase İstemcisini Başlat
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ==========================================
-    // Yardımcı Fonksiyonlar (Görünürlüğü Kontrol Etme)
-    // ==========================================
-
-    const showSection = (id) => {
-        document.querySelectorAll('.section').forEach(section => {
-            section.style.display = 'none';
-        });
-        document.getElementById(id).style.display = 'block';
-    }
-
-    // ==========================================
-    // 1. OTURUM YÖNETİMİ VE YÖNLENDİRME
-    // ==========================================
-
-    /**
-     * Oturum durumunu kontrol eder ve kullanıcıyı ilgili sayfaya yönlendirir.
-     */
-    async function checkAuthStatus() {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-            // Kullanıcı giriş yapmış, ana sayfayı göster
-            showSection('main-section');
-            // Gerekirse URL'deki hash'i kontrol et (p.ş. şifre sıfırlama sonrası)
-            checkPasswordRecovery();
-        } else {
-            // Kullanıcı giriş yapmamış, giriş/kayıt sayfasını göster
-            showSection('auth-section');
+        /** Shfaq mesazhe alarmi */
+        function shfaqAlert(mesazhi, tipi = 'error') {
+            const alertDiv = document.getElementById('mesazhi-alert');
+            alertDiv.innerText = mesazhi;
+            alertDiv.style.backgroundColor = tipi === 'error' ? '#ffcdd2' : '#c8e6c9';
+            alertDiv.style.color = tipi === 'error' ? '#b71c1c' : '#2e7d32';
+            alertDiv.style.display = 'block';
+            setTimeout(() => { alertDiv.style.display = 'none'; }, 5000);
         }
-    }
 
-    /**
-     * URL'deki şifre sıfırlama durumunu kontrol eder ve yeni şifre ister.
-     */
-    async function checkPasswordRecovery() {
-        // Supabase'in şifre sıfırlama linki, kullanıcıyı uygulamaya geri yönlendirir ve oturumu açar.
-        // Bu noktada, kullanıcıdan yeni şifreyi alıp güncellemeliyiz.
+        /** Fsheh të gjitha seksionet dhe shfaq atë të kërkuarin */
+        function shfaqFaqen(faqjaID) {
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(faqjaID).style.display = 'block';
 
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const type = urlParams.get('type');
-        
-        if (type === 'recovery') {
-            const newPassword = prompt("Yeni Şifrenizi Girin:");
-            if (newPassword) {
-                const { error } = await supabase.auth.updateUser({ password: newPassword });
-                if (error) {
-                    alert("Şifre güncellenirken hata oluştu: " + error.message);
-                } else {
-                    alert("Şifreniz başarıyla güncellendi! Lütfen yeni şifrenizle giriş yapın.");
-                    await supabase.auth.signOut(); // Güvenlik için oturumu kapat
-                    window.location.hash = ''; // URL'yi temizle
-                    showSection('auth-section');
-                }
+            // Funksione specifike për ngarkimin e të dhënave pas ndërrimit të faqes
+            if (faqjaID === 'produktet') ngarkoProduktetMenaxhim();
+            if (faqjaID === 'historiku') ngarkoHistorikunMujorParazgjedhur();
+        }
+
+        /** Kontrollon nëse përdoruesi është i kyçur */
+        async function kontrolloStatusinELlogarisë() {
+            const { data: { user } } = await supabase.auth.getUser();
+            perdoruesi = user;
+
+            if (perdoruesi) {
+                document.getElementById('navbar').style.display = 'block';
+                shfaqFaqen('numërimi');
             } else {
-                 alert("Şifre sıfırlama iptal edildi.");
+                document.getElementById('navbar').style.display = 'none';
+                shfaqFaqen('hyrja-regjistrimi');
             }
         }
-    }
+        
+        // ======================================================================
+        // III. AUTHENTICATION (Kimlik Doğrulama)
+        // ======================================================================
 
+        /** Hyrja në llogari (Giriş Yap) */
+        async function hyrja() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('fjalëkalimi').value;
+            
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    // Giriş/Kayıt Olay Dinleyicileri
-    document.getElementById('btn-login').onclick = async () => {
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-            alert("Giriş Başarısız: " + error.message);
-        } else {
-            showSection('main-section');
-        }
-    };
-
-    document.getElementById('btn-signup').onclick = async () => {
-        const email = document.getElementById('auth-email').value;
-        const password = document.getElementById('auth-password').value;
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) {
-            alert("Kayıt Başarısız: " + error.message);
-        } else {
-            alert("Kayıt Başarılı! Lütfen e-postanızı kontrol ederek hesabınızı onaylayın.");
-        }
-    };
-
-    document.getElementById('btn-logout').onclick = async () => {
-        await supabase.auth.signOut();
-        showSection('auth-section');
-    };
-
-    // Uygulama başlangıcında oturum durumunu kontrol et
-    checkAuthStatus();
-
-    // ==========================================
-    // 2. ENVANTER SAYIM VE ÜRÜN ARAMA FONKSİYONU
-    // ==========================================
-    
-    let activeProduct = null;
-
-    document.getElementById('product-search').oninput = async (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const suggestionsList = document.getElementById('product-suggestions');
-        suggestionsList.innerHTML = ''; // Listeyi temizle
-        document.getElementById('count-entry-area').style.display = 'none';
-
-        if (searchTerm.length < 2) return;
-
-        // Supabase Ürün Arama (İlk harfini yazınca önermesi istendi)
-        const { data, error } = await supabase
-            .from('product') // Kendi tablonuzun adını girin (p.ş. 'produktet')
-            .select('id, name')
-            .ilike('name', `${searchTerm}%`) // İlk harf ile başlayanları getir
-            .limit(10);
-
-        if (error) {
-            console.error(error);
-            return;
+            if (error) {
+                shfaqAlert(Gabim në Hyrje: ${error.message});
+            } else {
+                shfaqAlert("Hyrje me sukses!", 'sukses');
+                kontrolloStatusinELlogarisë();
+            }
         }
 
-        data.forEach(product => {
-            const li = document.createElement('li');
-            li.textContent = product.name;
-            li.onclick = () => selectProduct(product);
-            suggestionsList.appendChild(li);
-        });
-    };
-
-    function selectProduct(product) {
-        activeProduct = product;
-        document.getElementById('product-search').value = product.name;
-        document.getElementById('product-suggestions').innerHTML = ''; // Öneri listesini temizle
-        document.getElementById('active-product-name').textContent = `Seçilen Ürün: ${product.name}`;
-        document.getElementById('count-entry-area').style.display = 'block';
-        document.getElementById('count-amount').focus(); // Miktar alanına odaklan
-    }
-
-    document.getElementById('btn-register-count').onclick = async () => {
-        if (!activeProduct) {
-            alert("Lütfen önce bir ürün seçin.");
-            return;
-        }
-
-        const countAmount = parseInt(document.getElementById('count-amount').value);
-        if (isNaN(countAmount) || countAmount < 0) {
-            alert("Geçerli bir miktar girin.");
-            return;
-        }
-
-        const { data: { user } } = await supabase.auth.getUser();
-
-        // Supabase Envanter Kaydı
-        const { error } = await supabase
-            .from('inventory') // Kendi tablonuzun adını girin (p.ş. 'inventari')
-            .insert({
-                product_id: activeProduct.id,
-                amount: countAmount,
-                user_id: user.id // Kaydı yapan kullanıcıyı tut
-                // data_regjistrimit (Supabase'de varsayılan olarak NOW() ayarlanabilir)
+        /** Regjistrimi i ri (Kayıt Ol) */
+        async function regjistrimi() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('fjalëkalimi').value;
+            
+            const { error } = await supabase.auth.signUp({ 
+                email, 
+                password,
+                options: {
+                    emailRedirectTo: window.location.origin, 
+                }
             });
 
-        if (error) {
-            alert("Sayım kaydedilirken hata oluştu: " + error.message);
-        } else {
-            alert(`${activeProduct.name} için ${countAmount} adet sayım başarıyla kaydedildi!`);
-            // Formu sıfırla
-            document.getElementById('product-search').value = '';
-            document.getElementById('count-amount').value = '';
-            document.getElementById('count-entry-area').style.display = 'none';
-            activeProduct = null;
-        }
-    };
-    
-    // ==========================================
-    // 3. NAVİGASYON VE ROTA YÖNETİMİ
-    // ==========================================
-
-    document.getElementById('btn-go-to-products').onclick = () => {
-        showSection('products-section');
-        // Ürün listesini yükle
-        loadProductList(); 
-    };
-
-    document.getElementById('btn-go-to-history').onclick = () => {
-        showSection('history-section');
-        // İndirme işlemleri için başlangıç/bitiş tarihlerini ayarla (örneğin bu ay)
-        setupDateRange(); 
-    };
-    
-    document.getElementById('btn-go-to-settings').onclick = () => {
-        showSection('settings-section');
-    };
-
-    document.getElementById('btn-back-from-products').onclick = () => showSection('main-section');
-    document.getElementById('btn-back-from-history').onclick = () => showSection('main-section');
-    document.getElementById('btn-back-from-settings').onclick = () => showSection('main-section');
-
-    // ==========================================
-    // 4. ÜRÜN YÖNETİMİ FONKSİYONLARI
-    // ==========================================
-
-    async function loadProductList() {
-        const productList = document.getElementById('product-list');
-        productList.innerHTML = '<li>Yükleniyor...</li>';
-
-        const { data, error } = await supabase
-            .from('product') // 'produktet'
-            .select('id, name, unit');
-
-        if (error) {
-            productList.innerHTML = `<li>Hata: ${error.message}</li>`;
-            return;
+            if (error) {
+                shfaqAlert(Gabim në Regjistrim: ${error.message});
+            } else {
+                shfaqAlert("Regjistrimi u krye. Kontrolloni emailin tuaj për konfirmim!", 'sukses');
+            }
         }
 
-        productList.innerHTML = '';
-        data.forEach(product => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                ${product.name} (${product.unit})
-                <button onclick="editProduct('${product.id}', '${product.name}', '${product.unit}')" style="width: auto; float: right; margin-left: 10px;">Düzenle</button>
-            `;
-            productList.appendChild(li);
-        });
-    }
-
-    document.getElementById('btn-add-product').onclick = async () => {
-        const name = document.getElementById('new-product-name').value.trim();
-        const unit = document.getElementById('new-product-unit').value.trim();
-
-        if (!name || !unit) {
-            alert("Lütfen ürün adı ve birimini girin.");
-            return;
+        /** Dil nga llogaria (Çıkış Yap) */
+        async function dilNgaLlogaria() {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                shfaqAlert(Gabim në dalje: ${error.message});
+            } else {
+                shfaqAlert("Dolët me sukses!", 'sukses');
+                kontrolloStatusinELlogarisë();
+            }
         }
 
-        const { error } = await supabase
-            .from('product') // 'produktet'
-            .insert([{ name, unit }]);
+        /** Rivendos Fjalëkalimin (Harrova Fjalëkalimin - E-mail) */
+        async function resetFjalekaliminEmail() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                shfaqAlert("Ju lutemi vendosni emailin tuaj në fushën e Hyrjes.");
+                return;
+            }
+            
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/reset-password.html', // Duhet të keni një faqe të veçantë
+            });
 
-        if (error) {
-            alert("Ürün eklenirken hata: " + error.message);
-        } else {
-            alert("Ürün başarıyla eklendi!");
-            document.getElementById('new-product-name').value = '';
-            document.getElementById('new-product-unit').value = '';
-            loadProductList();
-        }
-    };
-    
-    // Düzenleme fonksiyonu (Basitleştirilmiş Prompt kullanımı)
-    window.editProduct = async (id, oldName, oldUnit) => {
-        const newName = prompt(`Yeni ürün adını girin (Eski: ${oldName}):`, oldName);
-        if (newName === null || newName.trim() === "") return;
-
-        const newUnit = prompt(`Yeni birimi girin (Eski: ${oldUnit}):`, oldUnit);
-        if (newUnit === null || newUnit.trim() === "") return;
-
-        const { error } = await supabase
-            .from('product') // 'produktet'
-            .update({ name: newName, unit: newUnit })
-            .eq('id', id);
-
-        if (error) {
-            alert("Ürün güncellenirken hata: " + error.message);
-        } else {
-            alert("Ürün başarıyla güncellendi!");
-            loadProductList();
-        }
-    };
-    
-    // ==========================================
-    // 5. AYARLAR FONKSİYONLARI
-    // ==========================================
-
-    document.getElementById('btn-send-reset-email').onclick = async () => {
-        const email = document.getElementById('auth-email').value; // Giriş ekranındaki e-postayı kullanmak ideal
-        if (!email) {
-            alert("Lütfen şifre sıfırlama için e-posta adresinizi girin.");
-            return;
+            if (error) {
+                shfaqAlert(Gabim: ${error.message});
+            } else {
+                shfaqAlert("Linku i rivendosjes u dërgua në emailin tuaj.", 'sukses');
+            }
         }
 
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-             // Kullanıcı şifre sıfırlama linkine tıkladığında yönlendirileceği URL
-             redirectTo: window.location.origin + window.location.pathname 
-        });
-
-        if (error) {
-            alert("Şifre sıfırlama e-postası gönderilirken hata: " + error.message);
-        } else {
-            alert("Şifre sıfırlama e-postası başarıyla gönderildi. Lütfen e-postanızı kontrol edin.");
-        }
-    };
-    
-    document.getElementById('btn-update-email').onclick = async () => {
-        const newEmail = document.getElementById('new-email').value;
-        if (!newEmail || !newEmail.includes('@')) {
-            alert("Lütfen geçerli bir e-posta adresi girin.");
-            return;
-        }
-
-        const { error } = await supabase.auth.updateUser({ email: newEmail });
-
-        if (error) {
-            alert("E-posta güncellenirken hata: " + error.message);
-        } else {
-            alert("E-posta güncelleme talebi gönderildi. Lütfen yeni e-posta adresinize gelen linki onaylayın.");
-            document.getElementById('new-email').value = '';
-        }
-    };
-
-    // ==========================================
-    // 6. GEÇMİŞ VE İNDİRME FONKSİYONLARI
-    // ==========================================
-    
-    function setupDateRange() {
-        // Otomatik olarak bu ayın ilk gününü ve bugünü ayarla
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        const today = now.toISOString().split('T')[0];
+        // ======================================================================
+        // IV. FUNKSIONET E STOKUT (Stok İşlemleri)
+        // ======================================================================
         
-        document.getElementById('date-from').value = firstDay;
-        document.getElementById('date-to').value = today;
-        
-        // Başlangıçta bu ayın kayıtlarını göster
-        document.getElementById('btn-show-history').click();
-    }
+        let produktiIDAktual = null; // ID-ja e produktit të zgjedhur
 
-    document.getElementById('btn-show-history').onclick = async () => {
-        const dateFrom = document.getElementById('date-from').value;
-        const dateTo = document.getElementById('date-to').value;
-        
-        await loadHistory(dateFrom, dateTo);
-    };
+        // Autokompletimi i Kërkimit
+        document.getElementById('kërko-produkt').addEventListener('input', debounce(kërkoProduktin, 300));
 
-    async function loadHistory(from, to) {
-        const historyList = document.getElementById('count-history-list');
-        historyList.innerHTML = 'Yükleniyor...';
+        async function kërkoProduktin(e) {
+            const term = e.target.value.toLowerCase().trim();
+            const listaDiv = document.getElementById('lista-produktit-autocomplete');
+            listaDiv.innerHTML = '';
+            document.getElementById('numërimi-i-produktit').style.display = 'none';
 
-        // Tarih filtresiyle Supabase sorgusu
-        const { data, error } = await supabase
-            .from('inventory') // 'inventari'
-            .select(`
-                amount,
-                data_regjistrimit,
-                product:product_id (name)
-            `)
-            .gte('data_regjistrimit', from)
-            .lte('data_regjistrimit', to + 'T23:59:59.999Z') // Bitiş gününün sonunu dahil et
-            .order('data_regjistrimit', { ascending: false });
+            if (term.length < 2) return;
 
-        if (error) {
-            historyList.innerHTML = `Hata: ${error.message}`;
-            return;
+            const { data, error } = await supabase
+                .from('produktet')
+                .select('id, emri_produktit')
+                .ilike('emri_produktit', %${term}%)
+                .eq('user_id', perdoruesi.id) // Vetëm produktet e përdoruesit
+                .limit(10);
+
+            if (error) return shfaqAlert(Gabim kërkimi: ${error.message});
+
+            data.forEach(p => {
+                const div = document.createElement('div');
+                div.innerText = p.emri_produktit;
+                div.onclick = () => zgjidhProduktin(p.id, p.emri_produktit);
+                listaDiv.appendChild(div);
+            });
         }
 
-        historyList.innerHTML = '';
-        if (data.length === 0) {
-            historyList.innerHTML = '<p>Seçilen tarihler arasında kayıt bulunamadı.</p>';
-            return;
+        /** Zgjedh një produkt për numërim */
+        function zgjidhProduktin(id, emri) {
+            produktiIDAktual = id;
+            document.getElementById('emri-produktit-për-numërim').innerText = Numërimi i: ${emri};
+            document.getElementById('produkt-id-per-numërim').value = id;
+            document.getElementById('kërko-produkt').value = emri;
+            document.getElementById('lista-produktit-autocomplete').innerHTML = ''; // Fsheh listën
+            document.getElementById('numërimi-i-produktit').style.display = 'block';
+            document.getElementById('sasia-e-numëruar').focus();
         }
 
-        // Kayıtları liste formatında göster
-        data.forEach(item => {
-            const p = document.createElement('p');
-            const date = new Date(item.data_regjistrimit).toLocaleString('tr-TR');
-            p.textContent = `${date}: ${item.product.name} - ${item.amount} Adet`;
-            historyList.appendChild(p);
-        });
+        /** Ruaj Numërimin (INSERT/UPSERT) */
+        async function ruajNumërimin() {
+            const produkt_id = document.getElementById('produkt-id-per-numërim').value;
+            const sasia = parseInt(document.getElementById('sasia-e-numëruar').value);
+            const shënime = document.getElementById('shenime-numërimi').value;
+
+            if (!produkt_id || isNaN(sasia) || sasia < 0) {
+                return shfaqAlert("Ju lutemi zgjidhni një produkt dhe vendosni një sasi të vlefshme.");
+            }
+
+            const regjistrimi = {
+                produkt_id: produkt_id,
+                sasia_e_numëruar: sasia,
+                shënime: shënime,
+                user_id: perdoruesi.id,
+                // Supabase do të përdorë 'current_date' për 'data_e_numërimit' (nga SQL RLS)
+            };
+
+            // Përdorim 'upsert' që nëse ka një numërim për këtë produkt sot, ta ndryshojë.
+            const { error } = await supabase
+                .from('regjistrimet_e_numërimit')
+                .upsert(regjistrimi, { onConflict: 'produkt_id, data_e_numërimit, user_id' });
+
+            if (error) {
+                shfaqAlert(Gabim gjatë ruajtjes: ${error.message});
+            } else {
+                shfaqAlert("Numërimi u ruajt me sukses! Ju mund ta ndryshoni sot sërish.", 'sukses');
+                // Pastrimi i fushave pas ruajtjes
+                document.getElementById('kërko-produkt').value = '';
+                document.getElementById('sasia-e-numëruar').value = '';
+                document.getElementById('shenime-numërimi').value = '';
+                document.getElementById('numërimi-i-produktit').style.display = 'none';
+            }
+        }
         
-        return data; // İndirme fonksiyonları için veriyi geri döndür
-    }
+        // ======================================================================
+        // V. FUNKSIONET E HISTORIKUT (Historik İşlemleri)
+        // ======================================================================
 
-    // İndirme Fonksiyonları (CSV Oluşturma)
-    
-    // Yardımcı fonksiyon: Veriyi CSV formatına dönüştürür
-    function convertToCSV(data) {
-        if (data.length === 0) return '';
+        /** Ngarkon të dhënat e historikut brenda një periudhe */
+        async function ngarkoHistorikun() {
+            const dataFillimi = document.getElementById('data-fillimi').value;
+            const dataMbarimit = document.getElementById('data-mbarimit').value;
+            const listaDiv = document.getElementById('lista-historikut');
+            listaDiv.innerHTML = 'Duke ngarkuar...';
+
+            if (!dataFillimi || !dataMbarimit) {
+                shfaqAlert("Ju lutemi zgjidhni datat.");
+                listaDiv.innerHTML = '';
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('regjistrimet_e_numërimit')
+                .select(`
+                    sasia_e_numëruar, 
+                    data_e_numërimit, 
+                    shënime, 
+                    produktet (emri_produktit)
+                `)
+                .eq('user_id', perdoruesi.id)
+                .gte('data_e_numërimit', dataFillimi)
+                .lte('data_e_numërimit', dataMbarimit)
+                .order('data_e_numërimit', { ascending: false });
+
+            if (error) {
+                listaDiv.innerHTML = '';
+                return shfaqAlert(Gabim historiku: ${error.message});
+            }
+
+            // Shfaqja në listë
+            if (data.length === 0) {
+                listaDiv.innerHTML = '<p>Nuk u gjet asnjë regjistrim për periudhën e zgjedhur.</p>';
+                return;
+            }
+
+            let html = '<ul>';
+            data.forEach(r => {
+                const emri = r.produktet ? r.produktet.emri_produktit : 'Produkt i Fshirë';
+                const sh = r.shënime ? ` (${r.shënime})` : '';
+                html += <li>[${r.data_e_numërimit}] <b>${emri}</b>: ${r.sasia_e_numëruar} njësi ${sh}</li>;
+            });
+            html += '</ul>';
+            listaDiv.innerHTML = html;
+        }
         
-        // Başlıkları (Header) oluştur
-        const headers = ["Ürün Adı", "Miktar", "Kayıt Tarihi"];
-        const csv = [headers.join(',')];
+        /** Ngarkon historikun e muajit aktual si parazgjedhje */
+        function ngarkoHistorikunMujorParazgjedhur() {
+            const sot = new Date();
+            const fillimiIMuajit = new Date(sot.getFullYear(), sot.getMonth(), 1).toISOString().split('T')[0];
+            const sotString = sot.toISOString().split('T')[0];
+            
+            document.getElementById('data-fillimi').value = fillimiIMuajit;
+            document.getElementById('data-mbarimit').value = sotString;
 
-        // Veri satırlarını oluştur
-        data.forEach(item => {
-            const productName = item.product.name.replace(/,/g, ''); // Virgülleri temizle
-            const date = new Date(item.data_regjistrimit).toLocaleString('tr-TR');
-            csv.push([productName, item.amount, date].join(','));
-        });
+            ngarkoHistorikun();
+        }
 
-        return csv.join('\n');
-    }
 
-    // Yardımcı fonksiyon: CSV dosyasını indirir
-    function downloadCSV(csv, filename) {
-        const blob = new Blob(["\ufeff", csv], { type: 'text/csv;charset=utf-8;' }); // BOM ekle (Türkçe karakterler için)
-        const link = document.createElement("a");
-        if (link.download !== undefined) { 
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", filename);
-            link.style.visibility = 'hidden';
+        /** Shkarko Të Dhënat (CSV) */
+        async function shkarkoTëDhënat() {
+            const dataFillimi = document.getElementById('data-fillimi').value;
+            const dataMbarimit = document.getElementById('data-mbarimit').value;
+            
+            const { data, error } = await supabase
+                .from('regjistrimet_e_numërimit')
+                .select(`
+                    sasia_e_numëruar, 
+                    data_e_numërimit, 
+                    shënime, 
+                    produktet (emri_produktit, eshte_i_ftohte)
+                `)
+                .eq('user_id', perdoruesi.id)
+                .gte('data_e_numërimit', dataFillimi)
+                .lte('data_e_numërimit', dataMbarimit)
+                .order('data_e_numërimit', { ascending: false });
+
+            if (error) return shfaqAlert(Gabim shkarkimi: ${error.message});
+            
+            if (data.length === 0) return shfaqAlert("Nuk ka të dhëna për t'u shkarkuar.", 'error');
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Headeri
+            csvContent += "Emri_Produktit,Data,Sasia,Lloji_Produktit,Shenime\n";
+            
+            // Të dhënat
+            data.forEach(r => {
+                const emri = r.produktet ? r.produktet.emri_produktit : 'Nuk gjendet';
+                const lloji = r.produktet && r.produktet.eshte_i_ftohte ? 'I Ftohtë' : 'Normal';
+                const sh = r.shënime ? r.shënime.replace(/,/g, '') : ''; // Heq presjet
+                csvContent += ${emri},${r.data_e_numërimit},${r.sasia_e_numëruar},${lloji},${sh}\n;
+            });
+
+            // Krijimi i linkut të shkarkimit
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", Historiku_Stokut_${dataFillimi}_deri_${dataMbarimit}.csv);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        } else {
-            alert("Tarayıcınız indirme işlemini desteklemiyor.");
         }
-    }
 
-    document.getElementById('btn-download-month').onclick = async () => {
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        const today = now.toISOString().split('T')[0];
+        // ======================================================================
+        // VI. FUNKSIONET E MENAXHIMIT TË PRODUKTEVE (Ürün Yönetimi)
+        // ======================================================================
+
+        /** Ngarkon listën e produkteve për menaxhim */
+        async function ngarkoProduktetMenaxhim() {
+            const listaDiv = document.getElementById('lista-e-produkteve-menaxhimi');
+            listaDiv.innerHTML = 'Duke ngarkuar...';
+
+            const { data, error } = await supabase
+                .from('produktet')
+                .select('*')
+                .eq('user_id', perdoruesi.id)
+                .order('emri_produktit', { ascending: true });
+
+            if (error) {
+                listaDiv.innerHTML = Gabim: ${error.message};
+                return;
+            }
+
+            if (data.length === 0) {
+                listaDiv.innerHTML = '<p>Nuk ka produkte të regjistruara.</p>';
+                return;
+            }
+
+            let html = '<table style="width:100%; border-collapse: collapse;">';
+            html += '<tr><th>Emri</th><th>Min. Alarm</th><th>Lloji</th><th>Veprimet</th></tr>';
+            
+            data.forEach(p => {
+                const lloji = p.eshte_i_ftohte ? 'I Ftohtë' : 'Normal';
+                html += `
+                    <tr>
+                        <td>${p.emri_produktit}</td>
+                        <td>${p.sasia_min_alarmit}</td>
+                        <td>${lloji}</td>
+                        <td>
+                            <button style="width:auto;" onclick="ndryshoProduktin(${p.id}, '${p.emri_produktit}', ${p.sasia_min_alarmit}, ${p.eshte_i_ftohte})">Ndrysho</button>
+                            <button style="width:auto; background-color: #d32f2f;" onclick="fshiProduktin(${p.id})">Fshi</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += '</table>';
+            listaDiv.innerHTML = html;
+        }
+
+        /** Përgatit formularin për ndryshim */
+        function ndryshoProduktin(id, emri, sasiaMin, eshteIFtohte) {
+            document.getElementById('produkt-id-per-ndryshim').value = id;
+            document.getElementById('emri-i-ri-produktit').value = emri;
+            document.getElementById('sasia-min-alarmit').value = sasiaMin;
+            document.getElementById('eshte-i-ftohte').checked = eshteIFtohte;
+            window.scrollTo(0, 0); // Kthehet në krye të formularit
+        }
+
+        /** Shton ose Ndryshon Produktin */
+        async function shtoOseNdryshoProdukt() {
+            const id = document.getElementById('produkt-id-per-ndryshim').value;
+            const emri = document.getElementById('emri-i-ri-produktit').value.trim();
+            const sasiaMin = parseInt(document.getElementById('sasia-min-alarmit').value || 0);
+            const eshteIFtohte = document.getElementById('eshte-i-ftohte').checked;
+
+            if (!emri) return shfaqAlert("Emri i produktit nuk mund të jetë bosh.");
+
+            const produktiData = {
+                emri_produktit: emri,
+                sasia_min_alarmit: sasiaMin,
+                eshte_i_ftohte: eshteIFtohte,
+                user_id: perdoruesi.id
+            };
+
+            let error;
+
+            if (id) {
+                // Ndryshim (Update)
+                const response = await supabase
+                    .from('produktet')
+                    .update(produktiData)
+                    .eq('id', id)
+                    .eq('user_id', perdoruesi.id);
+                error = response.error;
+            } else {
+                // Shtim (Insert)
+                const response = await supabase
+                    .from('produktet')
+                    .insert(produktiData);
+                error = response.error;
+            }
+
+            if (error) {
+                if (error.code === '23505') {
+                    shfaqAlert("Gabim: Një produkt me këtë emër tashmë ekziston.");
+                } else {
+                    shfaqAlert(Gabim ruajtje: ${error.message});
+                }
+            } else {
+                shfaqAlert(Produkti u ruajt me sukses!, 'sukses');
+                // Pastrimi dhe rifreskimi
+                document.getElementById('produkt-id-per-ndryshim').value = '';
+                document.getElementById('emri-i-ri-produktit').value = '';
+                document.getElementById('sasia-min-alarmit').value = '10';
+                ngarkoProduktetMenaxhim();
+            }
+        }
+
+        /** Fshirja e Produktit */
+        async function fshiProduktin(id) {
+            if (!confirm("A jeni i sigurt që dëshironi të fshini këtë produkt? Të gjitha numërimet e tij do të fshihen gjithashtu.")) {
+                return;
+            }
+
+            const { error } = await supabase
+                .from('produktet')
+                .delete()
+                .eq('id', id)
+                .eq('user_id', perdoruesi.id);
+
+            if (error) {
+                shfaqAlert(Gabim fshirje: ${error.message});
+            } else {
+                shfaqAlert("Produkti u fshi me sukses.", 'sukses');
+                ngarkoProduktetMenaxhim();
+            }
+        }
+
+        // ======================================================================
+        // VII. FUNKSIONET E CILËSIVE (Ayarlar İşlemleri)
+        // ======================================================================
+
+        /** Ndrysho Emailin */
+        async function ndryshoEmailin() {
+            const emailRi = document.getElementById('email-i-ri').value;
+            const passwordAktual = document.getElementById('fjalëkalimi-aktual-email').value;
+
+            // Supabase kërkon që të bëhet re-autentifikimi para se të ndryshohet emaili.
+            // Për thjeshtësi, e bëjmë ndryshimin direkt duke përdorur sessionin.
+
+            if (!emailRi) return shfaqAlert("Ju lutemi vendosni emailin e ri.");
+
+            // Shënim: Supabase automatikisht dërgon një email konfirmimi në emailin e ri.
+            const { error } = await supabase.auth.updateUser({ 
+                email: emailRi 
+            });
+
+            if (error) {
+                shfaqAlert(Gabim në ndryshim: ${error.message});
+            } else {
+                shfaqAlert("Email u ndryshua. Ju lutemi konfirmoni adresën e re në kutinë tuaj hyrëse.", 'sukses');
+                document.getElementById('email-i-ri').value = '';
+                document.getElementById('fjalëkalimi-aktual-email').value = '';
+            }
+        }
+
+        /** Rivendos Fjalëkalimin (Brenda Cilësimeve) */
+        async function rivendosFjalëkaliminNëCilësime() {
+            const passwordRi = document.getElementById('fjalëkalimi-i-ri').value;
+            const passwordRiKonfirmo = document.getElementById('fjalëkalimi-i-ri-konfirmo').value;
+
+            if (passwordRi.length < 6) return shfaqAlert("Fjalëkalimi duhet të jetë të paktën 6 karaktere.");
+            if (passwordRi !== passwordRiKonfirmo) return shfaqAlert("Fjalëkalimi i ri dhe konfirmimi nuk përputhen.");
+
+            const { error } = await supabase.auth.updateUser({ 
+                password: passwordRi 
+            });
+
+            if (error) {
+                shfaqAlert(Gabim në rivendosje: ${error.message});
+            } else {
+                shfaqAlert("Fjalëkalimi u rivendos me sukses. Ju duhet të kyçeni sërish.", 'sukses');
+                dilNgaLlogaria();
+            }
+        }
+
+        // ======================================================================
+        // VIII. UTILITY (Ndihmëse)
+        // ======================================================================
+
+        /** Funksion debouncing për kërkim (throttle) */
+        function debounce(func, timeout = 300) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
         
-        const data = await loadHistory(firstDay, today);
-        if (data && data.length > 0) {
-            const csvContent = convertToCSV(data);
-            downloadCSV(csvContent, `Bark_Kafe_Envanter_Bu_Ay_${today}.csv`);
-        } else {
-            alert("İndirilecek veri bulunamadı.");
-        }
-    };
-    
-    document.getElementById('btn-download-selected').onclick = async () => {
-        const dateFrom = document.getElementById('date-from').value;
-        const dateTo = document.getElementById('date-to').value;
+        // ======================================================================
+        // IX. INICIALIZIMI (Nisja)
+        // ======================================================================
+
+        // Kontrollo statusin e llogarisë kur ngarkohet faqja
+        kontrolloStatusinELlogarisë();
         
-        const data = await loadHistory(dateFrom, dateTo);
-        if (data && data.length > 0) {
-            const csvContent = convertToCSV(data);
-            downloadCSV(csvContent, `Bark_Kafe_Envanter_${dateFrom}_${dateTo}.csv`);
-        } else {
-            alert("İndirilecek veri bulunamadı.");
-        }
-    };
-
-</script>
-
+    </script>
 </body>
 </html>
